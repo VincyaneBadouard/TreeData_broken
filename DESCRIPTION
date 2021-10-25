@@ -1,16 +1,34 @@
 Package: TreeData
-Title: What the Package Does (One Line, Title Case)
+Title: Forest Inventories Harmonization & Correction.
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Vincyane",
+           family = "Badouard",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+           email = "vincyane.badouard@gmail.com"),
+      person(given = "Camille",
+           family = "Piponiot",
+           role = "aut",
+           email = "camille.piponiot@gmail.com"),
+      person(given = "Nino",
+           family = "Page",
+           role = "ctb",
+           email = "page.nino@gmail.com")
+           )
+Description: TreeData harmonises and corrects forest inventories.
+URL: https://github.com/VincyaneBadouard/TreeData.git
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Suggests:
+    knitr,
+    kableExtra,
+    rmarkdown,
+    testthat (>= 3.0.4)
+VignetteBuilder: knitr
+Depends: 
+    R (>= 3.6)
+Config/testthat/edition: 3
+BugReports: https://github.com/VincyaneBadouard/TreeData/issues
