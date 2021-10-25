@@ -1,5 +1,6 @@
 ---
 title: "TreeData"
+subtitle: "Forest Inventories Harmonization & Correction"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{TreeData}
@@ -10,10 +11,46 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>", echo = T, message = T, warning = F, cache = T
 )
 ```
 
+# Load Maria and datasets
+**Install TreeData**
+```{r, eval=F}
+install.packages("TreeData")
+```
+**Load the package**
 ```{r setup}
 library(TreeData)
+library(knitr)
+library(kableExtra)
+# library(ggplot2)
 ```
+**Load the exemple dataset stored in the package**
+```{r}
+# data()
+```
+
+# All the functions of the package
+# Arguments presentation
+# Harmonise and correct in 1 function
+## Results summary
+# Only harmonization
+
+# Decomposed corrections
+## Botanical identification correction
+## Life status
+## Diameter correction
+## Recruitment
+
+# Interesting other variables
+## Mortality rate
+## Recruitment rate
+## Growth rate
+## Basal area
+## Wood density
+## Biomass
+## Tree height
+## Disturbance intensity
+# Illustrations
