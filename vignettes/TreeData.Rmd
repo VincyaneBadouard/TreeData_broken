@@ -54,3 +54,6 @@ library(kableExtra)
 ## Tree height
 ## Disturbance intensity
 # Illustrations
+## Diagnostic graphs
+## Results graphs
+
