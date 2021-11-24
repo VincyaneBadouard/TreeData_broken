@@ -1,0 +1,101 @@
+---
+title: "RequiredFormat"
+author: "Vincyane Badouard"
+date: "04/11/2021"
+output: html_document
+---
+
+# Data import
+
++ 1000 individuals
++ Several plots
++ Several census 
++ No specific format
+```{r}
+library(data.table)
+
+Paracou_subset <- fread("D:/VSC TmFO/Data/Paracou_subset.csv")
+
+Acre_site <- fread("D:/VSC TmFO/Data/Acre_site_Marcus - Copie.csv")
+
+Guarani_site <- fread("D:/VSC TmFO/Data/Guarani_site.csv")
+
+Mbaiki_site <- fread("D:/VSC TmFO/Data/Mbaiki_site.csv", encoding = "UTF-8")
+
+BarroColoradoSubset <- fread("D:/VSC TmFO/Data/Barro Colorado_data/FullMeasurementBCI/Barro Colorado_fulldata.tsv")
+summary(BarroColoradoSubset)
+
+length(unique(BarroColoradoSubset$TreeID))
+length(unique(BarroColoradoSubset$PlotCensusNumber))
+length(unique(BarroColoradoSubset$QuadratName))
+length(unique(BarroColoradoSubset$QuadratID))
+length(sort(unique(BarroColoradoSubset$ExactDate))) # "IDate" "Date" class (package lubridate)
+
+# Censuses: 1981-2016
+# 8 plots
+# 1251 quadrats
+# 423617 TreeID
+# 1 < DBH < 8169
+# 0.2 < HOM < 15.9, standard: 1.3
+
+```
+
+# Required inventory format for the package
+
++ detection of variables of interest (Plot, SubPlot, time, idTree, status, size, POM, PlotArea, X, Y, ScientificName, VernName, Family, Genus, Species, CommercialSp, TreeHeight)
++ Long format (obs = row, var = col)
++ class, units
++ idtree and other necessary variables creation from the existing
+
+Difference with TmFO format: 
++ no changes in variable names
++ no changes in variable units
+
+
+```{r}
+Data = Paracou_subset
+Plot = "Plot"
+SubPlot = "SubPlot"
+Time = "CensusYear"
+IdTree = "idTree"
+LifeStatus = "CodeAlive"
+Size = "Circ"
+SizeUnit = NULL
+POM = NULL
+POMUnit = NULL
+PlotArea = NULL
+X = NULL
+Y = NULL
+ScientificName = NULL
+VernName = NULL
+Family = NULL
+Genus = NULL
+Species = NULL
+CommercialSp = NULL
+TreeHeight = NULL
+TreeHeightUnit = NULL
+
+RequiredFormat(Paracou_subset,
+               Plot = "Plot",
+               SubPlot = "SubPlot",
+               Time = "CensusYear",
+               IdTree = "idTree",
+               LifeStatus = "CodeAlive",
+               Size = "Circ",
+               SizeUnit = "cm",
+               POM = "MeasCode",
+               POMUnit = "m",
+               PlotArea = "PlotArea",
+               X = "Xutm",
+               Y = "Yutm",
+               ScientificName = NULL,
+               VernName = "VernName",
+               Family = "Family",
+               Genus = "Genus",
+               Species = "Species",
+               CommercialSp = "CommercialSp",
+               TreeHeight = NULL,
+               TreeHeightUnit = NULL)
+
+```
+
