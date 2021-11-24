@@ -28,7 +28,9 @@ Suggests:
     knitr,
     kableExtra,
     rmarkdown,
-    testthat (>= 3.0.4)
+    testthat (>= 3.0.4), 
+    bslib, 
+    DT
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.6)
