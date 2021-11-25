@@ -29,16 +29,19 @@ body <- dashboardBody(
               column(width = 3,
 
                      # load button for main data file (csv format)
-                     fileInput(inputId = "file1", "Choose CSV File", accept = ".csv"),
+                     box(title = "Actions",
+                         width = NULL,
+                         fileInput(inputId = "file1", "Choose CSV File", accept = ".csv"),
 
-                     # does the dataframe have a header?
-                     checkboxInput("header", "Header", TRUE),
+                         # does the dataframe have a header?
+                         checkboxInput("header", "Header", TRUE),
 
-                     # choose separator
-                     selectInput(inputId = "cbSeparator",
-                                 label = "Separator",
-                                 choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
-                                 selected = "auto"
+                         # choose separator
+                         selectInput(inputId = "cbSeparator",
+                                     label = "Separator",
+                                     choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
+                                     selected = "auto"
+                         )
                      )
               ),
 
@@ -51,8 +54,10 @@ body <- dashboardBody(
 
     tabItem(tabName = "Save",
             fluidRow(
-              downloadButton(outputId = "dbFile", label = "Save file"),
-              downloadButton(outputId = "dbCode", label = "Save code")
+              column(width = 6,
+                     box(downloadButton(outputId = "dbFile", label = "Save file")),
+                     box(downloadButton(outputId = "dbCode", label = "Save code"))
+              )
             )
     ) # end of "save" panel
   )
@@ -60,41 +65,3 @@ body <- dashboardBody(
 
 
 dashboardPage(header, sidebar, body)
-
-# tabPanel("Upload",
-#          sidebarLayout(
-#
-#            sidebarPanel(
-#              # load button for main data file (csv format)
-#              fileInput(inputId = "file1", "Choose CSV File", accept = ".csv"),
-#
-#              # does the dataframe have a header?
-#              checkboxInput("header", "Header", TRUE),
-#
-#              # choose separator
-#              selectInput(inputId = "cbSeparator",
-#                          label = "Separator",
-#                          choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
-#                          selected = "auto"
-#              )
-#            ),
-#
-#            mainPanel(
-#              DTOutput(outputId = "tabData"))
-#          )
-# ),
-
-# tabPanel("Change format"),
-
-# tabPanel("Correct"),
-
-# tabPanel("Visualise"),
-#
-#     tabPanel("Save",
-#              downloadButton(outputId = "dbFile", label = "Save file"),
-#              downloadButton(outputId = "dbCode", label = "Save code")
-# )
-
-# )
-
-
