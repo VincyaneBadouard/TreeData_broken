@@ -17,8 +17,6 @@ Authors@R:
            )
 Description: TreeData harmonises and corrects forest inventories.
 URL: https://github.com/VincyaneBadouard/TreeData.git
-Imports: 
-    shiny (>= 1.6.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -38,5 +36,6 @@ Depends:
     R (>= 3.6)
 Config/testthat/edition: 3
 Imports: 
-    data.table (>= 1.13.4)
+    data.table (>= 1.13.4),
+    shiny (>= 1.6.0)
 BugReports: https://github.com/VincyaneBadouard/TreeData/issues
