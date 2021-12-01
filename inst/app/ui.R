@@ -54,9 +54,17 @@ body <- dashboardBody(
 
     tabItem(tabName = "Save",
             fluidRow(
-              column(width = 6,
-                     box(downloadButton(outputId = "dbFile", label = "Save file")),
-                     box(downloadButton(outputId = "dbCode", label = "Save code"))
+              column(width = 3,
+                     box(title = "Save file",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbFile", label = "Save file")),
+                     box(title = "Save code",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbCode", label = "Save code"))
               )
             )
     ) # end of "save" panel

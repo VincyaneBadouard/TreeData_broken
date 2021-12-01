@@ -2,27 +2,27 @@
 # Fichier pour gérer les interactions de l'application Shiny
 
 server <- function(input, output) {
-  
+
   # read file and create data table
   invData <- reactive({
     file <- input$file1
     ext <- tools::file_ext(file$datapath)
-    
+
     req(file)
     validate(need(ext == "csv", "Please upload a csv file"))
-    
-    data.table::fread(file$datapath, 
-                      header = input$header, 
+
+    data.table::fread(file$datapath,
+                      header = input$header,
                       sep = input$cbSeparator)
   })
-  
+
   # render data table
   output$tabData <- renderDT({
     if (!is.null(input$file1$name))
       invData()
-  }, rownames = FALSE, # n'affiche pas les noms de lignes
-  options = list(pageLength = 10)) # nombre de lignes par page
-  
+  }, rownames = FALSE,
+  options = list(pageLength = 10))
+
   # save final data table
   output$dbFile <- downloadHandler(
     filename = function() {
@@ -44,5 +44,5 @@ server <- function(input, output) {
       writeLines(text_upload, file)
     }
   )
-  
+
 }
