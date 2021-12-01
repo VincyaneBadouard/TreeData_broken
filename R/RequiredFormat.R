@@ -6,7 +6,7 @@
 #'
 #' @param SubPlot The name of the column containing sub-plot indices (character)
 #'
-#' @param Time The name of the column containing census years (character)
+#' @param Time The name of the column(s) containing census years (character or vector of character)
 #'
 #' @param IdTree The name of the column containing tree unique identifiers
 #'   (character)
@@ -14,8 +14,8 @@
 #' @param LifeStatus The name of the column containing tree vital status
 #'   (character)
 #'
-#' @param Size The name of the column containing tree size measurements,
-#'   diameter or circumference (character)
+#' @param Size The name of the column(s) containing tree size measurements,
+#'   diameter or circumference (character or vector of character)
 #' @param SizeUnit The 'Size' measurement unit of the tree. The possible values
 #'   are 'mm' for millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm'
 #'   for metres"(character)
@@ -90,10 +90,10 @@ RequiredFormat <- function(
   Data,
   Plot = NULL,
   SubPlot = NULL,
-  Time = NULL,
+  Time = NULL,                # permettre un vecteur pour le wide format
   IdTree = NULL,
   LifeStatus = NULL,
-  Size = NULL,
+  Size = NULL,                # permettre un vecteur pour le wide format
   SizeUnit = NULL,
   POM = NULL,
   POMUnit = NULL,
@@ -177,12 +177,11 @@ RequiredFormat <- function(
   setDT(Data) # with "set" "<-" is not necessary
 
   ## Wide to long format (detect and change)
-  # detect : each census is a col ?
-  # str(Data) # dt structure
+  # detect : arguments pour lesquels un vecteur est renseigné
 
   # melt(Data,
-  #      id.vars = c("col1", "col2"), # columns that remain columns
-  #      measure.vars = patterns("^a", "^b"), # cols to rows (years?) : 4 digits, noms de var repetes, chiffres dans plsrs colonnes
+  #      id.vars = c("col1", "col2"), # columns that remain columns (arguments pour lesquels il n'ya qu'1 val renseignée)
+  #      measure.vars = patterns("^a", "^b"), # cols to rows (arguments pour lesquels un vecteur est renseigné)
   #      variable.name = "Time", # name of the new column that contains the names of the transposed variables
   #      value.name = "Size") # name of the new column that contains the values of the transposed variables
 

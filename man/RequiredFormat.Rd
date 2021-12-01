@@ -35,7 +35,7 @@ RequiredFormat(
 
 \item{SubPlot}{The name of the column containing sub-plot indices (character)}
 
-\item{Time}{The name of the column containing census years (character)}
+\item{Time}{The name of the column(s) containing census years (character or vector of character)}
 
 \item{IdTree}{The name of the column containing tree unique identifiers
 (character)}
@@ -43,8 +43,8 @@ RequiredFormat(
 \item{LifeStatus}{The name of the column containing tree vital status
 (character)}
 
-\item{Size}{The name of the column containing tree size measurements,
-diameter or circumference (character)}
+\item{Size}{The name of the column(s) containing tree size measurements,
+diameter or circumference (character or vector of character)}
 
 \item{SizeUnit}{The 'Size' measurement unit of the tree. The possible values
 are 'mm' for millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm'
