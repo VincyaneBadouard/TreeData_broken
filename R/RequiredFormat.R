@@ -18,16 +18,16 @@
 #'   diameter or circumference (character or vector of character)
 #' @param SizeUnit The 'Size' measurement unit of the tree. The possible values
 #'   are 'mm' for millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm'
-#'   for metres"(character)
+#'   for metres", or "code" if it is a code and not a measure (character)
 #'
 #' @param POM The name of the column containing Point of Measurement (POM)
 #'   values: height at which the 'Size' was measured, or POM code (character)
 #' @param POMUnit The 'POM' unit of the tree. The possible values are 'mm' for
-#'   millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for metres"
-#'   (character)
+#'   millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for metres",
+#'   or "code" if it is a code and not a measure (character)
 #'
-#' @param PlotArea The name of the column containing the area of each plot, in
-#'   hectares (character)
+#' @param PlotArea The name of the column containing the area of the plot, in
+#'   hectares (character), or the area of the plot in numeric
 #'
 #' @param X The name of the column containing the tree X coordinate (character)
 #' @param Y The name of the column containing the tree Y coordinate (character)
@@ -53,7 +53,7 @@
 #'   of the tree (character)
 #' @param TreeHeightUnit The 'TreeHeight' unit. The possible values are 'mm' for
 #'   millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for
-#'   metres"(character)
+#'   metres", or "code" if it is a code and not a measure (character)
 #'
 #' @return Input inventory (data.frame) in the required package format.
 #'
@@ -63,37 +63,39 @@
 #'
 #' @examples
 #'\dontrun{
-#' RequiredFormat(Data,
-#'                Plot = NULL,
-#'                SubPlot = NULL,
-#'                Time = NULL,
-#'                IdTree = NULL,
-#'                LifeStatus = NULL,
-#'                Size = NULL,
-#'                SizeUnit = NULL,
-#'                POM = NULL,
-#'                POMUnit = NULL,
-#'                PlotArea = NULL,
-#'                X = NULL,
-#'                Y = NULL,
-#'                ScientificName = NULL,
-#'                VernName = NULL,
-#'                Family = NULL,
-#'                Genus = NULL,
-#'                Species = NULL,
-#'                CommercialSp = NULL,
-#'                TreeHeight = NULL,
-#'                TreeHeightUnit = NULL)
+#' data(ParacouSubsetWide)
+#' Required_Format <- RequiredFormat(
+#'   ParacouSubsetWide,
+#'   Plot = "SubPlot",
+#'   SubPlot = "SubSubPlot",
+#'   Time = c("2016","2017","2018","2019","2020"),
+#'   IdTree = "idTree",
+#'   LifeStatus = "CodeAlive",
+#'   Size = "Circ",
+#'   SizeUnit = "m",
+#'   POM = "MeasCode",
+#'   POMUnit = "code",
+#'   PlotArea = "PlotArea",
+#'   X = "Xutm",
+#'   Y = "Yutm",
+#'   ScientificName = NULL,
+#'   VernName = "VernName",
+#'   Family = "Family",
+#'   Genus = "Genus",
+#'   Species = "Species",
+#'   CommercialSp = "CommercialSp",
+#'   TreeHeight = NULL,
+#'   TreeHeightUnit = NULL)
 #'                }
 #'
 RequiredFormat <- function(
   Data,
   Plot = NULL,
   SubPlot = NULL,
-  Time = NULL,                # permettre un vecteur pour le wide format
+  Time = NULL,
   IdTree = NULL,
   LifeStatus = NULL,
-  Size = NULL,                # permettre un vecteur pour le wide format
+  Size = NULL,
   SizeUnit = NULL,
   POM = NULL,
   POMUnit = NULL,
@@ -110,11 +112,10 @@ RequiredFormat <- function(
   TreeHeightUnit = NULL
 ){
 
-  # Check arguments
+  #### Check arguments ####
 
   args <- c(Plot, SubPlot, Time, IdTree, LifeStatus,
-            Size, SizeUnit, POM, POMUnit,
-            PlotArea, X, Y,
+            Size, SizeUnit, POM, POMUnit, X, Y,
             ScientificName, VernName, Family, Genus, Species, CommercialSp,
             TreeHeight, TreeHeightUnit)
 
@@ -126,19 +127,22 @@ RequiredFormat <- function(
   if (!inherits(Data, "data.frame"))
     stop("Data must be a data.frame")
 
-  # if the argument is not NULL
-  # for(i in 1:length(args))
-  #   if(!is.null(args[i])){
+  if(!any(is.character(PlotArea) || is.numeric(PlotArea)))
+    stop(cat(PlotArea, "must be in character or numeric"))
+
+  if(is.character(PlotArea))
+    argsCol <- c(argsCol, PlotArea) # PlotArea is a column name
+
 
   for(i in 1:length(args)) # all args
     if(!inherits(args[i], "character"))
-      stop(paste0("must be in character"[i]))
+      stop(paste0(args[i], "must be in character"))
 
   ## Units
 
   if(length(argsUnit) > 0){
     for(i in 1:length(argsUnit))
-      if(!argsUnit[i] %in% c("mm", "millimetre", "millimeter", "milimetro", "milimetrica",
+      if(!argsUnit[i] %in% c("code", "mm", "millimetre", "millimeter", "milimetro", "milimetrica",
                              "cm", "centimetre", "centimeter", "centimetro",
                              "dm", "decimetre", "decimeter", "decimetro",
                              "m", "metre", "meter", "metro")
@@ -147,29 +151,25 @@ RequiredFormat <- function(
           centimetres, 'dm' for decimetres and 'm' for metres")
   }
 
-
-  ## NULL case
   ## The column name exists
 
   for(i in 1:length(argsCol))
     if(!argsCol[i] %in% names(Data))
-      stop(paste0("is not a column name of your dataset"[i]))
-
-  # } # end "if the argument is not NULL"
+      stop(paste0(argsCol[i]," is not a column name of your dataset"))
 
   # if the variable exists but the unit is NULL
   if(is.null(SizeUnit) & !is.null(Size))
-    stop("Please indicate in which unit ('SizeUnit') the 'Size' of your tree is measured")
+    SizeUnit <- readline(cat("In what unit is your variable '", Size, "'?")) # question to the user
+
 
   if(is.null(POMUnit) & !is.null(POM))
-    stop("Please indicate in which unit ('POMUnit') the 'POM'
-         (Point Of Measurement) of your tree is measured")
+    POMUnit <- readline(cat("In what unit is your variable '", POM, "'?")) # question to the user. "code" is a possible answer
 
 
   if(is.null(TreeHeightUnit) & !is.null(TreeHeight))
-    stop("Please indicate in which unit ('TreeHeightUnit') the 'TreeHeight' is measured")
+    TreeHeightUnit <- readline(cat("In what unit is your variable '", TreeHeight, "'?")) # question to the user
 
-  # Formatting
+  #### Formatting ####
 
   DataInput <- copy(Data) # input data copy
 
@@ -185,40 +185,83 @@ RequiredFormat <- function(
   #      variable.name = "Time", # name of the new column that contains the names of the transposed variables
   #      value.name = "Size") # name of the new column that contains the values of the transposed variables
 
-  ## Class
+  ## Class changing
+
+  ### if it's a code
+  # for(u in 1:length(argsUnit)){ # argsUnit: SizeUnit, POMUnit, TreeHeightUnit
+  #   if(argsUnit[u] == "code"){
+  #
+  #   }
+  # }
+
+  ### as.character
   CharacVar <- c(Plot, SubPlot, IdTree, ScientificName, VernName, Family, Genus, Species) # character variables
 
   for(v in 1:length(CharacVar))
-    Data[, get(CharacVar[v]) := as.character(get(CharacVar[v]))]
+    Data[, c(CharacVar[v]) := as.character(get(CharacVar[v]))]
 
+  ### as.numeric
   NumVar <- c(Time, Size, PlotArea, X, Y, TreeHeight) # numeric variables
 
   for(v in 1:length(NumVar))
-    Data[, get(NumVar[v]) := as.numeric(get(NumVar[v]))]
+    Data[, c(NumVar[v]) := as.numeric(get(NumVar[v]))]
 
+  ### as.logical
   LogicVar <- c(LifeStatus, CommercialSp) # logical variables
 
   for(v in 1:length(LogicVar))
-    Data[, get(LogicVar[v]) := as.logical(get(LogicVar[v]))]
+    Data[, c(LogicVar[v]) := as.logical(get(LogicVar[v]))]
 
-  ## Units
+  ## Units changing
+  ### Size in cm
+  if(Size %in% names(Data)){
+
+    if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi")
+      Data[, c(Size) := get(Size)/10] # mm -> cm
+
+    if (substr(SizeUnit, 1, 1) == "d")
+      Data[, c(Size) := get(Size)*10] # dm -> cm
+
+    if (substr(SizeUnit, 1, 1) == "m")
+      Data[, c(Size) := get(Size)*100] # m -> cm
+  }
+
+  ### TreeHeight in m
+  if(TreeHeight %in% names(Data)){
+
+    if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
+      Data[, c(TreeHeight) := get(TreeHeight)/1000] # mm -> m
+
+    if (substr(TreeHeightUnit, 1, 1) == "m")
+      Data[, c(TreeHeight) := get(TreeHeight)/100] # cm -> m
 
 
-  ## Necessary variables creation from the existing
+    if (substr(TreeHeightUnit, 1, 1) == "d")
+      Data[, c(TreeHeight) := get(TreeHeight)/10] # dm -> m
+  }
+
+  ## Necessary columns creation from the existing
 
   ### IdTree
 
-  ### POM ? (detect pom is a code?)
+  ### POM ? (if pom is a code)
 
-  ### PlotArea (not a column but a value/values vector)
+  ### PlotArea (not a column but a value)
+  if(!PlotArea %in% names(Data) & is.numeric(PlotArea)){
 
-  ### Scientific name but no genus species columns
+    if(is.numeric(PlotArea)){ # if PlotArea is a (1) (numeric value) (cas à faire : 1 val par plot)
+      Data[,  PlotArea := PlotArea]
+    }
+  }
 
-  ### Genus & species columns but no ScientificName column
+  ### Genus Species (if ScientificName exists) (how to know the sep?)
+  tidyr::separate(ScientificName, sep = " ", into = c("Genus", "Species"), remove = F) # data.table version : https://stackoverflow.com/questions/18154556/split-text-string-in-a-data-table-columns
 
+  ### ScientificName (if Genus & Species exist)
+  tidyr::unite(Genus, Species, col = "ScientificName", sep = "_", remove = F)
 
   # Return in data.frame
   setDF(Data)
-
+  return(Data)
 
 }

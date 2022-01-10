@@ -10,7 +10,7 @@
 #' - 4 dummy sub-sub-squares created for the package to be use as plots
 #' Dataset extracted from the Guyafor database.
 #'
-#' @format A tibble with 1000 rows and 28 variables:
+#' @format A tibble with 1000 rows and 31 variables:
 #' \describe{
 #'   \item{2016-2020}{Circumference of the tree at 1.30m above ground (DBH level),
 #'   in cm for each census year between 2016 and 2020 (5)(numeric)}
@@ -43,6 +43,11 @@
 #'   \item{CommercialSp}{Is the tree considered as a commercial species
 #'   according to the list of species that were logged during the sylvicultural
 #'   treatment in Paracou (TRUE) or not (FALSE) ? (logical)}
+#'   \item{CodeAlive}{Is the tree alive (TRUE) or dead (FALSE)? (logical)}
+#'   \item{MeasCode}{Information on the method for measuring the circumference
+#'   or on the state of the tree (integer)}
+#'   \item{Circ}{Circumference of the tree at 1.30m above ground (DBH level),
+#'   in m (numeric)}
 #'   ...
 #' }
 #' @source \url{http://paracou.cirad.fr} ;

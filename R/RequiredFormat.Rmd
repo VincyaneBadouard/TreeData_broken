@@ -118,10 +118,10 @@ names(ParacouSubset)
 ```{r}
 ParacouSubsetWide <- dcast(ParacouSubset, idTree ~ CensusYear, value.var = "Circ")
 OtherCols <- copy(ParacouSubset)
-OtherCols[, c("CensusYear", "CensusDate", "CensusDateCertainty",
-              "Circ", "CircCorr", "CorrCode",
-              "CodeAlive", "MeasCode") := NULL]
+OtherCols[, c("CensusYear", "CensusDate", "CensusDateCertainty","CircCorr", "CorrCode") := NULL]
 ParacouSubsetWide <- unique(merge(ParacouSubsetWide, OtherCols, by = "idTree")) #1000 ind -> 1000 rows 
+ParacouSubsetWide[, Circ := Circ/100] # cm -> m for the exemple
+
 
 # usethis::use_data(ParacouSubsetWide, overwrite = TRUE)
 
@@ -207,5 +207,29 @@ RequiredFormat(Paracou_subset,
                TreeHeight = NULL,
                TreeHeightUnit = NULL)
 
+```
+
+```{r}
+Data = ParacouSubsetWide
+Plot = "SubPlot"
+SubPlot = "SubSubPlot"
+Time = c("2016","2017","2018","2019","2020")
+IdTree = "idTree"
+LifeStatus = "CodeAlive"
+Size = "Circ"
+SizeUnit = "m"
+POM = "MeasCode"
+POMUnit = NULL
+PlotArea = "PlotArea"
+X = "Xutm"
+Y = "Yutm"
+ScientificName = NULL
+VernName = NULL
+Family = "Family"
+Genus = "Genus"
+Species = "Species"
+CommercialSp = "CommercialSp"
+TreeHeight = NULL
+TreeHeightUnit = NULL
 ```
 
