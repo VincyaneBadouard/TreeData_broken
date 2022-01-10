@@ -17,8 +17,8 @@
 #'   \item{PlotArea}{Plot area, in hectare (numeric)}
 #'   \item{SubPlot}{Subplot number (integer)}
 #'   \item{SubSubPlot}{Dummy sub-sub-plots created for the package (integer)}
-#'   \item{TreeFieldNum}{Tree number within the subplot (matching the tag number
-#'   in the field) (numeric)}
+#'   \item{TreeFieldNum}{Tree unique identifiers within the subplot (matching
+#'    the tag number in the field) (numeric)}
 #'   \item{idTree}{Unique tree identifier from the database (integer)}
 #'   \item{Protocole}{Protocole name (character)}
 #'   \item{Xfield}{Euclidean position of the tree relative to
