@@ -221,17 +221,17 @@ LifeStatus = "CodeAlive"
 Size = "Circ"
 SizeUnit = "m"
 POM = "MeasCode"
-POMUnit = NULL
+POMUnit = "code" # NULL
 PlotArea = "PlotArea"
 X = "Xutm"
 Y = "Yutm"
-ScientificName = NULL
-VernName = NULL
+ScientificName = "none" # NULL
+VernName = "none" # NULL
 Family = "Family"
 Genus = "Genus"
 Species = "Species"
 CommercialSp = "CommercialSp"
-TreeHeight = NULL
-TreeHeightUnit = NULL
+TreeHeight = "none" # NULL
+TreeHeightUnit = "none" # NULL
 ```
 
