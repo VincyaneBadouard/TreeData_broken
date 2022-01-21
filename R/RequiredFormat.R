@@ -216,8 +216,8 @@ RequiredFormat <- function(
   eval(substitute(
     {
 
-      ## Wide to long format (detect and change)
-      # detect : arguments pour lesquels un vecteur est renseigné
+      ## Wide to long format (detect and reshape)
+      # Detects arguments with multiple values
 
       # pata = list(a = 2, b = c(9,5,6)) # list
       # length(unlist(pata["b"])) # 3
@@ -225,131 +225,149 @@ RequiredFormat <- function(
       # length(pata$b) # 3
 
       ColsList <- list(Plot=Plot, SubPlot=SubPlot, Time=Time, # arguments names and values
-                   TreeFieldNum=TreeFieldNum, IdTree=IdTree,
-                   LifeStatus=LifeStatus, Size=Size, POM=POM,
-                    X=X, Y=Y, ScientificName=ScientificName, VernName=VernName,
-                   Family=Family, Genus=Genus, Species=Species,
-                   CommercialSp=CommercialSp, TreeHeight=TreeHeight)
+                       TreeFieldNum=TreeFieldNum, IdTree=IdTree,
+                       LifeStatus=LifeStatus, Size=Size, POM=POM,
+                       X=X, Y=Y, ScientificName=ScientificName, VernName=VernName,
+                       Family=Family, Genus=Genus, Species=Species,
+                       CommercialSp=CommercialSp, TreeHeight=TreeHeight)
 
       ArgsNames <- c("Plot", "SubPlot", "Time", "TreeFieldNum", "IdTree", # arguments names
                      "LifeStatus", "Size", "POM", "X", "Y", "ScientificName",
                      "VernName", "Family", "Genus", "Species", "CommercialSp", "TreeHeight")
 
-      ColToTranspos <- FixCols <- vector() # empty vectors
+      ColToTranspos_argname <- vector("character") # empty vectors
 
-      # for (N in ArgsNames) {
+      for (N in 1:length(ArgsNames)) {
+
+        if(length(unlist(ColsList[ ArgsNames[[N]] ])) > 1) # arg = multiple values
+          ColToTranspos_argname <- c(ColToTranspos_argname, ArgsNames[[N]] )
+      }
+
+      # User col names in character (=argument values)
+      ColToTranspos <- unlist(ColsList[ColToTranspos_argname], use.names = FALSE)
+      ColToTranspos <- ColToTranspos[!ColToTranspos %in% "none"]
+
+      if(length(ColToTranspos_argname) == 1){
+
+        ValuesColName <- readline(cat("To which variable do the values in columns '", ColToTranspos,"' correspond?
+1: Size\n
+2: POM\n
+3: TreeHeight\n")) # question to the user
+        if(ValuesColName == "1") ValuesColName <- "Size"
+        if(ValuesColName == "2") ValuesColName <- "POM"
+        if(ValuesColName == "3") ValuesColName <- "TreeHeight"
+
+
+        # Work only with 1 col to create from the wide format columns
+        test <- melt(Data,
+                     measure.vars = ColToTranspos, # cols to rows (arguments pour lesquels un vecteur est renseigné)
+                     variable.name = ColToTranspos_argname, # name of the new column (length=1) that contains the names of the transposed variables
+                     value.name = ValuesColName) # name of the new column that contains the values of the transposed variables
+
+      } # ColToTranspos_argname == 1
+
+      ## Class changing
+
+      ### if it's a code
+      # for(u in 1:length(argsUnit)){ # argsUnit: SizeUnit, POMUnit, TreeHeightUnit
+      #   if(argsUnit[u] == "code"){
       #
-      #   if(length(unlist(ColsList[ArgsNames[N]])) == 1)
-      #     FixCols <- c(FixCols, ArgsNames[N]) # arg = 1 value
-      #
-      #       if(length(unlist(ColsList[ArgsNames[N]])) > 1)
-      #         ColToTranspos <- c(FixCols, ArgsNames[N]) # arg = a vector of values
-      #
+      #   }
       # }
-      #
-      #         melt(Data,
-      #              id.vars = c("col1", "col2"), # columns that remain columns (arguments pour lesquels il n'ya qu'1 val renseignée)
-      #              measure.vars = patterns("^a", "^b"), # cols to rows (arguments pour lesquels un vecteur est renseigné)
-      #              variable.name = "Time", # name of the new column that contains the names of the transposed variables
-      #              value.name = "Size") # name of the new column that contains the values of the transposed variables
+
+      ### as.character
+
+      CharacVar <- c(Plot, SubPlot, TreeFieldNum, IdTree, ScientificName, VernName, Family, Genus, Species) # character variables
+      CharacVar <- CharacVar[!CharacVar %in% "none"]
+
+      Data[, (CharacVar) := lapply(.SD, as.character), .SDcols = CharacVar] # (CharacVar) to say that these are existing columns and not new ones to create
+
+      ### as.numeric
+      NumVar <- c(Time, Size, PlotArea, X, Y, TreeHeight) # numeric variables
+      NumVar <- NumVar[!NumVar %in% "none"]
+
+      Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
+
+      ### as.logical
+      LogicVar <- c(LifeStatus, CommercialSp) # logical variables
+      LogicVar <- LogicVar[!LogicVar %in% "none"]
+
+      Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+
+      ## Units changing
+      ### Size in cm
+
+      if(Size %in% names(Data)){
+
+        if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi")
+          Data[, c(Size) := .Size/10] # mm -> cm
+
+        if (substr(SizeUnit, 1, 1) == "d")
+          Data[, c(Size) := .Size*10] # dm -> cm
+
+        if (substr(SizeUnit, 1, 1) == "m")
+          Data[, c(Size) := .Size*100] # m -> cm
+      }
+
+      ### TreeHeight in m
+      if(TreeHeight %in% names(Data)){
+
+        if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
+          Data[, c(TreeHeight) := .TreeHeight/1000] # mm -> m
+
+        if (substr(TreeHeightUnit, 1, 1) == "m")
+          Data[, c(TreeHeight) := .TreeHeight/100] # cm -> m
 
 
+        if (substr(TreeHeightUnit, 1, 1) == "d")
+          Data[, c(TreeHeight) := .TreeHeight/10] # dm -> m
+      }
 
-          ## Class changing
+      ## Necessary columns creation from the existing
 
-          ### if it's a code
-          # for(u in 1:length(argsUnit)){ # argsUnit: SizeUnit, POMUnit, TreeHeightUnit
-          #   if(argsUnit[u] == "code"){
-          #
-          #   }
-          # }
+      ### IdTree (unique along Plot, SubPlot, TreeFieldNum)
+      # Data[,  idTree := NULL]
 
-          ### as.character
+      if(!IdTree %in% names(Data) & all(c(Plot, SubPlot, TreeFieldNum) %in% names(Data))){
 
-          CharacVar <- c(Plot, SubPlot, TreeFieldNum, IdTree, ScientificName, VernName, Family, Genus, Species) # character variables
-          CharacVar <- CharacVar[!CharacVar %in% "none"]
+        uniq_key <- unique(Data[, c(Plot, SubPlot, TreeFieldNum)])
 
-          Data[, (CharacVar) := lapply(.SD, as.character), .SDcols = CharacVar] # (CharacVar) to say that these are existing columns and not new ones to create
+        uniq_key[, IdTree := seq(1, nrow(uniq_key))]
 
-          ### as.numeric
-          NumVar <- c(Time, Size, PlotArea, X, Y, TreeHeight) # numeric variables
-          NumVar <- NumVar[!NumVar %in% "none"]
+        merge(Data, uniq_key)
+      }
 
-          Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
+      ### POM ? (if pom is a code)
 
-          ### as.logical
-          LogicVar <- c(LifeStatus, CommercialSp) # logical variables
-          LogicVar <- LogicVar[!LogicVar %in% "none"]
+      ### PlotArea (not a column but a value)
+      if(!PlotArea %in% names(Data) & is.numeric(PlotArea)){
 
-          Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+        if(length(PlotArea) == 1){ # if PlotArea is a (1) numeric value
+          Data[,  PlotArea := PlotArea]
+        }
+        # if(length(PlotArea) > 1){ # cas à faire : c(1 val par plot)
+        #   Data[,  PlotArea := PlotArea, by = Plot] # grouped
+        #   Data[,  PlotArea := PlotArea, by = .(Plot)] # roup rows by values in specified column
+        #
+        #   Data[Plot == Plot1,  PlotArea := PlotArea1] # subset
+        # }
+      }
 
-          ## Units changing
-          ### Size in cm
-
-          if(Size %in% names(Data)){
-
-            if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi")
-              Data[, c(Size) := .Size/10] # mm -> cm
-
-            if (substr(SizeUnit, 1, 1) == "d")
-              Data[, c(Size) := .Size*10] # dm -> cm
-
-            if (substr(SizeUnit, 1, 1) == "m")
-              Data[, c(Size) := .Size*100] # m -> cm
-          }
-
-          ### TreeHeight in m
-          if(TreeHeight %in% names(Data)){
-
-            if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
-              Data[, c(TreeHeight) := .TreeHeight/1000] # mm -> m
-
-            if (substr(TreeHeightUnit, 1, 1) == "m")
-              Data[, c(TreeHeight) := .TreeHeight/100] # cm -> m
+      ### Genus Species (if ScientificName exists) (detect or ask the sep?)
 
 
-            if (substr(TreeHeightUnit, 1, 1) == "d")
-              Data[, c(TreeHeight) := .TreeHeight/10] # dm -> m
-          }
+      if(!all(c(Genus, Species) %in% names(Data)) & ScientificName %in% names(Data)) # or c(Genus, Species) == "none"
 
-          ## Necessary columns creation from the existing
+        # Ask the sep
+        SfcnameSep <- readline(cat(
+          "What is the separator (., _, , etc) between the genus and the species in '", ScientificName,"'?")) # question to the user
 
-          ### IdTree (unique along Plot, SubPlot, TreeFieldNum)
-          # Data[,  idTree := NULL]
-
-          if(!IdTree %in% names(Data) & all(c(Plot, SubPlot, TreeFieldNum) %in% names(Data))){
-
-            uniq_key <- unique(Data[, c(Plot, SubPlot, TreeFieldNum)])
-
-            uniq_key[, IdTree := seq(1, nrow(uniq_key))]
-
-            merge(Data, uniq_key)
-          }
-
-          ### POM ? (if pom is a code)
-
-          ### PlotArea (not a column but a value)
-          if(!PlotArea %in% names(Data) & is.numeric(PlotArea)){
-
-            if(length(PlotArea) == 1){ # if PlotArea is a (1) numeric value
-              Data[,  PlotArea := PlotArea]
-            }
-            # if(length(PlotArea) > 1){ # cas à faire : c(1 val par plot)
-            #   Data[,  PlotArea := PlotArea, by = Plot] # grouped
-            #   Data[,  PlotArea := PlotArea, by = .(Plot)] # roup rows by values in specified column
-            #
-            #   Data[Plot == Plot1,  PlotArea := PlotArea1] # subset
-            # }
-          }
-
-          ### Genus Species (if ScientificName exists) (how to know the sep?)
-          if(!all(c(Genus, Species) %in% names(Data)) & ScientificName %in% names(Data)) # or c(Genus, Species) == "none"
-            Data[, c("Genus", "Species") := tstrsplit(ScientificName, ".", fixed = TRUE)]
+      Data[, c("Genus", "Species") := tstrsplit(ScientificName, SfcnameSep, fixed = TRUE)]
 
 
-          ### ScientificName (if Genus & Species exist)
-          if(!ScientificName %in% names(Data) & all(c(Genus, Species) %in% names(Data))) # or ScientificName == "none"
-            Data[, ScientificName := paste(.Genus, .Species, sep = "_")]
+      ### ScientificName (if Genus & Species exist)
+      if(!ScientificName %in% names(Data) & all(c(Genus, Species) %in% names(Data))) # or ScientificName == "none"
+        Data[, ScientificName := paste(.Genus, .Species, sep = "_")]
 
     }, env)) # eval(substitute( END
 

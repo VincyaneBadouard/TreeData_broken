@@ -210,6 +210,8 @@ RequiredFormat(Paracou_subset,
 ```
 
 ```{r}
+library(TreeData)
+library(data.table)
 data(ParacouSubsetWide)
 Data = ParacouSubsetWide
 Plot = "SubPlot"
