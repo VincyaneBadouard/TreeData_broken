@@ -22,7 +22,9 @@ server <- function(input, output) {
     # req(x)
     lapply(names(x), function(i) {
       fluidRow(
-        textInput(glue("{i}"), label = h3(i), value = "Enter text...")
+        selectInput(glue::glue("{i}"), label = h3(i), choices = c(x[[i]], colnames(data.table::fread( input$file1$datapath,
+                                                                                                     header = input$header,
+                                                                                                     sep = input$cbSeparator))))
 
       )
     })

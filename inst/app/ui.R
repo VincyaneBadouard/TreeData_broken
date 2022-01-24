@@ -11,7 +11,7 @@ if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 lapply(as.list(list.of.packages), library, character.only = T)
 
 # source the REquiredFormat function to get the list of arguments
-source("https://raw.githubusercontent.com/VincyaneBadouard/TreeData/master/R/RequiredFormat.R?token=GHSAT0AAAAAABQDOAVUN5ZAL2KWZD4VW7VEYPO7LXA") # ***make this better!!**
+source(paste0(dirname(dirname(getwd())), "/R/RequiredFormat.R")) # ***make this better!!**
 
 x <- as.list(formals(RequiredFormat)[-1])
 
