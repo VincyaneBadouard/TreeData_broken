@@ -16,6 +16,18 @@ server <- function(input, output) {
                       sep = input$cbSeparator)
   })
 
+  # enter column names for each element of the RequiredFormat function
+
+  output$ui1 <- renderUI({
+    # req(x)
+    lapply(names(x), function(i) {
+      fluidRow(
+        textInput(glue("{i}"), label = h3(i), value = "Enter text...")
+
+      )
+    })
+  })
+
   # render data table
   output$tabData <- renderDT({
     if (!is.null(input$file1$name))

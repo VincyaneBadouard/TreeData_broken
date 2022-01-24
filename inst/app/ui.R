@@ -10,6 +10,11 @@ if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 # load required packages' libraries
 lapply(as.list(list.of.packages), library, character.only = T)
 
+# source the REquiredFormat function to get the list of arguments
+source("https://raw.githubusercontent.com/VincyaneBadouard/TreeData/master/R/RequiredFormat.R?token=GHSAT0AAAAAABQDOAVUN5ZAL2KWZD4VW7VEYPO7LXA") # ***make this better!!**
+
+x <- as.list(formals(RequiredFormat)[-1])
+
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
 
@@ -18,7 +23,7 @@ sidebar <- dashboardSidebar(
   useShinyjs(),
   sidebarMenu(menuItem("Short Manual", tabName = "Manual", icon = icon("book")),
               menuItem("Upload your file", tabName = "Upload", icon = icon("upload")),
-              menuItem("Change format", tabName = "Reformat", icon = icon("arrows-alt")),
+              menuItem("Identify headers", tabName = "headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
               menuItem("Save codes and data", tabName="Save", icon = icon("save"))
@@ -57,6 +62,12 @@ body <- dashboardBody(
 
             )
     ),  ## end of "upload" panel
+
+    tabItem(tabName = "headers",
+            fluidPage(
+
+              dashboardBody(column(4, uiOutput("ui1")))
+            )),
 
     tabItem(tabName = "Save",
             fluidRow(
