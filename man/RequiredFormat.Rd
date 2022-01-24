@@ -6,26 +6,27 @@
 \usage{
 RequiredFormat(
   Data,
-  Plot = NULL,
-  SubPlot = NULL,
-  Time = NULL,
-  IdTree = NULL,
-  LifeStatus = NULL,
-  Size = NULL,
-  SizeUnit = NULL,
-  POM = NULL,
-  POMUnit = NULL,
-  PlotArea = NULL,
-  X = NULL,
-  Y = NULL,
-  ScientificName = NULL,
-  VernName = NULL,
-  Family = NULL,
-  Genus = NULL,
-  Species = NULL,
-  CommercialSp = NULL,
-  TreeHeight = NULL,
-  TreeHeightUnit = NULL
+  Plot = "none",
+  SubPlot = "none",
+  Time = "none",
+  TreeFieldNum = "none",
+  IdTree = "none",
+  LifeStatus = "none",
+  Size = "none",
+  SizeUnit = "none",
+  POM = "none",
+  POMUnit = "none",
+  PlotArea = "none",
+  X = "none",
+  Y = "none",
+  ScientificName = "none",
+  VernName = "none",
+  Family = "none",
+  Genus = "none",
+  Species = "none",
+  CommercialSp = "none",
+  TreeHeight = "none",
+  TreeHeightUnit = "none"
 )
 }
 \arguments{
@@ -36,6 +37,10 @@ RequiredFormat(
 \item{SubPlot}{The name of the column containing sub-plot indices (character)}
 
 \item{Time}{The name of the column(s) containing census years (character or vector of character)}
+
+\item{TreeFieldNum}{The name of the column containing the tree unique
+identifiers within the subplot (matching the tag number in the field)
+(character)}
 
 \item{IdTree}{The name of the column containing tree unique identifiers
 (character)}
@@ -48,17 +53,17 @@ diameter or circumference (character or vector of character)}
 
 \item{SizeUnit}{The 'Size' measurement unit of the tree. The possible values
 are 'mm' for millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm'
-for metres"(character)}
+for metres", or "code" if it is a code and not a measure (character)}
 
 \item{POM}{The name of the column containing Point of Measurement (POM)
 values: height at which the 'Size' was measured, or POM code (character)}
 
 \item{POMUnit}{The 'POM' unit of the tree. The possible values are 'mm' for
-millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for metres"
-(character)}
+millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for metres",
+or "code" if it is a code and not a measure (character)}
 
-\item{PlotArea}{The name of the column containing the area of each plot, in
-hectares (character)}
+\item{PlotArea}{The name of the column containing the area of the plot, in
+hectares (character), or the area of the plot in numeric}
 
 \item{X}{The name of the column containing the tree X coordinate (character)}
 
@@ -87,7 +92,7 @@ of the tree (character)}
 
 \item{TreeHeightUnit}{The 'TreeHeight' unit. The possible values are 'mm' for
 millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for
-metres"(character)}
+metres", or "code" if it is a code and not a measure (character)}
 }
 \value{
 Input inventory (data.frame) in the required package format.
@@ -95,29 +100,36 @@ Input inventory (data.frame) in the required package format.
 \description{
 RequiredFormat
 }
+\details{
+The argument keeping the value "none" indicates that the user does
+not have the requested information.
+}
 \examples{
 \dontrun{
-RequiredFormat(Data,
-               Plot = NULL,
-               SubPlot = NULL,
-               Time = NULL,
-               IdTree = NULL,
-               LifeStatus = NULL,
-               Size = NULL,
-               SizeUnit = NULL,
-               POM = NULL,
-               POMUnit = NULL,
-               PlotArea = NULL,
-               X = NULL,
-               Y = NULL,
-               ScientificName = NULL,
-               VernName = NULL,
-               Family = NULL,
-               Genus = NULL,
-               Species = NULL,
-               CommercialSp = NULL,
-               TreeHeight = NULL,
-               TreeHeightUnit = NULL)
+data(ParacouSubsetWide)
+Required_Format <- RequiredFormat(
+  ParacouSubsetWide,
+  Plot = "SubPlot",
+  SubPlot = "SubSubPlot",
+  Time = c("2016","2017","2018","2019","2020"),
+  TreeFieldNum = "TreeFieldNum",
+  IdTree = "idTree",
+  LifeStatus = "CodeAlive",
+  Size = "Circ",
+  SizeUnit = "m",
+  POM = "MeasCode",
+  POMUnit = "code",
+  PlotArea = "PlotArea",
+  X = "Xutm",
+  Y = "Yutm",
+  ScientificName = "none",
+  VernName = "VernName",
+  Family = "Family",
+  Genus = "Genus",
+  Species = "Species",
+  CommercialSp = "CommercialSp",
+  TreeHeight = "none",
+  TreeHeightUnit = "none")
                }
 
 }

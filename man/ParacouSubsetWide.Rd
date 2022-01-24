@@ -5,7 +5,7 @@
 \alias{ParacouSubsetWide}
 \title{ParacouSubsetWide}
 \format{
-A tibble with 1000 rows and 28 variables:
+A tibble with 1000 rows and 31 variables:
 \describe{
 \item{2016-2020}{Circumference of the tree at 1.30m above ground (DBH level),
 in cm for each census year between 2016 and 2020 (5)(numeric)}
@@ -14,8 +14,8 @@ in cm for each census year between 2016 and 2020 (5)(numeric)}
 \item{PlotArea}{Plot area, in hectare (numeric)}
 \item{SubPlot}{Subplot number (integer)}
 \item{SubSubPlot}{Dummy sub-sub-plots created for the package (integer)}
-\item{TreeFieldNum}{Tree number within the subplot (matching the tag number
-in the field) (numeric)}
+\item{TreeFieldNum}{Tree unique identifiers within the subplot (matching
+the tag number in the field) (numeric)}
 \item{idTree}{Unique tree identifier from the database (integer)}
 \item{Protocole}{Protocole name (character)}
 \item{Xfield}{Euclidean position of the tree relative to
@@ -38,6 +38,11 @@ for the botanical identification (numeric)}
 \item{CommercialSp}{Is the tree considered as a commercial species
 according to the list of species that were logged during the sylvicultural
 treatment in Paracou (TRUE) or not (FALSE) ? (logical)}
+\item{CodeAlive}{Is the tree alive (TRUE) or dead (FALSE)? (logical)}
+\item{MeasCode}{Information on the method for measuring the circumference
+or on the state of the tree (integer)}
+\item{Circ}{Circumference of the tree at 1.30m above ground (DBH level),
+in m (numeric)}
 ...
 }
 }

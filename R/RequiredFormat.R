@@ -66,7 +66,7 @@
 #'
 #' @export
 #'
-#' @importFrom data.table copy setDT setDF :=
+#' @importFrom data.table copy setDT setDF melt tstrsplit :=
 #'
 #' @examples
 #'\dontrun{
@@ -259,10 +259,16 @@ RequiredFormat <- function(
 
 
         # Work only with 1 col to create from the wide format columns
-        test <- melt(Data,
+        Data <- data.table::melt(Data,
                      measure.vars = ColToTranspos, # cols to rows (arguments pour lesquels un vecteur est renseigné)
                      variable.name = ColToTranspos_argname, # name of the new column (length=1) that contains the names of the transposed variables
                      value.name = ValuesColName) # name of the new column that contains the values of the transposed variables
+
+        if(ColToTranspos_argname == "Time"){
+        Time <- ColToTranspos_argname
+        }else{
+          stop(cat("To create the cases where 'Time' is not the variable to transpose"))
+        }
 
       } # ColToTranspos_argname == 1
 
@@ -286,6 +292,7 @@ RequiredFormat <- function(
       NumVar <- c(Time, Size, PlotArea, X, Y, TreeHeight) # numeric variables
       NumVar <- NumVar[!NumVar %in% "none"]
 
+      Data[, (NumVar) := lapply(.SD, as.character), .SDcols = NumVar] # first as c haracter when the variable is in factor, to preserve writed information
       Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
 
       ### as.logical
@@ -356,13 +363,15 @@ RequiredFormat <- function(
       ### Genus Species (if ScientificName exists) (detect or ask the sep?)
 
 
-      if(!all(c(Genus, Species) %in% names(Data)) & ScientificName %in% names(Data)) # or c(Genus, Species) == "none"
+      if(!all(c(Genus, Species) %in% names(Data)) & ScientificName %in% names(Data)){ # or c(Genus, Species) == "none"
 
         # Ask the sep
         SfcnameSep <- readline(cat(
           "What is the separator (., _, , etc) between the genus and the species in '", ScientificName,"'?")) # question to the user
 
       Data[, c("Genus", "Species") := tstrsplit(ScientificName, SfcnameSep, fixed = TRUE)]
+
+      }
 
 
       ### ScientificName (if Genus & Species exist)
