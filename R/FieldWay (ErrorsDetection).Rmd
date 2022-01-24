@@ -17,6 +17,7 @@ Objective: Detect errors
 - Check for trees *outside the subplot*
 - Missing values in other columns (LifeStatus)
 - Check *missing trees* compared to the previous census (add rows) (idTree absent of the last census, but alive at the previous census)
+- Check *invariant columns*: "Plot","SubPlot","TreeFieldNum","X","Y" for a unique "idTree"
 
 - Bota
 - Life status
@@ -37,27 +38,27 @@ library(data.table)
 data("ParacouSubset") # import data
 # INPUTS
 Data = ParacouSubset
-Plot = "Plot"
-SubPlot = "SubPlot"
-Time = "CensusYear"
+Plot = "SubPlot"
+SubPlot = "SubSubPlot"
+Time = c("2016","2017","2018","2019","2020")
 TreeFieldNum = "TreeFieldNum"
 IdTree = "idTree"
 LifeStatus = "CodeAlive"
 Size = "Circ"
-SizeUnit = "cm"
+SizeUnit = "m"
 POM = "MeasCode"
-POMUnit = "m"
+POMUnit = "code" # NULL
 PlotArea = "PlotArea"
 X = "Xutm"
 Y = "Yutm"
-# ScientificName = NULL
-VernName = "VernName"
+ScientificName = "none" # NULL
+VernName = "none" # NULL
 Family = "Family"
 Genus = "Genus"
 Species = "Species"
 CommercialSp = "CommercialSp"
-# TreeHeight = NULL
-# TreeHeightUnit = NULL
+TreeHeight = "none" # NULL
+TreeHeightUnit = "none" # NULL
 ```
 
 
@@ -156,5 +157,12 @@ PrevIDs <- unique(PreviousCens$idTree[PreviousCens$CodeAlive == 1 & PreviousCens
     LastCens <- rbind(LastCens,unsighted_trees[,names(LastCens)]) 
   }
   row.names(LastCens) <- NULL
+```
+
+
+## Check invariant columns
+```{r}
+# "Plot","SubPlot","TreeFieldNum","X","Y"
+
 ```
 
