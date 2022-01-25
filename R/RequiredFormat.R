@@ -213,7 +213,7 @@ RequiredFormat <- function(
   ## data.frame to data.table
   setDT(Data) # with "set" "<-" is not necessary
 
-  eval(substitute(
+  eval(substitute( # use of argument values as variables
     {
 
       ## Wide to long format (detect and reshape)

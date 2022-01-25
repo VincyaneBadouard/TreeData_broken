@@ -10,15 +10,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Objective: Detect errors
-- Check of the *unique association of the idTree with plot, subplot*
+- Check *duplicated TreeFieldNum* in plot-subplot association
+- Check of the *unique association of the idTree with plot, subplot and TreeFieldNum*
 - Check *duplicated idTree* in a census
 - Check *missing value* (NA/NULL/0) of tree size
 - Check for *missing coordinates*
 - Check for trees *outside the subplot*
-- Missing values in other columns (LifeStatus)
+- Missing values in other columns (Plot, SubPlot, Time, TreeFieldNum, IdTree, LifeStatus, POM)
 - Check *missing trees* compared to the previous census (add rows) (idTree absent of the last census, but alive at the previous census)
 - Check *invariant columns*: "Plot","SubPlot","TreeFieldNum","X","Y" for a unique "idTree"
 
+Internals:
 - Bota
 - Life status
 - Diameter
@@ -27,7 +29,7 @@ Objective: Detect errors
 -> Create a comment ("Comment" column) to inform about the error type.
 
 # Packages libraries
-```{r}
+```{r, include = FALSE}
 library(TreeData)
 library(data.table)
 ```
@@ -35,12 +37,15 @@ library(data.table)
 
 # Import data & other inputs
 ```{r}
-data("ParacouSubset") # import data
+data("TestData") # import data
 # INPUTS
-Data = ParacouSubset
+Data = TestData
+## data.frame to data.table
+setDT(Data) # with "set" "<-" is not necessary
+
 Plot = "SubPlot"
 SubPlot = "SubSubPlot"
-Time = c("2016","2017","2018","2019","2020")
+Time = "CensusYear"
 TreeFieldNum = "TreeFieldNum"
 IdTree = "idTree"
 LifeStatus = "CodeAlive"
@@ -59,30 +64,50 @@ Species = "Species"
 CommercialSp = "CommercialSp"
 TreeHeight = "none" # NULL
 TreeHeightUnit = "none" # NULL
+
+# Environment
+# list with new names for the object in arguments (to avoid conflict and work with user variables names)
+env <- lapply(list(.Plot = Plot,
+                   .SubPlot = SubPlot,
+                   .Time = Time,    # if it's a vector as.name keeps only the first column name
+                   .TreeFieldNum = TreeFieldNum,
+                   .IdTree = IdTree,
+                   .LifeStatus = LifeStatus,
+                   .Size = Size,
+                   .POM = POM,
+                   .PlotArea = PlotArea,
+                   .X = X,
+                   .Y = Y,
+                   .ScientificName = ScientificName,
+                   .VernName = VernName,
+                   .Family = Family,
+                   .Genus = Genus,
+                   .Species = Species,
+                   .CommercialSp = CommercialSp,
+                   .TreeHeight = TreeHeight
+), as.name) # refer to R object by their name. Doesn't work if the value is NULL
 ```
 
 
 # Multiple checks
 
 ## Missing values
-Plot, SubPlot, Time,TreeFieldNum, IdTree, LifeStatus, Size, POM, X, Y
+Plot, SubPlot, Time, TreeFieldNum, IdTree, X, Y
 If the column exists, but have NA values
 ```{r}
-Vars <- c(Plot, SubPlot, Time, TreeFieldNum, IdTree, LifeStatus, Size, POM, X, Y)
+Vars <- c(Plot, SubPlot, Time, TreeFieldNum, IdTree, LifeStatus, Size, POM, X, Y) # col names (chr)
 
-for (v in Vars) {
+v =6
+for (v in 1:length(Vars)) {
   
   if(Vars[v] %in% names(Data)){ # If the column exists
     
-    MissingVal <- Data[is.na(get(Vars[v])) | get(Vars[v]) == 0, get(Vars[v])]
+    Data[is.na(Vars[v]), "Comment" := paste0("Missing value in ", Vars[v])] # comments
     
-    if(any(MissingVal)){ # but have NA values
-      Data[MissingVal, Comment := paste0("Missing value in ", Vars[v])] # comments
-    }
   }
 }
 
-# Simple version
+
 # Check for missing coordinates
 # missing_coor <- Data[is.na(get(X)) | is.na(get(Y))] # transformer en 1 vect
 # if(any(missing_coor)){
@@ -90,16 +115,22 @@ for (v in Vars) {
 #   Data[missing_coor, Comment := paste0("Missing coordinates: ",X,", ",Y)]
 # }
 ```
+
+## Check duplicated TreeFieldNum in plot-subplot association
+```{r}
+
+```
+
 ## Check of the unique association of the idTree with plot, subplot and TreeFieldNum
 ```{r}
-# Check of the unique association of the idTree with plot, subplot
+# Check of the unique association of the idTree with plot, subplot and TreeFieldNum
 
-correspondances <- na.omit(unique(Data[, c(IdTree, Plot, SubPlot, TreeFieldNum), with = FALSE])) # with = FALSE: the column names can be used as variables
+correspondances <- na.omit(unique(Data[, c(IdTree, Plot, SubPlot, TreeFieldNum), with = FALSE])) # with=F: the column names can be used as variables
 
-CorresIDs <- correspondances[, IdTree, with = FALSE]
+CorresIDs <- correspondances[, IdTree, with = FALSE] # all the possible idtree's
 
 
-if(!identical(CorresIDs, unique(CorresIDs))){ # same lenght, same ids -> 1 asso/ID
+if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same lenght, same ids -> 1 asso/ID
   
   Data[duplicated(CorresIDs),
        Comment := paste0("Non-unique association of the ",IdTree," with " ,Plot,", ",SubPlot," and " ,TreeFieldNum)]
@@ -108,8 +139,12 @@ if(!identical(CorresIDs, unique(CorresIDs))){ # same lenght, same ids -> 1 asso/
 
 
 ```
+
 ## Check duplicated idTree in a census
 ```{r}
+# Separate the data per census
+# Data2016 <- Data[Time == 2016]
+
 # Check duplicated idTree in a census
 ids <- apured_trees$idTree[!is.na(apured_trees$idTree)] # Take care of excluding NAs
 
@@ -134,29 +169,29 @@ LastTime <- max(Data[,get(Time)]) # Last census year
 LastCens <- Data[get(Time) == LastTime]
 PreviousTime <- max(unique(Data[get(Time) < LastTime, get(Time)])) # Previous census year
 PreviousCens <- Data[get(Time) == PreviousTime]
-  
+
 # IdTree's alive at the previous census, in the plot and subplot in common between last and previous census
 PreviousCensPlot <- unique(Data[,get(Plot)]) # unique(Data[,c(Plot), with = FALSE])
 PreviousCensSubPlot <- 
-
-PrevIDs <- unique(PreviousCens[get(LifeStatus)== TRUE, get(IdTree)])
+  
+  PrevIDs <- unique(PreviousCens[get(LifeStatus)== TRUE, get(IdTree)])
 
 PrevIDs <- unique(PreviousCens$idTree[PreviousCens$CodeAlive == 1 & PreviousCens$Plot %in% plot & 
-                                          PreviousCens$SubPlot %in% subplot])
+                                        PreviousCens$SubPlot %in% subplot])
 
-  unsighted <- PrevIDs[!PrevIDs %in% LastCens$idTree[!is.na(LastCens$idTree)]]
-  
-  info <- c("Plot","SubPlot","TreeFieldNum","Xfield","Yfield", "idTree")
+unsighted <- PrevIDs[!PrevIDs %in% LastCens$idTree[!is.na(LastCens$idTree)]]
 
-  if(length(unsighted) > 0){
-    unsighted_trees <- PreviousCens[PreviousCens$idTree %in% unsighted & PreviousCens$CodeAlive == TRUE, info]
-    unsighted_trees[,names(LastCens)[!names(LastCens) %in% names(unsighted_trees)]] <- NA
-    unsighted_trees$to_check <- TRUE
-    unsighted_trees$apurement_codes <- "unseen"
-    unsighted_trees$comments <- "Arbre oublie/non vu"
-    LastCens <- rbind(LastCens,unsighted_trees[,names(LastCens)]) 
-  }
-  row.names(LastCens) <- NULL
+info <- c("Plot","SubPlot","TreeFieldNum","Xfield","Yfield", "idTree")
+
+if(length(unsighted) > 0){
+  unsighted_trees <- PreviousCens[PreviousCens$idTree %in% unsighted & PreviousCens$CodeAlive == TRUE, info]
+  unsighted_trees[,names(LastCens)[!names(LastCens) %in% names(unsighted_trees)]] <- NA
+  unsighted_trees$to_check <- TRUE
+  unsighted_trees$apurement_codes <- "unseen"
+  unsighted_trees$comments <- "Arbre oublie/non vu"
+  LastCens <- rbind(LastCens,unsighted_trees[,names(LastCens)]) 
+}
+row.names(LastCens) <- NULL
 ```
 
 
@@ -165,4 +200,11 @@ PrevIDs <- unique(PreviousCens$idTree[PreviousCens$CodeAlive == 1 & PreviousCens
 # "Plot","SubPlot","TreeFieldNum","X","Y"
 
 ```
+
+# Internals
+
+## Bota
+## Life status
+## Diameter
+## Recruitment
 

@@ -9,4 +9,4 @@ TreeData: An R package to harmonize & correct forest data.
 
 "TreeData" is a provisional name.
 
-The package structure diagrams (TreeData_Structure.drawio.html)can be found in the "docs" folder.
+The package structure diagrams (TreeData_Structure.drawio.html) can be found in the "documents" folder.
