@@ -10,11 +10,7 @@ if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 # load required packages' libraries
 lapply(as.list(list.of.packages), library, character.only = T)
 
-# source the REquiredFormat function to get the list of arguments
-source(paste0(dirname(dirname(getwd())), "/R/RequiredFormat.R")) # ***make this better!!**
 
-# x <- as.list(formals(RequiredFormat)[-1])
-x <- read.csv("interactive_items.csv")
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
@@ -65,10 +61,30 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
-            fluidPage(
+            fluidRow(
 
-              dashboardBody(column(4, uiOutput("ui1")))
-            )),
+              column(width = 5,
+                     box(title = "Match your columns to ours (if you can)",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         uiOutput("ui1"))),
+
+            column(width = 5,
+                   box(title = "Tell us about your units (if they are not in a column)",
+                       width = NULL,
+                       status = "primary",
+                       solidHeader = TRUE,
+                       uiOutput("ui2"))),
+
+            column(width = 5,
+                   box(title = "Tell us about your plot (if info is not in a column)",
+                       width = NULL,
+                       status = "primary",
+                       solidHeader = TRUE,
+                       uiOutput("ui3")))
+            )
+            ),
 
     tabItem(tabName = "Save",
             fluidRow(
@@ -90,4 +106,4 @@ body <- dashboardBody(
 )
 
 
-dashboardPage(header, sidebar, body)
+ui <- dashboardPage(header, sidebar, body)

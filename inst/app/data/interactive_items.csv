@@ -1,0 +1,25 @@
+Tab,UI,ItemType,ItemID,Label,Choices,Value,Dependant_on
+Headers,1,selectInput,Plot,Plot name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Subplot,Suplot name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,TimeCol,Time of measurement,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,TreeFieldNum,What is your TreeFieldNum column name?,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,IdTree,Tree ID,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,LifeStatus,Tree status,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Size,DBH,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,POM,POM,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,X,X coordinate,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Y,Y coordinate,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,ScientificName,Scientifix name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,VernName,Vernacular name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Family,Family name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Genus,Genus name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,Species,Species name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,CommercialSp,commercial species name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,TreeHeight,Tree height,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,SizeUnitCol,DBH units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,POMUnitCol,POM units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,1,selectInput,TreeHeightUnitCol,Tree Height Units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
+Headers,2,selectInput,SizeUnit,What is your DBH unit ?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,SizeUnitCol
+Headers,2,selectInput,POMUnit,What is your POM unit?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,POMUnitCol
+Headers,2,selectInput,TreeHeightUnit,What is your tree height unit?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,TreeHeightUnitCol
+Headers,3,numericInput,Time,What is your time of measurement?,,2021,TimeCol
