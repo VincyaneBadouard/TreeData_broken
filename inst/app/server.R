@@ -20,13 +20,12 @@ server <- function(input, output) {
 
   output$ui1 <- renderUI({
     # req(x)
-    lapply(names(x), function(i) {
+    lapply(c(1:nrow(x)), function(i) {
       fluidRow(
-        selectInput(glue::glue("{i}"), label = h3(i), choices = c(x[[i]], colnames(data.table::fread( input$file1$datapath,
-                                                                                                     header = input$header,
-                                                                                                     sep = input$cbSeparator))))
-
+        selectInput(x$ItemID[i], label = h3(x$Label[i]), choices = eval(parse(text = x$Choices[i])))
       )
+
+
     })
   })
 
