@@ -10,6 +10,8 @@ if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 # load required packages' libraries
 lapply(as.list(list.of.packages), library, character.only = T)
 
+
+
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
 
@@ -18,7 +20,7 @@ sidebar <- dashboardSidebar(
   useShinyjs(),
   sidebarMenu(menuItem("Short Manual", tabName = "Manual", icon = icon("book")),
               menuItem("Upload your file", tabName = "Upload", icon = icon("upload")),
-              menuItem("Change format", tabName = "Reformat", icon = icon("arrows-alt")),
+              menuItem("Identify headers", tabName = "headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
               menuItem("Save codes and data", tabName="Save", icon = icon("save"))
@@ -58,6 +60,32 @@ body <- dashboardBody(
             )
     ),  ## end of "upload" panel
 
+    tabItem(tabName = "headers",
+            fluidRow(
+
+              column(width = 5,
+                     box(title = "Match your columns to ours (if you can)",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         uiOutput("ui1"))),
+
+            column(width = 5,
+                   box(title = "Tell us about your units (if they are not in a column)",
+                       width = NULL,
+                       status = "primary",
+                       solidHeader = TRUE,
+                       uiOutput("ui2"))),
+
+            column(width = 5,
+                   box(title = "Tell us about your plot (if info is not in a column)",
+                       width = NULL,
+                       status = "primary",
+                       solidHeader = TRUE,
+                       uiOutput("ui3")))
+            )
+            ),
+
     tabItem(tabName = "Save",
             fluidRow(
               column(width = 3,
@@ -78,4 +106,4 @@ body <- dashboardBody(
 )
 
 
-dashboardPage(header, sidebar, body)
+ui <- dashboardPage(header, sidebar, body)
