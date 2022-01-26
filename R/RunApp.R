@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom shiny runApp
 RunApp <- function() {
   # appDir <- system.file("app", package = "TreeData")
   appDir <- "inst/app"
