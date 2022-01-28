@@ -14,7 +14,7 @@ for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 server <- function(input, output) {
 
   # read file and create data table
-  invData <- reactive({
+  Data <- reactive({
     file <- input$file1
     ext <- tools::file_ext(file$datapath)
 
@@ -88,7 +88,7 @@ server <- function(input, output) {
   # render data table
   output$tabData <- renderDT({
     if (!is.null(input$file1$name))
-      invData()
+      Data()
   }, rownames = FALSE,
   options = list(pageLength = 10))
 
@@ -98,7 +98,7 @@ server <- function(input, output) {
       paste(Sys.Date(), '_data.csv', sep = '')
     },
     content = function(file) {
-      write.csv(invData(), file, row.names = FALSE)
+      write.csv(Data(), file, row.names = FALSE)
     }
   )
 
@@ -109,7 +109,7 @@ server <- function(input, output) {
     },
     content = function(file) {
       text_upload <- glue::glue("# upload the data
-                         invData <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')")
+                         Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')")
       writeLines(text_upload, file)
     }
   )
