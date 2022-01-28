@@ -1,25 +1,40 @@
-Tab,UI,ItemType,ItemID,Label,Choices,Value,Dependant_on
-Headers,1,selectInput,Plot,Plot name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Subplot,Suplot name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,TimeCol,Time of measurement,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,TreeFieldNum,What is your TreeFieldNum column name?,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,IdTree,Tree ID,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,LifeStatus,Tree status,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Size,DBH,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,POM,POM,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,X,X coordinate,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Y,Y coordinate,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,ScientificName,Scientifix name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,VernName,Vernacular name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Family,Family name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Genus,Genus name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,Species,Species name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,CommercialSp,commercial species name,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,TreeHeight,Tree height,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,SizeUnitCol,DBH units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,POMUnitCol,POM units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,1,selectInput,TreeHeightUnitCol,Tree Height Units column,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))",,
-Headers,2,selectInput,SizeUnit,What is your DBH unit ?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,SizeUnitCol
-Headers,2,selectInput,POMUnit,What is your POM unit?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,POMUnitCol
-Headers,2,selectInput,TreeHeightUnit,What is your tree height unit?,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")",,TreeHeightUnitCol
-Headers,3,numericInput,Time,What is your time of measurement?,,2021,TimeCol
+Tab,UI,ItemType,argument,ItemID,Label,helpText,Dependant_on,argValue
+Headers,1,selectInput,choices,Site,Site name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,3,textInput,value,SiteMan,What is your site name ?,,Site,
+Headers,1,selectInput,choices,Plot,Plot name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,3,textInput,value,PlotMan,What is your plot name ?,,Plot,
+Headers,1,selectInput,choices,Subplot,Subplot name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,3,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,
+Headers,1,selectInput,choices,CensusYear,Census year,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,3,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,as.numeric(2021)
+Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,IdTree,Tree ID,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,DBH,DBH,Diamter at breast height,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,DBHUnitCol,DBH unit,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,2,selectInput,choices,DBHUnit,What is your DBH unit ?,,DBHUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,1,selectInput,choices,POM,POM (height),height of measurement,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,POMUnitCol,POM units,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,2,selectInput,choices,POMUnit,What is your POM unit?,,POMUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,1,selectInput,choices,Lat,Tree latitude,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Lon,Tree longitude,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Xutm,Tree X UTM coordinate,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Yutm,Tree Y UTM coordinate,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Xfield,Tree X euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Yfield,Tree Y euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,ScientificName,Scientific name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,VernName,Vernacular name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Family,Family name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Genus,Genus name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Species,Species name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,TreeHeight,Tree height,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,TreeHeightUnitCol,Tree height units,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,2,selectInput,choices,TreeHeightUnit,What is your tree height unit?,,TreeHeightUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
+Headers,1,selectInput,choices,StemHeight,Stem height,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,LifeForm,Life form,(tree/palm/liana/bamboo),none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Treatment,Logging treatment,(CL/RIL/control/..),none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,SoilType,Type of soil,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"

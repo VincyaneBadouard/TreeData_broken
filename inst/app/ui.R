@@ -61,30 +61,28 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
+            column(width = 10,
             fluidRow(
-
-              column(width = 5,
                      box(title = "Match your columns to ours (if you can)",
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         uiOutput("ui1"))),
+                         uiOutput("ui1")),
 
-            column(width = 5,
                    box(title = "Tell us about your units (if they are not in a column)",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
-                       uiOutput("ui2"))),
+                       uiOutput("ui2")),
 
-            column(width = 5,
+
                    box(title = "Tell us about your plot (if info is not in a column)",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
                        uiOutput("ui3")))
-            )
-            ),
+
+            )),
 
     tabItem(tabName = "Save",
             fluidRow(
