@@ -10,6 +10,7 @@
 x <- read.csv("data/interactive_items.csv")
 
 for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
+
 server <- function(input, output) {
 
   # read file and create data table
@@ -27,11 +28,18 @@ server <- function(input, output) {
 
   # enter column names for each element of the RequiredFormat function
 
+
   output$ui1 <- renderUI({
-    # req(x1)
-    lapply(c(1:nrow(x1)), function(i) {
-      fluidRow(
-        selectInput(x1$ItemID[i], label = h3(x1$Label[i]), choices = eval(parse(text = x1$Choices[i])))
+    # box(input[[x$Dependant_on]] %in% "none")
+    lapply(1:nrow(x1), function(i) {
+      # if(input[[x$Dependant_on[i]]] == "none")
+      box(
+        # h5(input[[x$Dependant_on[i]]] %in% "none"),
+        h3(x1$Label[i]),
+        helpText(x1$helpText[i]),
+        eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label ='',", x1$argument[i], "= eval(parse(text = x1$argValue[i])))"))),
+        br()
+
       )
 
 
@@ -39,14 +47,21 @@ server <- function(input, output) {
   })
 
 
+
   output$ui2 <- renderUI({
     # req(x2)
 
     lapply(c(1:nrow(x2)), function(i) {
       if(input[[x2$Dependant_on[i]]] %in% "none")
-        fluidRow(
-        selectInput(x2$ItemID[i], label = h3(x2$Label[i]), choices = eval(parse(text = x2$Choices[i])))
-      )
+        box(
+          # h5(input[[x$Dependant_on[i]]] %in% "none"),
+          h3(x2$Label[i]),
+          helpText(x2$helpText[i]),
+          eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label ='',", x2$argument[i], "= eval(parse(text = x2$argValue[i])))"))),
+          br()
+
+        )
+
 
 
     })
@@ -57,8 +72,13 @@ server <- function(input, output) {
 
     lapply(c(1:nrow(x3)), function(i) {
       if(input[[x3$Dependant_on[i]]] %in% "none")
-        fluidRow(
-          numericInput(x3$ItemID[i], label = h3(x3$Label[i]), value = eval(parse(text = x3$Value[i])))
+        box(
+          # h5(input[[x$Dependant_on[i]]] %in% "none"),
+          h3(x3$Label[i]),
+          helpText(x3$helpText[i]),
+          eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label ='',", x3$argument[i], "= eval(parse(text = x3$argValue[i])))"))),
+          br()
+
         )
 
 
