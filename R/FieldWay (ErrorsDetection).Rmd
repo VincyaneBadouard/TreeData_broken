@@ -42,50 +42,6 @@ data("TestData") # import data
 Data = TestData
 ## data.frame to data.table
 setDT(Data) # with "set" "<-" is not necessary
-
-Plot = "SubPlot"
-SubPlot = "SubSubPlot"
-Time = "CensusYear"
-TreeFieldNum = "TreeFieldNum"
-IdTree = "idTree"
-LifeStatus = "CodeAlive"
-Size = "Circ"
-SizeUnit = "m"
-POM = "MeasCode"
-POMUnit = "code" # NULL
-PlotArea = "PlotArea"
-X = "Xutm"
-Y = "Yutm"
-ScientificName = "none" # NULL
-VernName = "none" # NULL
-Family = "Family"
-Genus = "Genus"
-Species = "Species"
-CommercialSp = "CommercialSp"
-TreeHeight = "none" # NULL
-TreeHeightUnit = "none" # NULL
-
-# Environment
-# list with new names for the object in arguments (to avoid conflict and work with user variables names)
-env <- lapply(list(.Plot = Plot,
-                   .SubPlot = SubPlot,
-                   .Time = Time,    # if it's a vector as.name keeps only the first column name
-                   .TreeFieldNum = TreeFieldNum,
-                   .IdTree = IdTree,
-                   .LifeStatus = LifeStatus,
-                   .Size = Size,
-                   .POM = POM,
-                   .PlotArea = PlotArea,
-                   .X = X,
-                   .Y = Y,
-                   .ScientificName = ScientificName,
-                   .VernName = VernName,
-                   .Family = Family,
-                   .Genus = Genus,
-                   .Species = Species,
-                   .CommercialSp = CommercialSp,
-                   .TreeHeight = TreeHeight
-), as.name) # refer to R object by their name. Doesn't work if the value is NULL
 ```
 
 
@@ -95,25 +51,20 @@ env <- lapply(list(.Plot = Plot,
 Plot, SubPlot, Time, TreeFieldNum, IdTree, X, Y
 If the column exists, but have NA values
 ```{r}
-Vars <- c(Plot, SubPlot, Time, TreeFieldNum, IdTree, LifeStatus, Size, POM, X, Y) # col names (chr)
+Vars <- c("Plot", "SubPlot", "CensusYear", "TreeFieldNum", "IdTree", "LifeStatus", "DBH", "POM", "Xutm", "Yutm")
 
-v =6
+v = 7
 for (v in 1:length(Vars)) {
   
   if(Vars[v] %in% names(Data)){ # If the column exists
     
-    Data[is.na(Vars[v]), "Comment" := paste0("Missing value in ", Vars[v])] # comments
+    Data[is.na(get(Vars[v])),
+         "Comment" := paste0("Missing value in ", Vars[v])] # comments
     
   }
 }
 
-
-# Check for missing coordinates
-# missing_coor <- Data[is.na(get(X)) | is.na(get(Y))] # transformer en 1 vect
-# if(any(missing_coor)){
-#   
-#   Data[missing_coor, Comment := paste0("Missing coordinates: ",X,", ",Y)]
-# }
+Data[!is.na(Comment)] # to check
 ```
 
 ## Check duplicated TreeFieldNum in plot-subplot association

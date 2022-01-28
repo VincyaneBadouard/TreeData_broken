@@ -7,8 +7,8 @@ library(data.table)
 
 #### Import data ####
 
-data("ParacouSubset") # import data
-Data = ParacouSubset
+data("StandardData") # import data
+Data = StandardData
 ## data.frame to data.table
 setDT(Data) # with "set" "<-" is not necessary
 
@@ -19,12 +19,12 @@ nError <- 2 # number of error to add for each case
 
 # Size = NA
 modif <- Data[, .I[sample(.N, nError)]] # .I = seq_len(nrow(Data)), .N = nrows in the group -> sample 2 rows number in Data
-Data[modif, Circ := NA]
+Data[modif, DBH := NA]
 # Data[modif] # to check
 
 # Size = 0
 modif <- Data[, .I[sample(.N, nError)]] # .I = seq_len(nrow(Data)), .N = nrows in the group -> sample 2 rows number in Data
-Data[modif, Circ := 0]
+Data[modif, DBH := 0]
 # Data[modif] # to check
 
 
@@ -32,7 +32,7 @@ Data[modif, Circ := 0]
 
 wrong <- c(0.2, 0.3, 0.569, 0.8)
 modif <- Data[, .I[sample(.N, nError)]]
-Data[modif, Circ := Circ + sample(wrong,1)]
+Data[modif, DBH := DBH + sample(wrong,1)]
 # Data[modif] # to check
 
 
@@ -42,17 +42,17 @@ Last_census <- Data[CensusYear == 2020]
 Previous_census <- Data[CensusYear == 2019]
 
 # See if a resurrected tree already exists
-MortPrev <- Previous_census[CodeAlive == 0 & idTree %in% Last_census[CodeAlive == 1, idTree], idTree]
+MortPrev <- Previous_census[LifeStatus == 0 & IdTree %in% Last_census[LifeStatus == 1, IdTree], IdTree]
 # dead in 2019, alive in 2020
 
-Previous_census[idTree == 101410] # dead
-Last_census[idTree == 101410] # alive
+Previous_census[IdTree == 101410] # dead
+Last_census[IdTree == 101410] # alive
 
 
 #### Missing life status ####
 
 modif <- Data[, .I[sample(.N, nError)]] # .I = seq_len(nrow(Data)), .N = nrows in the group -> sample 2 rows number in Data
-Data[modif, CodeAlive := NA]
+Data[modif, LifeStatus := NA]
 Data[modif] # to check
 
 
@@ -70,15 +70,15 @@ Data[modif, TreeFieldNum := duplicatedFieldNum] # on the row to modif, we duplic
 
 #### Unseen tree but alive tree after ####
 
-#### Duplicated idTree in a census ####
+#### Duplicated IdTree in a census ####
 
-idModif <- Last_census[, sample(idTree, nError)] # ne chercher que dans ceux qui ne sont pas à verifier pour eviter de prendre certains avec un duplicatedID # selectionner 2 idTree à modifier
+idModif <- Last_census[, sample(IdTree, nError)] # ne chercher que dans ceux qui ne sont pas à verifier pour eviter de prendre certains avec un duplicatedID # selectionner 2 IdTree à modifier
 
-duplicatedID <- Last_census[!(idTree %in% idModif), sample(idTree, 1)] # idTree != modif
+duplicatedID <- Last_census[!(IdTree %in% idModif), sample(IdTree, 1)] # IdTree != modif
 
-Data[idTree %in% idModif, idTree := duplicatedID] # we duplicate the idTree on the previous selected idTree
+Data[IdTree %in% idModif, IdTree := duplicatedID] # we duplicate the IdTree on the previous selected IdTree
 
-Data[CensusYear == 2020 & idTree == duplicatedID] # to check
+Data[CensusYear == 2020 & IdTree == duplicatedID] # to check
 
 
 
@@ -89,3 +89,4 @@ Data[CensusYear == 2020 & idTree == duplicatedID] # to check
 TestData <- Data
 
 usethis::use_data(TestData, overwrite = TRUE)
+

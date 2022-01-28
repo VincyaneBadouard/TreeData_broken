@@ -1,9 +1,13 @@
-#' Test Data of the TreeData package
+#' Standard data of the TreeData package
 #'
-#' *Attention*: this inventory contains errors that have been deliberately added
-#'  in order to test their detection.
 #'
-#' Subset of tree inventories of Paracou research station (French Guiana)
+#' This dataset is an adaptation of a subset of tree inventories of Paracou
+#' research station (French Guiana)
+#'
+#' Nature of the adaptation: modification of the names and classes of some
+#' variables.
+#'
+#' Nature of the subset:
 #' - Plot 6
 #' - SubPlot 1
 #' - 2016-2020
@@ -11,7 +15,7 @@
 #' - 1000 random individuals
 #' - 4 dummy sub-sub-squares created for the package to be use as plots
 #' in long format.
-#' Dataset extracted from the Guyafor database *WITH ADDING ERRORS*
+#' Dataset extracted from the Guyafor database.
 #'
 #' @format A tibble with 4854 rows and 32 variables:
 #' \describe{
@@ -62,4 +66,4 @@
 #' @source \url{http://paracou.cirad.fr} ;
 #' \url{https://paracoudata.cirad.fr/public/pdf/Paracou_data_dictionnary.pdf}
 #'
-"TestData"
+"StandardData"

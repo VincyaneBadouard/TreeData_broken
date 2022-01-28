@@ -260,14 +260,14 @@ RequiredFormat <- function(
 
         # Work only with 1 col to create from the wide format columns
         Data <- data.table::melt(Data,
-                     measure.vars = ColToTranspos, # cols to rows (arguments pour lesquels un vecteur est renseigné)
-                     variable.name = ColToTranspos_argname, # name of the new column (length=1) that contains the names of the transposed variables
-                     value.name = ValuesColName) # name of the new column that contains the values of the transposed variables
+                                 measure.vars = ColToTranspos, # cols to rows (arguments pour lesquels un vecteur est renseigné)
+                                 variable.name = ColToTranspos_argname, # name of the new column (length=1) that contains the names of the transposed variables
+                                 value.name = ValuesColName) # name of the new column that contains the values of the transposed variables
 
         if(ColToTranspos_argname == "Time"){
-        Time <- ColToTranspos_argname
+          Time <- ColToTranspos_argname
         }else{
-          stop(cat("To create the cases where 'Time' is not the variable to transpose"))
+          stop(cat("Create the cases where 'Time' is not the variable to transpose"))
         }
 
       } # ColToTranspos_argname == 1
@@ -282,7 +282,6 @@ RequiredFormat <- function(
       # }
 
       ### as.character
-
       CharacVar <- c(Plot, SubPlot, TreeFieldNum, IdTree, ScientificName, VernName, Family, Genus, Species) # character variables
       CharacVar <- CharacVar[!CharacVar %in% "none"]
 
@@ -342,6 +341,8 @@ RequiredFormat <- function(
         uniq_key[, IdTree := seq(1, nrow(uniq_key))]
 
         merge(Data, uniq_key)
+
+        IdTree <- "IdTree"
       }
 
       ### POM ? (if pom is a code)
@@ -351,6 +352,8 @@ RequiredFormat <- function(
 
         if(length(PlotArea) == 1){ # if PlotArea is a (1) numeric value
           Data[,  PlotArea := PlotArea]
+          PlotArea <- "PlotArea"
+
         }
         # if(length(PlotArea) > 1){ # cas à faire : c(1 val par plot)
         #   Data[,  PlotArea := PlotArea, by = Plot] # grouped
@@ -369,16 +372,20 @@ RequiredFormat <- function(
         SfcnameSep <- readline(cat(
           "What is the separator (., _, , etc) between the genus and the species in '", ScientificName,"'?")) # question to the user
 
-      Data[, c("Genus", "Species") := tstrsplit(ScientificName, SfcnameSep, fixed = TRUE)]
+        Data[, c("Genus", "Species") := tstrsplit(ScientificName, SfcnameSep, fixed = TRUE)]
 
+        Genus <- "Genus"
+        Species <- "Species"
       }
 
 
       ### ScientificName (if Genus & Species exist)
-      if(!ScientificName %in% names(Data) & all(c(Genus, Species) %in% names(Data))) # or ScientificName == "none"
+      if(!ScientificName %in% names(Data) & all(c(Genus, Species) %in% names(Data))){ # or ScientificName == "none"
         Data[, ScientificName := paste(.Genus, .Species, sep = "_")]
-
+      ScientificName <- "ScientificName"
+}
     }, env)) # eval(substitute( END
+
 
   # Return in data.frame
   setDF(Data)
