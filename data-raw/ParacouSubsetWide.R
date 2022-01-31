@@ -15,6 +15,9 @@ OtherCols[, c("CensusYear", "CensusDate", "CensusDateCertainty",
               "CodeAlive", "MeasCode") := NULL]
 ParacouSubsetWide <- unique(merge(ParacouSubsetWide, OtherCols, by = "idTree")) #1000 ind -> 1000 rows
 
+#### Circ: cm -> m for the exemple ####
+ParacouSubsetWide[, Circ := Circ/100]
+
 
 #### Save this data in the package ####
 usethis::use_data(ParacouSubsetWide, overwrite = TRUE)
