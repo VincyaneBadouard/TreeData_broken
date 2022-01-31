@@ -1,40 +1,44 @@
-Tab,UI,ItemType,argument,ItemID,Label,helpText,Dependant_on,argValue
-Headers,1,selectInput,choices,Site,Site name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,3,textInput,value,SiteMan,What is your site name ?,,Site,
-Headers,1,selectInput,choices,Plot,Plot name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,3,textInput,value,PlotMan,What is your plot name ?,,Plot,
-Headers,1,selectInput,choices,Subplot,Subplot name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,3,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,
-Headers,1,selectInput,choices,CensusYear,Census year,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,3,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,as.numeric(2021)
-Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,IdTree,Tree ID,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,DBH,DBH,Diamter at breast height,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,DBHUnitCol,DBH unit,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,2,selectInput,choices,DBHUnit,What is your DBH unit ?,,DBHUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,1,selectInput,choices,POM,POM (height),height of measurement,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,POMUnitCol,POM units,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,2,selectInput,choices,POMUnit,What is your POM unit?,,POMUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,1,selectInput,choices,Lat,Tree latitude,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Lon,Tree longitude,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Xutm,Tree X UTM coordinate,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Yutm,Tree Y UTM coordinate,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Xfield,Tree X euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Yfield,Tree Y euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,ScientificName,Scientific name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,VernName,Vernacular name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Family,Family name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Genus,Genus name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Species,Species name,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,TreeHeight,Tree height,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,TreeHeightUnitCol,Tree height units,,none,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,2,selectInput,choices,TreeHeightUnit,What is your tree height unit?,,TreeHeightUnitCol,"c(""none"", ""code"", ""mm"", ""millimetre"", ""millimeter"", ""milimetro"", ""milimetrica"", ""cm"", ""centimetre"", ""centimeter"", ""centimetro"", ""dm"", ""decimetre"", ""decimeter"", ""decimetro"", ""m"", ""metre"", ""meter"", ""metro"")"
-Headers,1,selectInput,choices,StemHeight,Stem height,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,SoilType,Type of soil,,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
-Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,"c(""none"", colnames(data.table::fread( input$file1$datapath, header = input$header, sep = input$cbSeparator)))"
+Tab,UI,ItemType,argument,ItemID,Label,helpText,if_X1_is_none,if_X2_isnot_none,argValue,Activate
+Headers,1,selectInput,choices,Site,Site name,,none,,column_options,TRUE
+Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,,TRUE
+Headers,1,selectInput,choices,Plot,Plot name,,none,,column_options,TRUE
+Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,,FALSE
+Headers,1,selectInput,choices,Subplot,Subplot name,,none,,column_options,TRUE
+Headers,2,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,,,FALSE
+Headers,1,selectInput,choices,CensusYear,Census year,,none,,column_options,TRUE
+Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,as.numeric(2021),TRUE
+Headers,1,selectInput,choices,CensusDate,Census Date,,none,,column_options,FALSE
+Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,,column_options,TRUE
+Headers,1,selectInput,choices,IdTree,Tree ID,,none,,column_options,TRUE
+Headers,1,selectInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,,column_options,TRUE
+Headers,1,selectInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,,column_options,TRUE
+Headers,1,selectInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,,column_options,TRUE
+Headers,1,selectInput,choices,DBH,DBH,Diamter at breast height,none,,column_options,TRUE
+Headers,1,selectInput,choices,DBHUnitCol,DBH unit,,none,,column_options,TRUE
+Headers,3,selectInput,choices,DBHUnit,What is your DBH unit ?,,DBHUnitCol,DBH,unit_options,TRUE
+Headers,1,selectInput,choices,Circ,Circumference,Circumference of the tree,,,column_options,TRUE
+Headers,1,selectInput,choices,CircUnitCol,Circumference unit,,,,column_options,TRUE
+Headers,3,selectInput,choices,CircUnit,What is your circumference unit?,,CircUnitCol,Circ,unit_options,TRUE
+Headers,1,selectInput,choices,POM,POM (height),height of measurement,none,,column_options,TRUE
+Headers,1,selectInput,choices,POMUnitCol,POM units,,none,,unit_options,TRUE
+Headers,3,selectInput,choices,POMUnit,What is your POM unit?,,POMUnitCol,POM,unit_options,TRUE
+Headers,1,selectInput,choices,Lat,Tree latitude,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Lon,Tree longitude,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Xutm,Tree X UTM coordinate,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Yutm,Tree Y UTM coordinate,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Xfield,Tree X euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,column_options,TRUE
+Headers,1,selectInput,choices,Yfield,Tree Y euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,column_options,TRUE
+Headers,1,selectInput,choices,ScientificName,Scientific name,,none,,column_options,TRUE
+Headers,1,selectInput,choices,VernName,Vernacular name,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Family,Family name,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Genus,Genus name,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Species,Species name,,none,,column_options,TRUE
+Headers,1,selectInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,,column_options,TRUE
+Headers,1,selectInput,choices,TreeHeight,Tree height,,none,,column_options,TRUE
+Headers,1,selectInput,choices,TreeHeightUnitCol,Tree height units,,none,,unit_options,TRUE
+Headers,3,selectInput,choices,TreeHeightUnit,What is your tree height unit?,,TreeHeightUnitCol,TreeHeight,unit_options,TRUE
+Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,,column_options,TRUE
+Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,column_options,TRUE
+Headers,1,selectInput,choices,SoilType,Type of soil,,none,,column_options,TRUE
+Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,column_options,TRUE
+Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,,TRUE
