@@ -13,24 +13,43 @@
 #' @examples
 #'\dontrun{
 #' data(ParacouSubset)
-#' Data <- ParacouSubset
-#' RequiredFormat_interactive(Data)
+#' ParacouProfile <- RequiredFormat_interactive(ParacouSubset)
 #'                }
 #'
 
 RequiredFormat_interactive <- function(Data, input = list()) {
 
   x <- read.csv("inst/app/data/interactive_items.csv")
+  x <- x[x$Activate,]
+
+  # remove what is already in the input (if it is a profile)
+  x <- x[!x$ItemID %in% names(input),]
+
+  # separate x into its subsets
   for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
+
 
   column_options <- c("none", colnames(Data))
   unit_options <- c("none", "mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
 
+helper_eval <- function(x) eval(parse(text = paste(paste0('input[["', x$ItemID, '"]] <<-', x$argValue, '[as.numeric(readline(cat("', x$Label, ifelse(x$helpText!="", paste0(" (", x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)), ": ", get(x$argValue), collapse = "  "), '")))]'))))
+
+readline(cat("Please, help us match your columns to ours.\nWe will successively ask you to give us what columns, in your data set, match the following items (when not provided in 'input'):\n", paste(paste("-", x$Label, ifelse(x$helpText!="", paste0(" (", x$helpText, ")"), "")), collapse = "\n"), "\nFor each if these items, you will have to enter a number. Follow the list provided and enter the number corresponding to the corresponding column, then press [enter].\nIf you don't have a column corresponding, enter '1:none'.\n\n***SCROLL UP TO SEE THE BEGEINING OF THIS MESSAGE***\n\nPress [enter] to start."))
+
+if(exists("x1")) helper_eval(x1)
 
 
-readline(cat("Please, help us match your columns to ours.\nWe will successively ask you to give us what columns, in your data set, match the following items:\n", paste(paste("-", x1$ItemID, ifelse(x1$helpText!="", paste0(" (", x1$helpText, ")"), "")), collapse = "\n"), "\nFor each if these items, you will have to enter a number. Follow the list provided and enter the number corresponding to the corresponding column, then press [enter].\nIf you don't have a column corresponding, enter '1:none'.\n\n***SCROLL UP TO SEE THE BEGEINING OF THIS MESSAGE***\n\nPress [enter] to start."))
+if(exists("x2")) {
+  x2_ask <- x2[sapply(input[x2$if_X1_is_none], is.null) | input[x2$if_X1_is_none] %in% "none", ]
+  if(nrow(x2_ask)>0) helper_eval(x2_ask)
 
-eval(parse(text = paste(paste0('input[["', x1$ItemID, '"]] <- column_options[as.numeric(readline(cat("', x1$Label, ifelse(x1$helpText!="", paste0(" (", x1$helpText, ")"), ""), ":\n", paste0(1:length(column_options), ": ", column_options, collapse = "  "), '")))]')))) # ask about the columns - level 1
+}
+
+if(exists("x3")) {
+  x3_ask <- x3[sapply(input[x3$if_X1_is_none], is.null) | (input[x3$if_X1_is_none] %in% "none" & !input[x3$if_X2_isnot_none] %in% "none"), ]
+  if(nrow(x3_ask)>0) helper_eval(x3_ask)
+
+}
 
 return(input)
 }

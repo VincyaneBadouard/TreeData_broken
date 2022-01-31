@@ -20,8 +20,7 @@ RequiredFormat_interactive
 \examples{
 \dontrun{
 data(ParacouSubset)
-Data <- ParacouSubset
-RequiredFormat_interactive(Data)
+ParacouProfile <- RequiredFormat_interactive(ParacouSubset)
                }
 
 }
