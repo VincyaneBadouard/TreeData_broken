@@ -8,7 +8,7 @@
 
 # read in csv file that has all we want to show in app
 x <- read.csv("data/interactive_items.csv")
-
+x <- x[x$Activate, ]
 for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
 server <- function(input, output) {
@@ -30,11 +30,8 @@ server <- function(input, output) {
 
 
   output$ui1 <- renderUI({
-    # box(input[[x$Dependant_on]] %in% "none")
     lapply(1:nrow(x1), function(i) {
-      # if(input[[x$Dependant_on[i]]] == "none")
       box(
-        # h5(input[[x$Dependant_on[i]]] %in% "none"),
         h3(x1$Label[i]),
         helpText(x1$helpText[i]),
         eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label ='',", x1$argument[i], "= eval(parse(text = x1$argValue[i])))"))),
@@ -52,9 +49,8 @@ server <- function(input, output) {
     # req(x2)
 
     lapply(c(1:nrow(x2)), function(i) {
-      if(input[[x2$Dependant_on[i]]] %in% "none")
+      if(input[[x2$if_X1_is_none[i]]] %in% "none")
         box(
-          # h5(input[[x$Dependant_on[i]]] %in% "none"),
           h3(x2$Label[i]),
           helpText(x2$helpText[i]),
           eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label ='',", x2$argument[i], "= eval(parse(text = x2$argValue[i])))"))),
@@ -71,7 +67,8 @@ server <- function(input, output) {
     # req(x3)
 
     lapply(c(1:nrow(x3)), function(i) {
-      if(input[[x3$Dependant_on[i]]] %in% "none")
+      if(input[[x3$if_X1_is_none
+[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
         box(
           # h5(input[[x$Dependant_on[i]]] %in% "none"),
           h3(x3$Label[i]),
