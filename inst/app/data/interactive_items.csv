@@ -1,12 +1,12 @@
 Tab,UI,ItemType,argument,ItemID,Label,helpText,if_X1_is_none,if_X2_isnot_none,argValue,Activate
 Headers,1,selectInput,choices,Site,Site name,,none,,column_options,TRUE
-Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,,TRUE
+Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,other_options,TRUE
 Headers,1,selectInput,choices,Plot,Plot name,,none,,column_options,TRUE
-Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,,FALSE
+Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,other_options,FALSE
 Headers,1,selectInput,choices,Subplot,Subplot name,,none,,column_options,TRUE
-Headers,2,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,,,FALSE
+Headers,2,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,,other_options,FALSE
 Headers,1,selectInput,choices,CensusYear,Census year,,none,,column_options,TRUE
-Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,as.numeric(2021),TRUE
+Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,other_options,TRUE
 Headers,1,selectInput,choices,CensusDate,Census Date,,none,,column_options,FALSE
 Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,,column_options,TRUE
 Headers,1,selectInput,choices,IdTree,Tree ID,,none,,column_options,TRUE
@@ -41,4 +41,4 @@ Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,,co
 Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,column_options,TRUE
 Headers,1,selectInput,choices,SoilType,Type of soil,,none,,column_options,TRUE
 Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,column_options,TRUE
-Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,,TRUE
+Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,other_options,TRUE
