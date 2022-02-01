@@ -19,7 +19,7 @@
 #'
 #' @format A tibble with 4854 rows and 32 variables:
 #' \describe{
-#'   \item{Forest}{Forest name (character)}
+#'   \item{Site}{Site name (character)}
 #'   \item{Plot}{Plot number (character)}
 #'   \item{PlotArea}{Plot area, in hectare (numeric)}
 #'   \item{SubPlot}{Subplot number (character)}

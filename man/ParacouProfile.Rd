@@ -18,7 +18,7 @@ A list of 34
 \item{LifeStatus}{The column name in datda set @ParacouSubset (CodeAlive) corresponding to Life status}
 \item{DBH}{The column name in datda set @ParacouSubset (none) corresponding to DBH}
 \item{DBHUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to DBH unit}
-\item{Circ}{The column name in datda set @ParacouSubset (CircCorr) corresponding to Circumference}
+\item{Circ}{The column name in datda set @ParacouSubset (Circ) corresponding to Circumference}
 \item{CircUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to Circumference unit}
 \item{POM}{The column name in datda set @ParacouSubset (none) corresponding to POM (height)}
 \item{POMUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to POM units}

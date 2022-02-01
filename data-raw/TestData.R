@@ -67,7 +67,7 @@ Last_census[IdTree == 101410] # alive
 
 #### Duplicated TreeFieldNum in plot-subplot association ####
 
-modif <- Data[, .I[sample(.N, 1)]] # 1 row to change
+modif <- Data[, .I[sample(.N, nError)]] # 1 row to change
 duplicatedFieldNum <- Data[!(row.names(Data)) %in% modif & # all rows != modif
                              Plot == Data[modif, Plot] & # same plot as modif
                              SubPlot == Data[modif, SubPlot], # same subplot as modif
@@ -78,9 +78,9 @@ Data[modif, TreeFieldNum := duplicatedFieldNum] # on the row to modif, we duplic
 
 #### Duplicated IdTree in a census ####
 
-idModif <- Last_census[, sample(IdTree, nError)] # ne chercher que dans ceux qui ne sont pas à verifier pour eviter de prendre certains avec un duplicatedID # selectionner 2 IdTree à modifier
+idModif <- Last_census[, sample(IdTree, nError)] # selectionner 1 IdTree (de 2019) à modifier
 
-duplicatedID <- Last_census[!(IdTree %in% idModif), sample(IdTree, 1)] # IdTree != modif
+duplicatedID <- Last_census[!(IdTree %in% idModif), sample(IdTree, 1)] # select 1 (2019) IdTree != modif to duplicate
 
 Data[IdTree %in% idModif, IdTree := duplicatedID] # we duplicate the IdTree on the previous selected IdTree
 

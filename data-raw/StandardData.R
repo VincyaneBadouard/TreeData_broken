@@ -20,6 +20,7 @@ setDT(Data) # with "set" "<-" is not necessary
 
 #### Columns renaming ####
 # setnames(Data, "old", "new")
+Data <- setnames(Data, "Forest", "Site")
 Data[, Plot := NULL]
 Data <- setnames(Data, "SubPlot", "Plot")
 Data <- setnames(Data, "SubSubPlot", "SubPlot")

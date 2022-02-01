@@ -110,57 +110,72 @@ Data[get(Vars) == 0] # to check
 
 ## Check duplicated TreeFieldNum in plot-subplot association
 ```{r}
-# Create "PlotSubNum" = "Plot/SubPlot/TreeFieldNum"
-Data[, PlotSubNum := paste(CensusYear, Plot, SubPlot, TreeFieldNum, sep = "/")]
+# Create "PlotSubNum" = "Site/CensusYear/Plot/SubPlot/TreeFieldNum"
+Data[, PlotSubNum := paste(Site, CensusYear, Plot, SubPlot, TreeFieldNum, sep = "/")]
 
-# y = 2019
-# p=1
-# c= 3
+y = 2019
+p=1
+c= 4
 duplicated_num <- num <- vector("character")
+
 # if any duplicats in this col
 if(anyDuplicated(Data$PlotSubNum) != 0) {
-  # For each census
-  for (y in unique(na.omit(Data$CensusYear))) {
-    # For each plot
-    for (p in unique(na.omit(Data$Plot))) {
-      # For each SubPlot in this plot
-      for (c in unique(na.omit(Data[Data$Plot==p, "SubPlot"]))) {
-        
-        num <- Data[Data$CensusYear == y & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
-        
-        # if there are several TreeFieldNum per Plot-SubPlot combination
-        if(anyDuplicated(num) != 0){
-          duplicated_num <- unique(num[duplicated(num)])
+  # For each site
+  for (s in unique(na.omit(Data$Site))) {
+    # For each census
+    for (y in unique(na.omit(Data$CensusYear))) {
+      # For each plot
+      for (p in unique(na.omit(Data$Plot))) {
+        # For each SubPlot in this plot
+        for (c in unique(na.omit(Data[Data$Plot==p, "SubPlot"]))) {
           
-          Data[Data$CensusYear == y & Data$Plot == p & Data$SubPlot == c & Data$TreeFieldNum %in% duplicated_num,
-               Comment := "Duplicate TreeFieldNum in the same Plot and SubPlot"]
-        }
-      }
-    }
-  }
+          num <- Data[Data$Site == s & Data$CensusYear == y
+                      & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
+          
+          # if there are several TreeFieldNum per Plot-SubPlot combination
+          if(anyDuplicated(num) != 0){
+            duplicated_num <- unique(num[duplicated(num)])
+            
+            Data[Data$Site == s & Data$CensusYear == y
+                 & Data$Plot == p & Data$SubPlot == c
+                 & Data$TreeFieldNum %in% duplicated_num,
+                 Comment := "Duplicate TreeFieldNum in the same Plot and SubPlot"]
+          }
+        } # end subplot loop
+      } # end plot loop
+    } # end year loop
+  } # end site loop
 }
 
-Data[TreeFieldNum == duplicated_num] # to check (1 duplicate)
+Data[TreeFieldNum == duplicated_num,.(Plot, SubPlot, TreeFieldNum)] # to check (1 duplicate)
 ```
 
-## Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum
+## Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum, at the site scale
+importfrom : data.table duplicated
 ```{r}
-# Check of the unique association of the IdTree with Plot-SubPlot-TreeFieldNum
+duplicated_ID <- CorresIDs <- vector("character")
 
-correspondances <- unique(Data[, .(IdTree, Plot, SubPlot, TreeFieldNum)])
+# For each site
+for (s in unique(na.omit(Data$Site))) {
 
-CorresIDs <- correspondances[, .(IdTree)] # all the possible idtree's
-length(CorresIDs)
+    correspondances <- na.omit(unique(
+      Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)] # & Data$CensusYear == y
+    ))
+    
+    CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
+    
+    if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+      
+      duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+      
+      Data[Data$Site == s & Data$IdTree %in% duplicated_ID,
+           Comment := "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum"]
+      
+    }
+} # end site loop
 
-
-if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
-  
-  Data[duplicated(CorresIDs),
-       Comment := "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum"]
-  
-}
-Data[duplicated(CorresIDs)== TRUE]
-Data[!duplicated(CorresIDs$IdTree)]
+unique(Data[Comment == "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum",
+            .(IdTree, Plot, SubPlot, TreeFieldNum)]) # to check 
 ```
 
 ## Check duplicated idTree in a census
