@@ -19,7 +19,7 @@ Headers,3,selectInput,choices,DBHUnit,What is your DBH unit ?,,DBHUnitCol,DBH,un
 Headers,1,selectInput,choices,Circ,Circumference,Circumference of the tree,,,column_options,TRUE
 Headers,1,selectInput,choices,CircUnitCol,Circumference unit,,,,column_options,TRUE
 Headers,3,selectInput,choices,CircUnit,What is your circumference unit?,,CircUnitCol,Circ,unit_options,TRUE
-Headers,1,selectInput,choices,POM,POM (height),height of measurement,none,,column_options,TRUE
+Headers,1,selectInput,choices,POM,POM,height of measurement,none,,column_options,TRUE
 Headers,1,selectInput,choices,POMUnitCol,POM units,,none,,unit_options,TRUE
 Headers,3,selectInput,choices,POMUnit,What is your POM unit?,,POMUnitCol,POM,unit_options,TRUE
 Headers,1,selectInput,choices,Lat,Tree latitude,,none,,column_options,TRUE

@@ -55,17 +55,17 @@ server <- function(input, output) {
   observeEvent(input$file1,
                {
                  output$ui1 <- renderUI({
+                   # dropdown(
                    lapply(1:nrow(x1), function(i) {
-                     box(
-                       h3(x1$Label[i]),
-                       helpText(x1$helpText[i]),
-                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label ='',", x1$argument[i], "= get(x1$argValue[i])())"))),
-                       br()
-
-                     )
+                     # box(
+                       # h3(x1$Label[i]),
+                       # helpText(x1$helpText[i]),
+                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])())")))
+                     # )
 
 
                    })
+                   # )
                  })
 
                  output$ui2 <- renderUI({
@@ -73,13 +73,13 @@ server <- function(input, output) {
 
                    lapply(c(1:nrow(x2)), function(i) {
                      if(input[[x2$if_X1_is_none[i]]] %in% "none")
-                       box(
-                         h3(x2$Label[i]),
-                         helpText(x2$helpText[i]),
-                         eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label ='',", x2$argument[i], "= get(x2$argValue[i])())"))),
-                         br()
-
-                       )
+                       # box(
+                       #   h3(x2$Label[i]),
+                       #   helpText(x2$helpText[i]),
+                         eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i], "= get(x2$argValue[i])())")))
+                       #   br()
+                       #
+                       # )
 
 
 
@@ -92,14 +92,14 @@ server <- function(input, output) {
                    lapply(c(1:nrow(x3)), function(i) {
                      if(input[[x3$if_X1_is_none
                                [i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
-                       box(
+                       # box(
                          # h5(input[[x$Dependant_on[i]]] %in% "none"),
-                         h3(x3$Label[i]),
-                         helpText(x3$helpText[i]),
-                         eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label ='',", x3$argument[i], "= get(x3$argValue[i])())"))),
-                         br()
-
-                       )
+                         # h3(x3$Label[i]),
+                         # helpText(x3$helpText[i]),
+                         eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])())")))
+                       #   br()
+                       #
+                       # )
 
 
                    })
