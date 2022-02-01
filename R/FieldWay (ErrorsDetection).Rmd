@@ -24,6 +24,7 @@ IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 
 Internals:
 + *Bota*
+- Special characters
 - Typographie
 - 1 same IdTree for different names
 
@@ -109,47 +110,37 @@ Data[get(Vars) == 0] # to check
 
 ## Check duplicated TreeFieldNum in plot-subplot association
 ```{r}
-# temp <- apured_trees # on 1 census
-temp = Data
-
 # Create "PlotSubNum" = "Plot/SubPlot/TreeFieldNum"
-temp$PlotSubNum <- paste(temp$CensusYear, temp$Plot, temp$SubPlot, temp$TreeFieldNum, sep="/") 
+Data[, PlotSubNum := paste(CensusYear, Plot, SubPlot, TreeFieldNum, sep = "/")]
 
 # y = 2019
 # p=1
-# c= 4
+# c= 3
 duplicated_num <- num <- vector("character")
 # if any duplicats in this col
-if(anyDuplicated(temp$PlotSubNum) != 0) {
+if(anyDuplicated(Data$PlotSubNum) != 0) {
   # For each census
-  for (y in unique(na.omit(temp$CensusYear))) {
+  for (y in unique(na.omit(Data$CensusYear))) {
     # For each plot
-    for (p in unique(na.omit(temp$Plot))) {
+    for (p in unique(na.omit(Data$Plot))) {
       # For each SubPlot in this plot
-      for (c in unique(na.omit(temp[temp$Plot==p, "SubPlot"]))) {
+      for (c in unique(na.omit(Data[Data$Plot==p, "SubPlot"]))) {
         
-        num <- temp[temp$CensusYear==y & temp$Plot==p & temp$SubPlot==c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
+        num <- Data[Data$CensusYear == y & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
         
         # if there are several TreeFieldNum per Plot-SubPlot combination
         if(anyDuplicated(num) != 0){
           duplicated_num <- unique(num[duplicated(num)])
           
-          temp[TreeFieldNum == duplicated_num, # faire en sorte qu'il considère le problème par année
+          Data[Data$CensusYear == y & Data$Plot == p & Data$SubPlot == c & Data$TreeFieldNum %in% duplicated_num,
                Comment := "Duplicate TreeFieldNum in the same Plot and SubPlot"]
-          
-          # condition <- eval(parse(text = "temp$Plot==p & temp$SubPlot==c & temp$TreeFieldNum %in% duplicated_num"))
-          
-          # "NumArbre duplique dans une même parcelle et un même carre"
         }
       }
     }
   }
 }
 
-# temp[TreeFieldNum == duplicated_num,
-#      Comment := "Duplicate TreeFieldNum in the same Plot and SubPlot"]
-# temp[TreeFieldNum == duplicated_num]
-
+Data[TreeFieldNum == duplicated_num] # to check (1 duplicate)
 ```
 
 ## Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum
@@ -203,6 +194,16 @@ if(anyDuplicated(ids) != 0){
 # Internals
 
 ## Bota
+### Special characters
+### Typographie
+é, è or œ
+### Gapfill missing botanical names using vernacular names
+based on probabilities of association of vernacular and botanical names.
+The typographie must already have been corrected.
+```{r}
+
+```
+
 ## Life status
 ### Check missing trees compared to the previous census (add rows)
 *Missing tree* = idTree absent of the last census, but alive at the previous census.
