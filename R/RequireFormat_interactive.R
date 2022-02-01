@@ -30,7 +30,7 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
 
   column_options <- c("none", colnames(Data))
-  unit_options <- c("none", "mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
+  unit_options <- c("none", "mm", "cm", "dm", "m")
   other_options <- ""
 
 

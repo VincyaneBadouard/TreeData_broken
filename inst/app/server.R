@@ -45,7 +45,7 @@ server <- function(input, output) {
   column_options <- eventReactive(Data(), { c("none", colnames(Data())) })
 
   unit_options <- eventReactive(Data(),
-                                {c("none", "mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
+                                {c("none", "mm", "cm", "dm", "m")
                                 })
 
   other_options <- eventReactive(Data(), { ""})
