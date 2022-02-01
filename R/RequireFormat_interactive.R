@@ -29,9 +29,9 @@ RequiredFormat_interactive <- function(Data, input = list()) {
   for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
 
-  column_options <- c("none", colnames(Data))
-  unit_options <- c("none", "mm", "cm", "dm", "m")
-  other_options <- ""
+  ColumnOptions <- c("none", colnames(Data))
+  UnitOptions <- c("none", "mm", "cm", "dm", "m")
+  OtherOptions <- ""
 
 
 

@@ -71,7 +71,7 @@ body <- dashboardBody(
                      ),
 
               column(width = 5,
-                     box(title = "Tell us about your units (if they are not in a column)",
+                     box(title = "Tell us about your plot (if info is not in a column)",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
@@ -80,7 +80,7 @@ body <- dashboardBody(
 
 
               column(width = 5,
-                     box(title = "Tell us about your plot (if info is not in a column)",
+                     box(title = "Tell us about your units (if they are not in a column)",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,

@@ -42,13 +42,13 @@ server <- function(input, output) {
 
   # create options to choose from:
 
-  column_options <- eventReactive(Data(), { c("none", colnames(Data())) })
+  ColumnOptions <- eventReactive(Data(), { c("none", colnames(Data())) })
 
-  unit_options <- eventReactive(Data(),
+  UnitOptions <- eventReactive(Data(),
                                 {c("none", "mm", "cm", "dm", "m")
                                 })
 
-  other_options <- eventReactive(Data(), { ""})
+  OtherOptions <- eventReactive(Data(), { ""})
 
   # enter column names for each element of the RequiredFormat function
 
