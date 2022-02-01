@@ -12,7 +12,7 @@ RequiredFormat_interactive(Data, input = list())
 \item{input}{a named list. Usually empty, except in Shiny App}
 }
 \value{
-a names list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
+a named list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
 }
 \description{
 RequiredFormat_interactive
