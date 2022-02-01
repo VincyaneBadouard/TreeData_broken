@@ -1,6 +1,6 @@
 ## code to prepare `ParacouProfile` dataset goes here
 
-## 1st option to create (non-interactive) - may need to be upadted if interactive_items.csv changes
+## 1st option to create (non-interactive) - may need to be updated if interactive_items.csv changes
 
 if(!interactive()) {
 ParacouProfile <- list(
@@ -41,46 +41,49 @@ ParacouProfile <- list(
 )
 
 }
-## 2nd option (interactive) - may need to be upadted if interactive_items.csv changes
+## 2nd option (interactive) - may need to be updated if interactive_items.csv changes
 
 if(interactive()) {
   data("ParacouSubset")
 
   ParacouProfile <- RequiredFormat_interactive(ParacouSubset)
-2 # Site
-3 # Plot
-5 # Subplot
-24 # CensusYear
-6 # TreeFieldNum
-7 # IdTree
-1 # IdStem
-1 # IdMeasure
-27 # LifeStatus
-1 # DBH
-1 # DBHUnitCol
-29 # Circ
-1 # CurcUnitCol
-1 # POM
-1 # POMUnitCol
-14 # Lat
-15 # Lon
-11 # Xutm
-12 # Yutm
-9 # Xfield
-10 # Yfield
-1 # ScientificName
-22 # VernName
-16 # Family
-17 # Genus
-18 # Species
-23 # CommercialSp
-1 # TreeHeight
-1 # TreeHeightUnitCol
-1 # LifeForm
-1 # Treatment
-1 # SoilType
-1 # Topography
-7 # CircUnit
+
+"ok" #
+2
+3
+5
+24
+6
+7
+1
+1
+27
+1
+1
+29
+1
+1
+1
+14
+15
+11
+12
+9
+10
+1
+22
+16
+17
+18
+23
+1
+1
+1
+1
+1
+1
+7
+
 }
 
 #### Save this data in the package ####
