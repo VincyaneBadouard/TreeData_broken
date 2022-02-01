@@ -4,7 +4,7 @@
 #'
 #' @param input a named list. Usually empty, except in Shiny App
 #'
-#' @return a names list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
+#' @return a named list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
 #'
 #' @export
 #'
@@ -79,6 +79,10 @@ if(exists("x3")) {
   if (nrow(x3_ask_nonchoice) > 0) helper_nonchoice(x3_ask_nonchoice)
 
 }
+
+cat("please review the table above and start over if it is not correct")
+
+View(t(as.data.frame(input, row.names = "Your column name")))
 
 return(input)
 }
