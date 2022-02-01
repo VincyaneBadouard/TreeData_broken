@@ -88,3 +88,10 @@ if(interactive()) {
 
 #### Save this data in the package ####
 usethis::use_data(ParacouProfile, overwrite = TRUE)
+
+
+## For ParacouProfile.Rmd  run next line of code and paste in the item section of R/ParacouProfile.R
+write.csv(
+  paste0("#'   \\item{", names(ParacouProfile), "}{The column name in datda set @ParacouSubset (", ParacouProfile, ") corresponding to ", x$Label[match(names(ParacouProfile), x$ItemID)], "}"), "clipboard",
+  quote = F, row.names = F)
+
