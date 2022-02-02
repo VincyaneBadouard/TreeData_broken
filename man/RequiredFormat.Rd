@@ -4,95 +4,12 @@
 \alias{RequiredFormat}
 \title{RequiredFormat}
 \usage{
-RequiredFormat(
-  Data,
-  Plot = "none",
-  SubPlot = "none",
-  Time = "none",
-  TreeFieldNum = "none",
-  IdTree = "none",
-  LifeStatus = "none",
-  Size = "none",
-  SizeUnit = "none",
-  POM = "none",
-  POMUnit = "none",
-  PlotArea = "none",
-  X = "none",
-  Y = "none",
-  ScientificName = "none",
-  VernName = "none",
-  Family = "none",
-  Genus = "none",
-  Species = "none",
-  CommercialSp = "none",
-  TreeHeight = "none",
-  TreeHeightUnit = "none"
-)
+RequiredFormat(Data, input)
 }
 \arguments{
-\item{Data}{Input forest inventory (data.frame)}
+\item{Data}{Forest inventory data set (data.frame or data.table)}
 
-\item{Plot}{The name of the column containing plot indices (character)}
-
-\item{SubPlot}{The name of the column containing sub-plot indices (character)}
-
-\item{Time}{The name of the column(s) containing census years (character or vector of character)}
-
-\item{TreeFieldNum}{The name of the column containing the tree unique
-identifiers within the subplot (matching the tag number in the field)
-(character)}
-
-\item{IdTree}{The name of the column containing tree unique identifiers
-(character)}
-
-\item{LifeStatus}{The name of the column containing tree vital status
-(character)}
-
-\item{Size}{The name of the column(s) containing tree size measurements,
-diameter or circumference (character or vector of character)}
-
-\item{SizeUnit}{The 'Size' measurement unit of the tree. The possible values
-are 'mm' for millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm'
-for metres", or "code" if it is a code and not a measure (character)}
-
-\item{POM}{The name of the column containing Point of Measurement (POM)
-values: height at which the 'Size' was measured, or POM code (character)}
-
-\item{POMUnit}{The 'POM' unit of the tree. The possible values are 'mm' for
-millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for metres",
-or "code" if it is a code and not a measure (character)}
-
-\item{PlotArea}{The name of the column containing the area of the plot, in
-hectares (character), or the area of the plot in numeric}
-
-\item{X}{The name of the column containing the tree X coordinate (character)}
-
-\item{Y}{The name of the column containing the tree Y coordinate (character)}
-
-\item{ScientificName}{The name of the column containing the binary scientific
-name of the tree (character)}
-
-\item{VernName}{The name of the column containing the vernacular name of the
-tree (character)}
-
-\item{Family}{The name of the column containing the family name of the tree
-(character)}
-
-\item{Genus}{The name of the column containing the genus name of the tree
-(character)}
-
-\item{Species}{The name of the column containing the species name of the tree
-(character)}
-
-\item{CommercialSp}{The name of the column containing the commercial or
-non-commercial nature of the tree species (character)}
-
-\item{TreeHeight}{The name of the column containing the the measured height
-of the tree (character)}
-
-\item{TreeHeightUnit}{The 'TreeHeight' unit. The possible values are 'mm' for
-millimetres, 'cm' for centimetres, 'dm' for decimetres and 'm' for
-metres", or "code" if it is a code and not a measure (character)}
+\item{input}{a named list, typically the output of function RequiredFormat_interactive, also called site profile. It has information on column names correspondence, size units etc...}
 }
 \value{
 Input inventory (data.frame) in the required package format.
@@ -101,35 +18,15 @@ Input inventory (data.frame) in the required package format.
 RequiredFormat
 }
 \details{
-The argument keeping the value "none" indicates that the user does
-not have the requested information.
+This function takes the forest inventory data.frame or data.table as it is, and converts the column names to the standardized names used in this package. It also generates missing information, when possible (e.g. DBH when only circumference is givent, Genus and Species when only scientifique name is given etc...). All the decisions are made based on what is provided in the input argument. It is a named list, output of function RequiredFormat_interactive.
 }
 \examples{
 \dontrun{
-data(ParacouSubsetWide)
-Required_Format <- RequiredFormat(
-  ParacouSubsetWide,
-  Plot = "SubPlot",
-  SubPlot = "SubSubPlot",
-  Time = c("2016","2017","2018","2019","2020"),
-  TreeFieldNum = "TreeFieldNum",
-  IdTree = "idTree",
-  LifeStatus = "CodeAlive",
-  Size = "Circ",
-  SizeUnit = "m",
-  POM = "MeasCode",
-  POMUnit = "code",
-  PlotArea = "PlotArea",
-  X = "Xutm",
-  Y = "Yutm",
-  ScientificName = "none",
-  VernName = "VernName",
-  Family = "Family",
-  Genus = "Genus",
-  Species = "Species",
-  CommercialSp = "CommercialSp",
-  TreeHeight = "none",
-  TreeHeightUnit = "none")
+data(ParacouSubset)
+data(ParacouProfile)
+ParacouSubsetFormated <- RequiredFormat(
+  ParacouSubset,
+  input = ParacouProfile)
                }
 
 }
