@@ -13,11 +13,11 @@ Objective: Detect errors
 - Check *duplicate rows*
 - Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/CensusYear/TreeFieldNum/
 IdTree/DBH/MeasCode/Family/Genus/Species/VernName
-- Check *missing value* (NA/NULL/0) in the measurement variables  
+- Check *missing value* (NA/0) in the measurement variables  
 
-- Check *duplicated TreeFieldNum* in plot-subplot association
-- Check of the *unique association of the idTree with plot, subplot and TreeFieldNum*
-- Check *duplicated idTree* in a census  
+- Check *duplicated TreeFieldNum* in plot-subplot association in a census (at the site scale)
+- Check of the *unique association of the idTree with plot, subplot and TreeFieldNum* (at the site scale)
+- Check *duplicated idTree* in a census (at the site scale)
 
 - Check for trees *outside the subplot*
 - Check *invariant columns*: "Plot","SubPlot","TreeFieldNum","X","Y" for a unique "idTree"  
@@ -70,7 +70,7 @@ if(anyDuplicated(Data) != 0)
 ```
 
 ## Missing values
-If the column exists, but have NA/NULL values
+If the column exists, but have NA values
 ```{r}
 # Check bota : Family/Genus/Species/ScientificName/VernName
 # Check size : DBH, POM(?)
@@ -82,15 +82,13 @@ for (v in 1:length(Vars)) {
   
   if(Vars[v] %in% names(Data)){ # If the column exists
     
-    Data[is.na(get(Vars[v])),
-         "Comment" := paste0("Missing value in ", Vars[v])] # comments
-    
-    Data[is.null(get(Vars[v])),
-         "Comment" := paste0(Vars[v]," cannot be NULL")] # comments
+    Data <- GenerateComment(Data,
+                            condition = is.na(Data[,get(Vars[v])]),
+                            comment = paste0("Missing value in ", Vars[v]))
   }
 }
 
-Data[!is.na(Comment)] # to check (13 comments)
+Data[Comment != ""] # to check (13 comments)
 ```
 
 ## Measurement variables = 0
@@ -100,8 +98,9 @@ Vars <- c("DBH", "POM", "TreeHeight", "StemHeight")
 for (v in 1:length(Vars)) {
   if(Vars[v] %in% names(Data)){ # If the column exists
     
-    Data[get(Vars[v]) == 0,
-         "Comment" := paste0(Vars[v]," cannot be 0")] # comments
+    Data <- GenerateComment(Data,
+                            condition = Data[,get(Vars[v])] == 0,
+                            comment = paste0(Vars[v]," cannot be 0"))
   }
 }
 Data[get(Vars) == 0] # to check
@@ -157,21 +156,21 @@ duplicated_ID <- CorresIDs <- vector("character")
 
 # For each site
 for (s in unique(na.omit(Data$Site))) {
-
-    correspondances <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)] # & Data$CensusYear == y
-    ))
+  
+  correspondances <- na.omit(unique(
+    Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)] # & Data$CensusYear == y
+  ))
+  
+  CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
+  
+  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
     
-    CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
+    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
     
-    if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
-      
-      duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
-      
-      Data[Data$Site == s & Data$IdTree %in% duplicated_ID,
-           Comment := "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum"]
-      
-    }
+    Data[Data$Site == s & Data$IdTree %in% duplicated_ID,
+         Comment := "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum"]
+    
+  }
 } # end site loop
 
 unique(Data[Comment == "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum",
