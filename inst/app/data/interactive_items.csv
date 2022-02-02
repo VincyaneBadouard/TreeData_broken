@@ -1,44 +1,45 @@
-Tab,UI,ItemType,argument,ItemID,Label,helpText,if_X1_is_none,if_X2_isnot_none,argValue,Activate,RequiredColumn
-Headers,1,selectInput,choices,Site,Site name,,none,,ColumnOptions,TRUE,TRUE
-Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,OtherOptions,TRUE,FALSE
-Headers,1,selectInput,choices,Plot,Plot name,,none,,ColumnOptions,TRUE,TRUE
-Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,OtherOptions,FALSE,FALSE
-Headers,1,selectInput,choices,Subplot,Subplot name,,none,,ColumnOptions,TRUE,TRUE
-Headers,2,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,,OtherOptions,FALSE,FALSE
-Headers,1,selectInput,choices,CensusYear,Census year,,none,,ColumnOptions,TRUE,TRUE
-Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,OtherOptions,TRUE,FALSE
-Headers,1,selectInput,choices,CensusDate,Census Date,,none,,ColumnOptions,FALSE,TRUE
-Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,IdTree,Tree ID,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,DBH,DBH,Diamter at breast height,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,DBHUnit,DBH unit,,none,,ColumnOptions,TRUE,FALSE
-Headers,3,selectInput,choices,DBHUnitMan,What is your DBH unit ?,,DBHUnit,DBH,UnitOptions,TRUE,FALSE
-Headers,1,selectInput,choices,Circ,Circumference,Circumference of the tree,,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,CircUnit,Circumference unit,,,,ColumnOptions,TRUE,FALSE
-Headers,3,selectInput,choices,CircUnitMan,What is your circumference unit?,,CircUnit,Circ,UnitOptions,TRUE,FALSE
-Headers,1,selectInput,choices,POM,POM,height of measurement,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,POMUnit,POM units,,none,,UnitOptions,TRUE,FALSE
-Headers,3,selectInput,choices,POMUnitMan,What is your POM unit?,,POMUnit,POM,UnitOptions,TRUE,FALSE
-Headers,1,selectInput,choices,Lat,Tree latitude,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Lon,Tree longitude,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Xutm,Tree X UTM coordinate,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Yutm,Tree Y UTM coordinate,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Xfield,Tree X euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Yfield,Tree Y euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,ScientificName,Scientific name,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,VernName,Vernacular name,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Family,Family name,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Genus,Genus name,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Species,Species name,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,TreeHeight,Tree height,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,TreeHeightUnit,Tree height units,,none,,UnitOptions,TRUE,FALSE
-Headers,3,selectInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,TreeHeight,UnitOptions,TRUE,FALSE
-Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,SoilType,Type of soil,,none,,ColumnOptions,TRUE,TRUE
-Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,ColumnOptions,TRUE,TRUE
-Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,OtherOptions,TRUE,FALSE
+Tab,UI,ItemType,argument,ItemID,Label,helpText,if_X1_is_none,if_X2_isnot_none,argValue,Activate,RequiredColumn,DataType
+Headers,1,selectInput,choices,Site,Site name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,OtherOptions,TRUE,FALSE,character
+Headers,1,selectInput,choices,Plot,Plot name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,OtherOptions,FALSE,FALSE,character
+Headers,1,selectInput,choices,Subplot,Subplot name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,2,textInput,value,SubplotMan,What is your subplot name ?,,Subplot,,OtherOptions,FALSE,FALSE,character
+Headers,1,selectInput,choices,CensusYear,Census year,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,OtherOptions,TRUE,FALSE,numeric
+Headers,1,selectInput,choices,CensusDate,Census Date,,none,,ColumnOptions,FALSE,FALSE,character
+Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m%d,none,CensusDate,OtherOptions,FALSE,FALSE,character
+Headers,1,selectInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,IdTree,Tree ID,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,,ColumnOptions,TRUE,TRUE,logical
+Headers,1,selectInput,choices,DBH,DBH,Diamter at breast height,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,DBHUnit,DBH unit,,none,,ColumnOptions,TRUE,FALSE,character
+Headers,3,selectInput,choices,DBHUnitMan,What is your DBH unit ?,,DBHUnit,DBH,UnitOptions,TRUE,FALSE,character
+Headers,1,selectInput,choices,Circ,Circumference,Circumference of the tree,,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,CircUnit,Circumference unit,,,,ColumnOptions,TRUE,FALSE,character
+Headers,3,selectInput,choices,CircUnitMan,What is your circumference unit?,,CircUnit,Circ,UnitOptions,TRUE,FALSE,character
+Headers,1,selectInput,choices,POM,POM,height of measurement,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,POMUnit,POM units,,none,,UnitOptions,TRUE,FALSE,character
+Headers,3,selectInput,choices,POMUnitMan,What is your POM unit?,,POMUnit,POM,UnitOptions,TRUE,FALSE,character
+Headers,1,selectInput,choices,Lat,Tree latitude,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,Lon,Tree longitude,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,Xutm,Tree X UTM coordinate,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,Yutm,Tree Y UTM coordinate,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,Xfield,Tree X euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,Yfield,Tree Y euclidean position in plot,position of the tree relative to the Southwestern corner of the subplot,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,ScientificName,Scientific name,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,VernName,Vernacular name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,Family,Family name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,Genus,Genus name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,Species,Species name,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,,ColumnOptions,TRUE,TRUE,logical
+Headers,1,selectInput,choices,TreeHeight,Tree height,,none,,ColumnOptions,TRUE,TRUE,numeric
+Headers,1,selectInput,choices,TreeHeightUnit,Tree height units,,none,,UnitOptions,TRUE,FALSE,character
+Headers,3,selectInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,TreeHeight,UnitOptions,TRUE,FALSE,character
+Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,SoilType,Type of soil,,none,,ColumnOptions,TRUE,TRUE,character
+Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,ColumnOptions,TRUE,TRUE,character
+Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,OtherOptions,TRUE,FALSE,character
