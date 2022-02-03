@@ -35,7 +35,7 @@ if (!"DBH" %in% names(Data) & "Circ" %in% names(Data)) {
 #### Necessary columns creation from the existing ####
 # ScientificName (if Genus & Species exist)
 if(!"ScientificName" %in% names(Data) & all(c("Genus", "Species") %in% names(Data))){ # or ScientificName == "none"
-  Data[, ScientificName := paste(Genus, Species, sep = "_")]
+  Data[, ScientificName := paste(Genus, Species)]
 }
 
 

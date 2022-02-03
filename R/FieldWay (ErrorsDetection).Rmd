@@ -19,14 +19,17 @@ IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 - Check of the *unique association of the idTree with plot, subplot and TreeFieldNum* (at the site scale)
 - Check *duplicated idTree* in a census (at the site scale)
 
-- Check for trees *outside the subplot*
-- Check *invariant columns*: "Plot","SubPlot","TreeFieldNum","X","Y" for a unique "idTree"  
+- Check for trees *outside the subplot*  (comparer plotArea avec l'aire du MCP (Minimum Convex Polygon) des arbres a l'interieur de la parcelle. Si aire du MCP > x% plotArea -> error)
+
+- Check *invariant coordinates per IdTree* 
+
+- Check *fix Plot and SubPlot number* 
 
 Internals:
 + *Bota*
 - Special characters
 - Typographie
-- 1 same IdTree for different names
+- Check invariant botanical informations per IdTree
 
 + *Life status*
 - Demande à l’utilisateur : considérer la présence d’une mesure comme le statut vivant de l’arbre (pas si l’on mesure les arbres morts)
@@ -65,8 +68,7 @@ setDT(Data) # with "set" "<-" is not necessary
 if there are duplicate rows, delete them 
 ```{r}
 if(anyDuplicated(Data) != 0)
-  unique(Data)
-
+ Data <- unique(Data)
 ```
 
 ## Missing values
@@ -112,9 +114,9 @@ Data[get(Vars) == 0] # to check
 # Create "PlotSubNum" = "Site/CensusYear/Plot/SubPlot/TreeFieldNum"
 Data[, PlotSubNum := paste(Site, CensusYear, Plot, SubPlot, TreeFieldNum, sep = "/")]
 
-y = 2019
-p=1
-c= 4
+# y = 2017
+# p=1
+# c= 3
 duplicated_num <- num <- vector("character")
 
 # if any duplicats in this col
@@ -126,7 +128,7 @@ if(anyDuplicated(Data$PlotSubNum) != 0) {
       # For each plot
       for (p in unique(na.omit(Data$Plot))) {
         # For each SubPlot in this plot
-        for (c in unique(na.omit(Data[Data$Plot==p, "SubPlot"]))) {
+        for (c in unique(na.omit(Data[Data$Plot==p, SubPlot]))) {
           
           num <- Data[Data$Site == s & Data$CensusYear == y
                       & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
@@ -135,18 +137,23 @@ if(anyDuplicated(Data$PlotSubNum) != 0) {
           if(anyDuplicated(num) != 0){
             duplicated_num <- unique(num[duplicated(num)])
             
-            Data[Data$Site == s & Data$CensusYear == y
-                 & Data$Plot == p & Data$SubPlot == c
-                 & Data$TreeFieldNum %in% duplicated_num,
-                 Comment := "Duplicate TreeFieldNum in the same Plot and SubPlot"]
-          }
+            Data <- GenerateComment(Data,
+                                    condition =
+                                      Data[,Site] == s & Data[,CensusYear] == y
+                                    & Data[,Plot] == p & Data[,SubPlot] == c
+                                    & Data[,TreeFieldNum] %in% duplicated_num,
+                                    comment = "Duplicate TreeFieldNum in the same Plot and SubPlot")
+            
+            num <- vector("character")
+            
+          } else {num <- vector("character")}
         } # end subplot loop
       } # end plot loop
     } # end year loop
   } # end site loop
 }
 
-Data[TreeFieldNum == duplicated_num,.(Plot, SubPlot, TreeFieldNum)] # to check (1 duplicate)
+Data[TreeFieldNum == duplicated_num,.(CensusYear = sort(CensusYear), Plot, SubPlot, TreeFieldNum, Comment)] # to check (1 duplicate)
 ```
 
 ## Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum, at the site scale
@@ -158,7 +165,7 @@ duplicated_ID <- CorresIDs <- vector("character")
 for (s in unique(na.omit(Data$Site))) {
   
   correspondances <- na.omit(unique(
-    Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)] # & Data$CensusYear == y
+    Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)]
   ))
   
   CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
@@ -167,43 +174,88 @@ for (s in unique(na.omit(Data$Site))) {
     
     duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
     
-    Data[Data$Site == s & Data$IdTree %in% duplicated_ID,
-         Comment := "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum"]
-    
+    Data <- GenerateComment(Data,
+                            condition =
+                              Data[,Site] == s
+                            & Data[,IdTree] %in% duplicated_ID,
+                            comment = "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum")
   }
 } # end site loop
 
-unique(Data[Comment == "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum",
-            .(IdTree, Plot, SubPlot, TreeFieldNum)]) # to check 
+unique(Data[IdTree %in% duplicated_ID,
+            .(IdTree = sort(IdTree), Plot, SubPlot, TreeFieldNum, Comment)]) # to check 
 ```
 
-## Check duplicated idTree in a census
+## Check duplicated IdTree in a census
 ```{r}
-# Separate the data per census
-# Data2016 <- Data[Time == 2016]
+# Create "SitYearID" = "Site/CensusYear/IdTree"
+Data[, SitYearID := paste(Site, CensusYear, IdTree, sep = "/")]
 
-# Check duplicated idTree in a census
-ids <- apured_trees$idTree[!is.na(apured_trees$idTree)] # Take care of excluding NAs
+duplicated_ids <- ids <- vector("character")
 
-if(anyDuplicated(ids) != 0){
-  # Extract the duplicated ids - Unique, just in case there is more than two measured for these ids.
-  duplicated_ids <- unique(ids[duplicated(ids)])
-  
-  Data[apured_trees$idTree %in% duplicated_ids, Comment := paste0("Duplicated ",IdTree," in the census")]
-  
+# if any duplicats in this col
+if(anyDuplicated(Data$SitYearID) != 0){
+  # For each site
+  for (s in unique(na.omit(Data$Site))) {
+    # For each census
+    for (y in unique(na.omit(Data$CensusYear))) {
+      
+      ids <- Data[Data$Site == s & Data$CensusYear == y,]$IdTree # all the IdTree for each Site and CensusYear combination
+      
+      # if there are several IdTree per Site and CensusYear combination
+      if(anyDuplicated(ids) != 0){
+        duplicated_ids <- unique(ids[duplicated(ids)])
+        
+        Data <- GenerateComment(Data,
+                                condition =
+                                  Data[,Site] == s & Data[,CensusYear] == y
+                                & Data[,IdTree] %in% duplicated_ids,
+                                comment = "Duplicated IdTree in the census")
+      }
+    } # end year loop
+  } # end site loop
 }
+
+Data[IdTree == duplicated_ids,.(CensusYear = sort(CensusYear), Plot, SubPlot, TreeFieldNum, IdTree, Comment)] # to check
 ```
+
 ## Check for trees outside the subplot
+Comparer plotArea avec l'aire du MCP (Minimum Convex Polygon) des arbres a l'interieur de la parcelle. Si aire du MCP > x% plotArea -> error
 ```{r}
-# Check for trees outside the subplot
 
 ```
 
-## Check invariant columns
+## Check invariant coordinates per IdTree
 ```{r}
-# "Plot","SubPlot","TreeFieldNum","X","Y"
+duplicated_ID <- CorresIDs <- vector("character")
 
+# For each site
+for (s in unique(na.omit(Data$Site))) {
+  
+  CoordIDCombination <- na.omit(unique(
+    Data[Data$Site == s, .(IdTree, Xutm, Yutm)]
+  ))
+  
+  CorresIDs <- CoordIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+  
+  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+    
+    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+    
+    Data <- GenerateComment(Data,
+                            condition =
+                              Data[,Site] == s
+                            & Data[,IdTree] %in% duplicated_ID,
+                            comment = "Different coordinates (Xutm, Yutm) for a same IdTree")
+  }
+} # end site loop
+
+unique(Data[IdTree %in% duplicated_ID,
+            .(IdTree = sort(IdTree), Xutm, Yutm, Comment)]) # to check 
 ```
+
+## Check fix Plot and SubPlot number 
+alerte quand le nombre de sous-parcelles/parcelles varie selon les années
 
 # Internals
 
@@ -211,6 +263,37 @@ if(anyDuplicated(ids) != 0){
 ### Special characters
 ### Typographie
 é, è or œ
+### Check invariant botanical informations per IdTree
+"Family", "ScientificName", VernName"
+```{r}
+duplicated_ID <- CorresIDs <- vector("character")
+
+# For each site
+for (s in unique(na.omit(Data$Site))) {
+  
+  BotaIDCombination <- na.omit(unique(
+    Data[Data$Site == s, .(IdTree, Family, ScientificName, VernName)]
+  ))
+  
+  CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+  
+  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+    
+    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+    
+    Data <- GenerateComment(Data,
+                            condition =
+                              Data[,Site] == s
+                            & Data[,IdTree] %in% duplicated_ID,
+                            comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
+  }
+} # end site loop
+
+unique(Data[IdTree %in% duplicated_ID,
+            .(IdTree = sort(IdTree), Family, ScientificName, VernName, Comment)]) # to check 
+
+```
+
 ### Gapfill missing botanical names using vernacular names
 based on probabilities of association of vernacular and botanical names.
 The typographie must already have been corrected.

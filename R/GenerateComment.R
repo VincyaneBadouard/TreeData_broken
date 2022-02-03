@@ -10,6 +10,7 @@
 #'
 #' @return The input data.table with the filled "Comment" column.
 #'
+#' @export
 #' @examples
 #' \dontrun{
 #' library(data.table)
@@ -41,6 +42,8 @@ GenerateComment <- function(Data, condition, comment){
 #' @param comment The string to add in the "Comment" column (character)
 #'
 #' @return The input data.table with the filled "Comment" column.
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{
