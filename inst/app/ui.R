@@ -84,10 +84,22 @@ body <- dashboardBody(
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
-                       uiOutput("ui3")))
+                       uiOutput("ui3"))),
+              actionButton("LaunchFormating", label = "Launch formating!")
             )
 
             ),
+    tabItem(tabName = "Visualise",
+
+            fluidRow(
+
+              column(width = 9,
+                     DTOutput(outputId = "tabDataFormated")
+            )
+              )
+
+
+    ),  ## end of "visualize" panel
 
     tabItem(tabName = "Save",
             fluidRow(
@@ -105,6 +117,7 @@ body <- dashboardBody(
               )
             )
     ) # end of "save" panel
+
   )
 )
 

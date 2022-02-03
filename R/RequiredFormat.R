@@ -26,7 +26,9 @@
 
 RequiredFormat <- function(
   Data,
-  input
+  input,
+  x = NULL,
+  ThisIsShinyApp = FALSE
 ){
   # data(ParacouSubset)
   # data(ParacouProfile)
@@ -36,14 +38,19 @@ RequiredFormat <- function(
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
-  if (!inherits(input, "list"))
+
+    if(!ThisIsShinyApp & !inherits(input, "list")) {
     stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R")
+    }
 
 
 
   # Load interactive items to see what we are missing ####
+
+  if(!ThisIsShinyApp) {
   x <- read.csv("inst/app/data/interactive_items.csv")
   x <- x[x$Activate,]
+  }
 
   CharacVar <- x$ItemID[x$DataType %in% "character"]
   NumVar <- x$ItemID[x$DataType %in% "numeric"]
