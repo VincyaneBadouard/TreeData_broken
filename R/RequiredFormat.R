@@ -5,6 +5,8 @@
 #'@param input A named list, typically the output of function
 #'  RequiredFormat_interactive, also called site profile. It has information on
 #'  column names correspondence, size units etc...
+#'@param x For internal use when function used by Shiny app
+#'@param ThisIsShinyApp For internal use when function used by Shiny app
 #'
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
