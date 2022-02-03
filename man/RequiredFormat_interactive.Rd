@@ -9,10 +9,11 @@ RequiredFormat_interactive(Data, input = list())
 \arguments{
 \item{Data}{Input forest inventory (data.frame)}
 
-\item{input}{a named list. Usually empty, except in Shiny App}
+\item{input}{A named list. Usually empty, except in Shiny App}
 }
 \value{
-a named list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
+A named list with all the argument needed for RequiredFormat_calcul
+function (column name correspondances + extra input)
 }
 \description{
 RequiredFormat_interactive

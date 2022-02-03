@@ -1,17 +1,26 @@
-#' RequiredFormat
+#'RequiredFormat
 #'
-#' @param Data Forest inventory data set (data.frame or data.table)
+#'@param Data Forest inventory data set (data.frame or data.table)
 #'
-#' @param input a named list, typically the output of function RequiredFormat_interactive, also called site profile. It has information on column names correspondence, size units etc...
+#'@param input A named list, typically the output of function
+#'  RequiredFormat_interactive, also called site profile. It has information on
+#'  column names correspondence, size units etc...
 #'
 #'
-#' @details This function takes the forest inventory data.frame or data.table as it is, and converts the column names to the standardized names used in this package. It also generates missing information, when possible (e.g. DBH when only circumference is givent, Genus and Species when only scientifique name is given etc...). All the decisions are made based on what is provided in the input argument. It is a named list, output of function RequiredFormat_interactive.
+#'@details This function takes the forest inventory data.frame or data.table as
+#'  it is, and converts the column names to the standardized names used in this
+#'  package. It also generates missing information, when possible (e.g. DBH when
+#'  only circumference is givent, Genus and Species when only scientifique name
+#'  is given etc...). All the decisions are made based on what is provided in
+#'  the input argument. It is a named list, output of function
+#'  RequiredFormat_interactive.
 #'
-#' @return Input inventory (data.frame) in the required package format.
+#'@return Input inventory (data.frame) in the required package format.
 #'
-#' @export
+#'@export
 #'
-#' @importFrom data.table copy setDT setDF melt tstrsplit :=
+#'@importFrom data.table copy setDT setDF melt tstrsplit :=
+#'@importFrom utils read.csv
 #'
 #' @examples
 #'\dontrun{
@@ -33,6 +42,7 @@ RequiredFormat <- function(
   # Data <- ParacouSubset
   # input <- ParacouProfile
 
+  # Arguments check
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
@@ -40,6 +50,9 @@ RequiredFormat <- function(
     stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R")
 
 
+  # Global variables
+  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <- NULL
+  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- unitsOptions  <- NULL
 
   # Load interactive items to see what we are missing ####
   x <- read.csv("inst/app/data/interactive_items.csv")

@@ -9,7 +9,9 @@ RequiredFormat(Data, input)
 \arguments{
 \item{Data}{Forest inventory data set (data.frame or data.table)}
 
-\item{input}{a named list, typically the output of function RequiredFormat_interactive, also called site profile. It has information on column names correspondence, size units etc...}
+\item{input}{A named list, typically the output of function
+RequiredFormat_interactive, also called site profile. It has information on
+column names correspondence, size units etc...}
 }
 \value{
 Input inventory (data.frame) in the required package format.
@@ -18,7 +20,13 @@ Input inventory (data.frame) in the required package format.
 RequiredFormat
 }
 \details{
-This function takes the forest inventory data.frame or data.table as it is, and converts the column names to the standardized names used in this package. It also generates missing information, when possible (e.g. DBH when only circumference is givent, Genus and Species when only scientifique name is given etc...). All the decisions are made based on what is provided in the input argument. It is a named list, output of function RequiredFormat_interactive.
+This function takes the forest inventory data.frame or data.table as
+it is, and converts the column names to the standardized names used in this
+package. It also generates missing information, when possible (e.g. DBH when
+only circumference is givent, Genus and Species when only scientifique name
+is given etc...). All the decisions are made based on what is provided in
+the input argument. It is a named list, output of function
+RequiredFormat_interactive.
 }
 \examples{
 \dontrun{

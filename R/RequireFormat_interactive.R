@@ -1,14 +1,16 @@
-#' RequiredFormat_interactive
+#'RequiredFormat_interactive
 #'
-#' @param Data Input forest inventory (data.frame)
+#'@param Data Input forest inventory (data.frame)
 #'
-#' @param input a named list. Usually empty, except in Shiny App
+#'@param input A named list. Usually empty, except in Shiny App
 #'
-#' @return a named list with all the argument needed for RequiredFormat_calcul function (column name correspondances + extra input)
+#'@return A named list with all the argument needed for RequiredFormat_calcul
+#'  function (column name correspondances + extra input)
 #'
-#' @export
+#'@export
 #'
-#' @importFrom data.table copy setDT setDF melt tstrsplit :=
+#'@importFrom data.table copy setDT setDF melt tstrsplit :=
+#'@importFrom utils read.csv View
 #'
 #' @examples
 #'\dontrun{
@@ -18,6 +20,9 @@
 #'
 
 RequiredFormat_interactive <- function(Data, input = list()) {
+
+  # Global variables
+  x1 <- x2 <- x3 <- NULL
 
   x <- read.csv("inst/app/data/interactive_items.csv")
   x <- x[x$Activate,]
@@ -36,8 +41,8 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
 
   helper_choice <- function(x) eval(parse(text = paste(paste0("input[[\"", x$ItemID, "\"]] <<-", x$argValue, "[as.numeric(readline(cat(\"", x$Label, ifelse(x$helpText != "", paste0(" (",
- x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
- ": ", get(x$argValue), collapse = "  "), "\")))]"))))
+                                                                                                                                                                                     x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
+                                                                                                                                                                                                                          ": ", get(x$argValue), collapse = "  "), "\")))]"))))
 
   helper_nonchoice <- function(x) eval(parse(text = paste(paste0("input[[\"", x$ItemID, "\"]] <<- readline(cat(\"", x$Label, ifelse(x$helpText != "", paste0(" (", x$helpText, ")"), ""), ":\n", "\"))"))))
 
@@ -45,45 +50,45 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
 
 
-readline(cat("Please, help us match your columns to ours.\nWe will successively ask you to give us what columns, in your data set, match the following items (when not provided in 'input'):\n", paste(paste("-", x$Label, ifelse(x$helpText!="", paste0(" (", x$helpText, ")"), "")), collapse = "\n"), "\nFor each if these items, you will have to enter a number. Follow the list provided and enter the number corresponding to the corresponding column, then press [enter].\nIf you don't have a column corresponding, enter '1:none'.\n\n***SCROLL UP TO SEE THE BEGEINING OF THIS MESSAGE***\n\nPress [enter] to start."))
+  readline(cat("Please, help us match your columns to ours.\nWe will successively ask you to give us what columns, in your data set, match the following items (when not provided in 'input'):\n", paste(paste("-", x$Label, ifelse(x$helpText!="", paste0(" (", x$helpText, ")"), "")), collapse = "\n"), "\nFor each if these items, you will have to enter a number. Follow the list provided and enter the number corresponding to the corresponding column, then press [enter].\nIf you don't have a column corresponding, enter '1:none'.\n\n***SCROLL UP TO SEE THE BEGEINING OF THIS MESSAGE***\n\nPress [enter] to start."))
 
-if(exists("x1")) {
+  if(exists("x1")) {
 
-  x1_choice <- x1[x1$ItemType %in% "selectInput", ]
-  x1_nonchoice <- x1[!x1$ItemType %in% "selectInput", ]
+    x1_choice <- x1[x1$ItemType %in% "selectInput", ]
+    x1_nonchoice <- x1[!x1$ItemType %in% "selectInput", ]
 
-  if (nrow(x1_choice) > 0) helper_choice(x1_choice)
-  if (nrow(x1_nonchoice) > 0) helper_nonchoice(x1_nonchoice)
-}
+    if (nrow(x1_choice) > 0) helper_choice(x1_choice)
+    if (nrow(x1_nonchoice) > 0) helper_nonchoice(x1_nonchoice)
+  }
 
 
-if(exists("x2")) {
-  x2_ask <- x2[sapply(input[x2$if_X1_is_none], is.null) | input[x2$if_X1_is_none] %in% "none", ]
+  if(exists("x2")) {
+    x2_ask <- x2[sapply(input[x2$if_X1_is_none], is.null) | input[x2$if_X1_is_none] %in% "none", ]
 
-  x2_ask_choice <- x2_ask[x2_ask$ItemType %in% "selectInput", ]
-  x2_ask_nonchoice <- x2_ask[!x2_ask$ItemType %in% "selectInput", ]
+    x2_ask_choice <- x2_ask[x2_ask$ItemType %in% "selectInput", ]
+    x2_ask_nonchoice <- x2_ask[!x2_ask$ItemType %in% "selectInput", ]
 
-  if (nrow(x2_ask_choice) > 0) helper_choice(x2_ask_choice)
-  if (nrow(x2_ask_nonchoice) > 0) helper_nonchoice(x2_ask_nonchoice)
+    if (nrow(x2_ask_choice) > 0) helper_choice(x2_ask_choice)
+    if (nrow(x2_ask_nonchoice) > 0) helper_nonchoice(x2_ask_nonchoice)
 
-}
+  }
 
-if(exists("x3")) {
+  if(exists("x3")) {
 
-  x3_ask <- x3[sapply(input[x3$if_X1_is_none], is.null) | (input[x3$if_X1_is_none] %in% "none" & !input[x3$if_X2_isnot_none] %in% "none"), ]
+    x3_ask <- x3[sapply(input[x3$if_X1_is_none], is.null) | (input[x3$if_X1_is_none] %in% "none" & !input[x3$if_X2_isnot_none] %in% "none"), ]
 
-  x3_ask_choice <- x3_ask[x3_ask$ItemType %in% "selectInput", ]
-  x3_ask_nonchoice <- x3_ask[!x3_ask$ItemType %in% "selectInput", ]
+    x3_ask_choice <- x3_ask[x3_ask$ItemType %in% "selectInput", ]
+    x3_ask_nonchoice <- x3_ask[!x3_ask$ItemType %in% "selectInput", ]
 
-  if (nrow(x3_ask_choice) > 0) helper_choice(x3_ask_choice)
-  if (nrow(x3_ask_nonchoice) > 0) helper_nonchoice(x3_ask_nonchoice)
+    if (nrow(x3_ask_choice) > 0) helper_choice(x3_ask_choice)
+    if (nrow(x3_ask_nonchoice) > 0) helper_nonchoice(x3_ask_nonchoice)
 
-}
+  }
 
-cat("please review the table above and start over if it is not correct")
+  cat("please review the table above and start over if it is not correct")
 
-View(t(as.data.frame(input, row.names = "Your column name")))
+  View(t(as.data.frame(input, row.names = "Your column name")))
 
-return(input)
+  return(input)
 }
 
