@@ -39,7 +39,7 @@ Headers,1,selectInput,choices,TreeHeight,Tree height,,none,,ColumnOptions,TRUE,T
 Headers,1,selectInput,choices,TreeHeightUnit,Tree height units,,none,,UnitOptions,TRUE,FALSE,character,-
 Headers,3,selectInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,TreeHeight,UnitOptions,TRUE,FALSE,character,-
 Headers,1,selectInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,,ColumnOptions,TRUE,TRUE,character,-
-Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,ColumnOptions,TRUE,TRUE,character,-
-Headers,1,selectInput,choices,SoilType,Type of soil,,none,,ColumnOptions,TRUE,TRUE,character,-
-Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,ColumnOptions,TRUE,TRUE,character,-
+Headers,1,selectInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,,ColumnOptions,TRUE,FALSE,character,-
+Headers,1,selectInput,choices,SoilType,Type of soil,,none,,ColumnOptions,TRUE,FALSE,character,-
+Headers,1,selectInput,choices,Topography,"Topographical position (lowland, plateau)",,none,,ColumnOptions,TRUE,FALSE,character,-
 Headers,3,textInput,value,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,ScientificName,OtherOptions,TRUE,FALSE,character,-
