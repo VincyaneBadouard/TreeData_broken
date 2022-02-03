@@ -5,7 +5,7 @@
 \alias{ParacouProfile}
 \title{ParacouProfile}
 \format{
-A list of 34
+A named list
 \describe{
 \item{Site}{The column name in datda set @ParacouSubset (Forest) corresponding to Site name}
 \item{Plot}{The column name in datda set @ParacouSubset (Plot) corresponding to Plot name}

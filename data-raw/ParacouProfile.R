@@ -6,7 +6,7 @@ if(!interactive()) {
   ParacouProfile <- list(
     Site = "Forest",
     Plot = "Plot",
-    Subplot = "SubPlot",
+    SubPlot = "SubPlot",
     CensusYear = "CensusYear",
     TreeFieldNum = "TreeFieldNum",
     IdTree = "idTree",
