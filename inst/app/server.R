@@ -11,6 +11,8 @@ x <- read.csv("data/interactive_items.csv")
 x <- x[x$Activate, ]
 for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
+# get the function here (ugly solution but not sure how esle to do it- unless installing packgae from GitHub)
+source("../../R/RequiredFormat.R")
 server <- function(input, output) {
 
   # read file and create data table
@@ -25,6 +27,14 @@ server <- function(input, output) {
                       header = input$header,
                       sep = input$cbSeparator)
   })
+
+
+  # render data table
+  output$tabData <- renderDT({
+    if (!is.null(input$file1$name))
+      Data()
+  }, rownames = FALSE,
+  options = list(pageLength = 10))
 
   # Avoid seeing error when data has no been submitted yet
   text_reactive <- reactiveValues(
@@ -107,10 +117,17 @@ server <- function(input, output) {
 
 
                })
-  # render data table
-  output$tabData <- renderDT({
-    if (!is.null(input$file1$name))
-      Data()
+
+
+  # format data usin the input
+
+ observeEvent(input$LaunchFormating, {
+   DataFormated <- RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+    })
+
+  # Visualize output
+  output$tabDataFormated <- renderDT({
+      DataFormated()
   }, rownames = FALSE,
   options = list(pageLength = 10))
 
