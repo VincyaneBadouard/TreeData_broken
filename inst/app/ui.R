@@ -94,9 +94,10 @@ body <- dashboardBody(
 
             fluidRow(
 
-              column(width = 11,
+              column(width = 10,
                      DTOutput(outputId = "tabDataFormated")
-            )
+            ),
+            actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
               )
 
 
