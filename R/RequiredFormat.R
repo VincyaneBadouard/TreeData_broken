@@ -128,7 +128,7 @@ RequiredFormat <- function(
 
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if (input$TreeFieldNum %in% "none") {
-      warning("You do not have a column with your tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
+      warning("You do not have a column with unique tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
       Data[, NewIdTree := seq(1, .N) , by = .(Plot, SubPlot)]
     }
 
@@ -153,7 +153,7 @@ RequiredFormat <- function(
 
 
   ## DBH if we have circumference ####
-  if(input$DBH %in% "none" & input$Circ %in% "none") stop("do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  if(input$DBH %in% "none" & input$Circ %in% "none") stop("You do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
   if(input$DBH %in% "none" & !input$Circ %in% "none")
     Data[, DBH := round(Circ/pi, 2)]

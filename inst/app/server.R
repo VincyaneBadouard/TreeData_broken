@@ -122,14 +122,23 @@ server <- function(input, output) {
   # format data usin the input
 
  observeEvent(input$LaunchFormating, {
-   DataFormated <- RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+
+   DataFormated <- tryCatch({
+   RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+   },
+   warning = function(warn){
+     showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning')
+   },
+   error = function(err){
+     showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err')
+   })
     })
 
   # Visualize output
   output$tabDataFormated <- renderDT({
-      DataFormated()
+      DataFormated
   }, rownames = FALSE,
-  options = list(pageLength = 10))
+  options = list(pageLength = 10, scrollX=TRUE))
 
   # save final data table
   output$dbFile <- downloadHandler(

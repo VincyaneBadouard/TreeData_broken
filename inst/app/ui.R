@@ -93,7 +93,7 @@ body <- dashboardBody(
 
             fluidRow(
 
-              column(width = 9,
+              column(width = 11,
                      DTOutput(outputId = "tabDataFormated")
             )
               )
