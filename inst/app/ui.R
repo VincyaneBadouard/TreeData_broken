@@ -85,7 +85,8 @@ body <- dashboardBody(
                        status = "primary",
                        solidHeader = TRUE,
                        uiOutput("ui3"))),
-              actionButton("LaunchFormating", label = "Launch formating!")
+
+              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
             )
 
             ),
