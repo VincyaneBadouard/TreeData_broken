@@ -36,18 +36,19 @@ server <- function(input, output) {
   }, rownames = FALSE,
   options = list(pageLength = 10))
 
-  # Avoid seeing error when data has no been submitted yet
+  # Avoid seeing errors
   text_reactive <- reactiveValues(
-    text = "No data has been submitted yet."
+    NoData = "No data has been submitted yet."
   )
+
   output$ui1 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
   })
   output$ui2 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
   })
   output$ui3 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
   })
 
   # create options to choose from:
@@ -121,22 +122,25 @@ server <- function(input, output) {
 
   # format data usin the input
 
- observeEvent(input$LaunchFormating, {
+  DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
-   DataFormated <- tryCatch({
-   RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
-   },
-   warning = function(warn){
-     showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning')
-   },
-   error = function(err){
-     showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err')
-   })
+    tryCatch({
+      RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+    },
+    warning = function(warn){
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning')
+    },
+    error = function(err){
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err')
     })
+  })
 
   # Visualize output
   output$tabDataFormated <- renderDT({
-      DataFormated
+    # validate(
+    #   need(req(DataFormated()), "AA")
+    # )
+      DataFormated()
   }, rownames = FALSE,
   options = list(pageLength = 10, scrollX=TRUE))
 
@@ -146,7 +150,7 @@ server <- function(input, output) {
       paste(Sys.Date(), '_data.csv', sep = '')
     },
     content = function(file) {
-      write.csv(Data(), file, row.names = FALSE)
+      write.csv(DataFormated(), file, row.names = FALSE)
     }
   )
 
