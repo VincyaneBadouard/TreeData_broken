@@ -147,17 +147,27 @@ server <- function(input, output) {
   # save final data table
   output$dbFile <- downloadHandler(
     filename = function() {
-      paste(Sys.Date(), '_data.csv', sep = '')
+      paste(input$file1$name, '_formated.csv', sep = '')
     },
     content = function(file) {
       write.csv(DataFormated(), file, row.names = FALSE)
     }
   )
 
+  # # save profile Rdata file
+  # output$dbProfile <- downloadHandler(
+  #   filename = function() {
+  #     paste(input$file1$name, '_profile.RData', sep = '')
+  #   },
+  #   content = function(file) {
+  #     save(reactiveValues(Data()), file)
+  #   }
+  # )
+
   # save code needed to produce the table
   output$dbCode <- downloadHandler(
     filename = function() {
-      paste(Sys.Date(), '_code.R', sep = '')
+      paste(input$file1$name, '_code.R', sep = '')
     },
     content = function(file) {
       text_upload <- glue::glue("# upload the data
