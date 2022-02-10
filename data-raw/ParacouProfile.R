@@ -8,6 +8,7 @@ if(!interactive()) {
     Plot = "Plot",
     SubPlot = "SubPlot",
     CensusYear = "CensusYear",
+    CensusDate = "none",
     TreeFieldNum = "TreeFieldNum",
     IdTree = "idTree",
     IdStem = "none",
@@ -53,6 +54,7 @@ if(interactive()) {
 3
 5
 24
+1
 6
 7
 1
