@@ -82,6 +82,7 @@ server <- function(input, output) {
                  output$ui2 <- renderUI({
                    # req(x2)
 
+
                    lapply(c(1:nrow(x2)), function(i) {
                      if(input[[x2$if_X1_is_none[i]]] %in% "none")
                        # box(

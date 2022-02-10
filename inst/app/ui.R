@@ -71,19 +71,22 @@ body <- dashboardBody(
                      ),
 
               column(width = 5,
-                     box(title = "Tell us about your plot (if info is not in a column)",
+                     box(title = "Tell us about your plot",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
+                       h4("Only fill this infomation if it is not in a column!"),
                        uiOutput("ui2"))
                      ),
 
 
               column(width = 5,
-                     box(title = "Tell us about your units (if they are not in a column)",
+                     box(title = "Tell us about your units",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
+                       h4("Only fill this infomation if it is not in a column!"),
+                       p("Note: we are not able to handle units varying by rows yet..."),
                        uiOutput("ui3"))),
 
               actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
