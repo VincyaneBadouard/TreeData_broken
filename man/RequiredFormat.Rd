@@ -13,9 +13,9 @@ RequiredFormat(Data, input, x = NULL, ThisIsShinyApp = FALSE)
 RequiredFormat_interactive, also called site profile. It has information on
 column names correspondence, size units etc...}
 
-\item{x}{describe me!}
+\item{x}{For internal use when function used by Shiny app}
 
-\item{ThisIsShinyApp}{(logical)}
+\item{ThisIsShinyApp}{For internal use when function used by Shiny app (logical)}
 }
 \value{
 Input inventory (data.frame) in the required package format.
