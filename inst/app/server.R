@@ -187,6 +187,10 @@ server <- function(input, output) {
     content = function(file) {
       text_upload <- glue::glue(
       "
+      # install TreeData package
+      githubinstall::githubinstall('VincyaneBadouard/TreeData')
+      library(TreeData)
+
       # upload the data
        Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')
 
