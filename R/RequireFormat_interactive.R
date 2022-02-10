@@ -54,8 +54,8 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
   if(exists("x1")) {
 
-    x1_choice <- x1[x1$ItemType %in% "selectInput", ]
-    x1_nonchoice <- x1[!x1$ItemType %in% "selectInput", ]
+    x1_choice <- x1[x1$ItemType %in% "pickerInput", ]
+    x1_nonchoice <- x1[!x1$ItemType %in% "pickerInput", ]
 
     if (nrow(x1_choice) > 0) helper_choice(x1_choice)
     if (nrow(x1_nonchoice) > 0) helper_nonchoice(x1_nonchoice)
@@ -65,8 +65,8 @@ RequiredFormat_interactive <- function(Data, input = list()) {
   if(exists("x2")) {
     x2_ask <- x2[sapply(input[x2$if_X1_is_none], is.null) | input[x2$if_X1_is_none] %in% "none", ]
 
-    x2_ask_choice <- x2_ask[x2_ask$ItemType %in% "selectInput", ]
-    x2_ask_nonchoice <- x2_ask[!x2_ask$ItemType %in% "selectInput", ]
+    x2_ask_choice <- x2_ask[x2_ask$ItemType %in% "pickerInput", ]
+    x2_ask_nonchoice <- x2_ask[!x2_ask$ItemType %in% "pickerInput", ]
 
     if (nrow(x2_ask_choice) > 0) helper_choice(x2_ask_choice)
     if (nrow(x2_ask_nonchoice) > 0) helper_nonchoice(x2_ask_nonchoice)
@@ -77,8 +77,8 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
     x3_ask <- x3[sapply(input[x3$if_X1_is_none], is.null) | (input[x3$if_X1_is_none] %in% "none" & !input[x3$if_X2_isnot_none] %in% "none"), ]
 
-    x3_ask_choice <- x3_ask[x3_ask$ItemType %in% "selectInput", ]
-    x3_ask_nonchoice <- x3_ask[!x3_ask$ItemType %in% "selectInput", ]
+    x3_ask_choice <- x3_ask[x3_ask$ItemType %in% "pickerInput", ]
+    x3_ask_nonchoice <- x3_ask[!x3_ask$ItemType %in% "pickerInput", ]
 
     if (nrow(x3_ask_choice) > 0) helper_choice(x3_ask_choice)
     if (nrow(x3_ask_nonchoice) > 0) helper_nonchoice(x3_ask_nonchoice)
