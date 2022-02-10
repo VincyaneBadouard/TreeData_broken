@@ -6,6 +6,9 @@
 #'  RequiredFormat_interactive, also called site profile. It has information on
 #'  column names correspondence, size units etc...
 #'
+#'@param x describe me!
+#'
+#'@param ThisIsShinyApp (logical)
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
 #'  it is, and converts the column names to the standardized names used in this

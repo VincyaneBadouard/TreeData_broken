@@ -4,7 +4,7 @@
 \alias{RequiredFormat}
 \title{RequiredFormat}
 \usage{
-RequiredFormat(Data, input)
+RequiredFormat(Data, input, x = NULL, ThisIsShinyApp = FALSE)
 }
 \arguments{
 \item{Data}{Forest inventory data set (data.frame or data.table)}
@@ -12,6 +12,10 @@ RequiredFormat(Data, input)
 \item{input}{A named list, typically the output of function
 RequiredFormat_interactive, also called site profile. It has information on
 column names correspondence, size units etc...}
+
+\item{x}{describe me!}
+
+\item{ThisIsShinyApp}{(logical)}
 }
 \value{
 Input inventory (data.frame) in the required package format.

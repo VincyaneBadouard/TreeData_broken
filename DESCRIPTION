@@ -1,6 +1,7 @@
 Package: TreeData
 Title: Forest Inventories Harmonization & Correction
 Version: 0.0.0.9000
+Date: 2022-02-10
 Authors@R: 
     c(person(given = "Vincyane",
            family = "Badouard",
@@ -10,14 +11,14 @@ Authors@R:
            family = "Herrmann",
            role = "aut",
            email = "HerrmannV@si.edu"),
-      person(given = "Camille",
-           family = "Piponiot",
-           role = "aut",
-           email = "camille.piponiot@gmail.com"),
       person(given = "Nino",
            family = "Page",
            role = "ctb",
-           email = "page.nino@gmail.com")
+           email = "page.nino@gmail.com"),
+      person(given = "Camille",
+           family = "Piponiot",
+           role = "aut",
+           email = "camille.piponiot@gmail.com")
            )
 Description: TreeData harmonises and corrects forest inventories.
 URL: https://github.com/VincyaneBadouard/TreeData.git
