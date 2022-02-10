@@ -115,7 +115,7 @@ body <- dashboardBody(
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbProfile", label = "Save file")),
+                         downloadButton(outputId = "dbProfile", label = "Save profile")),
                      box(title = "Save code",
                          width = NULL,
                          status = "primary",

@@ -145,33 +145,57 @@ server <- function(input, output) {
   options = list(pageLength = 10, scrollX=TRUE))
 
   # save final data table
+
+  # rf2 <- reactiveValues()
+  # observe({
+  #   if(!is.null(input[[names(input) %in% x$ItemID]]))
+  # eventReactive(input$LaunchFormating | input$UpdateTable, {
+  #       profile <- input[[which(names(input) %in% x$ItemID)]]
+  #     })
+  # })
+
   output$dbFile <- downloadHandler(
     filename = function() {
-      paste(input$file1$name, '_formated.csv', sep = '')
+      paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
     },
     content = function(file) {
       write.csv(DataFormated(), file, row.names = FALSE)
     }
   )
 
-  # # save profile Rdata file
-  # output$dbProfile <- downloadHandler(
-  #   filename = function() {
-  #     paste(input$file1$name, '_profile.RData', sep = '')
-  #   },
-  #   content = function(file) {
-  #     save(reactiveValues(Data()), file)
-  #   }
-  # )
+  # save profile Rdata file
+
+  output$dbProfile <- downloadHandler(
+    filename = function() {
+      paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
+    },
+    content = function(file) {
+      inputs_to_save <- names(input)[names(input) %in% x$ItemID]
+      Profile <- list()
+      for(input.i in inputs_to_save){
+        Profile[[input.i]] <-  input[[input.i]]
+      }
+      saveRDS( profile, file = file)
+    }
+  )
 
   # save code needed to produce the table
   output$dbCode <- downloadHandler(
     filename = function() {
-      paste(input$file1$name, '_code.R', sep = '')
+      paste(gsub(".csv", "",input$file1$name), '_Code.R', sep = '')
     },
     content = function(file) {
-      text_upload <- glue::glue("# upload the data
-                         Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')")
+      text_upload <- glue::glue(
+      "
+      # upload the data
+       Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')
+
+      # upload your profile (saved via shiny app)
+      Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
+
+      # format your data
+      DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
+      ")
       writeLines(text_upload, file)
     }
   )
