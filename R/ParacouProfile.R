@@ -6,19 +6,20 @@
 #' \describe{
 #'   \item{Site}{The column name in datda set @ParacouSubset (Forest) corresponding to Site name}
 #'   \item{Plot}{The column name in datda set @ParacouSubset (Plot) corresponding to Plot name}
-#'   \item{Subplot}{The column name in datda set @ParacouSubset (SubPlot) corresponding to Subplot name}
+#'   \item{SubPlot}{The column name in datda set @ParacouSubset (SubPlot) corresponding to SubPlot name}
 #'   \item{CensusYear}{The column name in datda set @ParacouSubset (CensusYear) corresponding to Census year}
+#'   \item{CensusDate}{The column name in datda set @ParacouSubset (none) corresponding to Census Date}
 #'   \item{TreeFieldNum}{The column name in datda set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
 #'   \item{IdTree}{The column name in datda set @ParacouSubset (idTree) corresponding to Tree ID}
 #'   \item{IdStem}{The column name in datda set @ParacouSubset (none) corresponding to Stem ID}
 #'   \item{IdMeasure}{The column name in datda set @ParacouSubset (none) corresponding to Measure ID}
 #'   \item{LifeStatus}{The column name in datda set @ParacouSubset (CodeAlive) corresponding to Life status}
 #'   \item{DBH}{The column name in datda set @ParacouSubset (none) corresponding to DBH}
-#'   \item{DBHUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to DBH unit}
+#'   \item{DBHUnit}{The column name in datda set @ParacouSubset (none) corresponding to DBH unit}
 #'   \item{Circ}{The column name in datda set @ParacouSubset (Circ) corresponding to Circumference}
-#'   \item{CircUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to Circumference unit}
-#'   \item{POM}{The column name in datda set @ParacouSubset (none) corresponding to POM (height)}
-#'   \item{POMUnitCol}{The column name in datda set @ParacouSubset (none) corresponding to POM units}
+#'   \item{CircUnit}{The column name in datda set @ParacouSubset (none) corresponding to Circumference unit}
+#'   \item{POM}{The column name in datda set @ParacouSubset (none) corresponding to POM}
+#'   \item{POMUnit}{The column name in datda set @ParacouSubset (none) corresponding to POM units}
 #'   \item{Lat}{The column name in datda set @ParacouSubset (Lat) corresponding to Tree latitude}
 #'   \item{Lon}{The column name in datda set @ParacouSubset (Lon) corresponding to Tree longitude}
 #'   \item{Xutm}{The column name in datda set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
@@ -38,7 +39,6 @@
 #'   \item{SoilType}{The column name in datda set @ParacouSubset (none) corresponding to Type of soil}
 #'   \item{Topography}{The column name in datda set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
 #'   \item{CircUnitMan}{The column name in datda set @ParacouSubset (cm) corresponding to What is your circumference unit?}
-
 #'   ...
 #' }
 

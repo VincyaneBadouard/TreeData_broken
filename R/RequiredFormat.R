@@ -6,9 +6,10 @@
 #'  RequiredFormat_interactive, also called site profile. It has information on
 #'  column names correspondence, size units etc...
 #'
-#'@param x describe me!
+#'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp (logical)
+#'@param ThisIsShinyApp For internal use when function used by Shiny app (logical)
+#'
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
 #'  it is, and converts the column names to the standardized names used in this
@@ -32,7 +33,6 @@
 #' ParacouSubsetFormated <- RequiredFormat(
 #'   ParacouSubset,
 #'   input = ParacouProfile)
-
 #'                }
 #'
 
@@ -59,12 +59,17 @@ RequiredFormat <- function(
 
   # Global variables
   .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <- NULL
-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- unitsOptions  <- NULL
+  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- NULL
 
   # Load interactive items to see what we are missing ####
 
   if(!ThisIsShinyApp) {
-  x <- read.csv("inst/app/data/interactive_items.csv")
+  x <- try(expr = read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)), silent = T)
+
+  if (class(x) %in% "try-error"){
+     warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
+    x <- read.csv("inst/app/data/interactive_items.csv")
+  }
   x <- x[x$Activate,]
   }
 
@@ -107,7 +112,16 @@ RequiredFormat <- function(
 
   ##NOT DOING IT YET AS WE NEED TO ASK USER WHAT IS ALIVE AND WHAT IS NOT etc...
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
-  #
+
+  ## Date of measurement ####
+  if(!input$CensusDate %in% "none"){
+
+    Data[, CensusDateOriginal := CensusDate]
+    Data[, (CensusDate) := as.Date(trimws(CensusDate), format = input$CensusDateFormat)]
+
+    if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+
+  }
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 
 
@@ -120,6 +134,8 @@ RequiredFormat <- function(
 
   # Fill in info in column missing ####
 
+
+
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
 
   if (input$Plot %in% "none") Data[, Plot := "1"]
@@ -129,7 +145,7 @@ RequiredFormat <- function(
 
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if (input$TreeFieldNum %in% "none") {
-      warning("You do not have a column with your tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
+      warning("You do not have a column with unique tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
       Data[, NewIdTree := seq(1, .N) , by = .(Plot, SubPlot)]
     }
 
@@ -154,7 +170,7 @@ RequiredFormat <- function(
 
 
   ## DBH if we have circumference ####
-  if(input$DBH %in% "none" & input$Circ %in% "none") stop("do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  if(input$DBH %in% "none" & input$Circ %in% "none") stop("You do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
   if(input$DBH %in% "none" & !input$Circ %in% "none")
     Data[, DBH := round(Circ/pi, 2)]
@@ -193,7 +209,7 @@ RequiredFormat <- function(
 
     POMUnit <- input$POMUnitMan
 
-    if(! POMUnit %in% unitsOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!POMUnit %in% unitOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (POMUnit %in% unitOptions)
 
@@ -218,7 +234,7 @@ RequiredFormat <- function(
 
     TreeHeightUnit <- input$TreeHeightUnitMan
 
-    if(! TreeHeightUnit %in% unitsOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(! TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (TreeHeightUnit %in% unitOptions)
 

@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs")
+list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table")
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -49,7 +49,10 @@ body <- dashboardBody(
                                      label = "Separator",
                                      choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                      selected = "auto"
-                         )
+                         ),
+                         radioButtons(inputId = "format",
+                                      label = div("Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
+                                      choices = list("Long" = "long", "Wide" = "wide"))
                      )
               ),
 
@@ -71,21 +74,31 @@ body <- dashboardBody(
                      ),
 
               column(width = 5,
-                     box(title = "Tell us about your plot (if info is not in a column)",
+                     box(title = "Tell us about your plot",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
+                       h4("Only fill this infomation if it is not in a column!"),
                        uiOutput("ui2"))
                      ),
 
 
               column(width = 5,
-                     box(title = "Tell us about your units (if they are not in a column)",
+                     box(title = "Tell us about your units",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
+                       h4("Only fill this infomation if it is not in a column!"),
+                       p("Note: we are not able to handle units varying by rows yet..."),
                        uiOutput("ui3"))),
-              actionButton("LaunchFormating", label = "Launch formating!")
+              column(width = 5,
+                     box(title = "A couple more things...",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         uiOutput("ui4"))),
+
+              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
             )
 
             ),
@@ -93,9 +106,10 @@ body <- dashboardBody(
 
             fluidRow(
 
-              column(width = 9,
+              column(width = 10,
                      DTOutput(outputId = "tabDataFormated")
-            )
+            ),
+            actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
               )
 
 
@@ -109,6 +123,11 @@ body <- dashboardBody(
                          status = "primary",
                          solidHeader = TRUE,
                          downloadButton(outputId = "dbFile", label = "Save file")),
+                     box(title = "Save profile",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbProfile", label = "Save profile")),
                      box(title = "Save code",
                          width = NULL,
                          status = "primary",

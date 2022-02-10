@@ -34,20 +34,24 @@ server <- function(input, output) {
     if (!is.null(input$file1$name))
       Data()
   }, rownames = FALSE,
-  options = list(pageLength = 10))
+  options = list(pageLength = 10, scrollX=TRUE))
 
-  # Avoid seeing error when data has no been submitted yet
+  # Avoid seeing errors
   text_reactive <- reactiveValues(
-    text = "No data has been submitted yet."
+    NoData = "No data has been submitted yet."
   )
+
   output$ui1 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
   })
   output$ui2 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
   })
   output$ui3 <- renderUI({
-    box(text_reactive$text)
+    p(text_reactive$NoData)
+  })
+  output$ui4 <- renderUI({
+    p(text_reactive$NoData)
   })
 
   # create options to choose from:
@@ -70,7 +74,7 @@ server <- function(input, output) {
                      # box(
                        # h3(x1$Label[i]),
                        # helpText(x1$helpText[i]),
-                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])())")))
+                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])(), options = ", x1$Options[i], ")")))
                      # )
 
 
@@ -80,6 +84,7 @@ server <- function(input, output) {
 
                  output$ui2 <- renderUI({
                    # req(x2)
+
 
                    lapply(c(1:nrow(x2)), function(i) {
                      if(input[[x2$if_X1_is_none[i]]] %in% "none")
@@ -115,40 +120,108 @@ server <- function(input, output) {
                    })
                  })
 
+                 output$ui4 <- renderUI({
+                   # req(x4)
+
+
+                   lapply(c(1:nrow(x4)), function(i) {
+                     if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" )
+                       # box(
+                       #   h3(x4$Label[i]),
+                       #   helpText(x4$helpText[i]),
+                       eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])())")))
+                     #   br()
+                     #
+                     # )
+
+
+
+                   })
+                 })
 
                })
 
 
   # format data usin the input
 
- observeEvent(input$LaunchFormating, {
-   DataFormated <- RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+  DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
+
+    tryCatch({
+      RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+    },
+    warning = function(warn){
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning')
+    },
+    error = function(err){
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err')
     })
+  })
 
   # Visualize output
   output$tabDataFormated <- renderDT({
+    # validate(
+    #   need(req(DataFormated()), "AA")
+    # )
       DataFormated()
   }, rownames = FALSE,
-  options = list(pageLength = 10))
+  options = list(pageLength = 10, scrollX=TRUE))
 
   # save final data table
+
+  # rf2 <- reactiveValues()
+  # observe({
+  #   if(!is.null(input[[names(input) %in% x$ItemID]]))
+  # eventReactive(input$LaunchFormating | input$UpdateTable, {
+  #       profile <- input[[which(names(input) %in% x$ItemID)]]
+  #     })
+  # })
+
   output$dbFile <- downloadHandler(
     filename = function() {
-      paste(Sys.Date(), '_data.csv', sep = '')
+      paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
     },
     content = function(file) {
-      write.csv(Data(), file, row.names = FALSE)
+      write.csv(DataFormated(), file, row.names = FALSE)
+    }
+  )
+
+  # save profile Rdata file
+
+  output$dbProfile <- downloadHandler(
+    filename = function() {
+      paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
+    },
+    content = function(file) {
+      inputs_to_save <- names(input)[names(input) %in% x$ItemID]
+      Profile <- list()
+      for(input.i in inputs_to_save){
+        Profile[[input.i]] <-  input[[input.i]]
+      }
+      saveRDS( profile, file = file)
     }
   )
 
   # save code needed to produce the table
   output$dbCode <- downloadHandler(
     filename = function() {
-      paste(Sys.Date(), '_code.R', sep = '')
+      paste(gsub(".csv", "",input$file1$name), '_Code.R', sep = '')
     },
     content = function(file) {
-      text_upload <- glue::glue("# upload the data
-                         Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')")
+      text_upload <- glue::glue(
+      "
+      # install TreeData package
+      githubinstall::githubinstall('VincyaneBadouard/TreeData')
+      library(TreeData)
+
+      # upload the data
+       Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')
+
+      # upload your profile (saved via shiny app)
+      Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
+
+      # format your data
+      DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
+      ")
       writeLines(text_upload, file)
     }
   )
