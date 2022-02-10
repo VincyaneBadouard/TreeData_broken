@@ -111,7 +111,16 @@ RequiredFormat <- function(
 
   ##NOT DOING IT YET AS WE NEED TO ASK USER WHAT IS ALIVE AND WHAT IS NOT etc...
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
-  #
+
+  ## Date of measurement ####
+  if(!input$CensusDate %in% "none"){
+
+    Data[, CensusDateOriginal := CensusDate]
+    Data[, (CensusDate) := as.Date(trimws(CensusDate), format = input$CensusDateFormat)]
+
+    if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+
+  }
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 
 
@@ -123,6 +132,8 @@ RequiredFormat <- function(
 
 
   # Fill in info in column missing ####
+
+
 
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
 
