@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs")
+list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets")
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -88,6 +88,12 @@ body <- dashboardBody(
                        h4("Only fill this infomation if it is not in a column!"),
                        p("Note: we are not able to handle units varying by rows yet..."),
                        uiOutput("ui3"))),
+              column(width = 5,
+                     box(title = "A couple more things...",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         uiOutput("ui4"))),
 
               actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
             )

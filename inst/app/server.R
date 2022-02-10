@@ -50,6 +50,9 @@ server <- function(input, output) {
   output$ui3 <- renderUI({
     p(text_reactive$NoData)
   })
+  output$ui4 <- renderUI({
+    p(text_reactive$NoData)
+  })
 
   # create options to choose from:
 
@@ -117,6 +120,24 @@ server <- function(input, output) {
                    })
                  })
 
+                 output$ui4 <- renderUI({
+                   # req(x4)
+
+
+                   lapply(c(1:nrow(x4)), function(i) {
+                     if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" )
+                       # box(
+                       #   h3(x4$Label[i]),
+                       #   helpText(x4$helpText[i]),
+                       eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])())")))
+                     #   br()
+                     #
+                     # )
+
+
+
+                   })
+                 })
 
                })
 

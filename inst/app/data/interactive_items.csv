@@ -7,8 +7,8 @@ Headers,1,pickerInput,choices,SubPlot,SubPlot name,,none,,ColumnOptions,list(`li
 Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,Subplot,,OtherOptions,list(),FALSE,FALSE,character,-,-
 Headers,1,pickerInput,choices,CensusYear,Census year,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,numeric,year,Census Year
 Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,OtherOptions,list(),TRUE,FALSE,numeric,year,-
-Headers,1,pickerInput,choices,CensusDate,Census Date,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,character,-,Census date (YYYY-mm-dd)
-Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m%d,none,CensusDate,OtherOptions,list(),FALSE,FALSE,character,-,-
+Headers,1,pickerInput,choices,CensusDate,Census Date,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
+Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m-%d,none,CensusDate,OtherOptions,list(),TRUE,FALSE,character,-,-
 Headers,1,pickerInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
 Headers,1,pickerInput,choices,IdTree,Tree ID,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if not provided in the input data
 Headers,1,pickerInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,FALSE,character,-,Stem unique identifier
