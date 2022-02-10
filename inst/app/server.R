@@ -71,7 +71,7 @@ server <- function(input, output) {
                      # box(
                        # h3(x1$Label[i]),
                        # helpText(x1$helpText[i]),
-                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])())")))
+                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])(), options = ", x1$Options[i], ")")))
                      # )
 
 
