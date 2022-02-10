@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets")
+list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table")
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -49,7 +49,10 @@ body <- dashboardBody(
                                      label = "Separator",
                                      choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                      selected = "auto"
-                         )
+                         ),
+                         radioButtons(inputId = "format",
+                                      label = div("Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
+                                      choices = list("Long" = "long", "Wide" = "wide"))
                      )
               ),
 
