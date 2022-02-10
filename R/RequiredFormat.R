@@ -63,8 +63,9 @@ RequiredFormat <- function(
   # Load interactive items to see what we are missing ####
 
   if(!ThisIsShinyApp) {
+  x <- try(expr = read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)), silent = T)
 
-    if(nzchar(system.file(package = "TreeData"))) x <- read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)) else {
+  if (class(x) %in% "try-error"){
      warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
     x <- read.csv("inst/app/data/interactive_items.csv")
   }
