@@ -58,7 +58,7 @@ RequiredFormat <- function(
 
   # Global variables
   .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <- NULL
-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- unitsOptions  <- NULL
+  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- NULL
 
   # Load interactive items to see what we are missing ####
 
@@ -197,7 +197,7 @@ RequiredFormat <- function(
 
     POMUnit <- input$POMUnitMan
 
-    if(! POMUnit %in% unitsOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!POMUnit %in% unitOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (POMUnit %in% unitOptions)
 
@@ -222,7 +222,7 @@ RequiredFormat <- function(
 
     TreeHeightUnit <- input$TreeHeightUnitMan
 
-    if(! TreeHeightUnit %in% unitsOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(! TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (TreeHeightUnit %in% unitOptions)
 
