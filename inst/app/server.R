@@ -197,7 +197,7 @@ server <- function(input, output) {
       for(input.i in inputs_to_save){
         Profile[[input.i]] <-  input[[input.i]]
       }
-      saveRDS( profile, file = file)
+      saveRDS( Profile, file = file)
     }
   )
 

@@ -112,17 +112,20 @@ RequiredFormat <- function(
 
   ##NOT DOING IT YET AS WE NEED TO ASK USER WHAT IS ALIVE AND WHAT IS NOT etc...
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
+  # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+
 
   ## Date of measurement ####
   if(!input$CensusDate %in% "none"){
 
     Data[, CensusDateOriginal := CensusDate]
-    Data[, (CensusDate) := as.Date(trimws(CensusDate), format = input$CensusDateFormat)]
+    Data[, CensusDate := as.Date(trimws(as.character(CensusDate)), format = input$CensusDateFormat)]
 
     if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
   }
-  # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+
+
 
 
   # make input complete ####
@@ -134,12 +137,17 @@ RequiredFormat <- function(
 
   # Fill in info in column missing ####
 
+  ## Year
+  if(input$CensusYear %in% "none") {
+    if(!input$CensusDate %in% "none") Data[, CensusYear := format(CensusDate, "%Y")] else Data[, CensusYear := input$CensusYearMan]
+  }
+
 
 
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
-
-  if (input$Plot %in% "none") Data[, Plot := "1"]
-  if (input$SubPlot %in% "none") Data[, SubPlot := "1"]
+  if (input$Site %in% "none") Data[, Site :=  input$SiteMan]
+  if (input$Plot %in% "none") Data[, Plot :=  input$PlotMan]
+  if (input$SubPlot %in% "none") Data[, SubPlot := input$SubPlotMan]
 
   if (input$IdTree %in% "none") {
 

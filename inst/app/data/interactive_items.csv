@@ -4,7 +4,7 @@ Headers,2,textInput,value,SiteMan,What is your site name ?,,Site,,OtherOptions,l
 Headers,1,pickerInput,choices,Plot,Plot name,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,Plot level name
 Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,,OtherOptions,list(),TRUE,FALSE,character,-,-
 Headers,1,pickerInput,choices,SubPlot,SubPlot name,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,SubPlot level name
-Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,Subplot,,OtherOptions,list(),FALSE,FALSE,character,-,-
+Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,SubPlot,,OtherOptions,list(),TRUE,FALSE,character,-,-
 Headers,1,pickerInput,choices,CensusYear,Census year,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,numeric,year,Census Year
 Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,,OtherOptions,list(),TRUE,FALSE,numeric,year,-
 Headers,1,pickerInput,choices,CensusDate,Census Date,,none,,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
