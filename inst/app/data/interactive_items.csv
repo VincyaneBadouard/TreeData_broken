@@ -14,7 +14,7 @@ Headers,1,pickerInput,choices,IdTree,Tree ID,,none,,ColumnOptions,list(`live-sea
 Headers,1,pickerInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
 Headers,1,pickerInput,choices,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
 Headers,1,pickerInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE is tree was alive, FALSE if it was dead"
-Headers,4,pickerInput,choices,LiveStatuses,Which of your status(es) represent a LIVE tree?,,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,logical,-,-
+Headers,4,pickerInput,choices,IsLive,Which of your status(es) represent a LIVE tree?,,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,character,-,-
 Headers,1,pickerInput,choices,DBH,DBH,Diamter at breast height,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Diameter at breast height in cm
 Headers,1,pickerInput,choices,DBHUnit,DBH unit,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 Headers,3,pickerInput,choices,DBHUnitMan,What is your DBH unit ?,,DBHUnit,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
@@ -35,7 +35,8 @@ Headers,1,pickerInput,choices,VernName,Vernacular name,,none,,ColumnOptions,list
 Headers,1,pickerInput,choices,Family,Family name,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
 Headers,1,pickerInput,choices,Genus,Genus name,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Genus name
 Headers,1,pickerInput,choices,Species,Species name,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Species name
-Headers,1,pickerInput,choices,CommercialSp,Species considered commercial,Is the tree considered as a commercial species,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
+Headers,1,pickerInput,choices,CommercialSp,Commercial species indicator,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
+Headers,4,pickerInput,choices,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,character,-,-
 Headers,1,pickerInput,choices,TreeHeight,Tree height,,none,,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
 Headers,1,pickerInput,choices,TreeHeightUnit,Tree height units,,none,,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 Headers,3,pickerInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-

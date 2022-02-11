@@ -28,11 +28,11 @@
 #'
 #' @examples
 #'\dontrun{
-#' data(ParacouSubset)
-#' data(ParacouProfile)
-#' ParacouSubsetFormated <- RequiredFormat(
-#'   ParacouSubset,
-#'   input = ParacouProfile)
+# data(ParacouSubset)
+# data(ParacouProfile)
+# ParacouSubsetFormated <- RequiredFormat(
+#   ParacouSubset,
+#   input = ParacouProfile)
 #'                }
 #'
 
@@ -109,9 +109,17 @@ RequiredFormat <- function(
 
   ### as.logical
   ## Here we have to use user input to know what is TRUE and what is not
+
+  ### Life status
   if( !input$LifeStatus %in% "none") {
-    Data[, LifeStatus := ifelse(LifeStatus %in% input$LiveStatuses, TRUE, FALSE)]
+    Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
   }
+
+  ### commercial species
+  if( !input$CommercialSp %in% "none") {
+    Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
+  }
+
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 

@@ -108,7 +108,11 @@ x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
     if (nrow(x4_ask_nonchoice) > 0) helper_nonchoice(x4_ask_nonchoice)
 
     if(nrow(x4_ask_multiple_choice) > 0 ){
-      LifeStatusOptions <- sort(unique(Data[[input$LifeStatus]]))
+
+      if(!input$LifeStatus %in% "none") LifeStatusOptions <- sort(unique(Data[[input$LifeStatus]]))
+
+      if(!input$CommercialSp %in% "none") CommercialOptions <- sort(unique(Data[[input$CommercialSp]]))
+
       cat("Select all that apply, separated by a comma, then hit ENTER.\n")
       helper_multichoice(x4_ask_multiple_choice)
 

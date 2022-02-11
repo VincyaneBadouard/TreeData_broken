@@ -40,7 +40,8 @@ if(!interactive()) {
     Topography = "none",
     CircUnitMan = "cm",
     CensusDateFormat = "%Y-%m-%d",
-    LiveStatuses = TRUE
+    IsLive = TRUE,
+    IsCommercrial = TRUE
   )
 
 }
@@ -89,13 +90,17 @@ if(interactive()) {
 3
 %Y-%m-%d
 2
+2
 }
+
+dput(ParacouProfile)
 
 #### Save this data in the package ####
 usethis::use_data(ParacouProfile, overwrite = TRUE)
 
 
 ## For ParacouProfile.Rmd  run next line of code and paste in the item section of R/ParacouProfile.R
+x <- read.csv("inst/app/data/interactive_items.csv")
 
 write.csv(
   paste0("#'   \\item{", names(ParacouProfile), "}{Value or column name in data set @ParacouSubset (", ParacouProfile, ") corresponding to ", x$Label[match(names(ParacouProfile), x$ItemID)], "}"), "clipboard",

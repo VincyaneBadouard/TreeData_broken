@@ -34,11 +34,6 @@ RequiredFormat_interactive.
 }
 \examples{
 \dontrun{
-data(ParacouSubset)
-data(ParacouProfile)
-ParacouSubsetFormated <- RequiredFormat(
-  ParacouSubset,
-  input = ParacouProfile)
                }
 
 }

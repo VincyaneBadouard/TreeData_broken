@@ -34,7 +34,7 @@ A named list
 \item{Family}{Value or column name in data set @ParacouSubset (Family) corresponding to Family name}
 \item{Genus}{Value or column name in data set @ParacouSubset (Genus) corresponding to Genus name}
 \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
-\item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Species considered commercial}
+\item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
 \item{TreeHeightUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height units}
 \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
@@ -43,7 +43,8 @@ A named list
 \item{Topography}{Value or column name in data set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
 \item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
 \item{CensusDateFormat}{Value or column name in data set @ParacouSubset (\%Y-\%m-\%d) corresponding to Census Date format}
-\item{LiveStatuses}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
+\item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
+\item{IsCommercrial}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
 ...
 }
 }

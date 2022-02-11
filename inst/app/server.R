@@ -65,6 +65,9 @@ server <- function(input, output) {
   LifeStatusOptions <- eventReactive(input$LifeStatus, {
     sort(unique(Data()[[input$LifeStatus]]))})
 
+  CommercialOptions <- eventReactive(input$CommercialSp, {
+    sort(unique(Data()[[input$CommercialSp]]))})
+
   OtherOptions <- eventReactive(Data(), {""})
 
   # enter column names for each element of the RequiredFormat function
