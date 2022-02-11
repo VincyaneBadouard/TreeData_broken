@@ -62,7 +62,10 @@ server <- function(input, output) {
                                 {c("none", "mm", "cm", "dm", "m")
                                 })
 
-  OtherOptions <- eventReactive(Data(), { ""})
+  LifeStatusOptions <- eventReactive(input$LifeStatus, {
+    sort(unique(Data()[[input$LifeStatus]]))})
+
+  OtherOptions <- eventReactive(Data(), {""})
 
   # enter column names for each element of the RequiredFormat function
 
@@ -74,7 +77,7 @@ server <- function(input, output) {
                      # box(
                        # h3(x1$Label[i]),
                        # helpText(x1$helpText[i]),
-                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i], "= get(x1$argValue[i])(), options = ", x1$Options[i], ")")))
+                       eval(parse(text = paste(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i],"= get(x1$argValue[i])()", ifelse(x1$Options[i] != FALSE, paste0(", options = ", x1$Options[i]), ""), ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                      # )
 
 
@@ -91,7 +94,7 @@ server <- function(input, output) {
                        # box(
                        #   h3(x2$Label[i]),
                        #   helpText(x2$helpText[i]),
-                         eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i], "= get(x2$argValue[i])())")))
+                         eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i], "= get(x2$argValue[i])()", ifelse(x2$Options[i] != FALSE, paste0(", options = ", x2$Options[i]), ""), ifelse(x2$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                        #   br()
                        #
                        # )
@@ -111,7 +114,7 @@ server <- function(input, output) {
                          # h5(input[[x$Dependant_on[i]]] %in% "none"),
                          # h3(x3$Label[i]),
                          # helpText(x3$helpText[i]),
-                         eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])())")))
+                         eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])()", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                        #   br()
                        #
                        # )
@@ -129,7 +132,7 @@ server <- function(input, output) {
                        # box(
                        #   h3(x4$Label[i]),
                        #   helpText(x4$helpText[i]),
-                       eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])())")))
+                       eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])()", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                      #   br()
                      #
                      # )
@@ -167,14 +170,6 @@ server <- function(input, output) {
   options = list(pageLength = 10, scrollX=TRUE))
 
   # save final data table
-
-  # rf2 <- reactiveValues()
-  # observe({
-  #   if(!is.null(input[[names(input) %in% x$ItemID]]))
-  # eventReactive(input$LaunchFormating | input$UpdateTable, {
-  #       profile <- input[[which(names(input) %in% x$ItemID)]]
-  #     })
-  # })
 
   output$dbFile <- downloadHandler(
     filename = function() {
