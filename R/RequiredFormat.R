@@ -58,8 +58,7 @@ RequiredFormat <- function(
 
 
   # Global variables
-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <- NULL
-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- NULL
+ . <-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- LifeStatus <- NULL
 
   # Load interactive items to see what we are missing ####
 
@@ -109,8 +108,10 @@ RequiredFormat <- function(
   Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
 
   ### as.logical
-
-  ##NOT DOING IT YET AS WE NEED TO ASK USER WHAT IS ALIVE AND WHAT IS NOT etc...
+  ## Here we have to use user input to know what is TRUE and what is not
+  if( !input$LifeStatus %in% "none") {
+    Data[, LifeStatus := ifelse(LifeStatus %in% input$LiveStatuses, TRUE, FALSE)]
+  }
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 
