@@ -36,7 +36,8 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
 
   ColumnOptions <- c("none", colnames(Data))
-  UnitOptions <- c("none", "mm", "cm", "dm", "m")
+  UnitOptions <- c("mm", "cm", "dm", "m")
+  AreaUnitOptions <- c("m2", "ha", "km2")
   # LifeStatusOptions (needs to be created later as it depends on column slected)
   OtherOptions <- ""
 

@@ -7,6 +7,7 @@
 #'   \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
 #'   \item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
 #'   \item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
+#'   \item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot (or subplot) area}
 #'   \item{CensusYear}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Census year}
 #'   \item{CensusDate}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Census Date}
 #'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
@@ -19,7 +20,7 @@
 #'   \item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
 #'   \item{CircUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Circumference unit}
 #'   \item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
-#'   \item{POMUnit}{Value or column name in data set @ParacouSubset (none) corresponding to POM units}
+#'   \item{POMUnit}{Value or column name in data set @ParacouSubset (mm) corresponding to POM units}
 #'   \item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
 #'   \item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
 #'   \item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
@@ -33,15 +34,17 @@
 #'   \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
 #'   \item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 #'   \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
-#'   \item{TreeHeightUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height units}
+#'   \item{TreeHeightUnit}{Value or column name in data set @ParacouSubset (mm) corresponding to Tree height units}
 #'   \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
 #'   \item{Treatment}{Value or column name in data set @ParacouSubset (none) corresponding to Logging treatment}
 #'   \item{SoilType}{Value or column name in data set @ParacouSubset (none) corresponding to Type of soil}
 #'   \item{Topography}{Value or column name in data set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
 #'   \item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
+#'   \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What the unit for plot area?}
 #'   \item{CensusDateFormat}{Value or column name in data set @ParacouSubset (%Y-%m-%d) corresponding to Census Date format}
 #'   \item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
 #'   \item{IsCommercrial}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
+
 #'   ...
 #' }
 

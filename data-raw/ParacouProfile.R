@@ -3,46 +3,49 @@
 ## 1st option to create (non-interactive) - may need to be updated if interactive_items.csv changes
 
 if(!interactive()) {
-  ParacouProfile <- list(
-    Site = "Forest",
-    Plot = "Plot",
-    SubPlot = "SubPlot",
-    CensusYear = "CensusYear",
-    CensusDate = "CensusDate",
-    TreeFieldNum = "TreeFieldNum",
-    IdTree = "idTree",
-    IdStem = "none",
-    IdMeasure = "none",
-    LifeStatus = "CodeAlive",
-    DBH = "none",
-    DBHUnit = "none",
-    Circ = "Circ",
-    CircUnit = "none",
-    POM = "none",
-    POMUnit = "none",
-    Lat = "Lat",
-    Lon = "Lon",
-    Xutm = "Xutm",
-    Yutm = "Yutm",
-    Xfield = "Xfield",
-    Yfield = "Yfield",
-    ScientificName = "none",
-    VernName = "VernName",
-    Family = "Family",
-    Genus = "Genus",
-    Species = "Species",
-    CommercialSp = "CommercialSp",
-    TreeHeight = "none",
-    TreeHeightUnit = "none",
-    LifeForm = "none",
-    Treatment = "none",
-    SoilType = "none",
-    Topography = "none",
-    CircUnitMan = "cm",
-    CensusDateFormat = "%Y-%m-%d",
-    IsLive = TRUE,
-    IsCommercrial = TRUE
-  )
+  ParacouProfile <-
+    list(
+      Site = "Forest",
+      Plot = "Plot",
+      SubPlot = "SubPlot",
+      PlotArea = "PlotArea",
+      CensusYear = "CensusYear",
+      CensusDate = "CensusDate",
+      TreeFieldNum = "TreeFieldNum",
+      IdTree = "idTree",
+      IdStem = "none",
+      IdMeasure = "none",
+      LifeStatus = "CodeAlive",
+      DBH = "none",
+      DBHUnit = "none",
+      Circ = "Circ",
+      CircUnit = "none",
+      POM = "none",
+      POMUnit = "mm",
+      Lat = "Lat",
+      Lon = "Lon",
+      Xutm = "Xutm",
+      Yutm = "Yutm",
+      Xfield = "Xfield",
+      Yfield = "Yfield",
+      ScientificName = "none",
+      VernName = "VernName",
+      Family = "Family",
+      Genus = "Genus",
+      Species = "Species",
+      CommercialSp = "CommercialSp",
+      TreeHeight = "none",
+      TreeHeightUnit = "mm",
+      LifeForm = "none",
+      Treatment = "none",
+      SoilType = "none",
+      Topography = "none",
+      CircUnitMan = "cm",
+      PlotAreaUnitMan = "ha",
+      CensusDateFormat = "%Y-%m-%d",
+      IsLive = TRUE,
+      IsCommercrial = TRUE
+    )
 
 }
 ## 2nd option (interactive) - may need to be updated if interactive_items.csv changes
@@ -56,6 +59,7 @@ if(interactive()) {
 2
 3
 5
+4
 24
 25
 6
@@ -87,7 +91,8 @@ if(interactive()) {
 1
 1
 1
-3
+2
+2
 %Y-%m-%d
 2
 2
