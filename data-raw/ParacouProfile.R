@@ -8,7 +8,7 @@ if(!interactive()) {
     Plot = "Plot",
     SubPlot = "SubPlot",
     CensusYear = "CensusYear",
-    CensusDate = "none",
+    CensusDate = "CensusDate",
     TreeFieldNum = "TreeFieldNum",
     IdTree = "idTree",
     IdStem = "none",
@@ -38,7 +38,9 @@ if(!interactive()) {
     Treatment = "none",
     SoilType = "none",
     Topography = "none",
-    CircUnitMan = "cm"
+    CircUnitMan = "cm",
+    CensusDateFormat = "%Y-%m-%d",
+    LiveStatuses = TRUE
   )
 
 }
@@ -54,7 +56,7 @@ if(interactive()) {
 3
 5
 24
-1
+25
 6
 7
 1
@@ -85,7 +87,8 @@ if(interactive()) {
 1
 1
 3
-
+%Y-%m-%d
+2
 }
 
 #### Save this data in the package ####
@@ -93,7 +96,8 @@ usethis::use_data(ParacouProfile, overwrite = TRUE)
 
 
 ## For ParacouProfile.Rmd  run next line of code and paste in the item section of R/ParacouProfile.R
+
 write.csv(
-  paste0("#'   \\item{", names(ParacouProfile), "}{The column name in datda set @ParacouSubset (", ParacouProfile, ") corresponding to ", x$Label[match(names(ParacouProfile), x$ItemID)], "}"), "clipboard",
+  paste0("#'   \\item{", names(ParacouProfile), "}{Value or column name in data set @ParacouSubset (", ParacouProfile, ") corresponding to ", x$Label[match(names(ParacouProfile), x$ItemID)], "}"), "clipboard",
   quote = F, row.names = F)
 

@@ -4,41 +4,45 @@
 
 #' @format A named list
 #' \describe{
-#'   \item{Site}{The column name in datda set @ParacouSubset (Forest) corresponding to Site name}
-#'   \item{Plot}{The column name in datda set @ParacouSubset (Plot) corresponding to Plot name}
-#'   \item{SubPlot}{The column name in datda set @ParacouSubset (SubPlot) corresponding to SubPlot name}
-#'   \item{CensusYear}{The column name in datda set @ParacouSubset (CensusYear) corresponding to Census year}
-#'   \item{CensusDate}{The column name in datda set @ParacouSubset (none) corresponding to Census Date}
-#'   \item{TreeFieldNum}{The column name in datda set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
-#'   \item{IdTree}{The column name in datda set @ParacouSubset (idTree) corresponding to Tree ID}
-#'   \item{IdStem}{The column name in datda set @ParacouSubset (none) corresponding to Stem ID}
-#'   \item{IdMeasure}{The column name in datda set @ParacouSubset (none) corresponding to Measure ID}
-#'   \item{LifeStatus}{The column name in datda set @ParacouSubset (CodeAlive) corresponding to Life status}
-#'   \item{DBH}{The column name in datda set @ParacouSubset (none) corresponding to DBH}
-#'   \item{DBHUnit}{The column name in datda set @ParacouSubset (none) corresponding to DBH unit}
-#'   \item{Circ}{The column name in datda set @ParacouSubset (Circ) corresponding to Circumference}
-#'   \item{CircUnit}{The column name in datda set @ParacouSubset (none) corresponding to Circumference unit}
-#'   \item{POM}{The column name in datda set @ParacouSubset (none) corresponding to POM}
-#'   \item{POMUnit}{The column name in datda set @ParacouSubset (none) corresponding to POM units}
-#'   \item{Lat}{The column name in datda set @ParacouSubset (Lat) corresponding to Tree latitude}
-#'   \item{Lon}{The column name in datda set @ParacouSubset (Lon) corresponding to Tree longitude}
-#'   \item{Xutm}{The column name in datda set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
-#'   \item{Yutm}{The column name in datda set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
-#'   \item{Xfield}{The column name in datda set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
-#'   \item{Yfield}{The column name in datda set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
-#'   \item{ScientificName}{The column name in datda set @ParacouSubset (none) corresponding to Scientific name}
-#'   \item{VernName}{The column name in datda set @ParacouSubset (VernName) corresponding to Vernacular name}
-#'   \item{Family}{The column name in datda set @ParacouSubset (Family) corresponding to Family name}
-#'   \item{Genus}{The column name in datda set @ParacouSubset (Genus) corresponding to Genus name}
-#'   \item{Species}{The column name in datda set @ParacouSubset (Species) corresponding to Species name}
-#'   \item{CommercialSp}{The column name in datda set @ParacouSubset (CommercialSp) corresponding to Species considered commercial}
-#'   \item{TreeHeight}{The column name in datda set @ParacouSubset (none) corresponding to Tree height}
-#'   \item{TreeHeightUnit}{The column name in datda set @ParacouSubset (none) corresponding to Tree height units}
-#'   \item{LifeForm}{The column name in datda set @ParacouSubset (none) corresponding to Life form}
-#'   \item{Treatment}{The column name in datda set @ParacouSubset (none) corresponding to Logging treatment}
-#'   \item{SoilType}{The column name in datda set @ParacouSubset (none) corresponding to Type of soil}
-#'   \item{Topography}{The column name in datda set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
-#'   \item{CircUnitMan}{The column name in datda set @ParacouSubset (cm) corresponding to What is your circumference unit?}
+#'   \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
+#'   \item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
+#'   \item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
+#'   \item{CensusYear}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Census year}
+#'   \item{CensusDate}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Census Date}
+#'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
+#'   \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
+#'   \item{IdStem}{Value or column name in data set @ParacouSubset (none) corresponding to Stem ID}
+#'   \item{IdMeasure}{Value or column name in data set @ParacouSubset (none) corresponding to Measure ID}
+#'   \item{LifeStatus}{Value or column name in data set @ParacouSubset (CodeAlive) corresponding to Life status}
+#'   \item{DBH}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
+#'   \item{DBHUnit}{Value or column name in data set @ParacouSubset (none) corresponding to DBH unit}
+#'   \item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
+#'   \item{CircUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Circumference unit}
+#'   \item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
+#'   \item{POMUnit}{Value or column name in data set @ParacouSubset (none) corresponding to POM units}
+#'   \item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
+#'   \item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
+#'   \item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
+#'   \item{Yutm}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
+#'   \item{Xfield}{Value or column name in data set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
+#'   \item{Yfield}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
+#'   \item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
+#'   \item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
+#'   \item{Family}{Value or column name in data set @ParacouSubset (Family) corresponding to Family name}
+#'   \item{Genus}{Value or column name in data set @ParacouSubset (Genus) corresponding to Genus name}
+#'   \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
+#'   \item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Species considered commercial}
+#'   \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
+#'   \item{TreeHeightUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height units}
+#'   \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
+#'   \item{Treatment}{Value or column name in data set @ParacouSubset (none) corresponding to Logging treatment}
+#'   \item{SoilType}{Value or column name in data set @ParacouSubset (none) corresponding to Type of soil}
+#'   \item{Topography}{Value or column name in data set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
+#'   \item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
+#'   \item{CensusDateFormat}{Value or column name in data set @ParacouSubset (%Y-%m-%d) corresponding to Census Date format}
+#'   \item{LiveStatuses}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
+
+
 #'   ...
 #' }
 
