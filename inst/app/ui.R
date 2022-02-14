@@ -65,58 +65,88 @@ body <- dashboardBody(
 
     tabItem(tabName = "headers",
             fluidRow(
-              column(width = 5,
-                     box(title = "Match your columns to ours (if you can)",
+              column(width = 6,
+                     actionBttn(
+                       inputId = "inactivebutton1",
+                       label = "1",
+                       style = "pill",
+                       color = "danger")
+                     ,   strong("  Match your columns to ours (if you can)"),
+                     br(),
+                     br(),
+                     box(
+                       # title = "Match your columns to ours (if you can)",
                          width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
+                         # status = "primary",
+                         # solidHeader = TRUE,
                          uiOutput("ui1"))
+              ),
+              column(width = 6,
+                     actionBttn(
+                       inputId = "inactivebutton2",
+                       label = "2",
+                       style = "pill",
+                       color = "danger")
+                     ,   strong("  Fill in information that is not in your column"),
+                     br(),
+                     br(),
+                     box(
+                       # title = "",
+                         width = NULL,
+                         # column(width = 5,
+                         # box(title = "Tell us more about your plot",
+                         #   width = NULL,
+                         #   status = "primary",
+                         #   solidHeader = TRUE,
+                         #   h4("Only fill this infomation if it is not in a column!"),
+                         uiOutput("ui2"),
+                         #)
+                         # ),
+
+
+                         # column(width = 5,
+                         # box(title = "Tell us about your units",
+                         #   width = NULL,
+                         #   status = "primary",
+                         #   solidHeader = TRUE,
+                         #   h4("Only fill this infomation if it is not in a column!"),
+                         #   p("Note: we are not able to handle units varying by rows yet..."),
+                         uiOutput("ui3"),
+                         #        ),
+                         # column(width = 5,
+                         # box(title = "A couple more things...",
+                         #     width = NULL,
+                         #     status = "primary",
+                         #     solidHeader = TRUE,
+                         uiOutput("ui4"),
+                         # )
+                         # ),
+                         # column(width = 5,
+                         # box(title = "and lastly...",
+                         #     width = NULL,
+                         #     status = "primary",
+                         #     solidHeader = TRUE,
+                         uiOutput("ui5")
+                         # )
+
+
                      ),
 
-              column(width = 5,
-                     box(title = "Tell us more about your plot",
-                       width = NULL,
-                       status = "primary",
-                       solidHeader = TRUE,
-                       h4("Only fill this infomation if it is not in a column!"),
-                       uiOutput("ui2"))
-                     ),
+
+              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256") #;   position: fixed
+              )
 
 
-              column(width = 5,
-                     box(title = "Tell us about your units",
-                       width = NULL,
-                       status = "primary",
-                       solidHeader = TRUE,
-                       h4("Only fill this infomation if it is not in a column!"),
-                       p("Note: we are not able to handle units varying by rows yet..."),
-                       uiOutput("ui3"))),
-              column(width = 5,
-                     box(title = "A couple more things...",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         uiOutput("ui4"))),
-              column(width = 5,
-                     box(title = "and lastly...",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         uiOutput("ui5"))),
-
-              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
-            )
-
-            ),
+    )),
     tabItem(tabName = "Visualise",
 
             fluidRow(
 
               column(width = 10,
                      DTOutput(outputId = "tabDataFormated")
-            ),
-            actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
-              )
+              ),
+              actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
+            )
 
 
     ),  ## end of "visualize" panel
