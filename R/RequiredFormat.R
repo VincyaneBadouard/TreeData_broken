@@ -276,7 +276,7 @@ RequiredFormat <- function(
 
     PlotAreaUnit <- input$PlotAreaUnitMan
 
-    if(! PlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+    if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
 
     if (PlotAreaUnit %in% AreaUnitOptions)
 

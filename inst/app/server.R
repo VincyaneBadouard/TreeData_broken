@@ -34,7 +34,7 @@ server <- function(input, output) {
     if (!is.null(input$file1$name))
       Data()
   }, rownames = FALSE,
-  options = list(pageLength = 10, scrollX=TRUE))
+  options = list(pageLength = 8, scrollX=TRUE))
 
   # Avoid seeing errors
   text_reactive <- reactiveValues(
@@ -142,7 +142,7 @@ server <- function(input, output) {
     # )
       DataFormated()
   }, rownames = FALSE,
-  options = list(pageLength = 10, scrollX=TRUE))
+  options = list(pageLength = 8, scrollX=TRUE))
 
   # save final data table
 

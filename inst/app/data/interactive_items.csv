@@ -8,7 +8,7 @@ Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,SubPlot,none,O
 Headers,1,pickerInput,choices,PlotArea,Plot (or subplot) area,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
 Headers,4,pickerInput,choices,PlotAreaUnitMan,What the unit for plot area?,,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusYear,Census year,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Census year
-Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,(if you did not specify a column for date),CensusYear,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,if you did not specify a column for date,CensusYear,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusDate,Census Date,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
 Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m-%d,none,CensusDate,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
