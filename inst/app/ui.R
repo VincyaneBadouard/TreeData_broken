@@ -28,6 +28,17 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+  tags$head(
+    tags$style(
+      HTML(".shiny-notification {
+             position:fixed;
+             top: calc(10%);
+             left: calc(25%);
+             }
+             "
+      )
+    ) # to make notification show up at top of page
+  ),
   tabItems(
 
     tabItem(tabName = "Upload",

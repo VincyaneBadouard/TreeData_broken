@@ -137,10 +137,10 @@ server <- function(input, output) {
       RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
     },
     warning = function(warn){
-      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning')
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
     },
     error = function(err){
-      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err')
+      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
     })
   })
 
