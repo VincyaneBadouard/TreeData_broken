@@ -58,7 +58,7 @@ RequiredFormat <- function(
 
 
   # Global variables
- . <-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- LifeStatus <- NULL
+ . <-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- LifeStatus <- PlotArea <- NULL
 
   # Load interactive items to see what we are missing ####
 
@@ -199,8 +199,9 @@ RequiredFormat <- function(
 
   unitOptions <- c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
 
+  AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### DBH in cm
+  ### DBH in cm ####
   if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
@@ -219,7 +220,7 @@ RequiredFormat <- function(
       Data[, DBH := DBH*100] # m -> cm
   }
 
-  ### POM in m
+  ### POM in m ####
   if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
@@ -243,7 +244,7 @@ RequiredFormat <- function(
 
 
 
-  ### TreeHeight in m
+  ### TreeHeight in m ####
   if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
 
 
@@ -264,6 +265,27 @@ RequiredFormat <- function(
 
     if (substr(TreeHeightUnit, 1, 1) == "d")
       Data[, TreeHeight := TreeHeight/10] # dm -> m
+  }
+
+
+
+
+  ### PlotArea in ha ####
+
+  if(!input$PlotArea %in% "none" & !input$PlotAreaUnitMan %in% "none") {
+
+    PlotAreaUnit <- input$PlotAreaUnitMan
+
+    if(! PlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+
+    if (PlotAreaUnit %in% AreaUnitOptions)
+
+      if (substr(PlotAreaUnit, 1, 2) == "m2")
+        Data[, PlotArea := PlotArea/10000] # m2 -> ha
+
+
+    if (substr(PlotAreaUnit, 1, 1) == "km2")
+      Data[, PlotArea := PlotArea*100] # km2 -> ha
   }
 
 
