@@ -51,10 +51,8 @@ body <- dashboardBody(
                      box(title = "Actions",
                          width = NULL,
                          fileInput(inputId = "file1", "Choose CSV File", accept = ".csv"),
-
                          # does the dataframe have a header?
                          checkboxInput("header", "Header", TRUE),
-
                          # choose separator
                          selectInput(inputId = "cbSeparator",
                                      label = "Separator",
@@ -63,8 +61,8 @@ body <- dashboardBody(
                          ),
                          radioButtons(inputId = "predefinedProfile",
                                       label = div("Use a predifined format", br(), em("(if your data follows one of the following network template)")),
-                                      choices = list("TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),
-                                      selected = character(0)),
+                                      choices = list("No thanks!" = "No", "TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),
+                                      selected = "No"),
 
                          # load a profile it one already exists
                          fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
