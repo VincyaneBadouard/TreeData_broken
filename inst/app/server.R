@@ -13,7 +13,7 @@ for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
 # get the function here (ugly solution but not sure how esle to do it- unless installing packgae from GitHub)
 source("../../R/RequiredFormat.R")
-server <- function(input, output) {
+server <- function(input, output, session) {
 
   # read file and create data table
   Data <- reactive({
@@ -26,6 +26,25 @@ server <- function(input, output) {
     data.table::fread(file$datapath,
                       header = input$header,
                       sep = input$cbSeparator)
+  })
+
+  observeEvent(input$profile, {
+    file <- input$profile
+    ext <- tools::file_ext(file$datapath)
+
+    req(file)
+    validate(need(ext == "rds", "Please upload a csv file"))
+
+    profile <- readRDS(file$datapath)
+
+    for(i in which(x$ItemID %in% names(profile))) {
+      eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
+      # updateTextInput(session, "Site", value = profile$Site)
+    }
+
+
+
+
   })
 
 

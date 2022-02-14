@@ -61,6 +61,11 @@ body <- dashboardBody(
                                      choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                      selected = "auto"
                          ),
+
+                         # load a profile it one already exists
+                         fileInput(inputId = "profile", "Choose RDS File", accept = ".rds"),
+
+                         # inform if long or wide format
                          radioButtons(inputId = "format",
                                       label = div("Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
                                       choices = list("Long" = "long", "Wide" = "wide"))
