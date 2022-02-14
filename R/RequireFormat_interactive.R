@@ -22,8 +22,9 @@
 RequiredFormat_interactive <- function(Data, input = list()) {
 
   # Global variables
-  x1 <- x2 <- x3 <- NULL
+  x1 <- x2 <- x3 <- x4 <-  NULL
 
+  # read in interactive items
   x <- read.csv("inst/app/data/interactive_items.csv")
   x <- x[x$Activate,]
 
@@ -35,14 +36,21 @@ RequiredFormat_interactive <- function(Data, input = list()) {
 
 
   ColumnOptions <- c("none", colnames(Data))
-  UnitOptions <- c("none", "mm", "cm", "dm", "m")
+  UnitOptions <- c("mm", "cm", "dm", "m")
+  AreaUnitOptions <- c("m2", "ha", "km2")
+  # LifeStatusOptions (needs to be created later as it depends on column slected)
   OtherOptions <- ""
 
 
 
   helper_choice <- function(x) eval(parse(text = paste(paste0("input[[\"", x$ItemID, "\"]] <<-", x$argValue, "[as.numeric(readline(cat(\"", x$Label, ifelse(x$helpText != "", paste0(" (",
-                                                                                                                                                                                     x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
-                                                                                                                                                                                                                          ": ", get(x$argValue), collapse = "  "), "\")))]"))))
+x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
+": ", get(x$argValue), collapse = "  "), "\")))]"))))
+
+
+  helper_multichoice <-  function(x) eval(parse(text = paste(paste0("input[[\"", x$ItemID, "\"]] <<-", x$argValue, "[as.numeric(strsplit(readline(cat(\"", x$Label, ifelse(x$helpText != "", paste0(" (",
+x$helpText, ")"), ""), ":\n", paste0(1:length(get(x$argValue)),
+": ", get(x$argValue), collapse = "  "), "\")),'[^0-9]')[[1]])]"))))
 
   helper_nonchoice <- function(x) eval(parse(text = paste(paste0("input[[\"", x$ItemID, "\"]] <<- readline(cat(\"", x$Label, ifelse(x$helpText != "", paste0(" (", x$helpText, ")"), ""), ":\n", "\"))"))))
 
@@ -83,6 +91,33 @@ RequiredFormat_interactive <- function(Data, input = list()) {
     if (nrow(x3_ask_choice) > 0) helper_choice(x3_ask_choice)
     if (nrow(x3_ask_nonchoice) > 0) helper_nonchoice(x3_ask_nonchoice)
 
+  }
+
+  if(exists("x4")) {
+
+    x4_ask <- x4[!input[x4$if_X2_isnot_none] %in% "none", ]
+
+    x4_ask_choice <- x4_ask[x4_ask$ItemType %in% "pickerInput" & x4_ask$Multiple != TRUE, ]
+    x4_ask_nonchoice <- x4_ask[!x4_ask$ItemType %in% "pickerInput", ]
+    x4_ask_multiple_choice <- x4_ask[x4_ask$ItemType %in% "pickerInput" & x4_ask$Multiple, ]
+
+    if (nrow(x4_ask_choice) > 0){
+
+      helper_choice(x4_ask_choice)
+    }
+
+    if (nrow(x4_ask_nonchoice) > 0) helper_nonchoice(x4_ask_nonchoice)
+
+    if(nrow(x4_ask_multiple_choice) > 0 ){
+
+      if(!input$LifeStatus %in% "none") LifeStatusOptions <- sort(unique(Data[[input$LifeStatus]]))
+
+      if(!input$CommercialSp %in% "none") CommercialOptions <- sort(unique(Data[[input$CommercialSp]]))
+
+      cat("Select all that apply, separated by a comma, then hit ENTER.\n")
+      helper_multichoice(x4_ask_multiple_choice)
+
+    }
   }
 
   cat("please review the table above and start over if it is not correct")

@@ -74,7 +74,7 @@ body <- dashboardBody(
                      ),
 
               column(width = 5,
-                     box(title = "Tell us about your plot",
+                     box(title = "Tell us more about your plot",
                        width = NULL,
                        status = "primary",
                        solidHeader = TRUE,
@@ -97,6 +97,12 @@ body <- dashboardBody(
                          status = "primary",
                          solidHeader = TRUE,
                          uiOutput("ui4"))),
+              column(width = 5,
+                     box(title = "and lastly...",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         uiOutput("ui5"))),
 
               actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
             )

@@ -28,11 +28,11 @@
 #'
 #' @examples
 #'\dontrun{
-#' data(ParacouSubset)
-#' data(ParacouProfile)
-#' ParacouSubsetFormated <- RequiredFormat(
-#'   ParacouSubset,
-#'   input = ParacouProfile)
+# data(ParacouSubset)
+# data(ParacouProfile)
+# ParacouSubsetFormated <- RequiredFormat(
+#   ParacouSubset,
+#   input = ParacouProfile)
 #'                }
 #'
 
@@ -58,8 +58,7 @@ RequiredFormat <- function(
 
 
   # Global variables
-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <- NULL
-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- NULL
+ . <-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- LifeStatus <- PlotArea <- NULL
 
   # Load interactive items to see what we are missing ####
 
@@ -109,20 +108,33 @@ RequiredFormat <- function(
   Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
 
   ### as.logical
+  ## Here we have to use user input to know what is TRUE and what is not
 
-  ##NOT DOING IT YET AS WE NEED TO ASK USER WHAT IS ALIVE AND WHAT IS NOT etc...
+  ### Life status
+  if( !input$LifeStatus %in% "none") {
+    Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
+  }
+
+  ### commercial species
+  if( !input$CommercialSp %in% "none") {
+    Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
+  }
+
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
+  # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+
 
   ## Date of measurement ####
   if(!input$CensusDate %in% "none"){
 
     Data[, CensusDateOriginal := CensusDate]
-    Data[, (CensusDate) := as.Date(trimws(CensusDate), format = input$CensusDateFormat)]
+    Data[, CensusDate := as.Date(trimws(as.character(CensusDate)), format = input$CensusDateFormat)]
 
     if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
   }
-  # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
+
+
 
 
   # make input complete ####
@@ -134,12 +146,17 @@ RequiredFormat <- function(
 
   # Fill in info in column missing ####
 
+  ## Year
+  if(input$CensusYear %in% "none") {
+    if(!input$CensusDate %in% "none") Data[, CensusYear := format(CensusDate, "%Y")] else Data[, CensusYear := input$CensusYearMan]
+  }
+
 
 
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
-
-  if (input$Plot %in% "none") Data[, Plot := "1"]
-  if (input$SubPlot %in% "none") Data[, SubPlot := "1"]
+  if (input$Site %in% "none") Data[, Site :=  input$SiteMan]
+  if (input$Plot %in% "none") Data[, Plot :=  input$PlotMan]
+  if (input$SubPlot %in% "none") Data[, SubPlot := input$SubPlotMan]
 
   if (input$IdTree %in% "none") {
 
@@ -161,7 +178,7 @@ RequiredFormat <- function(
 
   ### Genus and species if we have ScientificName and ScientificNameSep
   if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none")
-    Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE)]
+    Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
@@ -182,8 +199,9 @@ RequiredFormat <- function(
 
   unitOptions <- c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
 
+  AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### DBH in cm
+  ### DBH in cm ####
   if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
@@ -202,7 +220,7 @@ RequiredFormat <- function(
       Data[, DBH := DBH*100] # m -> cm
   }
 
-  ### POM in m
+  ### POM in m ####
   if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
@@ -226,7 +244,7 @@ RequiredFormat <- function(
 
 
 
-  ### TreeHeight in m
+  ### TreeHeight in m ####
   if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
 
 
@@ -247,6 +265,27 @@ RequiredFormat <- function(
 
     if (substr(TreeHeightUnit, 1, 1) == "d")
       Data[, TreeHeight := TreeHeight/10] # dm -> m
+  }
+
+
+
+
+  ### PlotArea in ha ####
+
+  if(!input$PlotArea %in% "none" & !input$PlotAreaUnitMan %in% "none") {
+
+    PlotAreaUnit <- input$PlotAreaUnitMan
+
+    if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+
+    if (PlotAreaUnit %in% AreaUnitOptions)
+
+      if (substr(PlotAreaUnit, 1, 2) == "m2")
+        Data[, PlotArea := PlotArea/10000] # m2 -> ha
+
+
+    if (substr(PlotAreaUnit, 1, 1) == "km2")
+      Data[, PlotArea := PlotArea*100] # km2 -> ha
   }
 
 
