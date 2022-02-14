@@ -8,7 +8,7 @@ Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,SubPlot,none,O
 Headers,1,pickerInput,choices,PlotArea,Plot (or subplot) area,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
 Headers,4,pickerInput,choices,PlotAreaUnitMan,What the unit for plot area?,,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusYear,Census year,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Census year
-Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,,CensusYear,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Headers,2,numericInput,value,CensusYearMan,What is your year of measurement?,(if you did not specify a column for date),CensusYear,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusDate,Census Date,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
 Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m-%d,none,CensusDate,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
@@ -24,7 +24,7 @@ Headers,1,pickerInput,choices,Circ,Circumference,Circumference of the tree,none,
 Headers,1,pickerInput,choices,CircUnit,Circumference unit,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 Headers,3,pickerInput,choices,CircUnitMan,What is your circumference unit?,,CircUnit,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,POM,POM,height of measurement,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement in m
-Headers,1,pickerInput,choices,POMUnit,POM units,,none,none,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+Headers,1,pickerInput,choices,POMUnit,POM units,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 Headers,3,pickerInput,choices,POMUnitMan,What is your POM unit?,,POMUnit,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,Lat,Tree latitude,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude in degrees
 Headers,1,pickerInput,choices,Lon,Tree longitude,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude in degrees
@@ -40,7 +40,7 @@ Headers,1,pickerInput,choices,Species,Species name,,none,none,ColumnOptions,list
 Headers,1,pickerInput,choices,CommercialSp,Commercial species indicator,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
 Headers,4,pickerInput,choices,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeHeight,Tree height,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
-Headers,1,pickerInput,choices,TreeHeightUnit,Tree height units,,none,none,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+Headers,1,pickerInput,choices,TreeHeightUnit,Tree height units,,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 Headers,3,pickerInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,LifeForm,Life form,tree/palm/liana/bamboo,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Life form
 Headers,1,pickerInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Treatment type

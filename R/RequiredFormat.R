@@ -178,7 +178,7 @@ RequiredFormat <- function(
 
   ### Genus and species if we have ScientificName and ScientificNameSep
   if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none")
-    Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE)]
+    Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
