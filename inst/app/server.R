@@ -100,8 +100,7 @@ server <- function(input, output) {
                  output$ui3 <- renderUI({
 
                    lapply(c(1:nrow(x3)), function(i) {
-                     if(input[[x3$if_X1_is_none
-                               [i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
+                     if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
 
                        eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])()", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
@@ -113,6 +112,16 @@ server <- function(input, output) {
                    lapply(c(1:nrow(x4)), function(i) {
                      if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" )
                        eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])()", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+
+                   })
+                 })
+
+                 output$ui5 <- renderUI({
+
+                   lapply(c(1:nrow(x5)), function(i) {
+                     if(input[[x5$if_X1_is_none[i]]] %in% "none" & input[[x5$if_X2_is_none[i]]] %in% "none" )
+
+                       eval(parse(text = paste(x5$ItemType[i], "(inputId = x5$ItemID[i], label = ifelse(x5$helpText[i] %in% '', x5$Label[i], paste0(x5$Label[i], ' (', x5$helpText[i], ')')),", x5$argument[i], "= get(x5$argValue[i])()", ifelse(x5$Options[i] != FALSE, paste0(", options = ", x5$Options[i]), ""), ifelse(x5$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
                    })
                  })
