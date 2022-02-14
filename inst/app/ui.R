@@ -61,9 +61,13 @@ body <- dashboardBody(
                                      choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                      selected = "auto"
                          ),
+                         radioButtons(inputId = "predefinedProfile",
+                                      label = div("Use a predifined format", br(), em("(if your data follows one of the following network template)")),
+                                      choices = list("TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),
+                                      selected = character(0)),
 
                          # load a profile it one already exists
-                         fileInput(inputId = "profile", "Choose RDS File", accept = ".rds"),
+                         fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
 
                          # inform if long or wide format
                          radioButtons(inputId = "format",
