@@ -18,12 +18,13 @@ header <- dashboardHeader(title = "Data harmonisation")
 # sidebar contains menu items
 sidebar <- dashboardSidebar(
   useShinyjs(),
-  sidebarMenu(menuItem("Short Manual", tabName = "Manual", icon = icon("book")),
+  sidebarMenu(
               menuItem("Upload your file", tabName = "Upload", icon = icon("upload")),
               menuItem("Identify headers", tabName = "headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
-              menuItem("Save codes and data", tabName="Save", icon = icon("save"))
+              menuItem("Save codes and data", tabName="Save", icon = icon("save")),
+              menuItem("Help", tabName = "Manual", icon = icon("book"))
   )
 )
 
@@ -48,7 +49,7 @@ body <- dashboardBody(
               column(width = 3,
 
                      # load button for main data file (csv format)
-                     box(title = "Actions",
+                     box(title = "Upload your data",
                          width = NULL,
                          fileInput(inputId = "file1", "Choose CSV File", accept = ".csv"),
                          # does the dataframe have a header?
@@ -60,17 +61,12 @@ body <- dashboardBody(
                                      selected = "auto"
                          ),
                          radioButtons(inputId = "predefinedProfile",
-                                      label = div("Use a predifined format", br(), em("(if your data follows one of the following network template)")),
+                                      label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
                                       choices = list("No thanks!" = "No", "TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),
                                       selected = "No"),
 
                          # load a profile it one already exists
-                         fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
-
-                         # inform if long or wide format
-                         radioButtons(inputId = "format",
-                                      label = div("Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
-                                      choices = list("Long" = "long", "Wide" = "wide"))
+                         fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
                      )
               ),
 
@@ -83,10 +79,20 @@ body <- dashboardBody(
 
     tabItem(tabName = "headers",
             fluidRow(
+              # inform if long or wide format
+              box(width = 12,
+                  radioButtons(inputId = "format",
+                           label = div(actionBttn(
+                             inputId = "inactivebutton",
+                             label = "1",
+                             style = "pill",
+                             color = "danger"),
+                             "Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
+                           choices = list("Long" = "long", "Wide" = "wide"))),
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton1",
-                       label = "1",
+                       inputId = "inactivebutton",
+                       label = "2",
                        style = "pill",
                        color = "danger")
                      ,   strong("  Match your columns to ours (if you can)"),
@@ -101,11 +107,11 @@ body <- dashboardBody(
               ),
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton2",
-                       label = "2",
+                       inputId = "inactivebutton",
+                       label = "3",
                        style = "pill",
                        color = "danger")
-                     ,   strong("  Fill in information that is not in your column"),
+                     ,   strong("  Fill in information that is not in your columns"),
                      br(),
                      br(),
                      box(
@@ -156,6 +162,11 @@ body <- dashboardBody(
 
 
     )),
+
+    tabItem(tabName = "Correct",
+            radioButtons(inputId = "taper", label = "Apply taper corrections?", choices = list("Yes" = "Yes", "No" = "No"), selected = "No")
+            ),
+
     tabItem(tabName = "Visualise",
 
             fluidRow(
@@ -186,7 +197,12 @@ body <- dashboardBody(
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbCode", label = "Save code"))
+                         downloadButton(outputId = "dbCode", label = "Save code")),
+                     box(title = "Save metadata",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbMetadata", label = "Save metadata"))
               )
             )
     ) # end of "save" panel

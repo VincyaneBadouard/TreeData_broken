@@ -200,6 +200,7 @@ server <- function(input, output, session) {
   )
 
   # save code needed to produce the table
+
   output$dbCode <- downloadHandler(
     filename = function() {
       paste(gsub(".csv", "",input$file1$name), '_Code.R', sep = '')
@@ -221,6 +222,21 @@ server <- function(input, output, session) {
       DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
       ")
       writeLines(text_upload, file)
+    }
+  )
+
+  # Save metadata
+
+  output$dbMetadata <- downloadHandler(
+    filename = function() {
+      paste(gsub(".csv", "", input$file1$name), '_Metadata.csv', sep = '')
+    },
+    content = function(file) {
+      columns_to_save <- colnames(DataFormated())
+      Metadata <- data.frame(Field = columns_to_save,
+                             Description = x$Description[match(columns_to_save, x$ItemID)])
+
+      write.csv(Metadata, file = file, row.names = F)
     }
   )
 
