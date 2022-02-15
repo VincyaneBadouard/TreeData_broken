@@ -53,7 +53,7 @@ RequiredFormat <- function(
 
 
     if(!ThisIsShinyApp & !inherits(input, "list")) {
-    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R")
+    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R, or a profile saved viw the Shiny App")
     }
 
 
@@ -291,8 +291,8 @@ RequiredFormat <- function(
 
 
   # return output ####
-
-  return(Data)
+  ColumnsToReturn <- intersect(x$ItemID, colnames(Data))
+  return(Data[, ..ColumnsToReturn])
 
 }
 
