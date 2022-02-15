@@ -59,14 +59,7 @@ body <- dashboardBody(
                                      label = "Separator",
                                      choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                      selected = "auto"
-                         ),
-                         radioButtons(inputId = "predefinedProfile",
-                                      label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
-                                      choices = list("No thanks!" = "No", "TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),
-                                      selected = "No"),
-
-                         # load a profile it one already exists
-                         fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
+                         )
                      )
               ),
 
@@ -79,6 +72,16 @@ body <- dashboardBody(
 
     tabItem(tabName = "headers",
             fluidRow(
+              # inform if profile already exists
+              box(width = 12,
+                  radioButtons(inputId = "predefinedProfile",
+                               label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
+                               choices = list("No thanks!" = "No", "TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),selected = "No"),
+
+                  # load a profile it one already exists
+                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
+                  ),
+
               # inform if long or wide format
               box(width = 12,
                   radioButtons(inputId = "format",
