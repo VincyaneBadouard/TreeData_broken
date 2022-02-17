@@ -27,7 +27,7 @@ table des associations verna-bota codées "0" ou "1"
 - vernacular names in columns (consistency with the data to fill)
 - botanical names (Family-Genus-Species) in rows
 
-              Family        Genus         Species PresentInGuyaFor acacia franc acajou de guyane adugue aganananga aganiamai
+Family        Genus         Species PresentInGuyaFor acacia franc acajou de guyane adugue aganananga aganiamai
 1           Fabaceae      Abarema         jupunba             TRUE            0                0      0          0         0
 2   Chrysobalanaceae        Acioa      guianensis            FALSE            0                0      0          0         0
 3    Melastomataceae      Aciotis    purpurascens            FALSE            0                0      0          0         0
@@ -65,7 +65,7 @@ DataTree <- unique(Data[,list(idTree, VernName, Family, Genus, Species, GenSp)])
 + GensSpCor
 + BotaCorCode 
 ```{r}
-DataTree <- cbind(DataTree, GensSpCor=as.factor(NA), BotaCorCode=as.factor(NA))
+DataTree <- cbind(DataTree, GensSpCor = as.factor(NA), BotaCorCode = as.factor(NA))
 ```
 
 ## Already fully determined 
@@ -101,7 +101,6 @@ DataTree[Species == "Indet." & VernName != "-"  & !(VernName %in% colnames(Alpha
 
 #### No genus name
 ##### Family name ok
-
 ```{r}
 # No vern name, but a family name
 DataTree[Species == "Indet." & VernName == "-" & Genus == "Indet." & Family != "Indet.",
@@ -121,7 +120,6 @@ DataTree[Species == "Indet." & VernName != "-" & !(VernName %in% colnames(Alpha)
 ```
 
 ##### No family name
-
 ```{r}
 # No vern name
 DataTree[Species == "Indet." & VernName == "-" & Genus == "Indet." & Family == "Indet.",
@@ -151,6 +149,102 @@ DataTree[Species == "Indet." & VernName != "-" & VernName %in% colnames(Alpha),
                                                    eps = eps, # background noise for sp not associated with a given vern name
                                                    Determ = Determ),
          by = idTree]
+```
+
+#### Ce qui se passe dans DrawBota()
+##### No species, Vern name ok, Genus ok
+Lorsqu'il y a une asso genre-vern dans data2fill qui ne matche pas avec Alpha, on garde l'info data2fill
+```{r}
+# get AlphaV, a data.frame with the bota info (4 1er colums) and one colum for the tree vern name
+AlphaV <- data.table(Alpha[, 1:4, with = FALSE], Alpha[,VernName2Sim, with = FALSE])
+colnames(AlphaV)[length(colnames(AlphaV))] <- "alphaV"
+
+# create an empty vector to store the result
+res <- list(as.character(NA), as.character(NA))
+
+if (Genus2Sim != "Indet.") { # Genus ok
+  # Put 0 to alphaV for bota names associated with this vernacular but with different genus
+  AlphaV[alphaV != 0 & Genus != Genus2Sim, alphaV := 0] # bad genus
+  # case with no compatibility between the Genus name and the vernname in Alpha
+  if (sum(AlphaV$alphaV) == 0) { # no good genus
+    res <- list(paste(Genus2Sim, "Indet.", sep = "-"), "Det2Genus") # on garde le Genus de Data2fill
+  }else{
+    # case with compatibility (same genus-vern asso, alphaV = 1)
+    # for same vern name but different genus and for different vernacular name
+    # gives a freq = eps/nb (of other asso)
+    AlphaV[alphaV == 0, alphaV := eps/dim(AlphaV[alphaV == 0])[1]] # pas compris
+    
+    if(Determ == TRUE){ # the more likely association
+      res <- DrawDeterm(AlphaV, levelAsso = "AssoByGenus", VernName2Sim = VernName2Sim)
+    }
+    if(Determ == FALSE) { # random sampling in the alpha matrix
+      # Draw in Dirichlet-Categorical
+      res[1] <- DirichCat(alphaV = AlphaV$alphaV, Names = AlphaV$GenSp, Vern = VernName2Sim)
+      res[2] <- "AssoByGenus"
+    }
+  }
+}
+```
+
+##### No species, no genus, Vern name ok, Family ok
+```{r}
+if (Family2Sim!="Indet." & Genus2Sim=="Indet.") {
+  # Put 0  to alphaV for bota names associated with this vernacular but of different family
+  AlphaV[alphaV!=0 & Family!=Family2Sim, alphaV:=0]
+  # case with no compatibility between the Family name and the vernname in Alpha
+  if (sum(AlphaV$alphaV)==0) {
+    res <- list(paste(Family2Sim, "Indet.", sep="-"), "Det2Fam")
+  } else {
+    # case with compatibility
+    # for same vernacular name but different family And for different vernacular name
+    # gives a freq =eps/nb
+    AlphaV[alphaV==0, alphaV := eps/dim(AlphaV[alphaV==0])[1]]
+    
+    if(Determ==TRUE){
+      res <- DrawDeterm(AlphaV, levelAsso="AssoByFam", VernName2Sim=VernName2Sim)
+    }
+    if(Determ==FALSE) {
+      # Draw in Dirichlet-Categorical
+      res[1] <- DirichCat(alphaV = AlphaV$alphaV, Names = AlphaV$GenSp, Vern = VernName2Sim)
+      res[2] <- "AssoByFam"
+    }
+  }
+}
+```
+
+##### No species, no genus, no family, Vern name ok
+```{r}
+if (Family2Sim=="Indet." & Genus2Sim=="Indet.") {
+  # gives a freq =eps/nb for different vernacular name
+  AlphaV[alphaV==0, alphaV := eps/dim(AlphaV[alphaV==0])[1]]
+  if(Determ==TRUE){
+    res <- DrawDeterm(AlphaV, levelAsso="AssoByVern", VernName2Sim=VernName2Sim)
+  }
+  if(Determ==FALSE) {
+    # Draw in Dirichlet-Categorical
+    res[1] <- DirichCat(alphaV = AlphaV$alphaV, Names = AlphaV$GenSp, Vern = VernName2Sim)
+    res[2] <- "AssoByVern"
+  }
+}
+```
+
+#### Ce qui se passe dans DrawDeterm() (the more likely association)
+```{r}
+# create an empty vector to store the result
+res <- list(as.character(NA),as.character(NA))
+
+Spmax <- AlphaV[alphaV==max(alphaV),GenSp] # max de la colonne alphaV : the more likely association
+# if no tie
+if (length(Spmax)==1) { # 1 seul max
+  res[1] <- as.character(Spmax)
+  res[2] <- paste(levelAsso, "Determ", sep="")
+} else { # several more likely associations
+  # if tie
+  res[1] <- as.character(sample(x=Spmax, size=1))
+  res[2] <- paste(levelAsso, "DetermT", sep="")
+  warning(paste("There were several species with the same probability of association for ", VernName2Sim,
+                ", the species was chosen randomly on a tree by tree basis"))
+}
 ```
 
 

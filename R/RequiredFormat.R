@@ -56,10 +56,6 @@ RequiredFormat <- function(
     stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R")
     }
 
-
-  # Global variables
- . <-  .N <- .SD <- Circ <- DBH <- Genus <- NewIdTree <- POM <- Plot <- Species <-  ScientificName <- SubPlot <- TreeFieldNum <- TreeHeight <- CensusDateOriginal <- CensusDate <- LifeStatus <- PlotArea <- NULL
-
   # Load interactive items to see what we are missing ####
 
   if(!ThisIsShinyApp) {
