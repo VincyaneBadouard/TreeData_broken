@@ -53,7 +53,7 @@ RequiredFormat <- function(
 
 
     if(!ThisIsShinyApp & !inherits(input, "list")) {
-    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R")
+    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R, or a profile saved viw the Shiny App")
     }
 
   # Load interactive items to see what we are missing ####
@@ -123,8 +123,13 @@ RequiredFormat <- function(
   ## Date of measurement ####
   if(!input$CensusDate %in% "none"){
 
+    CensusDateFormat <- input$CensusDateFormat
+    CensusDateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", CensusDateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+    CensusDateFormat <- gsub("yyy", "Y", CensusDateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+
+
     Data[, CensusDateOriginal := CensusDate]
-    Data[, CensusDate := as.Date(trimws(as.character(CensusDate)), format = input$CensusDateFormat)]
+    Data[, CensusDate := as.Date(trimws(as.character(CensusDate)), format = CensusDateFormat)]
 
     if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
@@ -159,13 +164,13 @@ RequiredFormat <- function(
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if (input$TreeFieldNum %in% "none") {
       warning("You do not have a column with unique tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
-      Data[, NewIdTree := seq(1, .N) , by = .(Plot, SubPlot)]
+      Data[, IdTree := seq(1, .N) , by = .(Plot, SubPlot)]
     }
 
     # if we have TreeFieldNum, we use it
 
     if (!input$TreeFieldNum %in% "none")
-      Data[, NewIdTree := paste(Plot, SubPlot, TreeFieldNum, sep = "_")]
+      Data[, IdTree := paste(Plot, SubPlot, TreeFieldNum, sep = "_")]
 
   }
 
@@ -287,8 +292,8 @@ RequiredFormat <- function(
 
 
   # return output ####
-
-  return(Data)
+  ColumnsToReturn <- intersect(x$ItemID, colnames(Data))
+  return(Data[, ..ColumnsToReturn])
 
 }
 

@@ -5,12 +5,12 @@ Headers,1,pickerInput,choices,Plot,Plot name,,none,none,none,ColumnOptions,list(
 Headers,2,textInput,value,PlotMan,What is your plot name ?,,Plot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,SubPlot,SubPlot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,SubPlot level name
 Headers,2,textInput,value,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Headers,1,pickerInput,choices,PlotArea,Plot (or subplot) area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
+Headers,1,pickerInput,choices,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
 Headers,4,pickerInput,choices,PlotAreaUnitMan,What the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusYear,Census year,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Census year
 Headers,5,numericInput,value,CensusYearMan,What is your year of measurement?,if you did not specify a column for date,CensusYear,CensusDate,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,CensusDate,Census Date,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
-Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be %Y-%m-%d,none,none,CensusDate,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Headers,4,textInput,value,CensusDateFormat,Census Date format,e.g. 2021-01-31 would be yyyy-mm-dd and 9/14/2016 would be mm/dd/yyyy,none,none,CensusDate,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
 Headers,1,pickerInput,choices,IdTree,Tree ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if not provided in the input data
 Headers,1,pickerInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
