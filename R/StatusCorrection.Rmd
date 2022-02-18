@@ -43,6 +43,18 @@ setDT(Data) # with "set" "<-" is not necessary
 Censuses = c(2011:2021) # censuses for the plot in which the tree is (numeric)
 deathconfirmation = 2 # (numeric)
 usesize = FALSE # (logical)
+InvariantColumns = c("Site",
+                     "Genus",
+                     "Species",
+                     "Family",
+                     "ScientificName") # user choice
+
+# Supply names of columns that have 0 variance (= invariant columns)
+vari <- lapply(DataTree, var)
+df <- data.frame(InvariantC = c(vari == 0))
+InvariantColumns <- setDT(df, keep.rownames = TRUE)[InvariantC == TRUE| is.na(InvariantC), rn] # detection
+
+InvariantColumns <- InvariantColumns[!InvariantColumns %in% c("CensusDate", "CensusDateCertainty", "LifeStatus", "MeasCode", "CorrCode")]  
 ```
 
 # Ask to the user
@@ -93,7 +105,7 @@ if(usesize){
 }
 ```
 
-### Work
+### Sequence analyse
 ```{r}
 # The first tree life status in the dataset
 FirstStatus <- DataTree[CensusYear == min(CensusYear), LifeStatus]
@@ -102,28 +114,135 @@ FirstStatus <- DataTree[CensusYear == min(CensusYear), LifeStatus]
 FirstAlive <- min(DataTree[LifeStatus %in% TRUE, CensusYear])
 LastAlive <- max(DataTree[LifeStatus %in% TRUE, CensusYear])
 
-# The last time where the tree has been recorded dead (in case there are several)
-LastDeathRecord <- max(DataTree[LifeStatus %in% FALSE, CensusYear])
+# Before/between positions (rows id)
+Before <- which(DataTree$CensusYear < FirstAlive) # Before the first alive
+Between <- which(DataTree$CensusYear > FirstAlive & DataTree$CensusYear < LastAlive) # Between the fist and last alive
 
-
-Before
-# After the last death record
-After <- which(DataTree$CensusYear > LastDeathRecord) # rows id
-Between
-# Absents are the absent record years between first record and the last record of the tree
-# s'il ya des vivant (TRUE) apres la dernière mort
-Absents <- (Censuses > FirstAlive & !Censuses %in% DataTree$CensusYear)
-# sinon 
-Absents <- (Censuses > FirstAlive &
-              Censuses < LastDeathRecord & # take into acount the last death as the end 
-              !Censuses %in% DataTree$CensusYear) # Bon chais pas, REFLECHIR a ça (sur papier)
-
-#if tree has not been reported dead yet, we search in all censuses
-Absents <- (Censuses > FirstAlive & !Censuses %in% DataTree$CensusYear)
 ```
 
-### Creating rows for absents
+### Absents (logical vector of the Censuses length)
 ```{r}
+# if tree has ever been recorded dead
+if(any(DataTree$LifeStatus %in% FALSE)){
+  # The last time where the tree has been recorded dead (in case there are several)
+  LastDeathRecord <- max(DataTree[LifeStatus %in% FALSE, CensusYear])
+  
+  After <- which(DataTree$CensusYear > LastDeathRecord) # After the last death record
+  
+  # If there is any "Alive" report after last reported death
+  if(any(DataTree$LifeStatus[After] %in% TRUE)) {
+    # Absents are the absent record years among the plot censuses from the 1st alive record
+    Absents <- (Censuses > FirstAlive & !Censuses %in% DataTree$CensusYear)
+    
+  }else{
+    # Absents are the absent record years between first alive record and the last death record
+    Absents <- (Censuses > FirstAlive &
+                  Censuses < LastDeathRecord & # death = the end 
+                  !Censuses %in% DataTree$CensusYear)
+  }
+  
+}else{ # if tree has not been reported dead yet
+  
+  # Absents are the absent record years among the plot censuses from the 1st alive record
+  Absents <- (Censuses > FirstAlive & !Censuses %in% DataTree$CensusYear)
+  
+}
+
+```
+
+### Creating rows for absents (arrétée ici)
+```{r}
+FillinInvariantColumns <- function(NewRows, InvariantColumns, DataTree, IdTree){
+  
+  for(j in InvariantColumns){
+    
+    if(any(is.na(NewRows[,j]))){ # if some columns are empty in the new rows (the "absent" trees)
+      uni <- unique(DataTree[, j])
+      # if(any(is.na(uni)))
+      # warning(paste0("The tree ",IdTree," has NA values for the variable ",j, " that is supposed to be invariant"))
+      # UNACTIVATED ON DEMAND FOR DANI.
+      # uni <- uni[which(!is.na(uni))]
+      if(length(uni) > 1){ # if the "invariant column is not invariant
+        message = paste0("attribute ",
+                         j,
+                         " that you defined as a non-varying column -i.e. supposed to have always the same value for each measurement of the same tree- has multiple values for tree ",
+                         IdTree,
+                         " and takes the values ",
+                         uni)
+        stop(message)
+      }
+      else if(length(uni) == 0){ # no value in the invariant column
+        stop(paste0("Attribute ",j," has no replacement value for individual ",IdTree))
+      }
+      else{
+        NewRows[which(is.na(NewRows[,j])),j] <- uni # fill the invariant column of NewRows with their (unique) value
+        # NewRows[which(is.na(NewRows[,which(names(NewRows) == j)])),which(names(NewRows) == j)] <- uni
+      }
+    }
+  }
+  # ret <- NewRows[,names(NewRows)%in%InvariantColumns]
+  # print(ret)
+  return(NewRows)
+}
+
+```
+
+```{r}
+Nabs <- sum(Absents) # absent is a logical vector giving the census times for which trees were not seen.
+
+if(Nabs > 0){ # if there are absents
+  # if(DataTree$Plot[1] == 1) print(DataTree$Plot[1])
+  NewRows <- data.table(IdTree = unique(DataTree$IdTree),     # the idtree
+                        CensusYear = Censuses[Absents],       # absent censuses list
+                        LifeStatus = NA,                    # not seen
+                        LifeStatusCor = NA,               # no corrected status for now
+                        Plot = unique(DataTree$Plot),  # the unique plot in DataTree
+                        SubPlot = unique(DataTree$SubPlot),  # the unique subplot in DataTree
+                        stringsAsFactors =  FALSE)      # do not convert characters into factors
+  NewNames <- names(NewRows)
+  
+  if(length(InvariantColumns) > 0){ # if there are invariant columns
+    
+    NewRows[,(InvariantColumns) := NA] # empty the invariant columns for the added rows
+    
+    # Fill in the invariant columns in the added rows
+    NewRows <- FillinInvariantColumns(NewRows = NewRows,
+                                      InvariantColumns = InvariantColumns,
+                                      DataTree = DataTree,
+                                      IdTree = unique(DataTree$IdTree))
+  }
+  # print(NewRows)
+  # if(i == 75599){
+  #   # print(DataTreesav)
+  #   print("############rows")
+  #   print(c(ncol(NewRows),ncol(DataTree)))
+  # }
+  new_rows_init <- (nrow(DataTree)+1) # first added row
+  new_rows_end <- (nrow(DataTree)+Nabs) #  Nabs = sum(Absents), until the last added row
+  DataTree[new_rows_init:new_rows_end,vars] <- NA  # vars = input columns -> emptied
+  DataTree[new_rows_init:new_rows_end,NewNames] <- NewRows[,NewNames] # NewRows = the created rows, NewNames = columns for the added rows
+  # if(i == 75599){
+  #   # print(DataTreesav)
+  #   print("###########tree1")
+  #   print(DataTree)
+  # }
+  
+  # Add the invariant columns
+  if(length(InvariantColumns) > 0) DataTree[new_rows_init:new_rows_end, InvariantColumns] <- NewRows[,InvariantColumns]
+  
+  DataTree <- DataTree[order(DataTree$CensusYear),] # order by time
+  # if(i == 75599){
+  #   # print(DataTreesav)
+  #   print("############tree2")
+  #   print(DataTree)
+  # }
+}
+if(!all(is.na(DataTree$LifeStatus))){ # if not all is NA (= if there are TRUE and/or FALSE too)
+  if(all(!DataTree$LifeStatus)){ # if all is FALSE
+    print(DataTree$LifeStatus)
+    print("#")
+  }
+}
 
 ```
 
