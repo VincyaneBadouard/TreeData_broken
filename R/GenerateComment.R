@@ -5,7 +5,7 @@
 #'   value, the string is pasted after the "/" separator.
 #'
 #' @param Data (data.table)
-#' @param condition (logical)
+#' @param condition Vector of logicals
 #' @param comment The string to add in the "Comment" column (character)
 #'
 #' @return The input data.table with the filled "Comment" column.
