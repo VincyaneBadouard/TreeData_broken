@@ -30,7 +30,6 @@ library(TreeData)
 library(data.table)
 ```
 
-
 # Import data & other inputs
 ```{r}
 data("TestData") # import data
