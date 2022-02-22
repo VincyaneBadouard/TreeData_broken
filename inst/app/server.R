@@ -11,8 +11,10 @@ x <- read.csv("data/interactive_items.csv")
 x <- x[x$Activate, ]
 for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
-# get the function here (ugly solution but not sure how esle to do it- unless installing packgae from GitHub)
-source("../../R/RequiredFormat.R")
+# install TreeData package
+# devtools::install_github("VincyaneBadouard/TreeData")
+library(TreeData)
+
 server <- function(input, output, session) {
 
   # read file and create data table

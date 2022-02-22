@@ -5,10 +5,10 @@ list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWid
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 #install missing ones
-if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
+# if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 
 # load required packages' libraries
-lapply(as.list(list.of.packages), library, character.only = T)
+lapply(as.list(list.of.packages), require, character.only = T)
 
 
 
@@ -76,7 +76,7 @@ body <- dashboardBody(
               box(width = 12,
                   radioButtons(inputId = "predefinedProfile",
                                label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
-                               choices = list("No thanks!" = "No", "TmFO" = "TmFO", "ForestGEO" = "ForestGEO"),selected = "No"),
+                               choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
 
                   # load a profile it one already exists
                   fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
