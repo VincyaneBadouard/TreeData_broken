@@ -8,7 +8,8 @@
 #'
 #'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp For internal use when function used by Shiny app (logical)
+#'@param ThisIsShinyApp For internal use when function used by Shiny app
+#'  (logical)
 #'
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
@@ -28,11 +29,11 @@
 #'
 #' @examples
 #'\dontrun{
-# data(ParacouSubset)
-# data(ParacouProfile)
-# ParacouSubsetFormated <- RequiredFormat(
-#   ParacouSubset,
-#   input = ParacouProfile)
+#' data(ParacouSubset)
+#' data(ParacouProfile)
+#' ParacouSubsetFormated <- RequiredFormat(
+#'   ParacouSubset,
+#'   input = ParacouProfile)
 #'                }
 #'
 
@@ -52,20 +53,21 @@ RequiredFormat <- function(
     stop("Data must be a data.frame or data.table")
 
 
-    if(!ThisIsShinyApp & !inherits(input, "list")) {
-    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R, or a profile saved viw the Shiny App")
-    }
+  if(!ThisIsShinyApp & !inherits(input, "list")) {
+    stop("input must be a list (typically, the output of funcion RequireFormat_interactive.R,
+         or a profile saved viw the Shiny App")
+  }
 
   # Load interactive items to see what we are missing ####
 
   if(!ThisIsShinyApp) {
-  x <- try(expr = read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)), silent = T)
+    x <- try(expr = read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)), silent = T)
 
-  if (class(x) %in% "try-error"){
-     warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
-    x <- read.csv("inst/app/data/interactive_items.csv")
-  }
-  x <- x[x$Activate,]
+    if (class(x) %in% "try-error"){
+      warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
+      x <- read.csv("inst/app/data/interactive_items.csv")
+    }
+    x <- x[x$Activate,]
   }
 
   CharacVar <- x$ItemID[x$DataType %in% "character"]
@@ -257,8 +259,8 @@ RequiredFormat <- function(
 
     if (TreeHeightUnit %in% unitOptions)
 
-    if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
-      Data[, TreeHeight := TreeHeight/1000] # mm -> m
+      if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
+        Data[, TreeHeight := TreeHeight/1000] # mm -> m
 
     if (substr(TreeHeightUnit, 1, 1) == "m")
       Data[, TreeHeight := TreeHeight/100] # cm -> m

@@ -8,6 +8,11 @@
 \description{
 Forest Inventories Harmonization & Correction
 }
+\section{TreeData functions}{
+
+RequiredFormat
+}
+
 \seealso{
 Useful links:
 \itemize{
@@ -22,12 +27,8 @@ Useful links:
 Authors:
 \itemize{
   \item Valentine Herrmann \email{HerrmannV@si.edu}
+  \item Nino Page \email{page.nino@gmail.com}
   \item Camille Piponiot \email{camille.piponiot@gmail.com}
-}
-
-Other contributors:
-\itemize{
-  \item Nino Page \email{page.nino@gmail.com} [contributor]
 }
 
 }

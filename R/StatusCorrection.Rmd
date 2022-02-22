@@ -10,9 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 Inspiration: ForestData::correct_alive() and .correct_alive_tree()
 
-Return: Create the 'LifeStatusCor' column
+Return: Create the 'LifeStatusCor' column and fill the 'Comment' column
 
-- if usesize : if DBH != NA -> Alive
+- if UseSize : if DBH != NA -> Alive
 - [*Dead* > Alive] -> NA
 - add rows for the forgotten censuses between 2 'Alive'
 - [Alive > *Dead*/*NA* > Alive] -> Alive
@@ -20,8 +20,8 @@ Return: Create the 'LifeStatusCor' column
 - [Alive > *Dead* > NA] -> Dead
 
 - [Alive > *NA* > *NA*]:
-if deathconfirmation > nrow(LifeStatus = "NA") -> NA
-if deathconfirmation =< nrow(LifeStatus = "NA") -> Dead
+if DeathConfirmation > unseens -> NA
+if DeathConfirmation =< unseens -> Dead
 
 
 # Packages libraries
@@ -40,9 +40,13 @@ setDT(Data) # with "set" "<-" is not necessary
 
 # Args
 Censuses = c(2011:2021) # censuses for the plot in which the tree is (numeric)
-deathconfirmation = 2 # (numeric)
-usesize = FALSE # (logical)
+DeathConfirmation = 2 # (numeric)
+UseSize = FALSE # (logical)
 DetectOnly = FALSE # (logical)
+
+RemoveRAfterDeath = FALSE # "After correction do you want to delete the rows concerning the tree after its death?" (logical)
+RemoveRBeforeAlive = FALSE # "Do you want to delete the rows about the tree before it was seen alive for the 1st time?" (logical)
+
 InvariantColumns = c("Site",
                      "Genus",
                      "Species",
@@ -64,8 +68,6 @@ InvariantColumns = c("Site",
 # 1 = alive (TRUE)
 # 0 = dead (FALSE)
 # NA = unseen
-
-RemoveRAfterDeath = FALSE # "After correction do you want to delete the rows concerning the tree after its death?" (logical)
 ```
 
 # Function per tree (IdTree)
@@ -88,7 +90,7 @@ DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)] # w
 
 ## Code
 ```{r}
-# Arrange year in ascending order
+# Arrange years in ascending order
 DataTree <- DataTree[order(CensusYear)] # order de dt
 
 
@@ -99,7 +101,7 @@ if(!length(unique(DataTree$Plot)) == 1){ # if there are several plots for the sa
 
 ### Use the size presence as a witness of the living status of the tree
 ```{r}
-if(usesize){
+if(UseSize){
   
   DataTree <- GenerateComment(DataTree,
                               condition = !is.na(DataTree[, DBH]) &
@@ -122,18 +124,18 @@ if(usesize){
 ### Sequence analyse
 ```{r}
 # The first tree life status in the dataset
-FirstStatus <- DataTree[CensusYear == min(CensusYear), LifeStatus]
+# FirstStatus <- DataTree[CensusYear == min(CensusYear), LifeStatus]
 
 # The first and last Alive record year
 FirstAliveYear <- min(DataTree[LifeStatus %in% TRUE, CensusYear])
-LastAliveYear <- max(DataTree[LifeStatus %in% TRUE, CensusYear])
+# LastAliveYear <- max(DataTree[LifeStatus %in% TRUE, CensusYear])
 
 # Before/between positions (rows id)
 FirstAlive <- which(DataTree$LifeStatus %in% TRUE)[1] # the 1st seen alive
-LastAlive <-  max(which(DataTree$LifeStatus == 1)) # the last seen alive
+LastAlive <-  max(which(DataTree$LifeStatus %in% TRUE)) # the last seen alive
 
-Before <- which(DataTree$CensusYear < FirstAliveYear) # Before the first alive
-Between <- which(DataTree$CensusYear > FirstAliveYear & DataTree$CensusYear < LastAliveYear) # Between the fist and last alive
+# Before <- which(DataTree$CensusYear < FirstAliveYear) # Before the first alive
+# Between <- which(DataTree$CensusYear > FirstAliveYear & DataTree$CensusYear < LastAliveYear) # Between the fist and last alive
 
 ```
 
@@ -191,7 +193,7 @@ FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
         stop("The variable ",j," has no value for individual ",IdTree)
       }
       else{
-        NewRow[is.na(get(j)), (j) := uni] # fill the invariant column in NewRow with their (unique) value
+        NewRow[is.na(get(j)), (j) := uni] # fill the invariant columns in NewRow with their (unique) value
       }
     }
   }
@@ -256,35 +258,95 @@ if(DetectOnly %in% FALSE){
 
 ```
 
-### Enough/not enough occurrences of death to validate it (arrétée ici)
+### Enough/not enough occurrences of death to validate it
 ```{r}
+# If there are things after the last occurrence of life
 if(LastAlive != nrow(DataTree)){ # if the last seen alive is not the last row of the database
   
-  # if the one after the last one seen alive is dead:
+  #### if the one after the last one seen alive is Dead ####
   if(DataTree[LastAlive +1, LifeStatus] %in% FALSE){
     
     # Remove rows after the death (after correction) (User choice)
     if(RemoveRAfterDeath %in% TRUE)
-      
       DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
+    
   }
-  else{
-    # enough occurrences of death to validate it
-    if(LastAlive < nrow(DataTree)-(dead_confirmation_censuses -1)){ # -1 to count the last row and check if the data finish with at least 2 deaths
-      DataTree$LifeStatusCor[LastAlive +1] <- 0 # validated: the one after the last one seen alive is dead
-      DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),] # not understand
+  #### if the one after the last one seen alive is Unseen ####
+  else if(DataTree[LastAlive +1, LifeStatus] %in% NA){
+    
+    ##### If there is still a "death" occurrence #####
+    if(any(DataTree$LifeStatus %in% FALSE)){
+      
+      LastDeath <- max(which(DataTree$LifeStatus %in% FALSE))
+      
+      ###### If the death is not the last record ######
+      if(LastDeath < nrow(DataTree)){
+        unseen <- sum(DataTree[(LastAlive +1):(LastDeath-1), LifeStatus] %in% NA) # NA until the death (logicals vector) 
+        
+      }else{
+        unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatus] %in% NA) # NA until the dataset end (logicals vector) 
+      }
+      ##### No death record #####
+    }else{
+      unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatus] %in% NA) # NA until the dataset end (logicals vector) 
     }
-    else{ # there are not enough occurrences of death to validate it
-      DataTree[(LastAlive +1):nrow(DataTree),"LifeStatusCor"] <- NA # the death is not sure
-    }
+    
+    if(DeathConfirmation <= unseen){
+      
+      # The comment
+      DataTree <- GenerateComment(DataTree,
+                                  condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
+                                    DataTree[, LifeStatus] %in% NA,
+                                  comment = "When the tree is unseen a number of times >= DeathConfirmation, it is considered dead")
+      
+      if(DetectOnly %in% FALSE){
+        
+        # The correction
+        DataTree[(LastAlive +1):(LastAlive +unseen), LifeStatusCor := FALSE] # Death validated
+        
+        # Remove rows after the death (after correction) (User choice)
+        if(RemoveRAfterDeath %in% TRUE)
+          DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
+        
+      } # correction end
+      
+    } # else if(DeathConfirmation > unseen) NAs remain NAs
+    
   }
-}
+} # If there nothing after the last occurrence of life
+
 ```
 
 ### Before the first alive 
 ```{r}
-if(first_seen_alive > 1){ # if the first seen alive is not the first row
-  DataTree <- DataTree[-(1:(first_seen_alive-1)),] # remove from the first row to to the last before the first seen alive
+if(FirstAlive > 1){ # if the first seen alive is not the first row -> NA/dead
+  
+  # The comment
+  DataTree <- GenerateComment(DataTree,
+                              condition = seq.int(nrow(DataTree)) %in% (1:(FirstAlive -1)) &
+                                DataTree[, LifeStatus] %in% NA, # -> unseen
+                              comment = "Isn't the tree alive?")
+  
+  DataTree <- GenerateComment(DataTree,
+                              condition = seq.int(nrow(DataTree)) %in% (1:(FirstAlive -1)) &
+                                DataTree[, LifeStatus] %in% FALSE, # -> dead
+                              comment = "Tree cannot be dead before being alive")
+  
+  
+  if(DetectOnly %in% FALSE){
+    
+    # The correction (mettre un ifelse)
+    DataTree[1:(FirstAlive -1), LifeStatusCor := ifelse(LifeStatus %in% FALSE, NA, LifeStatusCor)] # Tree cannot be dead before being alive -> NA
+    
+    # Remove rows after the death (after correction) (User choice)
+    if(RemoveRBeforeAlive %in% TRUE)
+      DataTree <- DataTree[-(1:(FirstAlive -1)),] # remove from the first to the last row before the first seen alive
+    
+  } # correction end
 }
 ```
+
+
+
+
 

@@ -13,7 +13,7 @@ Authors@R:
            email = "HerrmannV@si.edu"),
       person(given = "Nino",
            family = "Page",
-           role = "ctb",
+           role = "aut",
            email = "page.nino@gmail.com"),
       person(given = "Camille",
            family = "Piponiot",

@@ -15,7 +15,8 @@ column names correspondence, size units etc...}
 
 \item{x}{For internal use when function used by Shiny app}
 
-\item{ThisIsShinyApp}{For internal use when function used by Shiny app (logical)}
+\item{ThisIsShinyApp}{For internal use when function used by Shiny app
+(logical)}
 }
 \value{
 Input inventory (data.frame) in the required package format.
@@ -34,6 +35,11 @@ RequiredFormat_interactive.
 }
 \examples{
 \dontrun{
+data(ParacouSubset)
+data(ParacouProfile)
+ParacouSubsetFormated <- RequiredFormat(
+  ParacouSubset,
+  input = ParacouProfile)
                }
 
 }

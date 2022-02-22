@@ -9,7 +9,7 @@ GenerateComment(Data, condition, comment)
 \arguments{
 \item{Data}{(data.table)}
 
-\item{condition}{(logical)}
+\item{condition}{Vector of logicals}
 
 \item{comment}{The string to add in the "Comment" column (character)}
 }
