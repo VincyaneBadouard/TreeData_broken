@@ -8,6 +8,11 @@
 \description{
 Forest Inventories Harmonization & Correction
 }
+\section{TreeData functions}{
+
+RequiredFormat
+}
+
 \seealso{
 Useful links:
 \itemize{
