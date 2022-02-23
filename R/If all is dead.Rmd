@@ -1,0 +1,16 @@
+---
+title: "If all is dead"
+author: "Vincyane Badouard"
+date: "23/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+DataTree <- Data[IdTree == "100635"]
+```
+

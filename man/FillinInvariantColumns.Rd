@@ -19,7 +19,8 @@ measurements, with the invariant columns and their value (data.table)}
 \item{IdTree}{(character)}
 }
 \value{
-Fill the invariant columns in NewRow with their (unique) value
+The \emph{NewRow} dataset with the invariant columns filled with their
+(unique) value
 }
 \description{
 Fill the invariant columns in NewRow with their (unique) value

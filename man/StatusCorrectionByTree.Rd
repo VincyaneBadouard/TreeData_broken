@@ -83,8 +83,9 @@ DataTree <- rbindlist(list(DataTree, AddR)) # add rows
 
 DataTree <- DataTree[order(CensusYear)] # arrange years in ascending order
 
-DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)] # write the sequence
+# Write the sequence
+DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 
-StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
+Rslt <- StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
 
 }

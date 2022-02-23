@@ -1,6 +1,5 @@
 # StatusCorrection <- function(
 #   Data,
-#   Censuses, # censuses for the plot in which the tree is (numeric)
 #   InvariantColumns = c("Site",
 #                        "Genus",
 #                        "Species",
@@ -66,6 +65,8 @@
 #'   *DetectOnly* = FALSE, add a *LifeStatusCor* column with the corrected tree
 #'   life status.
 #'
+#' @importFrom data.table order
+#'
 #' @export
 #'
 #' @examples
@@ -84,9 +85,10 @@
 #'
 #' DataTree <- DataTree[order(CensusYear)] # arrange years in ascending order
 #'
-#' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)] # write the sequence
+#' # Write the sequence
+#' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 #'
-#' StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
+#' Rslt <- StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
 #'
 StatusCorrectionByTree <- function(
   DataTree,
@@ -105,15 +107,58 @@ StatusCorrectionByTree <- function(
 ){
 
   #### Arguments check ####
+  # DataTree
   if (!inherits(DataTree, c("data.table", "data.frame")))
     stop("DataTree must be a data.frame or data.table")
 
-  # if there are several plots for the same idtree
-  if(!length(unique(DataTree$Plot)) == 1){
+  # Censuses
+  if (!inherits(Censuses, "numeric"))
+    stop("'Censuses' argument must be numeric")
+
+  # InvariantColumns
+  if (!inherits(InvariantColumns, "character"))
+    stop("'InvariantColumns' argument must be of character class")
+
+  # DeathConfirmation
+  if (!inherits(DeathConfirmation, "numeric"))
+    stop("'DeathConfirmation' argument must be numeric")
+
+  # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
+  if(!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
+                        inherits, "logical"))))
+    stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
+         of the 'SatusCorrection' function must be logicals")
+
+  # if there are several IdTrees
+  if(length(unique(DataTree$IdTree)) != 1){
+    stop("DataTree must correspond to only 1 same tree so 1 same IdTree
+    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),")")
+  }
+
+  # if there are several plots for the same IdTree
+  if(length(unique(DataTree$Plot)) != 1){
     stop(paste0("Tree ",unique(DataTree$IdTree)," has multiple plots: " ,paste0(unique(DataTree$Plot), collapse = "/")))
   }
 
+  # Check if the InvariantColumns name exists in DataTree
+  for(c in InvariantColumns){
+    if(!c %in% names(DataTree)){
+      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                 ,c,"is apparently not a dataset's column"))
+    }
+  }
+
+  if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
+    if(!DBH %in% names(DataTree)){
+      stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
+           the DBH column must be present in the dataset")
+    }
+  }
+
+
   #### Function ####
+
+  print(unique(DataTree[, IdTree]))
 
   # data.frame to data.table
   setDT(DataTree)
@@ -142,15 +187,19 @@ StatusCorrectionByTree <- function(
   }
 
   #### Sequence analyse ####
-
+  # if tree has ever been recorded alive
+  if(any(DataTree$LifeStatus %in% TRUE)){
   # The first Alive record year
   FirstAliveYear <- min(DataTree[LifeStatus %in% TRUE, CensusYear])
 
   # First/last alive positions (rows id)
   FirstAlive <- which(DataTree$LifeStatus %in% TRUE)[1] # the 1st seen alive
   LastAlive <-  max(which(DataTree$LifeStatus %in% TRUE)) # the last seen alive
+  }
 
   #### Absents (logical vector of the Censuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
+
+  Censuses <- sort(Censuses) # increasing order
 
   # if tree has ever been recorded dead
   if(any(DataTree$LifeStatus %in% FALSE)){
@@ -308,6 +357,34 @@ StatusCorrectionByTree <- function(
 
     } # correction end
   }
+
+  #### After the death ####
+  # If all rows count
+  if(RemoveRAfterDeath %in% FALSE){
+
+    # If there is still a "death" occurrence
+    if(any(DataTree$LifeStatus %in% FALSE)){
+
+      LastDeath <- max(which(DataTree$LifeStatus %in% FALSE))
+
+      # If the death is not the last record
+      if(LastDeath < nrow(DataTree)){
+
+        # The comment
+        DataTree <- GenerateComment(DataTree,
+                                    condition = seq.int(nrow(DataTree)) %in% ((LastDeath +1):nrow(DataTree)) &
+                                      DataTree[, LifeStatus] %in% NA,
+                                    comment = "After its death the tree is still dead")
+
+        if(DetectOnly %in% FALSE){
+
+          # The correction
+          DataTree[(LastDeath +1):nrow(DataTree), LifeStatusCor := FALSE] # After death there is only death
+
+        } # correction end
+      } # the death isn't the last record
+    } # there is still a death
+  } # we want all the deaths!
 
 
 
