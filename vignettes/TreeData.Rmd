@@ -41,6 +41,7 @@ library(kableExtra)
 # Decomposed corrections
 ## Botanical identification correction
 ## Life status
+
 ## Diameter correction
 ## Recruitment
 

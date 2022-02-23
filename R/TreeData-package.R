@@ -16,7 +16,9 @@
 utils::globalVariables(c(".", ".N", ".SD", "Circ", "DBH", "Genus", "NewIdTree",
                          "POM", "Plot", "Species", "ScientificName", "SubPlot",
                          "TreeFieldNum", "TreeHeight", "CensusDateOriginal",
-                         "CensusDate", "LifeStatus", "PlotArea"
+                         "CensusDate", "LifeStatus", "PlotArea", "CommercialSp",
+                         "CensusYear", "Site", "IdTree", "..ColumnsToReturn",
+                         "LifeStatusCor"
 ))
 
 ## usethis namespace: end
