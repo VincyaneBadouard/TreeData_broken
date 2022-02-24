@@ -135,7 +135,7 @@ if(any(DataTree$LifeStatusCor %in% TRUE)){
   # Before/between positions (rows id)
   FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
   LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
-  
+
   # Before <- which(DataTree$CensusYear < FirstAliveYear) # Before the first alive
   # Between <- which(DataTree$CensusYear > FirstAliveYear & DataTree$CensusYear < LastAliveYear) # Between the fist and last alive
 }
@@ -416,7 +416,6 @@ if(RemoveRAfterDeath %in% FALSE){
 } # we want all the deaths!
 ```
 
-
 ### Dead > *Dead* > Dead
 S'il reste des NA entre 2 deads (après les vivants)
 ```{r}
@@ -438,6 +437,35 @@ if(DetectOnly %in% FALSE){
 
 ```
 
+### After the death 
+```{r}
+# If all rows count
+if(RemoveRAfterDeath %in% FALSE){
+  
+  # If there is still a "death" occurrence
+  if(any(DataTree$LifeStatus %in% FALSE)){
+    
+    LastDeath <- max(which(DataTree$LifeStatus %in% FALSE))
+    
+    # If the death is not the last record
+    if(LastDeath < nrow(DataTree)){
+      
+      # The comment
+      DataTree <- GenerateComment(DataTree,
+                                  condition = seq.int(nrow(DataTree)) %in% ((LastDeath +1):nrow(DataTree)) &
+                                    DataTree[, LifeStatus] %in% NA,
+                                  comment = "After its death the tree is still dead")
+      
+      if(DetectOnly %in% FALSE){
+        
+        # The correction
+        DataTree[(LastDeath +1):nrow(DataTree), LifeStatusCor := FALSE] # After death there is only death
+        
+      } # correction end
+    } # the death isn't the last record
+  } # there is still a death
+} # we want all the deaths!
+```
 
 # For all the trees 
 ```{r}
