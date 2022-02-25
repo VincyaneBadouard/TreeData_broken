@@ -74,12 +74,12 @@ StatusCorrection <- function(
                        "Species",
                        "Family",
                        "ScientificName"),
-  DeathConfirmation = 2, # (numeric)
-  UseSize = FALSE, # (logical)
-  DetectOnly = FALSE, # (logical)
+  DeathConfirmation = 2,
+  UseSize = FALSE,
+  DetectOnly = FALSE,
 
-  RemoveRBeforeAlive = FALSE, # "Do you want to delete the rows about the tree before it was seen alive for the 1st time?" (logical)
-  RemoveRAfterDeath = FALSE # "After correction do you want to delete the rows concerning the tree after its death?" (logical)
+  RemoveRBeforeAlive = FALSE,
+  RemoveRAfterDeath = FALSE
 ){
 
   #### Arguments check ####
@@ -128,6 +128,9 @@ StatusCorrection <- function(
   # IdTrees vector
   Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
 
+  # Dataset with the rows without IdTree
+  DataIDNa <-  Data[is.na(IdTree)]
+
   # Apply for all the trees
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
@@ -142,6 +145,9 @@ StatusCorrection <- function(
     RemoveRAfterDeath = RemoveRAfterDeath
   )
   )) # do.call apply the 'rbind' to the lapply result
+
+  # Re-put the the rows without IdTree
+  Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
 
   return(Data)
 
@@ -304,7 +310,7 @@ StatusCorrectionByTree <- function(
 
   #### Function ####
 
-  print(unique(DataTree[, IdTree]))
+  # print(unique(DataTree[, IdTree])) # to debug
 
   # data.frame to data.table
   setDT(DataTree)
@@ -451,11 +457,13 @@ StatusCorrectionByTree <- function(
 
         #### if the one after the last one seen alive is Dead ####
         if(DataTree[LastAlive +1, LifeStatusCor] %in% FALSE){
+          if(DetectOnly %in% FALSE){
 
-          # Remove rows after the death (after correction) (User choice)
-          if(RemoveRAfterDeath %in% TRUE)
-            DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
+            # Remove rows after the death (after correction) (User choice)
+            if(RemoveRAfterDeath %in% TRUE)
+              DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
 
+          }
         }
         #### if the one after the last one seen alive is Unseen ####
         else if(DataTree[LastAlive +1, LifeStatusCor] %in% NA){
