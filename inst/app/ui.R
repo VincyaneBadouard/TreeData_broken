@@ -10,6 +10,8 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 # load required packages' libraries
 lapply(as.list(list.of.packages), require, character.only = T)
 
+# source script to get VegX_tree
+source("../data-raw/My_VegX.R")
 
 
 # header with title
@@ -71,100 +73,50 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
+
             fluidRow(
-              # inform if profile already exists
-              box(width = 12,
-                  radioButtons(inputId = "predefinedProfile",
-                               label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
-                               choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
+              lapply(ToListSimple(tree)[-1], function(x) {
 
-                  # load a profile it one already exists
-                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
-                  ),
+                box(tags$h3(x$name), dropdown(
+                  circle = F,
+                  tooltip = T,
 
-              # inform if long or wide format
-              box(width = 12,
-                  radioButtons(inputId = "format",
-                           label = div(actionBttn(
-                             inputId = "inactivebutton",
-                             label = "1",
-                             style = "pill",
-                             color = "danger"),
-                             "Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
-                           choices = list("Long" = "long", "Wide" = "wide"))),
-              column(width = 6,
-                     actionBttn(
-                       inputId = "inactivebutton",
-                       label = "2",
-                       style = "pill",
-                       color = "danger")
-                     ,   strong("  Match your columns to ours (if you can)"),
-                     br(),
-                     br(),
-                     box(
-                       # title = "Match your columns to ours (if you can)",
-                         width = NULL,
-                         # status = "primary",
-                         # solidHeader = TRUE,
-                         uiOutput("ui1"))
-              ),
-              column(width = 6,
-                     actionBttn(
-                       inputId = "inactivebutton",
-                       label = "3",
-                       style = "pill",
-                       color = "danger")
-                     ,   strong("  Fill in information that is not in your columns"),
-                     br(),
-                     br(),
-                     box(
-                       # title = "",
-                         width = NULL,
-                         # column(width = 5,
-                         # box(title = "Tell us more about your plot",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         uiOutput("ui2"),
-                         #)
-                         # ),
+                  lapply(x[-1], function(y) {
+
+                    div(tags$h3(y$name), dropdown(
+                      circle = F,
+                      tooltip = T,
+
+                      lapply(y[-1], function(z) {
+                        if(length(z) ==1) {
+                          pickerInput(inputId = z$name,
+                                      label =  z$name,
+                                      choices = names(iris))
+                        } else {
+                          div(tags$h3(z$name), dropdown(
+                            circle = F,
+                            tooltip = T,
+
+                            lapply(z[-1], function(w) {
+                            if(length(w) ==1) {
+                              pickerInput(inputId = w$name,
+                                          label =  w$name,
+                                          choices = names(iris))
+
+                            } else {
+                              warning("more nested stuff")
+                            }
+                            })
+                          ))
+                        }
+                      })
+                    ))
+                  })
 
 
-                         # column(width = 5,
-                         # box(title = "Tell us about your units",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         #   p("Note: we are not able to handle units varying by rows yet..."),
-                         uiOutput("ui3"),
-                         #        ),
-                         # column(width = 5,
-                         # box(title = "A couple more things...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
-                         uiOutput("ui4"),
-                         # )
-                         # ),
-                         # column(width = 5,
-                         # box(title = "and lastly...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
-                         uiOutput("ui5")
-                         # )
-
-
-                     ),
-
-
-              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256") #;   position: fixed
-              )
-
-
-    )),
+                ))
+              })
+            )),
 
     tabItem(tabName = "Correct",
             radioButtons(inputId = "taper", label = "Apply taper corrections?", choices = list("Yes" = "Yes", "No" = "No"), selected = "No")
