@@ -11,7 +11,7 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 lapply(as.list(list.of.packages), require, character.only = T)
 
 # source script to get VegX_tree
-source("../data-raw/My_VegX.R")
+source("data/My_VegX.R")
 
 
 # header with title
