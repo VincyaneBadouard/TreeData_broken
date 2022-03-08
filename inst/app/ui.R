@@ -13,6 +13,29 @@ lapply(as.list(list.of.packages), require, character.only = T)
 # source script to get VegX_tree
 source("data/My_VegX.R")
 
+my_pickerInput <- function(x) {
+  pickerInput(inputId = x$name,
+              label =  x$name,
+              choices = names(iris))
+}
+
+my_lapply <- function(x) {
+  lapply(x, function(y) {
+    if(length(y) ==1) my_pickerInput(y) else my_dropdown(y)
+  })
+}
+
+
+my_dropdown <-     function(x) {
+  div(tags$h3(x$name), dropdown(
+    circle = F,
+    tooltip = T,
+
+    my_lapply(x[-1])
+
+  ))
+
+}
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
@@ -76,47 +99,49 @@ body <- dashboardBody(
 
             fluidRow(
               lapply(ToListSimple(tree)[-1], function(x) {
-
-                box(tags$h3(x$name), dropdown(
-                  circle = F,
-                  tooltip = T,
-
-                  lapply(x[-1], function(y) {
-
-                    div(tags$h3(y$name), dropdown(
-                      circle = F,
-                      tooltip = T,
-
-                      lapply(y[-1], function(z) {
-                        if(length(z) ==1) {
-                          pickerInput(inputId = z$name,
-                                      label =  z$name,
-                                      choices = names(iris))
-                        } else {
-                          div(tags$h3(z$name), dropdown(
-                            circle = F,
-                            tooltip = T,
-
-                            lapply(z[-1], function(w) {
-                            if(length(w) ==1) {
-                              pickerInput(inputId = w$name,
-                                          label =  w$name,
-                                          choices = names(iris))
-
-                            } else {
-                              warning("more nested stuff")
-                            }
-                            })
-                          ))
-                        }
-                      })
-                    ))
-                  })
-
-
-                ))
+                my_dropdown(x)
+              #   box(tags$h3(x$name), dropdown(
+              #     circle = F,
+              #     tooltip = T,
+              #
+              #     lapply(x[-1], function(y) {
+              #
+              #       div(tags$h3(y$name), dropdown(
+              #         circle = F,
+              #         tooltip = T,
+              #
+              #         lapply(y[-1], function(z) {
+              #           if(length(z) ==1) {
+              #             pickerInput(inputId = z$name,
+              #                         label =  z$name,
+              #                         choices = names(iris))
+              #           } else {
+              #             div(tags$h3(z$name), dropdown(
+              #               circle = F,
+              #               tooltip = T,
+              #
+              #               lapply(z[-1], function(w) {
+              #               if(length(w) ==1) {
+              #                 pickerInput(inputId = w$name,
+              #                             label =  w$name,
+              #                             choices = names(iris))
+              #
+              #               } else {
+              #                 warning("more nested stuff")
+              #               }
+              #               })
+              #             ))
+              #           }
+              #         })
+              #       ))
+              #     })
+              #
+              #
+              #   ))
               })
-            )),
+            )
+            )
+    ,
 
     tabItem(tabName = "Correct",
             radioButtons(inputId = "taper", label = "Apply taper corrections?", choices = list("Yes" = "Yes", "No" = "No"), selected = "No")
