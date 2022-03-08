@@ -11,6 +11,35 @@ x <- read.csv("data/interactive_items.csv")
 x <- x[x$Activate, ]
 for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
+
+# source script to get VegX_tree
+source("data/My_VegX.R")
+
+my_pickerInput <- function(x, choices) {
+  pickerInput(inputId = x$name,
+              label =  x$name,
+              choices = choices,
+              multiple = T)
+}
+
+my_lapply <- function(x, choices) {
+  lapply(x, function(y) {
+    if(length(y) ==1) my_pickerInput(y, choices) else my_dropdown(y, choices)
+  })
+}
+
+
+my_dropdown <-     function(x, choices) {
+  div(tags$h3(x$name), dropdown(
+    circle = F,
+    tooltip = T,
+
+    my_lapply(x[-1], choices)
+
+  ))
+
+}
+
 # install TreeData package
 # devtools::install_github("VincyaneBadouard/TreeData")
 library(TreeData)
@@ -19,7 +48,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$nTable,
                {
-                 output$upladTables <- renderUI({
+                 output$ui_uploadTables <- renderUI({
                    lapply(1:input$nTable, function(i) {
 
                      column(width = 3,
@@ -28,13 +57,17 @@ server <- function(input, output, session) {
                                 width = NULL,
                                 fileInput(inputId = paste0("file", i), "Choose CSV File", accept = ".csv"),
                                 # does the dataframe have a header?
-                                checkboxInput("header", "Header", TRUE),
+                                checkboxInput( paste0("header", i), "Header", TRUE),
                                 # choose separator
                                 selectInput(inputId = paste0("cbSeparator", i),
                                             label = "Separator",
                                             choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                                             selected = "auto"
-                                )
+                                ),
+                                textInput(inputId = paste0("TableName", i),
+                                          label = "Give an exmplicit UNIQUE name to this table. No space, no special character, no accent.",
+                                          value = paste0("Table", i)
+                                          )
                             )
                      )
 
@@ -47,16 +80,23 @@ server <- function(input, output, session) {
 
   # read file and create data table
   Data <- reactive({
-    file <- input$file0
-    ext <- tools::file_ext(file$datapath)
+    req(input$file1)
+     sapply(c(reactiveValuesToList(input)[[paste0("TableName", 1:input$nTable)]]), function(n) {
 
-    req(file)
-    validate(need(ext == "csv", "Please upload a csv file"))
+       i = which(c(reactiveValuesToList(input)[[paste0("TableName", 1:input$nTable)]]) %in% n)
+      file <- input[[paste0("file", i)]]
+      ext <- tools::file_ext(file$datapath)
 
-    data.table::fread(file$datapath,
-                      header = input$header,
-                      sep = input$cbSeparator)
+      req(file)
+      validate(need(ext == "csv", "Please upload a csv file"))
+
+      data.table::fread(file$datapath,
+                        header = input[[paste0("header", i)]],
+                        sep = input[[paste0("cbSeparator", i)]])
+    }, simplify = F)
+
   })
+
 
   observeEvent(input$profile, {
     file <- input$profile
@@ -102,6 +142,21 @@ server <- function(input, output, session) {
   output$ui4 <- renderUI({
     p(text_reactive$NoData)
   })
+
+  column_names <- reactive({
+    req(Data)
+    sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_"))
+  })
+
+  lapply(ToListSimple(tree)[-1], function(x) {
+    output[[paste0("uiheaders_", x$name)]] <-  renderUI({ my_dropdown(x, choices =column_names())})
+
+  })
+
+
+  observeEvent(Data(), {output$test <- renderText({unlist(sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_")))})})
+  observeEvent(Data(), {output$test <-renderText({ paste(paste(names(Data())[1], colnames(Data()[[1]]), sep = "_"), collapse = "") })})
+  observeEvent(Data(), {output$test <-renderText({ paste(column_names(), collapse = "") })})
 
   # create options to choose from:
 

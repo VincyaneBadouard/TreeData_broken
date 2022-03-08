@@ -13,29 +13,7 @@ lapply(as.list(list.of.packages), require, character.only = T)
 # source script to get VegX_tree
 source("data/My_VegX.R")
 
-my_pickerInput <- function(x) {
-  pickerInput(inputId = x$name,
-              label =  x$name,
-              choices = names(iris))
-}
 
-my_lapply <- function(x) {
-  lapply(x, function(y) {
-    if(length(y) ==1) my_pickerInput(y) else my_dropdown(y)
-  })
-}
-
-
-my_dropdown <-     function(x) {
-  div(tags$h3(x$name), dropdown(
-    circle = F,
-    tooltip = T,
-
-    my_lapply(x[-1])
-
-  ))
-
-}
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
@@ -75,10 +53,11 @@ body <- dashboardBody(
                           label = "How many tables do you wish to upload?",
                           value = 1,
                           min = 1,
-                          max = 5
+                          max = NA
                           )
               ),
-              uiOutput("upladTables")
+              uiOutput("ui_uploadTables"),
+              textOutput("test")
             )
 
             #   column(width = 3,
@@ -109,7 +88,9 @@ body <- dashboardBody(
 
             fluidRow(
               lapply(ToListSimple(tree)[-1], function(x) {
-                my_dropdown(x)
+                uiOutput(paste0("uiheaders_", x$name))
+
+                # my_dropdown(x)
               #   box(tags$h3(x$name), dropdown(
               #     circle = F,
               #     tooltip = T,
