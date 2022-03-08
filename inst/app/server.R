@@ -17,9 +17,37 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
+  observeEvent(input$nTable,
+               {
+                 output$upladTables <- renderUI({
+                   lapply(1:input$nTable, function(i) {
+
+                     column(width = 3,
+                            # load button for main data file (csv format)
+                            box(title = paste("Upload your table", i),
+                                width = NULL,
+                                fileInput(inputId = paste0("file", i), "Choose CSV File", accept = ".csv"),
+                                # does the dataframe have a header?
+                                checkboxInput("header", "Header", TRUE),
+                                # choose separator
+                                selectInput(inputId = paste0("cbSeparator", i),
+                                            label = "Separator",
+                                            choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
+                                            selected = "auto"
+                                )
+                            )
+                     )
+
+
+                   })
+
+
+                 })
+               })
+
   # read file and create data table
   Data <- reactive({
-    file <- input$file1
+    file <- input$file0
     ext <- tools::file_ext(file$datapath)
 
     req(file)
@@ -52,7 +80,7 @@ server <- function(input, output, session) {
 
   # render data table
   output$tabData <- renderDT({
-    if (!is.null(input$file1$name))
+    if (!is.null(input$file0$name))
       Data()
   }, rownames = FALSE,
   options = list(pageLength = 8, scrollX=TRUE))
@@ -98,7 +126,7 @@ server <- function(input, output, session) {
 
   # enter column names for each element of the RequiredFormat function
 
-  observeEvent(input$file1,
+  observeEvent(input$file0,
                {
                  output$ui1 <- renderUI({
                    lapply(1:nrow(x1), function(i) {
@@ -178,7 +206,7 @@ server <- function(input, output, session) {
 
   output$dbFile <- downloadHandler(
     filename = function() {
-      paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
+      paste(gsub(".csv", "", input$file0$name), '_formated.csv', sep = '')
     },
     content = function(file) {
       write.csv(DataFormated(), file, row.names = FALSE)
@@ -189,7 +217,7 @@ server <- function(input, output, session) {
 
   output$dbProfile <- downloadHandler(
     filename = function() {
-      paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
+      paste(gsub(".csv", "", input$file0$name), '_Profile.rds', sep = '')
     },
     content = function(file) {
       inputs_to_save <- names(input)[names(input) %in% x$ItemID]
@@ -205,7 +233,7 @@ server <- function(input, output, session) {
 
   output$dbCode <- downloadHandler(
     filename = function() {
-      paste(gsub(".csv", "",input$file1$name), '_Code.R', sep = '')
+      paste(gsub(".csv", "",input$file0$name), '_Code.R', sep = '')
     },
     content = function(file) {
       text_upload <- glue::glue(
@@ -215,10 +243,10 @@ server <- function(input, output, session) {
       library(TreeData)
 
       # upload the data
-       Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')
+       Data <- data.table::fread('{input$file0$name}', header = {input$header}, sep = '{input$cbSeparator}')
 
       # upload your profile (saved via shiny app)
-      Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
+      Profile <- readRDS(paste0(gsub('.csv', '', '{input$file0$name}'), '_Profile.rds'))
 
       # format your data
       DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
@@ -231,7 +259,7 @@ server <- function(input, output, session) {
 
   output$dbMetadata <- downloadHandler(
     filename = function() {
-      paste(gsub(".csv", "", input$file1$name), '_Metadata.csv', sep = '')
+      paste(gsub(".csv", "", input$file0$name), '_Metadata.csv', sep = '')
     },
     content = function(file) {
       columns_to_save <- colnames(DataFormated())
