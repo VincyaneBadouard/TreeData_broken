@@ -81,19 +81,19 @@ server <- function(input, output, session) {
   # read file and create data table
   Data <- reactive({
     req(input$file1)
-     sapply(c(reactiveValuesToList(input)[[paste0("TableName", 1:input$nTable)]]), function(n) {
+     sapply(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]), function(n) {
 
-       i = which(c(reactiveValuesToList(input)[[paste0("TableName", 1:input$nTable)]]) %in% n)
-      file <- input[[paste0("file", i)]]
-      ext <- tools::file_ext(file$datapath)
+       i = which(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]) %in% n)
+       file <- input[[paste0("file", i)]]
+       ext <- tools::file_ext(file$datapath)
 
-      req(file)
-      validate(need(ext == "csv", "Please upload a csv file"))
+       req(file)
+       validate(need(ext == "csv", "Please upload a csv file"))
 
-      data.table::fread(file$datapath,
-                        header = input[[paste0("header", i)]],
-                        sep = input[[paste0("cbSeparator", i)]])
-    }, simplify = F)
+       data.table::fread(file$datapath,
+                         header = input[[paste0("header", i)]],
+                         sep = input[[paste0("cbSeparator", i)]])
+     }, simplify = F)
 
   })
 
@@ -154,9 +154,9 @@ server <- function(input, output, session) {
   })
 
 
-  observeEvent(Data(), {output$test <- renderText({unlist(sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_")))})})
-  observeEvent(Data(), {output$test <-renderText({ paste(paste(names(Data())[1], colnames(Data()[[1]]), sep = "_"), collapse = "") })})
-  observeEvent(Data(), {output$test <-renderText({ paste(column_names(), collapse = "") })})
+  # observeEvent(Data(), {output$test <- renderText({unlist(sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_")))})})
+  # observeEvent(Data(), {output$test <-renderText({ paste(paste(names(Data())[1], colnames(Data()[[1]]), sep = "_"), collapse = "") })})
+  observeEvent(Data(), {output$test <-renderText({ paste(column_names(), collapse = " ") })})
 
   # create options to choose from:
 
