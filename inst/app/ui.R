@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table")
+list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table", "data.tree")
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -11,7 +11,38 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 lapply(as.list(list.of.packages), require, character.only = T)
 
 # source script to get VegX_tree
-source("data/My_VegX.R")
+# source("data/My_VegX.R")
+VegXtree <- readRDS("data/VegXtree.rds")
+VegXtree$Do(function(x) x$inputId <- gsub("/", "_", x$pathString))
+
+# tree <- ToListExplicit(VegXtree)
+tree <- cbind(ToDataFrameTypeCol(VegXtree), ToDataFrameTable(VegXtree, "name", "inputId", "annotation"))
+tree <- split(tree, factor(tree$level_2, levels = unique(tree$level_2)))
+
+my_pickerInput <- function(x) {
+  pickerInput(inputId = x$itemID ,
+              label =  div(h3(x$name2), p(x$annotation)),
+              choices = "")
+}
+
+my_lapply <- function(x) {
+  lapply(x, function(y) {
+    if(length(y) ==1) my_pickerInput(y) else my_dropdown(y)
+  })
+}
+
+
+my_dropdown <-     function(x) {
+  div(tags$h3(x$name), dropdown(
+    circle = F,
+    tooltip = T,
+
+    my_lapply(x[-1])
+
+  ))
+
+}
+
 
 
 
@@ -56,8 +87,7 @@ body <- dashboardBody(
                           max = NA
                           )
               ),
-              uiOutput("ui_uploadTables"),
-              textOutput("test")
+              uiOutput("ui_uploadTables")
             )
 
             #   column(width = 3,
@@ -85,52 +115,10 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
-
             fluidRow(
-              lapply(ToListSimple(tree)[-1], function(x) {
-                uiOutput(paste0("uiheaders_", x$name))
-
-                # my_dropdown(x)
-              #   box(tags$h3(x$name), dropdown(
-              #     circle = F,
-              #     tooltip = T,
-              #
-              #     lapply(x[-1], function(y) {
-              #
-              #       div(tags$h3(y$name), dropdown(
-              #         circle = F,
-              #         tooltip = T,
-              #
-              #         lapply(y[-1], function(z) {
-              #           if(length(z) ==1) {
-              #             pickerInput(inputId = z$name,
-              #                         label =  z$name,
-              #                         choices = names(iris))
-              #           } else {
-              #             div(tags$h3(z$name), dropdown(
-              #               circle = F,
-              #               tooltip = T,
-              #
-              #               lapply(z[-1], function(w) {
-              #               if(length(w) ==1) {
-              #                 pickerInput(inputId = w$name,
-              #                             label =  w$name,
-              #                             choices = names(iris))
-              #
-              #               } else {
-              #                 warning("more nested stuff")
-              #               }
-              #               })
-              #             ))
-              #           }
-              #         })
-              #       ))
-              #     })
-              #
-              #
-              #   ))
-              })
-            )
+            column(width = 12,
+              uiOutput("uiheader")
+            ))
             )
     ,
 

@@ -1,48 +1,14 @@
 
 # Fichier pour gérer les interactions de l'application Shiny
 
-
-# source the REquiredFormat function to get the list of arguments
-# source(paste0(dirname(dirname(getwd())), "/R/RequiredFormat.R")) # ***make this better!!**
-# x <- as.list(formals(RequiredFormat)[-1])
-
-# read in csv file that has all we want to show in app
-x <- read.csv("data/interactive_items.csv")
-x <- x[x$Activate, ]
-for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
-
-
 # source script to get VegX_tree
-source("data/My_VegX.R")
+# source("data/My_VegX.R")
+VegXtree <- readRDS("data/VegXtree.rds")
+VegXtree$Do(function(x) x$inputId <- gsub("/", "_", x$pathString))
 
-my_pickerInput <- function(x, choices) {
-  pickerInput(inputId = x$name,
-              label =  x$name,
-              choices = choices,
-              multiple = T)
-}
-
-my_lapply <- function(x, choices) {
-  lapply(x, function(y) {
-    if(length(y) ==1) my_pickerInput(y, choices) else my_dropdown(y, choices)
-  })
-}
-
-
-my_dropdown <-     function(x, choices) {
-  div(tags$h3(x$name), dropdown(
-    circle = F,
-    tooltip = T,
-
-    my_lapply(x[-1], choices)
-
-  ))
-
-}
-
-# install TreeData package
-# devtools::install_github("VincyaneBadouard/TreeData")
-library(TreeData)
+# tree <- ToListExplicit(VegXtree)
+tree <- cbind(ToDataFrameTypeCol(VegXtree), ToDataFrameTable(VegXtree, "name", "inputId", "annotation"))
+tree <- split(tree, factor(tree$level_2, levels = unique(tree$level_2)))
 
 server <- function(input, output, session) {
 
@@ -65,9 +31,9 @@ server <- function(input, output, session) {
                                             selected = "auto"
                                 ),
                                 textInput(inputId = paste0("TableName", i),
-                                          label = "Give an exmplicit UNIQUE name to this table. No space, no special character, no accent.",
+                                          label = "Give an explicit UNIQUE name to this table. No space, no special character, no accent.",
                                           value = paste0("Table", i)
-                                          )
+                                )
                             )
                      )
 
@@ -81,19 +47,19 @@ server <- function(input, output, session) {
   # read file and create data table
   Data <- reactive({
     req(input$file1)
-     sapply(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]), function(n) {
+    sapply(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]), function(n) {
 
-       i = which(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]) %in% n)
-       file <- input[[paste0("file", i)]]
-       ext <- tools::file_ext(file$datapath)
+      i = which(c(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]) %in% n)
+      file <- input[[paste0("file", i)]]
+      ext <- tools::file_ext(file$datapath)
 
-       req(file)
-       validate(need(ext == "csv", "Please upload a csv file"))
+      req(file)
+      validate(need(ext == "csv", "Please upload a csv file"))
 
-       data.table::fread(file$datapath,
-                         header = input[[paste0("header", i)]],
-                         sep = input[[paste0("cbSeparator", i)]])
-     }, simplify = F)
+      data.table::fread(file$datapath,
+                        header = input[[paste0("header", i)]],
+                        sep = input[[paste0("cbSeparator", i)]])
+    }, simplify = F)
 
   })
 
@@ -130,41 +96,124 @@ server <- function(input, output, session) {
     NoData = "No data has been submitted yet."
   )
 
-  output$ui1 <- renderUI({
-    p(text_reactive$NoData)
-  })
-  output$ui2 <- renderUI({
-    p(text_reactive$NoData)
-  })
-  output$ui3 <- renderUI({
-    p(text_reactive$NoData)
-  })
-  output$ui4 <- renderUI({
-    p(text_reactive$NoData)
-  })
 
-  column_names <- reactive({
-    req(Data)
-    sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_"))
-  })
+  # observe({
+  #     lapply(ToListSimple(tree)[-1], function(x) {
+  #
+  #   output[[paste0("uiheaders_", x$name)]] <-  renderUI({
+  #
+  #     choices <-  unlist(sapply(names(Data()), function(x) setNames(paste(x, colnames(Data()[[x]]), sep = "_"), paste(x, colnames(Data()[[x]]), sep = "_")), simplify = FALSE))
+  #
+  #     my_dropdown(x)
+  #   })
+  #
+  #
+  # })
+  # })
 
-  lapply(ToListSimple(tree)[-1], function(x) {
-    output[[paste0("uiheaders_", x$name)]] <-  renderUI({ my_dropdown(x, choices =column_names())})
+  observe({
 
-  })
+
+
+    output$uiheader <- renderUI({
+      choices <-  isolate(unlist(sapply(names(Data()), function(x) setNames(paste(x, colnames(Data()[[x]]), sep = "_"), paste(x, colnames(Data()[[x]]), sep = "_")), simplify = FALSE)))
+      lapply(tree, function(x) {
+      div(h2(x$level_2[1]),
+          lapply(1:nrow(x), function(i) {
+            pickerInput(inputId = x$inputId[i] ,
+                        label =  div(h4(x$name[i]), p(x$annotation[i])),
+                        choices = choices,
+                        inline = T)
+          })
+      )
+
+      # uiOutput(paste0("uiheaders_", x$name))
+
+      # my_dropdown(x)
+      #   box(tags$h3(x$name), dropdown(
+      #     circle = F,
+      #     tooltip = T,
+      #
+      #     lapply(x[-1], function(y) {
+      #
+      #       div(tags$h3(y$name), dropdown(
+      #         circle = F,
+      #         tooltip = T,
+      #
+      #         lapply(y[-1], function(z) {
+      #           if(length(z) ==1) {
+      #             pickerInput(inputId = z$name,
+      #                         label =  z$name,
+      #                         choices = names(iris))
+      #           } else {
+      #             div(tags$h3(z$name), dropdown(
+      #               circle = F,
+      #               tooltip = T,
+      #
+      #               lapply(z[-1], function(w) {
+      #               if(length(w) ==1) {
+      #                 pickerInput(inputId = w$name,
+      #                             label =  w$name,
+      #                             choices = names(iris))
+      #
+      #               } else {
+      #                 warning("more nested stuff")
+      #               }
+      #               })
+      #             ))
+      #           }
+      #         })
+      #       ))
+      #     })
+      #
+      #
+      #   ))
+    })})
+    # lapply(tree, function(x) {
+    #       lapply(1:nrow(x), function(i) {
+    #         updateSelectInput(inputId = x$itemID[i] ,
+    #                     # label =  div(h4(x$name[i]), p(x$annotation[i])),
+    #                     choices = choices
+    #                     )
+    #       })
+    #
+    # })
+
+    # }
+
+    })
+
+
+
+
+
+
+
+
+
+
+  # output$uiheader <- renderUI({
+  #   lapply(1:input$nTable, function(i) {
+  #     box(title = reactiveValuesToList(input)[paste0("TableName", i)],
+  #         lapply(colnames(Data()[[i]]), function(x) selectInput(inputId = paste(reactiveValuesToList(input)[paste0("TableName", i)], x, sep = "_"), label = x, choices = c("A", "B")))
+  #     )})
+  #
+  # })
+
+
 
 
   # observeEvent(Data(), {output$test <- renderText({unlist(sapply(names(Data()), function(x) paste(x, colnames(Data()[[x]]), sep = "_")))})})
   # observeEvent(Data(), {output$test <-renderText({ paste(paste(names(Data())[1], colnames(Data()[[1]]), sep = "_"), collapse = "") })})
-  observeEvent(Data(), {output$test <-renderText({ paste(column_names(), collapse = " ") })})
+  # observeEvent(Data(), {output$test <-renderText({ column_names() })})
 
   # create options to choose from:
 
   ColumnOptions <- eventReactive(Data(), { c("none", colnames(Data())) })
 
   UnitOptions <- eventReactive(Data(),
-                                {c("mm", "cm", "dm", "m")
-                                })
+                               {c("mm", "cm", "dm", "m")
+                               })
 
   AreaUnitOptions <- eventReactive(Data(),
                                    {c("m2", "ha", "km2")
@@ -253,7 +302,7 @@ server <- function(input, output, session) {
     # validate(
     #   need(req(DataFormated()), "AA")
     # )
-      DataFormated()
+    DataFormated()
   }, rownames = FALSE,
   options = list(pageLength = 8, scrollX=TRUE))
 
@@ -292,7 +341,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       text_upload <- glue::glue(
-      "
+        "
       # install TreeData package
       githubinstall::githubinstall('VincyaneBadouard/TreeData')
       library(TreeData)
