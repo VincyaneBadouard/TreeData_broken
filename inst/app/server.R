@@ -6,9 +6,14 @@
 VegXtree <- readRDS("data/VegXtree.rds")
 VegXtree$Do(function(x) x$inputId <- gsub("/", "_", x$pathString))
 
-# tree <- ToListExplicit(VegXtree)
+# tree <- ToListExplicit(VegXtree)$children
 tree <- cbind(ToDataFrameTypeCol(VegXtree), ToDataFrameTable(VegXtree, "name", "inputId", "annotation"))
 tree <- split(tree, factor(tree$level_2, levels = unique(tree$level_2)))
+choices <- sapply(tree, "[[", "name")
+subtext <- unlist(sapply(tree, "[[", "annotation"))
+subtext <- stringr::str_wrap(subtext, width = 75)
+subtext <- paste("<strong>", unlist(choices), "</strong>", stringr::str_replace_all(subtext, "\\n", "<br>"))
+
 
 server <- function(input, output, session) {
 
@@ -97,108 +102,49 @@ server <- function(input, output, session) {
   )
 
 
+
   # observe({
-  #     lapply(ToListSimple(tree)[-1], function(x) {
   #
-  #   output[[paste0("uiheaders_", x$name)]] <-  renderUI({
   #
-  #     choices <-  unlist(sapply(names(Data()), function(x) setNames(paste(x, colnames(Data()[[x]]), sep = "_"), paste(x, colnames(Data()[[x]]), sep = "_")), simplify = FALSE))
   #
-  #     my_dropdown(x)
+  #   output$uiheader <- renderUI({
+  #     choices <-  isolate(unlist(sapply(names(Data()), function(x) setNames(paste(x, colnames(Data()[[x]]), sep = "_"), paste(x, colnames(Data()[[x]]), sep = "_")), simplify = FALSE)))
+  #     lapply(tree, function(x) {
+  #     div(h2(x$level_2[1]),
+  #         lapply(1:nrow(x), function(i) {
+  #           pickerInput(inputId = x$inputId[i] ,
+  #                       label =  div(h4(x$name[i]), p(x$annotation[i])),
+  #                       choices = choices,
+  #                       inline = T)
+  #         })
+  #     )
+  #
+  #
+  #   })})
+  #
+  #
   #   })
-  #
-  #
-  # })
-  # })
-
-  observe({
-
-
-
-    output$uiheader <- renderUI({
-      choices <-  isolate(unlist(sapply(names(Data()), function(x) setNames(paste(x, colnames(Data()[[x]]), sep = "_"), paste(x, colnames(Data()[[x]]), sep = "_")), simplify = FALSE)))
-      lapply(tree, function(x) {
-      div(h2(x$level_2[1]),
-          lapply(1:nrow(x), function(i) {
-            pickerInput(inputId = x$inputId[i] ,
-                        label =  div(h4(x$name[i]), p(x$annotation[i])),
-                        choices = choices,
-                        inline = T)
-          })
-      )
-
-      # uiOutput(paste0("uiheaders_", x$name))
-
-      # my_dropdown(x)
-      #   box(tags$h3(x$name), dropdown(
-      #     circle = F,
-      #     tooltip = T,
-      #
-      #     lapply(x[-1], function(y) {
-      #
-      #       div(tags$h3(y$name), dropdown(
-      #         circle = F,
-      #         tooltip = T,
-      #
-      #         lapply(y[-1], function(z) {
-      #           if(length(z) ==1) {
-      #             pickerInput(inputId = z$name,
-      #                         label =  z$name,
-      #                         choices = names(iris))
-      #           } else {
-      #             div(tags$h3(z$name), dropdown(
-      #               circle = F,
-      #               tooltip = T,
-      #
-      #               lapply(z[-1], function(w) {
-      #               if(length(w) ==1) {
-      #                 pickerInput(inputId = w$name,
-      #                             label =  w$name,
-      #                             choices = names(iris))
-      #
-      #               } else {
-      #                 warning("more nested stuff")
-      #               }
-      #               })
-      #             ))
-      #           }
-      #         })
-      #       ))
-      #     })
-      #
-      #
-      #   ))
-    })})
-    # lapply(tree, function(x) {
-    #       lapply(1:nrow(x), function(i) {
-    #         updateSelectInput(inputId = x$itemID[i] ,
-    #                     # label =  div(h4(x$name[i]), p(x$annotation[i])),
-    #                     choices = choices
-    #                     )
-    #       })
-    #
-    # })
-
-    # }
-
-    })
 
 
 
 
 
 
+  observeEvent(input$submit, {
+  output$uiheader <- renderUI({
+
+    lapply(1:isolate(input$nTable), function(i) {
+      X <- isolate(colnames(Data()[[i]]))
+      title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
+      box(title = title,
+          lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(liveSearch =T, width = F), choicesOpt = list(content = subtext)))
+      )})
 
 
+  })
 
-
-  # output$uiheader <- renderUI({
-  #   lapply(1:input$nTable, function(i) {
-  #     box(title = reactiveValuesToList(input)[paste0("TableName", i)],
-  #         lapply(colnames(Data()[[i]]), function(x) selectInput(inputId = paste(reactiveValuesToList(input)[paste0("TableName", i)], x, sep = "_"), label = x, choices = c("A", "B")))
-  #     )})
-  #
-  # })
+  updateTabItems(session, "tabs", "headers")
+  })
 
 
 

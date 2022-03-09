@@ -52,7 +52,7 @@ header <- dashboardHeader(title = "Data harmonisation")
 # sidebar contains menu items
 sidebar <- dashboardSidebar(
   useShinyjs(),
-  sidebarMenu(
+  sidebarMenu(id = "tabs",
               menuItem("Upload your file(s)", tabName = "Upload", icon = icon("upload")),
               menuItem("Identify headers", tabName = "headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
@@ -87,7 +87,14 @@ body <- dashboardBody(
                           max = NA
                           )
               ),
-              uiOutput("ui_uploadTables")
+              uiOutput("ui_uploadTables"),
+              actionBttn(
+                inputId = "submit",
+                label = "submit",
+                style = "material-flat",
+                color = "success"
+              )
+
             )
 
             #   column(width = 3,
@@ -115,7 +122,7 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
-            fluidRow(
+            fluidRow(h5("This may take a few seconds to show..."),
             column(width = 12,
               uiOutput("uiheader")
             ))
