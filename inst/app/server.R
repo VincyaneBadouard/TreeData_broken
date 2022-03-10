@@ -4,16 +4,29 @@
 # source script to get VegX_tree
 # source("data/My_VegX.R")
 VegXtree <- readRDS("data/VegXtree.rds")
-VegXtree$Do(function(x) x$inputId <- gsub("/", "_", x$pathString))
+VegXtree$Do(function(x) x$inputId <-gsub("/", "_", x$pathString))
 
 # tree <- ToListExplicit(VegXtree)$children
 tree <- cbind(ToDataFrameTypeCol(VegXtree), ToDataFrameTable(VegXtree, "name", "inputId", "annotation"))
-tree <- split(tree, factor(tree$level_2, levels = unique(tree$level_2)))
-choices <- sapply(tree, "[[", "name")
-subtext <- unlist(sapply(tree, "[[", "annotation"))
-subtext <- stringr::str_wrap(subtext, width = 75)
-subtext <- paste("<strong>", unlist(choices), "</strong>", stringr::str_replace_all(subtext, "\\n", "<br>"))
 
+tree$subtext <- paste("<strong>", tree$name, "</strong>", stringr::str_replace_all( stringr::str_wrap(tree$annotation, width = 50), "\\n", "<br>"))
+# tree <- tree[tree$name != "NULL",] # remove "NULL names
+tree <- split(tree, factor(tree$level_2, levels = unique(tree$level_2)))
+
+choices <- sapply(tree, function(x) setNames(as.list(gsub("VegX_", "", x$inputId)), x$name))
+subtext <- unlist(sapply(tree, "[[", "subtext"), recursive = T)
+
+# subtext <- unlist(sapply(tree, "[[", "annotation"))
+# subtext <- stringr::str_wrap(subtext, width = 75)
+# subtext <- paste("<strong>", unlist(choices), "</strong>", stringr::str_replace_all(subtext, "\\n", "<br>"))
+
+# level3 <-  sapply(tree, "[[", "level_3")
+# choices <- mapply(FUN = function(x, y) split(x, factor(y, levels = unique(y))), x = choices, y = level3)
+# subtext <- mapply(FUN = function(x, y) split(x, factor(y, levels = unique(y))), x = subtext, y = level3)
+
+# test to show we can only have 1 2 levels of nestedness
+# choices = list(A = c("A", B = c("b", "B")), C = c("C", "D"))
+# subtext = unlist(choices)
 
 server <- function(input, output, session) {
 
@@ -136,9 +149,12 @@ server <- function(input, output, session) {
     lapply(1:isolate(input$nTable), function(i) {
       X <- isolate(colnames(Data()[[i]]))
       title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
-      box(title = title,
-          lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(liveSearch =T, width = F), choicesOpt = list(content = subtext)))
-      )})
+      box(
+        title = title,
+        lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(liveSearch =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
+
+      )
+      })
 
 
   })

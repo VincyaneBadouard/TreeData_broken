@@ -68,9 +68,8 @@ body <- dashboardBody(
       HTML(".shiny-notification {
              position:fixed;
              top: calc(10%);
-             left: calc(25%);
-             }
-             "
+             left: calc(25%);}
+             .dropdown-menu span {width: 94%;}"
       )
     ) # to make notification show up at top of page
   ),
@@ -122,9 +121,13 @@ body <- dashboardBody(
     ),  ## end of "upload" panel
 
     tabItem(tabName = "headers",
-            fluidRow(h5("This may take a few seconds to show..."),
-            column(width = 12,
-              uiOutput("uiheader")
+            fluidRow(
+              column(width = 12,
+                     h5("This may take a few seconds to show..."),
+                     br(),
+                     h4("In the menus below, select the option(s) that apply to each of your columns."),
+                     p("Multiple choice allowed -  To clear a field, deselect all of the options."),
+                     uiOutput("uiheader")
             ))
             )
     ,
