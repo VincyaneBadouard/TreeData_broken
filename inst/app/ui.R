@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table", "data.tree")
+list.of.packages <- c("shiny","bslib","shinydashboard","shinyjs", "shinyWidgets", "data.tree", "stringr") # "data.table",
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -8,7 +8,13 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 # if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
 
 # load required packages' libraries
-lapply(as.list(list.of.packages), require, character.only = T)
+# lapply(as.list(list.of.packages), library, character.only = T)
+library(shinydashboard)
+library(shiny)
+library(shinyjs)
+library(shinyWidgets)
+library(data.tree)
+library(stringr)
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")

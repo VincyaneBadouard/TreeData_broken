@@ -103,11 +103,11 @@ server <- function(input, output, session) {
 
 
   # render data table
-  output$tabData <- renderDT({
-    if (!is.null(input$file0$name))
-      Data()
-  }, rownames = FALSE,
-  options = list(pageLength = 8, scrollX=TRUE))
+  # output$tabData <- renderDT({
+  #   if (!is.null(input$file0$name))
+  #     Data()
+  # }, rownames = FALSE,
+  # options = list(pageLength = 8, scrollX=TRUE))
 
   # Avoid seeing errors
   text_reactive <- reactiveValues(
