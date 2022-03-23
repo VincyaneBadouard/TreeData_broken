@@ -1,0 +1,186 @@
+---
+title: "DiameterCorrection"
+author: "Vincyane Badouard"
+date: "16/03/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Inspiration: adaptation from Camille Piponiot's and Nino Page (ForestData package) original correction functions.
+
+Return: Create the 'DBHCor' column and fill the 'Comment' column
+et col pour le type de cor ?
+
+DBH : diameter in cm
+
+
+# Packages libraries
+```{r, include = FALSE}
+library(TreeData)
+library(data.table)
+# importfrom utils::txtProgressBar
+```
+
+# Import data & other inputs
+```{r}
+data("TestData") # import data
+# INPUTS
+Data = TestData
+## data.frame to data.table
+setDT(Data) # with "set" "<-" is not necessary
+
+# Args
+PositiveGrowthThreshold = 5 # (numeric, 1 value) in cm
+NegativeGrowthThreshold = -2 # (numeric, 1 value) in cm
+DefaultPOM = 1.3 # (numeric, 1 value) in m
+Pioneers = c("Cecropia","Pourouma") # verna or scfic names ? (characters vector)
+PioneersTreshold = 7.5  # (numeric, 1 value) in cm
+IgnorePOM = FALSE # (logical) est-ce que je garde ?
+DetectOnly = FALSE # (logical)
+
+```
+
+# Ask to the user
+
+# Check args
+```{r}
+# Data
+if (!inherits(Data, c("data.table", "data.frame")))
+  stop("Data must be a data.frame or data.table")
+
+# PositiveGrowthThreshold/NegativeGrowthThreshold/PioneersTreshold/DefaultPOM (numeric, 1 value)
+if(!all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultPOM, PioneersTreshold),
+                      length)) %in% 1) |
+   !all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultPOM, PioneersTreshold),
+                      inherits, c("numeric", "integer")))))
+  stop("The 'PositiveGrowthThreshold', 'NegativeGrowthThreshold', 'PioneersTreshold' and 'DefaultPOM' arguments
+         of the 'DiameterCorrection' function must be 1 numeric value each")
+
+# Pioneers (characters vector)
+if (!inherits(Pioneers, "character"))
+  stop("'Pioneers' argument of the 'DiameterCorrection' function must be a characters vector")
+
+# IgnorePOM/DetectOnly (logical)
+if(!all(unlist(lapply(list(IgnorePOM, DetectOnly),
+                      inherits, "logical"))))
+  stop("The 'IgnorePOM' and 'DetectOnly' arguments
+         of the 'DiameterCorrection' function must be logicals")
+
+# DBH column exists
+if(!DBH %in% names(Data))
+  stop("The 'DBH' (Diameter at Breast Height) column does't exist in the dataset")
+
+```
+
+# Errors detection
+```{r}
+# Missing measure
+Vars <- c("DBH", "POM")
+
+for (v in 1:length(Vars)) {
+  
+  if(Vars[v] %in% names(Data)){ # If the column exists
+    
+    Data <- GenerateComment(Data,
+                            condition = is.na(Data[,get(Vars[v])]),
+                            comment = paste0("Missing value in ", Vars[v]))
+  }
+}
+
+```
+
+# POM translation (pas encore adapté)
+Default POM : 1.3m
+Si le POM est diférent en général il est plus élevé (au dessus des contreforts),
+mais pourrait être inférieur si on a du éviter un obstacle par ex
+
+```{r}
+# cresc = annual size difference
+
+if(!all(POM %in% DefaultPOM)){ # if any POMs are different to the default POM
+  
+  POM_diff <- diff(POM) # differences between POMs
+  
+  # Rows with a different POM
+  Shifts <- which(!is.na(POM_diff) & POM_diff != 0) 
+  
+  for(s in Shifts){ # s = rows id with a POM different to the default
+    
+    existing <- c(s-2, s-1, s+1, s+2) # 2 rows before and 2 after
+    existing <- existing[existing > 0 & existing <= length(cresc)] # "0" rows doesn't exist, we can't take it. length(POM) = length(size difference)
+    existing <- existing[cresc[existing] > negative_growth_threshold &
+                           cresc[existing] < positive_growth_threshold] #Because we don't want to use outliers to compute expected growth...
+    
+    meancresc <- max(mean(cresc[existing], na.rm = TRUE), 0) # annual size diff (positive) mean
+    
+    # Correction from POM
+    correction <- max(size_corr[s] - size_corr[s+1], 0) + (meancresc*(time[s+1]-time[s]))
+    # if size increases (max = 0), correction =  (meancresc*(time[s+1]-time[s]))
+    # if size decreases, correction = lost size + (meancresc*(time[s+1]-time[s]))
+    # size evolution (= size at t0 - size at t1) or 0 + annual size diff mean * years nbr between 2 censuses
+    
+    size_corr[(s+1):length(size_corr)] <- (size_corr[(s+1):length(size_corr)]) + correction
+    code_corr[(s+1):length(code_corr)] <- ifelse(code_corr[(s+1):length(code_corr)] == 0, # if no code
+                                                 "POM",
+                                                 paste(code_corr[(s+1):length(code_corr)], "POM", sep = "+"))
+  }
+  
+}
+```
+
+
+# Errors correction per tree (lire .correct_size_tree)
+Si l'arbre est une sp pionnière prendre le threshold approprié
+```{r}
+if(DetectOnly %in% FALSE){
+  
+  
+}
+
+```
+
+# Errors correction for all trees
+```{r}
+# Create the DBHCor column (check that it does not already exist) et col pour le type de cor ?
+
+# data.frame to data.table
+setDT(Data)
+
+# Tag pioneer sp (T/F) (A FAIRE)
+# if VernName %in% Pioneers -> TRUE
+if(!PioneerSp %in% names(Data))
+  Data[, PioneerSp := ifelse(VernName %in% Pioneers, TRUE, FALSE)]
+
+# Order IdTrees and times in ascending order
+Data <- Data[order(IdTree, CensusYear)]
+
+# IdTrees vector
+Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
+
+# Dataset with the rows without IdTree
+DataIDNa <-  Data[is.na(IdTree)]
+
+# Apply for all the trees
+pb <- utils::txtProgressBar(min = 0, max = length(Ids), style = 3) # a progress bar per id
+
+# i = "100635"
+Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
+  Data[IdTree %in% i], # per IdTree, all censuses
+  Censuses = as.vector(na.omit( # rm NA
+    unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
+  )),
+  DetectOnly = DetectOnly
+)
+)) # do.call apply the 'rbind' to the lapply result
+
+close(pb) # close the progress bar
+
+
+# Re-put the the rows without IdTree
+Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
+
+```
+

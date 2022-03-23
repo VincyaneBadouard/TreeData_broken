@@ -37,3 +37,7 @@ A BibTeX entry for LaTeX users is
     year = {2022},
     note = {R package version 0.0.0.9000},
     url = {https://github.com/VincyaneBadouard/TreeData.git},
+    
+# To contribute
+
+How do you correct your forest data? Survey: https://forms.gle/huFGUo1TR31bEMKp8
