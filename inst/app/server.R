@@ -122,7 +122,7 @@ server <- function(input, output, session) {
       title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
       box(
         title = title,
-        lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(liveSearch =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
+        lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(`live-search` =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
 
       )
       })
