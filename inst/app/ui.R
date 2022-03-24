@@ -153,19 +153,37 @@ body <- dashboardBody(
               column(width = 12,
 
                      h1("Merging tables"),
-                     h3("Select the tables that need to be merged and the key to merge them. ATTENTION: the table on the left should be the most exhaustive table (the one you want to keep all the rows from."),
-                     actionButton("addMerge", "Add a Merging relationship"),
+                     h4("Select the tables that need to be merged and the key to merge them."),
+                     h4("The table on the left should be the most exhaustive table (the one you want to keep all the rows from."),
+                     # actionButton("addMerge", "Add a Merging relationship"),
                      # uiOutput("MergeTablesUI"),
-                     textOutput("test"),
-                     verbatimTextOutput("test2"),
+                     # textOutput("test"),
+                     # verbatimTextOutput("test2"),
                      # checkboxGroupButtons("TablesToMerge", choices = ""),
 
-                     # box(width = 12,
-                     # column(3, selectInput("leftTable", "Take table", choices = "")),
-                     # column(3, selectInput("rightTable", "add to it this table", choices = "")),
-                     # column(3, selectInput("leftKey", "Using this column(s) from first table", choices = "", multiple = T)),
-                     # column(3,  selectInput("rightKey", "and this column(s) from second table", choices = "", multiple = T))
-                     # ),
+                     box(width = 12,
+
+                         fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
+                                  column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(6,  pickerInput("leftKey", "Using this/these column(s) - ORDER MATTERS", choices = "", multiple = T))),
+
+                         fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
+                                  column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(6,  pickerInput("rightKey", "Using this/these column(s) - ORDER MATTERS", choices = "", multiple = T)))
+                     #
+                     #     fluidRow(column(3, pickerInput("rightTable", "Take table", choices = "")),
+                     #              column(3,actionBttn("selectRight", "ok")))
+                     #
+                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
+                     #              column(3,actionBttn("selectLeft", "ok")))
+                     #
+                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
+                     #              column(3,actionBttn("selectLeft", "ok")))
+                     #
+                     # column(3, pickerInput("rightTable", "add to it this table", choices = "")),
+                     # column(3, pickerInput("leftKey", "Using this column(s) from first table", choices = "", multiple = T)),
+                     # column(3,  pickerInput("rightKey", "and this column(s) from second table", choices = "", multiple = T))
+                     ),
 
                      actionBttn(
                        inputId = "Merge",

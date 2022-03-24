@@ -103,15 +103,15 @@ server <- function(input, output, session) {
 
   # stack tables ####
 
-  stackedTables <- eventReactive(input$Stack, {
+  StackedTables <<- eventReactive(input$Stack, {
     do.call(rbind, Data()[input$TablesToStack])
   })
 
   observeEvent(input$Stack, {
-    output$stackedTables <- renderDT(stackedTables(), rownames = FALSE,
+    output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
                                      options = list(pageLength = 8, scrollX=TRUE))
 
-    output$stackedTablesSummary <- renderPrint(summary(stackedTables()))
+    output$StackedTablesSummary <- renderPrint(summary(StackedTables()))
     insertUI("#Stack", "afterEnd",
              actionBttn(
                inputId = "GoToMerge",
@@ -129,58 +129,82 @@ server <- function(input, output, session) {
 
     updateTabItems(session, "tabs", "Merging")
 
+    # if(is.null(input$TablesToStack)) {
+    options_to_merge <- names(Data())
+    column_options_list <- sapply(Data(), colnames)
+    # }
+
+    if(!is.null(input$TablesToStack)){
+      options_to_merge <- c(names(Data())[!names(Data()) %in% input$TablesToStack], "StackedTables")
+      column_options_list <- sapply(Data(), colnames)
+      column_options_list[names(Data()) %in% input$TablesToStack] <- NULL
+      column_options_list <- c(column_options_list, StackedTables = list(colnames(StackedTables())))
+
+    }
+        updatePickerInput(session, "leftTable", choices = options_to_merge, selected =  "")
+        updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
+
+        observeEvent(input$selectLeft, {
+        updatePickerInput(session, "leftKey", choices = column_options_list[[input$leftTable]])
+})
+
+        observeEvent(input$selectRight, {
+          updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
+        })
+
+  })
+
+  observeEvent(input$Merge, {
+
+    if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
+    if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
+
+    m <- merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
+
+
+    output$mergedTables <- renderDT(m, rownames = FALSE,
+                                    options = list(pageLength = 8, scrollX=TRUE))
+
   })
 
 
-  observeEvent(input$addMerge, {
-        insertUI(
-        selector = "#addMerge",
-        where = "afterEnd",
-        ui =
-          tags$div(
-            box(width = 12,
-                column(3, selectInput(paste0("leftTable", input$add), "Take table", choices = "")),
-                column(3, selectInput(paste0("rightTable", input$add), "add to it this table", choices = "")),
-                column(3, selectInput(paste0("leftKey", input$add), "Using this column(s) from first table", choices = "", multiple = T)),
-                column(3,  selectInput(paste0("rightKey", input$add), "and this column(s) from second table", choices = "", multiple = T))
-            )
-          )
-      )
-  })
-
-  #   # if(is.null(input$TablesToStack)) {
-  #     options_to_merge <- names(Data())
-  #     column_options_list <- sapply(Data(), colnames)
-  #   # }
-  #
-  #   if(!is.null(input$TablesToStack)){
-  #     options_to_merge <- c(names(Data())[!names(Data()) %in% input$TablesToStack], "StackedTables")
-  #     column_options_list <- sapply(Data(), colnames)
-  #     column_options_list[names(Data()) %in% input$TablesToStack] <- NULL
-  #     column_options_list <- c(column_options_list, StackedTables = list(colnames(stackedTables())))
-  #
-  #   }
-  #     updateSelectInput(session, "leftTable", choices = options_to_merge)
-  #     updateSelectInput(session, "rightTable", choices = options_to_merge)
-  #
-  #     updateSelectInput(session, "leftKey", label = paste("Using this column(s) from", input$leftTable), choices = column_options_list[[input$leftTable]])
-  #     updateSelectInput(session, "rightKey",  label = paste("and this column(s) from", input$rightTable), choices = column_options_list[[input$rightTable]])
-  #
-  #
-  #
-  #
-  #
-  # output$test <- renderText(options_to_merge)
-  # output$test2 <- renderPrint(column_options_list)
-  # })
+#   values <- reactiveValues(n_merge = 0)
+#
+# # add a merge
+#   observeEvent(input$addMerge, {
+#
+#
+#     values$n_merge <- values$n_merge + 1
+#     add <- values$n_merge
+#
+#   insertUI(
+#         selector = "#addMerge",
+#         where = "afterEnd",
+#         ui =
+#           tags$div(
+#             box(width = 12,
+#                 column(3, selectInput(paste0("leftTable", input$add), "Take table", choices = options_to_merge)),
+#                 column(3, selectInput(paste0("rightTable", input$add), "add to it this table", choices = options_to_merge)),
+#                 column(3, selectInput(paste0("leftKey", input$add), "Using this column(s) from first table", choices = "", multiple = T)),
+#                 column(3,  selectInput(paste0("rightKey", input$add), "and this column(s) from second table", choices = "", multiple = T))
+#                 ),
+#                 box(
+#                   title = "inputID", width = 12, background = "black",
+#
+#                   paste0("Number_Product1_", input$add))  #### inputID's of the selectizeinput "Product 1"
+#
+#
+#           )
+#       )
+#
+#   output$test <- renderText(input$add)
+#
+#
+#   })
 
 
 
 
-  # output$MergeTablesUI <- renderUI({
-
-
-  # })
 
 
   # submit tables
