@@ -23,6 +23,11 @@ Return: Create the 'LifeStatusCor' column and fill the 'Comment' column
 if DeathConfirmation > unseens -> NA
 if DeathConfirmation =< unseens -> Dead
 
+Tests :
+- pas de dead avant alive
+- pas de NA entre le 1er et le dernier alive
+- après la mort toujours la mort
+- si pas de mort recensée mais nbr de NA >= à la DeathConfirmation -> dead dans la colonne corrigée 
 
 # Packages libraries
 ```{r, include = FALSE}
