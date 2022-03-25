@@ -22,7 +22,7 @@ sidebar <- dashboardSidebar(
               menuItem("Upload your file(s)", tabName = "Upload", icon = icon("upload")),
               menuItem("Stack tables", tabName = "Stacking", icon = icon("layer-group")),
               menuItem("Merge tables", tabName = "Merging", icon = icon("key")),
-              menuItem("Check merging", tabName = "ViewMerging", icon = icon("check")),
+              menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
               menuItem("Identify headers", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
@@ -113,23 +113,43 @@ body <- dashboardBody(
 
                        h1("Stacking tables"),
                        h3("Select the tables that have the same set of columns and can be stacked on top of each other (e.g. one table per census, or one table per plot etc...)"),
-                      code("If you have no tables to stack, please, move to next tab."),
+                      code("If you have no tables to stack, skip this step."),
                       checkboxGroupButtons("TablesToStack", choices = ""),
                       actionBttn(
                         inputId = "Stack",
                         label = "Stack tables",
                         style = "material-flat",
                         color = "success"
-                      )
+                      ),
+                      actionBttn(
+                        inputId = "SkipStack",
+                        label = "Skip this step",
+                        style = "material-flat",
+                        color = "warning"
+                      ),
+                      # insertUI("#Stack", "afterEnd",
+                     hidden( actionBttn(
+                        inputId = "GoToMerge",
+                        label = "Go To Merge",
+                        style = "material-flat",
+                        color = "success"
+                      ),
+                      actionBttn(
+                        inputId = "SkipMerge",
+                        label = "Skip Merging since all your data is now stacked",
+                        style = "material-flat",
+                        color = "warning"
+                      ))
+                      #)
                 )
                 ),
               fluidRow(
 
                 column(width = 12,
                        h4("summary of your stacked tables:"),
-                       verbatimTextOutput("stackedTablesSummary"),
+                       verbatimTextOutput("StackedTablesSummary"),
                        h4("View of your stacked tables:"),
-                       DTOutput(outputId = "stackedTables"),
+                       DTOutput(outputId = "StackedTables"),
                 )
                 # ,
                 # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
@@ -190,7 +210,13 @@ body <- dashboardBody(
                        label = "Merge tables",
                        style = "material-flat",
                        color = "success"
-                     )
+                     ),
+                     hidden( actionBttn(
+                       inputId = "GoToTidy",
+                       label = "Go To Tidy",
+                       style = "material-flat",
+                       color = "success"
+                     ))
               )
             ),
             fluidRow(
@@ -207,6 +233,50 @@ body <- dashboardBody(
 
 
     ),  ## end of "Merging" panel
+
+    tabItem(tabName = "Tidying",
+            h3("This is where we want to make your data 'tidy'. this means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
+            h4("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
+            h5("This is called wide-to-long reshaping."),
+            h4("If you already have one observation per row, skip this step"),
+
+            box(
+            textInput("ValueName", "What type of measurement is repeated horizontally? (Give a column name without space)", value = "DBH"),
+            radioButtons(
+              "VariableName",
+              "What is the meaning of the repeated column?",
+              choices = c("CensusID", "CensusYear", "POM", "StemID"),
+              selected = "",
+              inline = FALSE
+            ),
+            actionButton("ClearValueName","Clear"),
+            pickerInput("Variablecolumns", label = "Select the columns that are repeats of measurements", choices = "", multiple = T, options = list(size = 10)),
+            ),
+            actionBttn(
+              inputId = "Tidy",
+              label = "Tidy",
+              style = "material-flat",
+              color = "success"
+            ),
+
+
+            actionBttn(
+              inputId = "SkipTidy",
+              label = "Skip this step",
+              style = "material-flat",
+              color = "warning"
+            ),
+            fluidRow(
+
+              column(width = 12,
+                     h4("summary of your tidy table:"),
+                     verbatimTextOutput("TidyTableSummary"),
+                     h4("View of your tidy table:"),
+                     DTOutput(outputId = "TidyTable")
+              ))
+
+
+            ), ## end of "Tidy" panel
     tabItem(tabName = "Headers",
             fluidRow(
               # inform if profile already exists
