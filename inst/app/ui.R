@@ -22,7 +22,7 @@ sidebar <- dashboardSidebar(
               menuItem("Upload your file(s)", tabName = "Upload", icon = icon("upload")),
               menuItem("Stack tables", tabName = "Stacking", icon = icon("layer-group")),
               menuItem("Merge tables", tabName = "Merging", icon = icon("key")),
-              menuItem("Check merging", tabName = "ViewMerging", icon = icon("check")),
+              menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
               menuItem("Identify headers", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
@@ -113,23 +113,43 @@ body <- dashboardBody(
 
                        h1("Stacking tables"),
                        h3("Select the tables that have the same set of columns and can be stacked on top of each other (e.g. one table per census, or one table per plot etc...)"),
-                      code("If you have no tables to stack, please, move to next tab."),
+                      code("If you have no tables to stack, skip this step."),
                       checkboxGroupButtons("TablesToStack", choices = ""),
                       actionBttn(
                         inputId = "Stack",
                         label = "Stack tables",
                         style = "material-flat",
                         color = "success"
-                      )
+                      ),
+                      actionBttn(
+                        inputId = "SkipStack",
+                        label = "Skip this step",
+                        style = "material-flat",
+                        color = "success"
+                      ),
+                      # insertUI("#Stack", "afterEnd",
+                     hidden( actionBttn(
+                        inputId = "GoToMerge",
+                        label = "Go To Merge",
+                        style = "material-flat",
+                        color = "success"
+                      ),
+                      actionBttn(
+                        inputId = "SkipMerge",
+                        label = "Skip Merging since all your data is now stacked",
+                        style = "material-flat",
+                        color = "success"
+                      ))
+                      #)
                 )
                 ),
               fluidRow(
 
                 column(width = 12,
                        h4("summary of your stacked tables:"),
-                       verbatimTextOutput("stackedTablesSummary"),
+                       verbatimTextOutput("StackedTablesSummary"),
                        h4("View of your stacked tables:"),
-                       DTOutput(outputId = "stackedTables"),
+                       DTOutput(outputId = "StackedTables"),
                 )
                 # ,
                 # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
@@ -190,7 +210,13 @@ body <- dashboardBody(
                        label = "Merge tables",
                        style = "material-flat",
                        color = "success"
-                     )
+                     ),
+                     hidden( actionBttn(
+                       inputId = "GoToTidy",
+                       label = "Go To Tidy",
+                       style = "material-flat",
+                       color = "success"
+                     ))
               )
             ),
             fluidRow(
@@ -207,6 +233,9 @@ body <- dashboardBody(
 
 
     ),  ## end of "Merging" panel
+
+    tabItem(tabName = "Tidying",
+            h2("We need to know something...")), ## end of "Tidy" panel
     tabItem(tabName = "Headers",
             fluidRow(
               # inform if profile already exists

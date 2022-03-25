@@ -108,20 +108,33 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$Stack, {
+    shinyjs::hide("SkipStack")
+
     output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
                                      options = list(pageLength = 8, scrollX=TRUE))
 
     output$StackedTablesSummary <- renderPrint(summary(StackedTables()))
-    insertUI("#Stack", "afterEnd",
-             actionBttn(
-               inputId = "GoToMerge",
-               label = "Go To Merge",
-               style = "material-flat",
-               color = "success"
-             ))
+
+
+    if(all(names(Data()) %in% input$TablesToStack)) {
+
+      shinyjs::show("SkipMerge")
+      shinyjs::hide("GoToMerge")
+    } else {
+
+      shinyjs::show("GoToMerge")
+      shinyjs::hide("SkipMerge")
+
+    }
+
   })
 
+  observe({
+    if(is.null(input$TablesToStack))   shinyjs::show("SkipStack")
+    if(!is.null(input$TablesToStack))   shinyjs::hide("SkipStack")
+  })
 
+  observeEvent(input$SkipStack, { updateTabItems(session, "tabs", "Merging")})
   # merge tables ####
 
   observeEvent(input$GoToMerge, {
@@ -129,14 +142,16 @@ server <- function(input, output, session) {
 
     updateTabItems(session, "tabs", "Merging")
 
+
+
     # if(is.null(input$TablesToStack)) {
     options_to_merge <- names(Data())
-    column_options_list <- sapply(Data(), colnames)
+    column_options_list <- lapply(Data(), colnames)
     # }
 
     if(!is.null(input$TablesToStack)){
+
       options_to_merge <- c(names(Data())[!names(Data()) %in% input$TablesToStack], "StackedTables")
-      column_options_list <- sapply(Data(), colnames)
       column_options_list[names(Data()) %in% input$TablesToStack] <- NULL
       column_options_list <- c(column_options_list, StackedTables = list(colnames(StackedTables())))
 
@@ -152,6 +167,8 @@ server <- function(input, output, session) {
           updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
         })
 
+
+
   })
 
   observeEvent(input$Merge, {
@@ -165,6 +182,18 @@ server <- function(input, output, session) {
     output$mergedTables <- renderDT(m, rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE))
 
+    shinyjs::show("GoToTidy")
+
+  })
+
+
+  # tidy tables ####
+  observeEvent(input$GoToTidy, {
+    updateTabItems(session, "tabs", "Tidying")
+  })
+
+  observeEvent(input$SkipMerge, {
+    updateTabItems(session, "tabs", "Tidying")
   })
 
 
