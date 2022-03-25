@@ -125,7 +125,7 @@ body <- dashboardBody(
                         inputId = "SkipStack",
                         label = "Skip this step",
                         style = "material-flat",
-                        color = "success"
+                        color = "warning"
                       ),
                       # insertUI("#Stack", "afterEnd",
                      hidden( actionBttn(
@@ -138,7 +138,7 @@ body <- dashboardBody(
                         inputId = "SkipMerge",
                         label = "Skip Merging since all your data is now stacked",
                         style = "material-flat",
-                        color = "success"
+                        color = "warning"
                       ))
                       #)
                 )
@@ -235,7 +235,48 @@ body <- dashboardBody(
     ),  ## end of "Merging" panel
 
     tabItem(tabName = "Tidying",
-            h2("We need to know something...")), ## end of "Tidy" panel
+            h3("This is where we want to make your data 'tidy'. this means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
+            h4("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
+            h5("This is called wide-to-long reshaping."),
+            h4("If you already have one observation per row, skip this step"),
+
+            box(
+            textInput("ValueName", "What type of measurement is repeated horizontally? (Give a column name without space)", value = "DBH"),
+            radioButtons(
+              "VariableName",
+              "What is the meaning of the repeated column?",
+              choices = c("CensusID", "CensusYear", "POM", "StemID"),
+              selected = "",
+              inline = FALSE
+            ),
+            actionButton("ClearValueName","Clear"),
+            pickerInput("Variablecolumns", label = "Select the columns that are repeats of measurements", choices = "", multiple = T, options = list(size = 10)),
+            ),
+            actionBttn(
+              inputId = "Tidy",
+              label = "Tidy",
+              style = "material-flat",
+              color = "success"
+            ),
+
+
+            actionBttn(
+              inputId = "SkipTidy",
+              label = "Skip this step",
+              style = "material-flat",
+              color = "warning"
+            ),
+            fluidRow(
+
+              column(width = 12,
+                     h4("summary of your tidy table:"),
+                     verbatimTextOutput("TidyTableSummary"),
+                     h4("View of your tidy table:"),
+                     DTOutput(outputId = "TidyTable")
+              ))
+
+
+            ), ## end of "Tidy" panel
     tabItem(tabName = "Headers",
             fluidRow(
               # inform if profile already exists

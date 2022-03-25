@@ -100,10 +100,18 @@ server <- function(input, output, session) {
 
   })
 
+  observeEvent(input$submitTables, {
+    if(input$nTable == 1 & length(Data()) == 1) {
+      updateTabItems(session, "tabs", "Tidying")
+      OneTable <<- Data()[[1]]
+      updatePickerInput(session, "Variablecolumns", choices = colnames(OneTable))
+      }
+  })
+
 
   # stack tables ####
 
-  StackedTables <<- eventReactive(input$Stack, {
+  StackedTables <- eventReactive(input$Stack, {
     do.call(rbind, Data()[input$TablesToStack])
   })
 
@@ -134,10 +142,10 @@ server <- function(input, output, session) {
     if(!is.null(input$TablesToStack))   shinyjs::hide("SkipStack")
   })
 
-  observeEvent(input$SkipStack, { updateTabItems(session, "tabs", "Merging")})
+
   # merge tables ####
 
-  observeEvent(input$GoToMerge, {
+  observeEvent(input$GoToMerge | input$SkipStack, {
 
 
     updateTabItems(session, "tabs", "Merging")
@@ -169,18 +177,22 @@ server <- function(input, output, session) {
 
 
 
-  })
+  }, ignoreInit = T)
 
-  observeEvent(input$Merge, {
+
+  MergedTables <- eventReactive(input$Merge, {
 
     if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
     if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
 
-    m <- merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
+   merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
+  })
 
+  observeEvent(input$Merge, {
 
-    output$mergedTables <- renderDT(m, rownames = FALSE,
+    output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE))
+
 
     shinyjs::show("GoToTidy")
 
@@ -188,12 +200,38 @@ server <- function(input, output, session) {
 
 
   # tidy tables ####
-  observeEvent(input$GoToTidy, {
+
+
+  observeEvent(input$GoToTidy | input$SkipMerge, {
     updateTabItems(session, "tabs", "Tidying")
+
+    if(exists("MergedTables")) OneTable <<- MergedTables() else OneTable <<- StackedTables()
+
+    updatePickerInput(session, "Variablecolumns", choices = colnames(OneTable))
+
+  }, ignoreInit = TRUE)
+
+
+
+  observeEvent(input$ClearValueName,{
+    updateRadioButtons(session,"VariableName",selected = character(0))
   })
 
-  observeEvent(input$SkipMerge, {
-    updateTabItems(session, "tabs", "Tidying")
+  observe({
+    if(!is.null(input$VariableName)) shinyjs::hide("SkipTidy")
+    if(is.null(input$VariableName)) shinyjs::show("SkipTidy")
+
+
+  })
+
+
+  observeEvent(input$Tidy, {
+    TidyTable <- melt(OneTable, measure.vars	= input$Variablecolumns, variable.name = input$VariableName, value.name = input$ValueName)
+
+    output$TidyTable <- renderDT(TidyTable, rownames = FALSE,
+                                     options = list(pageLength = 8, scrollX=TRUE))
+
+    output$TidyTableSummary <- renderPrint(summary(TidyTable))
   })
 
 
