@@ -102,7 +102,7 @@ ggplot(Data) +
   facet_wrap(vars(IdTree), scales = "free")
 
 # 1 ind at a time
-id <- "c"
+id <- "d"
 IdTree <- unique(Data[IdTree %in% id, IdTree])
 DBHCor <- Data[IdTree %in% id, DBH]
 Time <- Data[IdTree %in% id, CensusYear]
@@ -244,6 +244,7 @@ if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
 1 : another POM
 2 : another POM
 ```{r}
+# je pense qu'il faudrait éviter que qu'il corrige quand le POM est cst (pour les erreurs ponctuelles) (a faire)
 if (any(!is.na(POM))) { # POM exists?
   
   raised = which(diff(c(NA, POM)) == 1) # Detection des changements de POM (1ere val = NA car ) (1 = changement de POM)
@@ -263,7 +264,7 @@ if (any(!is.na(POM))) { # POM exists?
     DBHCor_Vin[raised[rs]:min(raised[rs+1]-1, length(DBHCor_Vin), na.rm = TRUE)] <-
       (DBHCor_Vin[raised[rs]:min(raised[rs+1]-1, length(DBHCor_Vin), na.rm = TRUE)]) + # initial DBH values
       (DBHCor_Vin[raised[rs] - 1] - DBHCor_Vin[raised[rs]]) + # lost size
-      mean(cresc[((raised[rs]+1):min(raised[rs+1]-1, length(DBHCor_Vin), na.rm = TRUE))-1]) *(Time[raised[rs]+1]-Time[raised[rs]]) # mean of the annual diameter increments in the shift, multiplied by the number of years between the census of the shift and the previous one.
+      mean(cresc[((raised[rs]+1):min(raised[rs+1]-1, length(DBHCor_Vin), na.rm = TRUE))-1]) *(Time[raised[rs]+1]-Time[raised[rs]]) # mean of the annual diameter increments in the shift, multiplied by the number of years between the census of the shift and the following one.
     
     # previous version
     # mean(cresc[-((raised[1]:length(DBHCor_Vin))-1)]) *(Time[raised[rs]+1]-Time[raised[rs]]) # mean of the annual diameter increments before the shifts, multiplied by the number of years between the census of the shift and the previous one.
@@ -314,7 +315,7 @@ if (Ncresc_abn > 0) { # if there are abnormal values
     
     # begin with the census with the highest DBH change
     cresc_abn = which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # quels sont les concernés
-    ab <- cresc_abn[which.max(abs(cresc[cresc_abn]))] # the highest absolute DBH increment (celui qui a initié)
+    ab <- cresc_abn[which.max(abs(cresc[cresc_abn]))] # the highest absolute DBH increment (celui qui a initié) (ab in cresc indices)
     
     if (length(ab) == 1) {
       # values surrounding ab
@@ -322,9 +323,6 @@ if (Ncresc_abn > 0) { # if there are abnormal values
       # that have a meaning (no NAs or 0 values)
       surround = surround[surround > 0 &
                             surround <= length(cresc)] # de taille maximale [0;longueur de l'incrémentation = length(dbh) -1)]
-      
-      # mean DBH change around ab
-      meancresc = max(mean(cresc[surround], na.rm = TRUE), 0) # mean(cresc) of these 4 values. 0 is better than a negative cresc
       
       # moment of max and min DBH changes around ab (including ab, that should be one of the 2)
       sourround_ab = sort(c(surround, ab)) # ab and its 4 values around in the increasing order
@@ -387,7 +385,91 @@ if (any(!is.na(DBHCor))) {
 ```
 
 
-# Shift correction (arrété là)
+# Shift correction without available POM (arrété là)
+User choice (TrustMeasSet):
+A) Always trust the **1st set** of measurements (ex: because it's at the default POM)
+B) Always trust the **last set** of measurements (ex: because new method, safer in your opinion)
+
+C) Trust the set of measurements with **more values** (ex: because safer in your opinion) and:
+- (C1) if they are the same size, then we trust the **1st one** (ex: because it's at the default POM)
+or
+- (C2) if they are the same size, then we trust the **last one** (ex: because new method, safer in your opinion)
+
+Penser qu'il peut y avoir plsrs shifts !
+```{r}
+TrustMeasSet = "C1"
+# Mean DBH change around ab (surround = 4 values max)
+MeanLocalcresc <- max(mean(cresc[surround], na.rm = TRUE), 0) # mean(cresc) of these 4 values (without ab). 0 is better than a negative cresc
+
+# else {
+
+# 2 types of correction? (considèrent qu'1 shift possible:
+Correc1st <- DBHCor[1:ab] <-
+  DBHCor[1:ab] + # inital values
+  (DBHCor[ab +1] - DBHCor[ab]) - # on rajoute la valeur gagnée entre l'erreur et sa valeur précédente
+  MeanLocalcresc * diff(Time)[ab] # on enlève l'incrémentation moyenne initialement présente * nbr d'années entre l'erreur et la valeur précédente
+
+Correclast <- DBHCor[(ab +1):length(DBHCor)] <-
+  DBHCor[(ab +1):length(DBHCor)] - # inital values
+  (DBHCor[ab +1] - DBHCor[ab]) + # on enlève la valeur gagnée entre l'erreur et sa valeur précédente
+  mean(cresc[-ab]) * diff(Time)[ab] # on ajoute l'incrémentation moyenne sans l'erreur * nbr d'années entre l'erreur et la valeur précédente (Nino utilise MeanLocalcresc)
+
+# Always trust the **1st set** of measurements (ex: because it's at the default POM)
+if(TrustMeasSet %in% "A"){
+  
+  # So, we correct from error to last measurement (ptetre mieux encore une fois de faire shift après shift)
+  Correclast
+}
+# Always trust the **last set** of measurements (ex: because new method, safer in your opinion)
+if(TrustMeasSet %in% "B"){
+  
+  # So, we correct from the 1st measurement to the value before the error
+  Correc1st
+}
+# Trust the set of measurements with **more values** (ex: because safer in your opinion)
+if(TrustMeasSet %in% c("C1", "C2")){
+  
+  # Trust the set of measurements with **more values**
+  if ((sum(!is.na(DBHCor[1:ab])) > sum(!is.na(DBHCor))/2)) { # si la serie avant l'erreur est plus longue que le reste des mesures
+    
+    
+  }
+  if(TrustMeasSet %in% "C1"){ #  if they are the same size, then we trust the **1st one** (ex: because it's at the default POM)
+    Correclast
+  }
+  
+  if(TrustMeasSet %in% "C2"){ # if they are the same size, then we trust the **last one** (ex: because new method, safer in your opinion)
+    # So, we correct from the 1st measurement to the value before the error
+    Correc1st
+  }
+  
+  
+  # Nino fait ça si l'erreur est positive (aug DBH) (et trust the 1st si dim DBH) :
+  if ((sum(!is.na(DBHCor[1:ab])) > sum(!is.na(DBHCor))/2)) { # si la serie avant l'erreur est plus longue que le reste des mesures
+    
+    # On corrige la plus courte
+    Correclast
+    
+  }else{ # si la série après l'erreur est de même longueur ou plus grande que la série avant l'erreur
+    # on corrige la 1ere serie (on croit la dernière)
+    Correc1st
+  }
+  
+  
+}
+
+
+
+
+#   }
+# } # if there are values around ab
+
+```
+
+
+
+
+
 
 
 # POM translation (pas encore adapté)
@@ -412,12 +494,12 @@ if(!all(POM %in% DefaultPOM)){ # if any POMs are different to the default POM
     existing <- existing[cresc[existing] > negative_growth_threshold &
                            cresc[existing] < positive_growth_threshold] #Because we don't want to use outliers to compute expected growth...
     
-    meancresc <- max(mean(cresc[existing], na.rm = TRUE), 0) # annual size diff (positive) mean
+    MeanLocalcresc <- max(mean(cresc[existing], na.rm = TRUE), 0) # annual size diff (positive) mean
     
     # Correction from POM
-    correction <- max(size_corr[s] - size_corr[s+1], 0) + (meancresc*(Time[s+1]-Time[s]))
-    # if size increases (max = 0), correction =  (meancresc*(Time[s+1]-Time[s]))
-    # if size decreases, correction = lost size + (meancresc*(Time[s+1]-Time[s]))
+    correction <- max(size_corr[s] - size_corr[s+1], 0) + (MeanLocalcresc*(Time[s+1]-Time[s]))
+    # if size increases (max = 0), correction =  (MeanLocalcresc*(Time[s+1]-Time[s]))
+    # if size decreases, correction = lost size + (MeanLocalcresc*(Time[s+1]-Time[s]))
     # size evolution (= size at t0 - size at t1) or 0 + annual size diff mean * years nbr between 2 censuses
     
     size_corr[(s+1):length(size_corr)] <- (size_corr[(s+1):length(size_corr)]) + correction
