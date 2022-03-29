@@ -1,5 +1,5 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table")
+list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table", "stringdist")
 
 #checking missing packages from list
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -54,8 +54,8 @@ body <- dashboardBody(
                        inputId = "inactivebutton",
                        label = "1",
                        style = "pill",
-                       color = "danger"),
-                     h2("How many tables do you wish to upload?"),
+                       color = "warning"),
+                     strong("How many tables do you wish to upload?"),
                      h4("Select this before you move to step 2."),
                      h4("Changing this value after uploading a table will clear the upload."),
                      numericInput(inputId = "nTable",
@@ -72,7 +72,7 @@ body <- dashboardBody(
                        inputId = "inactivebutton",
                        label = "2",
                        style = "pill",
-                       color = "danger"),
+                       color = "warning"),
                      strong("Upload your tables"),
                      uiOutput("ui_uploadTables"))),
 
@@ -83,7 +83,7 @@ body <- dashboardBody(
                        inputId = "inactivebutton",
                        label = "3",
                        style = "pill",
-                       color = "danger"),
+                       color = "warning"),
                      actionBttn(
                        inputId = "submitTables",
                        label = "submit",
@@ -235,37 +235,57 @@ body <- dashboardBody(
     ),  ## end of "Merging" panel
 
     tabItem(tabName = "Tidying",
-            h3("This is where we want to make your data 'tidy'. this means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
+            h3("This is where we want to make your data 'tidy'"),
+            h3("This means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
             h4("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
             h5("This is called wide-to-long reshaping."),
             h4("If you already have one observation per row, skip this step"),
-
-            box(
-            textInput("ValueName", "What type of measurement is repeated horizontally? (Give a column name without space)", value = "DBH"),
-            radioButtons(
-              "VariableName",
-              "What is the meaning of the repeated column?",
-              choices = c("CensusID", "CensusYear", "POM", "StemID"),
-              selected = "",
-              inline = FALSE
-            ),
-            actionButton("ClearValueName","Clear"),
-            pickerInput("Variablecolumns", label = "Select the columns that are repeats of measurements", choices = "", multiple = T, options = list(size = 10)),
-            ),
-            actionBttn(
-              inputId = "Tidy",
-              label = "Tidy",
-              style = "material-flat",
-              color = "success"
-            ),
-
-
             actionBttn(
               inputId = "SkipTidy",
               label = "Skip this step",
               style = "material-flat",
               color = "warning"
             ),
+            box(width = 12,
+                radioButtons(
+              "VariableName",
+              "What is the meaning of the repeated column?",
+              choices = c("CensusID", "CensusYear", "POM", "StemID"),
+              selected = "",
+              inline = FALSE
+            ),
+            actionButton("ClearValueName","Clear")),
+            h3("Tick the groupings that should be applied and fix the prefilled information if necessary."),
+
+            uiOutput("meltUI"),
+
+            # box(
+            # textInput("ValueName", "What type of measurement is repeated horizontally? (Give a column name without space)", value = "DBH"),
+            # radioButtons(
+            #   "VariableName",
+            #   "What is the meaning of the repeated column?",
+            #   choices = c("CensusID", "CensusYear", "POM", "StemID"),
+            #   selected = "",
+            #   inline = FALSE
+            # ),
+            # actionButton("ClearValueName","Clear"),
+            # pickerInput("Variablecolumns", label = "Select the columns that are repeats of measurements", choices = "", multiple = T, options = list(size = 10)),
+            # ),
+            actionBttn(
+              inputId = "Tidy",
+              label = "Tidy",
+              style = "material-flat",
+              color = "success"
+            ),
+            hidden( actionBttn(
+              inputId = "GoToHeaders",
+              label = "Go To Headers",
+              style = "material-flat",
+              color = "success"
+            )),
+
+
+
             fluidRow(
 
               column(width = 12,
@@ -280,31 +300,31 @@ body <- dashboardBody(
     tabItem(tabName = "Headers",
             fluidRow(
               # inform if profile already exists
-              box(width = 12,
-                  radioButtons(inputId = "predefinedProfile",
-                               label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
-                               choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
-
-                  # load a profile it one already exists
-                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
-                  ),
+              # box(width = 12,
+              #     radioButtons(inputId = "predefinedProfile",
+              #                  label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
+              #                  choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
+              #
+              #     # load a profile it one already exists
+              #     fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
+              #     ),
 
               # inform if long or wide format
-              box(width = 12,
-                  radioButtons(inputId = "format",
-                           label = div(actionBttn(
-                             inputId = "inactivebutton",
-                             label = "1",
-                             style = "pill",
-                             color = "danger"),
-                             "Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
-                           choices = list("Long" = "long", "Wide" = "wide"))),
+              # box(width = 12,
+              #     radioButtons(inputId = "format",
+              #              label = div(actionBttn(
+              #                inputId = "inactivebutton",
+              #                label = "1",
+              #                style = "pill",
+              #                color = "danger"),
+              #                "Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
+              #              choices = list("Long" = "long", "Wide" = "wide"))),
               column(width = 6,
                      actionBttn(
                        inputId = "inactivebutton",
-                       label = "2",
+                       label = "1",
                        style = "pill",
-                       color = "danger")
+                       color = "warning")
                      ,   strong("  Match your columns to ours (if you can)"),
                      br(),
                      br(),
@@ -318,9 +338,9 @@ body <- dashboardBody(
               column(width = 6,
                      actionBttn(
                        inputId = "inactivebutton",
-                       label = "3",
+                       label = "2",
                        style = "pill",
-                       color = "danger")
+                       color = "warning")
                      ,   strong("  Fill in information that is not in your columns"),
                      br(),
                      br(),

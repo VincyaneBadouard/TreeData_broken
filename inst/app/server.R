@@ -18,6 +18,7 @@ for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 # devtools::install_github("VincyaneBadouard/TreeData")
 library(TreeData)
 
+
 server <- function(input, output, session) {
 
   # generate the upload UI  ####
@@ -62,20 +63,21 @@ server <- function(input, output, session) {
 
 
   })
-               # })
+  # })
 
   # read file(s) ####
 
 
   observeEvent(input$submitTables, {
 
+    if(input$nTable == 1 & length(Data()) == 1) {
+      updateTabItems(session, "tabs", "Tidying")
+    } else {
+      updateCheckboxGroupButtons(session, "TablesToStack",
+                                 choices = unname(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]))
 
-  updateCheckboxGroupButtons(session, "TablesToStack",
-                    choices = unname(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]))
-
-
-  updateTabItems(session, "tabs", "Stacking")
-
+      updateTabItems(session, "tabs", "Stacking")
+    }
 
   })
 
@@ -83,30 +85,23 @@ server <- function(input, output, session) {
   Data <- eventReactive(input$submitTables, {
     req(input$file1)
     setNames(
-    sapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
+      sapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
 
-      i = which(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)] %in% n)
-      file <- input[[paste0("file", i)]]
-      ext <- tools::file_ext(file$datapath)
+        i = which(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)] %in% n)
+        file <- input[[paste0("file", i)]]
+        ext <- tools::file_ext(file$datapath)
 
-      req(file)
-      validate(need(ext == "csv", "Please upload a csv file"))
+        req(file)
+        validate(need(ext == "csv", "Please upload a csv file"))
 
-      data.table::fread(file$datapath,
-                        header = input[[paste0("header", i)]],
-                        sep = input[[paste0("cbSeparator", i)]])
-    }, simplify = F),
-    reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
+        data.table::fread(file$datapath,
+                          header = input[[paste0("header", i)]],
+                          sep = input[[paste0("cbSeparator", i)]])
+      }, simplify = F),
+      reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
 
   })
 
-  observeEvent(input$submitTables, {
-    if(input$nTable == 1 & length(Data()) == 1) {
-      updateTabItems(session, "tabs", "Tidying")
-      OneTable <<- Data()[[1]]
-      updatePickerInput(session, "Variablecolumns", choices = colnames(OneTable))
-      }
-  })
 
 
   # stack tables ####
@@ -164,16 +159,16 @@ server <- function(input, output, session) {
       column_options_list <- c(column_options_list, StackedTables = list(colnames(StackedTables())))
 
     }
-        updatePickerInput(session, "leftTable", choices = options_to_merge, selected =  "")
-        updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
+    updatePickerInput(session, "leftTable", choices = options_to_merge, selected =  "")
+    updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
 
-        observeEvent(input$selectLeft, {
-        updatePickerInput(session, "leftKey", choices = column_options_list[[input$leftTable]])
-})
+    observeEvent(input$selectLeft, {
+      updatePickerInput(session, "leftKey", choices = column_options_list[[input$leftTable]])
+    })
 
-        observeEvent(input$selectRight, {
-          updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
-        })
+    observeEvent(input$selectRight, {
+      updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
+    })
 
 
 
@@ -185,7 +180,7 @@ server <- function(input, output, session) {
     if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
     if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
 
-   merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
+    merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
   })
 
   observeEvent(input$Merge, {
@@ -201,17 +196,65 @@ server <- function(input, output, session) {
 
   # tidy tables ####
 
-
+  # observeEvent(input$submitTables, {
+  #   if(input$nTable == 1 & length(Data()) == 1) {
+  #     updateTabItems(session, "tabs", "Tidying")
+  #     OneTable <<- reactive(Data()[[1]])
+  #
+  #   }
+  # })
   observeEvent(input$GoToTidy | input$SkipMerge, {
-    updateTabItems(session, "tabs", "Tidying")
+    updateTabItems(session, "tabs", "Tidying")}, ignoreInit = T)
 
-    if(exists("MergedTables")) OneTable <<- MergedTables() else OneTable <<- StackedTables()
+  OneTable <- eventReactive(input$submitTables | input$GoToTidy | input$SkipMerge, {
 
-    updatePickerInput(session, "Variablecolumns", choices = colnames(OneTable))
+    if(input$nTable == 1 & length(Data()) == 1) {
+      Data()[[1]]
+    } else {
+      if(exists("MergedTables")) MergedTables() else  StackedTables()
+    }
+
 
   }, ignoreInit = TRUE)
 
 
+
+  observe({
+    groupNames <- split(names(OneTable()), cutree(hclust(stringdistmatrix(names(OneTable()))), h = 2))
+    groupNames <- groupNames[sapply(groupNames, length) > 1]
+    names(groupNames) <- sapply(groupNames, function(x) paste(Reduce(intersect, strsplit(x,"")), collapse=""))
+
+    # updatePickerInput(session, "Variablecolumns", choices = groupNames)
+
+    output$meltUI <- renderUI({
+      lapply(c(1:length(groupNames)), function(i)
+      {
+        box(width = 12,
+            column(1,         awesomeCheckbox(
+              inputId = paste0("TickedMelt", i),
+              label = "",
+              value = FALSE,
+              status = "info"
+            )),
+            column(11, textInput(paste0("ValueName", i), "What type of measurement is repeated horizontally? (Give a column name without space)", value = names(groupNames)[i]),
+                   pickerInput(
+                     inputId = paste0("Variablecolumns", i),
+                     label = "Select the columns that are repeats of measurements",
+                     choices = colnames(OneTable()),
+                     selected = groupNames[[i]],
+                     multiple = T
+                     # status = "primary",
+                     # checkIcon = list(
+                     #   yes = icon("ok",
+                     #              lib = "glyphicon"),
+                     #   no = icon("remove",
+                     #             lib = "glyphicon"))
+                   )
+            ))
+      })
+
+    })
+  })
 
   observeEvent(input$ClearValueName,{
     updateRadioButtons(session,"VariableName",selected = character(0))
@@ -224,84 +267,113 @@ server <- function(input, output, session) {
 
   })
 
+  TidyTable <- reactiveVal(NULL)
 
   observeEvent(input$Tidy, {
-    TidyTable <- melt(OneTable, measure.vars	= input$Variablecolumns, variable.name = input$VariableName, value.name = input$ValueName)
 
-    output$TidyTable <- renderDT(TidyTable, rownames = FALSE,
-                                     options = list(pageLength = 8, scrollX=TRUE))
+    Variablecolumns <- reactiveValuesToList(input)[grep("Variablecolumns\\d", names(input))]
+    Variablecolumns<- Variablecolumns[order(names(Variablecolumns))]
 
-    output$TidyTableSummary <- renderPrint(summary(TidyTable))
+    ValueName <- reactiveValuesToList(input)[grep("ValueName\\d", names(input))]
+    ValueName <- ValueName[order(names(ValueName))]
+
+    TickedMelt <- unlist(reactiveValuesToList(input)[grep("TickedMelt\\d", names(input))])
+    TickedMelt <- TickedMelt[order(names(TickedMelt))]
+
+    names(Variablecolumns) <- unlist(ValueName)
+
+    TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName,  value.name = names(Variablecolumns[TickedMelt]), variable.factor = FALSE))
+
+
+  }, ignoreInit = TRUE)
+
+  observeEvent(input$SkipTidy, {
+    TidyTable(OneTable())
+  }, ignoreInit = TRUE)
+
+
+
+  observeEvent(input$Tidy, {
+    shinyjs::show("GoToHeaders")
+
+    output$TidyTable <- renderDT(TidyTable(), rownames = FALSE,
+                                 options = list(pageLength = 8, scrollX=TRUE))
+
+    output$TidyTableSummary <- renderPrint(summary(TidyTable()))
   })
 
 
-#   values <- reactiveValues(n_merge = 0)
-#
-# # add a merge
-#   observeEvent(input$addMerge, {
-#
-#
-#     values$n_merge <- values$n_merge + 1
-#     add <- values$n_merge
-#
-#   insertUI(
-#         selector = "#addMerge",
-#         where = "afterEnd",
-#         ui =
-#           tags$div(
-#             box(width = 12,
-#                 column(3, selectInput(paste0("leftTable", input$add), "Take table", choices = options_to_merge)),
-#                 column(3, selectInput(paste0("rightTable", input$add), "add to it this table", choices = options_to_merge)),
-#                 column(3, selectInput(paste0("leftKey", input$add), "Using this column(s) from first table", choices = "", multiple = T)),
-#                 column(3,  selectInput(paste0("rightKey", input$add), "and this column(s) from second table", choices = "", multiple = T))
-#                 ),
-#                 box(
-#                   title = "inputID", width = 12, background = "black",
-#
-#                   paste0("Number_Product1_", input$add))  #### inputID's of the selectizeinput "Product 1"
-#
-#
-#           )
-#       )
-#
-#   output$test <- renderText(input$add)
-#
-#
-#   })
+  observeEvent(input$GoToHeaders | input$SkipTidy, {
+    updateTabItems(session, "tabs", "Headers")}, ignoreInit = T)
+
+
+  #   values <- reactiveValues(n_merge = 0)
+  #
+  # # add a merge
+  #   observeEvent(input$addMerge, {
+  #
+  #
+  #     values$n_merge <- values$n_merge + 1
+  #     add <- values$n_merge
+  #
+  #   insertUI(
+  #         selector = "#addMerge",
+  #         where = "afterEnd",
+  #         ui =
+  #           tags$div(
+  #             box(width = 12,
+  #                 column(3, selectInput(paste0("leftTable", input$add), "Take table", choices = options_to_merge)),
+  #                 column(3, selectInput(paste0("rightTable", input$add), "add to it this table", choices = options_to_merge)),
+  #                 column(3, selectInput(paste0("leftKey", input$add), "Using this column(s) from first table", choices = "", multiple = T)),
+  #                 column(3,  selectInput(paste0("rightKey", input$add), "and this column(s) from second table", choices = "", multiple = T))
+  #                 ),
+  #                 box(
+  #                   title = "inputID", width = 12, background = "black",
+  #
+  #                   paste0("Number_Product1_", input$add))  #### inputID's of the selectizeinput "Product 1"
+  #
+  #
+  #           )
+  #       )
+  #
+  #   output$test <- renderText(input$add)
+  #
+  #
+  #   })
 
 
 
 
 
 
-  # submit tables
-  observeEvent(input$submit, {
-    output$uiheader <- renderUI({
-
-      lapply(1:isolate(input$nTable), function(i) {
-        X <- isolate(colnames(Data()[[i]]))
-        title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
-        box(
-          title = title,
-          lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(`live-search` =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
-
-        )
-      })
-
-
-    })
-
-    updateTabItems(session, "tabs", "Headers")
-
-
-  })
-
-
+  # # submit tables
+  # observeEvent(input$submit, {
+  #   output$uiheader <- renderUI({
+  #
+  #     lapply(1:isolate(input$nTable), function(i) {
+  #       X <- isolate(colnames(Data()[[i]]))
+  #       title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
+  #       box(
+  #         title = title,
+  #         lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(`live-search` =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
+  #
+  #       )
+  #     })
+  #
+  #
+  #   })
+  #
+  #   updateTabItems(session, "tabs", "Headers")
+  #
+  #
+  # })
 
 
 
 
-### other stuff ####
+
+
+  ### other stuff ####
 
 
   observeEvent(input$profile, {
@@ -351,11 +423,11 @@ server <- function(input, output, session) {
 
   # create options to choose from:
 
-  ColumnOptions <- eventReactive(Data(), { c("none", colnames(Data())) })
+  ColumnOptions <- eventReactive(input$SkipTidy | input$Tidy | input$GoToHeaders, { c("none", colnames(TidyTable())) })
 
   UnitOptions <- eventReactive(Data(),
-                                {c("mm", "cm", "dm", "m")
-                                })
+                               {c("mm", "cm", "dm", "m")
+                               })
 
   AreaUnitOptions <- eventReactive(Data(),
                                    {c("m2", "ha", "km2")
@@ -444,7 +516,7 @@ server <- function(input, output, session) {
     # validate(
     #   need(req(DataFormated()), "AA")
     # )
-      DataFormated()
+    DataFormated()
   }, rownames = FALSE,
   options = list(pageLength = 8, scrollX=TRUE))
 
@@ -483,7 +555,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       text_upload <- glue::glue(
-      "
+        "
       # install TreeData package
       githubinstall::githubinstall('VincyaneBadouard/TreeData')
       library(TreeData)
