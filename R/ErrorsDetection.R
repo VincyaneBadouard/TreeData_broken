@@ -22,10 +22,10 @@
 #'   - Check *invariant coordinates per IdTree*
 #'   - Check *fix Plot and SubPlot number*
 #'
-#'   - Check botanical identification
-#'   - Check the life status evolution of the trees
-#'   - Check diameter evolution of the trees
-#'   - Check recruitment
+#'   - Check botanical identification (BotanicalCorrection)
+#'   - Check the life status evolution of the trees (StatusCorrection)
+#'   - Check diameter evolution of the trees (DiameterCorrection)
+#'   - Check recruitment (RecruitmentCorrection)
 #'
 #'
 #' @seealso \code{\link{StatusCorrection}}

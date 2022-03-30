@@ -27,6 +27,7 @@ IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 
 Internals:
 + *Bota*
+- Detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
 - Special characters
 - Typographie
 - Check invariant botanical informations per IdTree

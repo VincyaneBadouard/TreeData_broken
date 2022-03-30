@@ -91,13 +91,15 @@ Data[IdTree %in% "c" & CensusYear %in% c(2008:2014), ("POM") := 1]
 
 Data[IdTree %in% "c" & CensusYear %in% c(2016:2020), ("POM") := 2] 
 
-Data[POM %in% 1, ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # always 0.5cm/year
-Data[POM %in% 2, ("DBH") := c(15-4, (15-4)+2)] # always 0.5cm/year
+Data[POM %in% 1, ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # 1st shift, always 0.5cm/yearr
+Data[POM %in% 2, ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
 
 
 ## 1 shift error without available POM : growth < -2 cm DBH/census with no return to normal
 Data[IdTree %in% "d", ("POM") := NA] # no POM
-Data[IdTree %in% "d" & CensusYear %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # same shift
+# Data[IdTree %in% "d" & CensusYear %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # only 1 shift
+Data[IdTree %in% "d" & CensusYear %in% c(2008:2014), ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # 1st shift, always 0.5cm/year
+Data[IdTree %in% "d" & CensusYear %in% c(2016:2020), ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
 
 
 # check their growth
@@ -501,12 +503,12 @@ for(scen in TrustMeasSet){
       
       # else {
       
-      # 2 types of correction? (considèrent qu'1 shift possible:
+      # 2 types of correction? (considèrent qu'1 shift possible et fctne que dans ce cas):
       if(scen %in% c("B", "C2")){
         Correc1st <-
         DBHCor[1:ab] + # inital values
         (DBHCor[ab +1] - DBHCor[ab]) - # on rajoute la valeur gagnée entre l'erreur et sa valeur précédente
-        MeanLocalcresc * diff(Time)[ab] # on enlève l'incrémentation moyenne initialement présente * nbr d'années entre l'erreur et la valeur précédente
+        MeanLocalcresc * diff(Time)[ab] # on enlève l'incrémentation des valeurs encadrantes * nbr d'années entre l'erreur et la valeur précédente
       }
       if(scen %in% c("A", "C1")){
       Correclast <- 
