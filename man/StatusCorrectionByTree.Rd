@@ -6,7 +6,7 @@
 \usage{
 StatusCorrectionByTree(
   DataTree,
-  Censuses,
+  PlotCensuses,
   InvariantColumns = c("Site", "Genus", "Species", "Family", "ScientificName"),
   DeathConfirmation = 2,
   UseSize = FALSE,
@@ -23,7 +23,7 @@ The \emph{LifeStatus} column must be coded as:
 - FALSE = dead,
 - NA = unseen}
 
-\item{Censuses}{Census years for the plot in which the tree is (integer)}
+\item{PlotCensuses}{Census years for the plot in which the tree is (integer)}
 
 \item{InvariantColumns}{Vector with the names of the columns that are
 supposed to have always the same value for each measurement of the same
@@ -86,7 +86,7 @@ DataTree <- DataTree[order(CensusYear)] # arrange years in ascending order
 # Write the sequence
 DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 
-Rslt <- StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
+Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021))
 
 library(ggplot2)
 ggplot(DataTree) +

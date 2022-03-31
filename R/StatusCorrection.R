@@ -45,8 +45,8 @@
 #'   *DetectOnly* = FALSE, add a *LifeStatusCor* column with the corrected trees
 #'   life status.
 #'
-#' @importFrom stats na.omit
 #' @importFrom data.table data.table rbindlist
+#' @importFrom stats na.omit
 #'
 #' @export
 #'
@@ -135,7 +135,7 @@ StatusCorrection <- function(
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
     Data[IdTree %in% i], # per IdTree, all censuses
-    Censuses = as.vector(na.omit( # rm NA
+    PlotCensuses = as.vector(na.omit( # rm NA
       unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
     )),
     UseSize = UseSize,
@@ -169,7 +169,7 @@ StatusCorrection <- function(
 #'     - FALSE = dead,
 #'     - NA = unseen
 #'
-#' @param Censuses Census years for the plot in which the tree is (integer)
+#' @param PlotCensuses Census years for the plot in which the tree is (integer)
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same
@@ -229,7 +229,7 @@ StatusCorrection <- function(
 #' # Write the sequence
 #' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 #'
-#' Rslt <- StatusCorrectionByTree(DataTree, Censuses = c(2011:2021))
+#' Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021))
 #'
 #' library(ggplot2)
 #' ggplot(DataTree) +
@@ -244,7 +244,7 @@ StatusCorrection <- function(
 #'
 StatusCorrectionByTree <- function(
   DataTree,
-  Censuses,
+  PlotCensuses,
   InvariantColumns = c("Site",
                        "Genus",
                        "Species",
@@ -263,9 +263,9 @@ StatusCorrectionByTree <- function(
   if (!inherits(DataTree, c("data.table", "data.frame")))
     stop("DataTree must be a data.frame or data.table")
 
-  # Censuses
-  if (!inherits(Censuses, c("numeric", "integer")))
-    stop("'Censuses' argument must be numeric or integer")
+  # PlotCensuses
+  if (!inherits(PlotCensuses, c("numeric", "integer")))
+    stop("'PlotCensuses' argument must be numeric or integer")
 
   # InvariantColumns
   if (!inherits(InvariantColumns, "character"))
@@ -300,6 +300,7 @@ StatusCorrectionByTree <- function(
     }
   }
 
+  # UseSize-DBH column
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
     if(!DBH %in% names(DataTree)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
@@ -349,9 +350,9 @@ StatusCorrectionByTree <- function(
     LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
   }
 
-  #### Absents (logical vector of the Censuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
+  #### Absents (logical vector of the PlotCensuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
 
-  Censuses <- sort(Censuses) # increasing order
+  PlotCensuses <- sort(PlotCensuses) # increasing order
 
   if(any(DataTree$LifeStatusCor %in% TRUE)){
 
@@ -365,19 +366,19 @@ StatusCorrectionByTree <- function(
       # If there is any "Alive" report after last reported death
       if(any(DataTree$LifeStatusCor[After] %in% TRUE)) {
         # Absents are the absent record years among the plot censuses from the 1st alive record
-        Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$CensusYear)
+        Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$CensusYear)
 
       }else{
         # Absents are the absent record years between first alive record and the last death record
-        Absents <- (Censuses > FirstAliveYear &
-                      Censuses < LastDeathRecord & # death = the end
-                      !Censuses %in% DataTree$CensusYear)
+        Absents <- (PlotCensuses > FirstAliveYear &
+                      PlotCensuses < LastDeathRecord & # death = the end
+                      !PlotCensuses %in% DataTree$CensusYear)
       }
 
     }else{ # if tree has not been reported dead yet
 
       # Absents are the absent record years among the plot censuses from the 1st alive record
-      Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$CensusYear)
+      Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$CensusYear)
 
     }
 
@@ -387,9 +388,9 @@ StatusCorrectionByTree <- function(
     # La j'ai choisi de ne rajouter les lignes absentes qu'entre le census min et max de l'arbre
     # Si tout est FALSE effectivement ça ne sert à rien de rajouter des lignes apres, mais des lignes avant ? il risque d'en avoir beaucoup, et on ne pourra mettre qu'NA
     # Pour tout est NA, ça aurait un intéret de rajouter des lignes avant-après ?
-    Absents <- (Censuses > min(DataTree$CensusYear, na.rm = TRUE) & # entre les bornes, pas avnt pas après
-                  Censuses < max(DataTree$CensusYear, na.rm = TRUE) &
-                  !Censuses %in% DataTree$CensusYear)
+    Absents <- (PlotCensuses > min(DataTree$CensusYear, na.rm = TRUE) & # entre les bornes, pas avnt pas après
+                  PlotCensuses < max(DataTree$CensusYear, na.rm = TRUE) &
+                  !PlotCensuses %in% DataTree$CensusYear)
 
   }
 
@@ -422,7 +423,7 @@ StatusCorrectionByTree <- function(
 
       # Multiply this new row the number of times as well as the number of absents
       NewRows <- do.call("rbind", replicate(n = Nabs, NewRow, simplify = FALSE))
-      NewRows[, CensusYear := Censuses[Absents]]
+      NewRows[, CensusYear := PlotCensuses[Absents]]
 
       # Add these rows in the dataset
       DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
@@ -613,6 +614,14 @@ StatusCorrectionByTree <- function(
 #' @export
 #'
 FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
+
+  # Check if the InvariantColumns name exists in DataTree
+  for(c in InvariantColumns){
+    if(!c %in% names(DataTree)){
+      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                 ,c,"is apparently not a dataset's column"))
+    }
+  }
 
   # j = "ScientificName"
   for(j in InvariantColumns){

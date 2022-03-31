@@ -37,10 +37,10 @@ TreeFieldNum} (at the site scale)
 \item Check for trees \emph{outside the subplot}
 \item Check \emph{invariant coordinates per IdTree}
 \item Check \emph{fix Plot and SubPlot number}
-\item Check botanical identification
-\item Check the life status evolution of the trees
-\item Check diameter evolution of the trees
-\item Check recruitment
+\item Check botanical identification (BotanicalCorrection)
+\item Check the life status evolution of the trees (StatusCorrection)
+\item Check diameter evolution of the trees (DiameterCorrection)
+\item Check recruitment (RecruitmentCorrection)
 }
 }
 \examples{

@@ -319,7 +319,7 @@ ErrorsDetection <- function(
   #### Life status ####
 
   Data <- StatusCorrection(Data,
-                           InvariantColumns = c("Site",
+                           InvariantColumns = c("Site", # remplacer les val par dft par les inputs
                                                 "Genus",
                                                 "Species",
                                                 "Family",
@@ -332,7 +332,19 @@ ErrorsDetection <- function(
                            RemoveRAfterDeath = FALSE)
 
   #### Diameter ####
+
   #### Recruitment ####
+
+  Data <- RecruitmentCorrection(Data,
+                        MinDBH = 10, # remplacer les val par dft par les inputs
+                        PositiveGrowthThreshold = 5,
+                        InvariantColumns = c("Site",
+                                             "Genus",
+                                             "Species",
+                                             "Family",
+                                             "ScientificName"),
+                        DetectOnly = DetectOnly
+  )
 
   return(Data)
 }
