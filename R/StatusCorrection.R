@@ -614,6 +614,14 @@ StatusCorrectionByTree <- function(
 #'
 FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
 
+  # Check if the InvariantColumns name exists in DataTree
+  for(c in InvariantColumns){
+    if(!c %in% names(DataTree)){
+      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                 ,c,"is apparently not a dataset's column"))
+    }
+  }
+
   # j = "ScientificName"
   for(j in InvariantColumns){
 
