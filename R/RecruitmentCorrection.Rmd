@@ -35,7 +35,6 @@ Tests :
 library(TreeData)
 library(data.table)
 library(ggplot2)
-# importfrom utils::txtProgressBar
 # importfrom stats::lm
 ```
 
