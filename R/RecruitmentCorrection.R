@@ -37,7 +37,7 @@
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' # setnames(TestData, "DBH", "DBHCor")
+#' setnames(TestData, "DBH", "DBHCor")
 #'
 #' Rslt <- RecruitmentCorrection(TestData)
 #' IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
@@ -356,7 +356,7 @@ RecruitmentCorrectionByTree <- function(
 
           DataTree <- DataTree[order(CensusYear)] # order by CensusYear
 
-          #### Linear regression (DBH ~ Year) ####
+          #### Linear regression (DBH ~ Year) #### with all the DBH values
           coef <- stats::lm(
             DataTree[!is.na(DBHCor), DBHCor] ~ DataTree[!is.na(DBHCor), CensusYear])$coefficients
 
