@@ -13,7 +13,9 @@ RecruitmentCorrection(
 )
 }
 \arguments{
-\item{Data}{(data.frame or data.table)}
+\item{Data}{(data.frame or data.table)
+The dataset should preferably contain the column of corrected diameters:
+'DBHCor', otherwise the function will take the column "DBH"}
 
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
 protocol (in cm) (numeric, 1 value)}
@@ -41,11 +43,14 @@ RecruitmentCorrection
 \details{
 If the size of the tree has never changed, or if there is only one
 value the same value is kept for the added forgotten recruits.
+If the DBH has not been corrected (DBCor column does not exist), the
+function will create it for the forgotten recruits. It is strongly
+recommended to correct the DBH before correcting the recruits
 }
 \examples{
 library(data.table)
 data(TestData)
-setnames(TestData, "DBH", "DBHCor")
+# setnames(TestData, "DBH", "DBHCor")
 
 Rslt <- RecruitmentCorrection(TestData)
 IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
