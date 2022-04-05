@@ -9,9 +9,9 @@ Headers,1,pickerInput,choices,PlotArea,Plot area,,none,none,none,ColumnOptions,l
 Headers,4,pickerInput,choices,PlotAreaUnitMan,What the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Census year
 Headers,1,pickerInput,choices,Year,Year of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Census year
-Headers,5,numericInput,value,YearMan,What is your year of measurement?,if you did not specify a column for date,CensusYear,CensusDate,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Headers,5,numericInput,value,YearMan,What is your year of measurement?,if you did not specify a column for date,Year,Date,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,Date,Date of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Census date (YYYY-mm-dd)
-Headers,4,textInput,value,DateFormat,What is your date format,e.g. 2021-01-31 would be yyyy-mm-dd and 9/14/2016 would be mm/dd/yyyy,none,none,CensusDate,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Headers,4,textInput,value,DateFormat,What is your date format,e.g. 2021-01-31 would be yyyy-mm-dd and 9/14/2016 would be mm/dd/yyyy,none,none,Date,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
 Headers,1,pickerInput,choices,IdTree,Tree ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if not provided in the input data
 Headers,1,pickerInput,choices,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
@@ -19,14 +19,14 @@ Headers,1,pickerInput,choices,IdMeasure,Measure ID,if you measured more than one
 Headers,1,pickerInput,choices,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE is tree was alive, FALSE if it was dead"
 Headers,4,pickerInput,choices,IsLive,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,DBH,DBH,Diamter at breast height,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Diameter at breast height in cm
-Headers,1,pickerInput,choices,DBHUnit,DBH unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
-Headers,3,pickerInput,choices,DBHUnitMan,What is your DBH unit ?,,DBHUnit,none,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Headers,1,pickerInput,choices,DBHUnit,DBH unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+Headers,3,pickerInput,choices,DBHUnitMan,What is your DBH unit ?,,none,none,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,Circ,Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,circumference in cm
 Headers,1,pickerInput,choices,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-Headers,3,pickerInput,choices,CircUnitMan,What is your circumference unit?,,CircUnit,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Headers,3,pickerInput,choices,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,POM,POM,height of measurement,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement in m
 Headers,1,pickerInput,choices,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-Headers,3,pickerInput,choices,POMUnitMan,What is your POM unit?,,POMUnit,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Headers,3,pickerInput,choices,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude in degrees
 Headers,1,pickerInput,choices,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude in degrees
 Headers,1,pickerInput,choices,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,X UTM coordinates in m
@@ -44,7 +44,7 @@ Headers,1,pickerInput,choices,CommercialSp,Commercial species indicator,,none,no
 Headers,4,pickerInput,choices,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
 Headers,1,pickerInput,choices,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-Headers,3,pickerInput,choices,TreeHeightUnitMan,What is your tree height unit?,,TreeHeightUnit,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Headers,3,pickerInput,choices,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 Headers,1,pickerInput,choices,LifeForm,Life form,tree/palm/liana/bamboo…,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Life form
 Headers,1,pickerInput,choices,Treatment,Logging treatment,CL/RIL/control/..,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Treatment type
 Headers,1,pickerInput,choices,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil

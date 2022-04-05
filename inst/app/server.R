@@ -12,7 +12,13 @@ options(shiny.maxRequestSize=10*1024^2)
 # read in csv file that has all we want to show in app
 x <- read.csv("data/interactive_items.csv")
 x <- x[x$Activate, ]
-for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
+x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
+x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
+x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
+x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
+x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
+
+# for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
 # install TreeData package
 # devtools::install_github("VincyaneBadouard/TreeData")
@@ -405,20 +411,21 @@ server <- function(input, output, session) {
 
   # Avoid seeing errors
   text_reactive <- reactiveValues(
-    NoData = "No data has been submitted yet."
+    NoData = "No data has been submitted yet.",
+    NoNeed = "This step does not apply to you, click Next again"
   )
 
   output$ui1 <- renderUI({
     p(text_reactive$NoData)
   })
   output$ui2 <- renderUI({
-    p(text_reactive$NoData)
+    p(text_reactive$NoNeed)
   })
   output$ui3 <- renderUI({
-    p(text_reactive$NoData)
+    p(text_reactive$NoNeed)
   })
   output$ui4 <- renderUI({
-    p(text_reactive$NoData)
+    p(text_reactive$NoNeed)
   })
 
   # create options to choose from:
@@ -454,34 +461,72 @@ server <- function(input, output, session) {
                    })
 
                  })
+               })
+  observeEvent(input$Header1Next, {
 
-                 output$ui2 <- renderUI({
+    shinyjs::show("header2")
+    output$ui2 <- renderUI({
 
-                   lapply(c(1:nrow(x2)), function(i) {
-                     if(input[[x2$if_X1_is_none[i]]] %in% "none")
-                       eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i], "= get(x2$argValue[i])()", ifelse(x2$Options[i] != FALSE, paste0(", options = ", x2$Options[i]), ""), ifelse(x2$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+      if(any(reactiveValuesToList(input)[x2$if_X1_is_none] %in% "none")) {
 
-                   })
-                 })
+        value <- isolate(reactiveValuesToList(input)[x2$if_X1_is_none])
+        lapply(c(1:nrow(x2)), function(i) {
+          if(input[[x2$if_X1_is_none[i]]] %in% "none")
+            eval(parse(text = paste(x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i], "= get(x2$argValue[i])()", ifelse(x2$Options[i] != FALSE, paste0(", options = ", x2$Options[i]), ""), ifelse(x2$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
-                 output$ui3 <- renderUI({
+        })
+      } else {
+        p(text_reactive$NoNeed)
+      }
 
-                   lapply(c(1:nrow(x3)), function(i) {
-                     if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
+    })
+  })
 
-                       eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])()", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+  observeEvent(input$Header2Next, {
 
-                   })
-                 })
+    shinyjs::show("header3")
 
+    output$ui3 <- renderUI({
+
+      if(any(reactiveValuesToList(input)[x3$if_X1_is_none] %in% "none" & !reactiveValuesToList(input)[x3$if_X2_isnot_none] %in% "none" )){
+
+        lapply(c(1:nrow(x3)), function(i) {
+          if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" )
+
+            eval(parse(text = paste(x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "= get(x3$argValue[i])()", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+
+        })
+      } else {
+        p(text_reactive$NoNeed)
+      }
+    })
+
+  })
+
+  observeEvent(input$Header3Next, {
+
+
+    shinyjs::show("header4")
                  output$ui4 <- renderUI({
 
-                   lapply(c(1:nrow(x4)), function(i) {
-                     if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" )
-                       eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])()", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                   if(any(!reactiveValuesToList(input)[x4$if_X2_isnot_none] %in% "none" )) {
+                     lapply(c(1:nrow(x4)), function(i) {
+                       if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" )
+                         eval(parse(text = paste(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "= get(x4$argValue[i])()", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
-                   })
+                     })
+                   } else {
+                     p(text_reactive$NoNeed)
+                   }
+
+
                  })
+
+  })
+
+  observeEvent(input$Header4Next, {
+
+    shinyjs::show("header5")
 
                  output$ui5 <- renderUI({
 
@@ -493,7 +538,9 @@ server <- function(input, output, session) {
                    })
                  })
 
-               })
+  })
+
+
 
 
   # format data usin the input
@@ -501,15 +548,15 @@ server <- function(input, output, session) {
   DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
     tryCatch({
-      RequiredFormat(Data = Data(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+      RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
     },
     warning = function(warn){
-      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+      showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
     },
     error = function(err){
-      showNotification(gsub("in RequiredFormat\\(Data = Data\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
+      showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
     })
-  })
+  }, ignoreInit = T)
 
   # Visualize output
   output$tabDataFormated <- renderDT({

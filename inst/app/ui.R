@@ -1,16 +1,13 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table", "stringdist")
-
-#checking missing packages from list
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-
-#install missing ones
-# if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
-
-# load required packages' libraries
-lapply(as.list(list.of.packages), require, character.only = T)
-
-
+library(shinydashboard)
+library(bslib)
+library(DT)
+library(shiny)
+library(shinyjs)
+library(shinyWidgets)
+library(data.tree)
+library(stringr)
+library(stringdist)
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
@@ -325,7 +322,7 @@ body <- dashboardBody(
                        label = "1",
                        style = "pill",
                        color = "warning")
-                     ,   strong("  Match your columns to ours (if you can)"),
+                     ,   strong("  Match your columns to ours (when you can)"),
                      br(),
                      br(),
                      box(
@@ -333,61 +330,41 @@ body <- dashboardBody(
                          width = NULL,
                          # status = "primary",
                          # solidHeader = TRUE,
-                         uiOutput("ui1"))
+                         uiOutput("ui1"),
+                         actionBttn("Header1Next", "next", style = "fill", color = "primary"))
               ),
               column(width = 6,
-                     actionBttn(
-                       inputId = "inactivebutton",
-                       label = "2",
-                       style = "pill",
-                       color = "warning")
-                     ,   strong("  Fill in information that is not in your columns"),
-                     br(),
-                     br(),
-                     box(
-                       # title = "",
-                         width = NULL,
-                         # column(width = 5,
-                         # box(title = "Tell us more about your plot",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         uiOutput("ui2"),
-                         #)
-                         # ),
+                     hidden(
+                       div( id = "header2",
+                            actionBttn(
+                              inputId = "inactivebutton",
+                              label = "2",
+                              style = "pill",
+                              color = "warning")
+                            ,   strong("  Fill in information that is not in your columns"),
+                            br(),
+                            br(),
+                            box(width = NULL,
+                                uiOutput("ui2"),
+                                actionBttn("Header2Next", "next", style = "fill", color = "primary")
+                            )
+                       )),
+                       hidden(
+                         div( id = "header3",
+                              uiOutput("ui3"),
+                              actionBttn("Header3Next", "next", style = "fill", color = "primary"))),
 
-
-                         # column(width = 5,
-                         # box(title = "Tell us about your units",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         #   p("Note: we are not able to handle units varying by rows yet..."),
-                         uiOutput("ui3"),
-                         #        ),
-                         # column(width = 5,
-                         # box(title = "A couple more things...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
+                       hidden(
+                         div( id = "header4",
                          uiOutput("ui4"),
-                         # )
-                         # ),
-                         # column(width = 5,
-                         # box(title = "and lastly...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
-                         uiOutput("ui5")
-                         # )
+                         actionBttn("Header4Next", "next", style = "fill", color = "primary"))),
 
 
-                     ),
-
-
-              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256") #;   position: fixed
+                       hidden(
+                         div( id = "header5",
+                         uiOutput("ui5"),
+                         actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256")))
+             #;   position: fixed
               )
 
 
