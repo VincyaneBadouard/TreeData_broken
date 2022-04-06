@@ -10,6 +10,8 @@
 #'     - TRUE = alive,
 #'     - FALSE = dead,
 #'     - NA = unseen
+#'  The *Plot* column is needed to add rows to the census where the plot was
+#'  inventoried, where the tree was alive, but not recorded.
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same
@@ -87,6 +89,12 @@ StatusCorrection <- function(
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
+  # Plot column exists
+  if (!"Plot" %in% names(Data)){
+    stop("The column 'Plot' must be present in the dataset
+    to add rows to the census where the plot was inventoried, where the tree was alive, but not recorded")
+  }
+
   # InvariantColumns
   if (!inherits(InvariantColumns, "character"))
     stop("'InvariantColumns' argument must be of character class")
@@ -96,21 +104,22 @@ StatusCorrection <- function(
     stop("'DeathConfirmation' argument must be numeric")
 
   # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
-  if(!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
-                        inherits, "logical"))))
+  if (!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
+                         inherits, "logical"))))
     stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # Check if the InvariantColumns name exists in Data
   for(c in InvariantColumns){
-    if(!c %in% names(Data)){
+    if (!c %in% names(Data)){
       stop(paste("InvariantColumns argument must contain one or several column names (see help)."
                  ,c,"is apparently not a dataset's column"))
     }
   }
 
+  # UseSize-DBH
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!DBH %in% names(Data)){
+    if (!"DBH" %in% names(Data)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
            the DBH column must be present in the dataset")
     }
@@ -138,6 +147,8 @@ StatusCorrection <- function(
     PlotCensuses = as.vector(na.omit( # rm NA
       unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
     )),
+    InvariantColumns = InvariantColumns,
+    DeathConfirmation = DeathConfirmation,
     UseSize = UseSize,
     DetectOnly = DetectOnly,
 
@@ -302,7 +313,7 @@ StatusCorrectionByTree <- function(
 
   # UseSize-DBH column
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!DBH %in% names(DataTree)){
+    if(!"DBH" %in% names(DataTree)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
            the DBH column must be present in the dataset")
     }
@@ -319,6 +330,10 @@ StatusCorrectionByTree <- function(
   # Arrange year in ascending order
   DataTree <- DataTree[order(CensusYear)] # order de dt
 
+  if(DetectOnly %in% FALSE){
+    DataTree[, LifeStatusCor := LifeStatus] # we will work on a new col and keep the original col intact
+  }
+
   #### Use the size presence as a witness of the living status of the tree ####
   if(UseSize){
 
@@ -329,14 +344,9 @@ StatusCorrectionByTree <- function(
 
 
     if(DetectOnly %in% FALSE){
-      DataTree[!is.na(DBH), LifeStatusCor := TRUE] # c'est tout ? une taille = vivant ?
+      DataTree[!is.na(DBH), LifeStatusCor := TRUE]
     }
 
-  }else{
-
-    if(DetectOnly %in% FALSE){
-      DataTree[, LifeStatusCor := LifeStatus] # we will work on a new col and keep the original col intact
-    }
   }
 
   #### Sequence analyse ####

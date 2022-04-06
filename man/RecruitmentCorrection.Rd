@@ -50,7 +50,7 @@ recommended to correct the DBH before correcting the recruits
 \examples{
 library(data.table)
 data(TestData)
-# setnames(TestData, "DBH", "DBHCor")
+setnames(TestData, "DBH", "DBHCor")
 
 Rslt <- RecruitmentCorrection(TestData)
 IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]

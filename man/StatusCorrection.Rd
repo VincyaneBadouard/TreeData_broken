@@ -19,7 +19,9 @@ StatusCorrection(
 The \emph{LifeStatus} column must be coded as:
 - TRUE = alive,
 - FALSE = dead,
-- NA = unseen}
+- NA = unseen
+The \emph{Plot} column is needed to add rows to the census where the plot was
+inventoried, where the tree was alive, but not recorded.}
 
 \item{InvariantColumns}{Vector with the names of the columns that are
 supposed to have always the same value for each measurement of the same
