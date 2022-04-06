@@ -1,14 +1,24 @@
 #list of packages required
-list.of.packages <- c("shiny","bslib","DT","shinydashboard","shinyjs", "shinyWidgets", "data.table", "stringdist")
+library(shinydashboard)
+library(bslib)
+library(DT)
+library(shiny)
+library(shinyjs)
+library(shinyWidgets)
+library(data.tree)
+library(stringr)
+library(stringdist)
 
-#checking missing packages from list
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+# read in csv file that has all we want to ask about the headers
+x <- read.csv("data/interactive_items.csv")
+x <- x[x$Activate, ]
+x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
+x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
+x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
+x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
+x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
 
-#install missing ones
-# if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
-
-# load required packages' libraries
-lapply(as.list(list.of.packages), require, character.only = T)
+if(!all(unlist(sapply(list(x1, x2, x3, x4, x5), "[[", "ItemID")) %in% x$ItemID)) stop ("not all interactive items are implemented in the app")
 
 
 
@@ -325,7 +335,7 @@ body <- dashboardBody(
                        label = "1",
                        style = "pill",
                        color = "warning")
-                     ,   strong("  Match your columns to ours (if you can)"),
+                     ,   strong("  Match your columns to ours (when you can)"),
                      br(),
                      br(),
                      box(
@@ -333,63 +343,83 @@ body <- dashboardBody(
                          width = NULL,
                          # status = "primary",
                          # solidHeader = TRUE,
-                         uiOutput("ui1"))
+                         # uiOutput("ui1"),
+
+                           lapply(1:nrow(x1), function(i) {
+
+                             eval(parse(text = paste0(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i]," ='",  x1$Default[i],"'", ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+
+                           })
+
+                         # actionBttn("Header1Next", "next", style = "fill", color = "primary")
+                         )
               ),
               column(width = 6,
-                     actionBttn(
-                       inputId = "inactivebutton",
-                       label = "2",
-                       style = "pill",
-                       color = "warning")
-                     ,   strong("  Fill in information that is not in your columns"),
-                     br(),
-                     br(),
-                     box(
-                       # title = "",
-                         width = NULL,
-                         # column(width = 5,
-                         # box(title = "Tell us more about your plot",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         uiOutput("ui2"),
-                         #)
-                         # ),
 
+                     div(
+                       actionBttn(
+                         inputId = "inactivebutton",
+                         label = "2",
+                         style = "pill",
+                         color = "warning")
+                       ,   strong("  Fill in information that is not in your columns"),
+                       lapply(which(x$ItemID %in% unlist(sapply(list(x2, x3, x4, x5), "[[", "ItemID"))), function(i) {
 
-                         # column(width = 5,
-                         # box(title = "Tell us about your units",
-                         #   width = NULL,
-                         #   status = "primary",
-                         #   solidHeader = TRUE,
-                         #   h4("Only fill this infomation if it is not in a column!"),
-                         #   p("Note: we are not able to handle units varying by rows yet..."),
-                         uiOutput("ui3"),
-                         #        ),
-                         # column(width = 5,
-                         # box(title = "A couple more things...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
-                         uiOutput("ui4"),
-                         # )
-                         # ),
-                         # column(width = 5,
-                         # box(title = "and lastly...",
-                         #     width = NULL,
-                         #     status = "primary",
-                         #     solidHeader = TRUE,
-                         uiOutput("ui5")
-                         # )
+                         eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
-
-                     ),
-
-
-              actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256") #;   position: fixed
+                       }),
+                       actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256")
+                     )
               )
 
+             #           div( id = "header2",
+             #                actionBttn(
+             #                  inputId = "inactivebutton",
+             #                  label = "2",
+             #                  style = "pill",
+             #                  color = "warning")
+             #                ,   strong("  Fill in information that is not in your columns"),
+             #                br(),
+             #                br(),
+             #                box(width = NULL,
+             #                    # uiOutput("ui2"),
+             #                    lapply(c(1:nrow(x2)), function(i) {
+             #
+             #                      eval(parse(text = paste0( x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i]," = '",  x2$Default[i],"'",  ifelse(x2$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+             #
+             #                    })
+             #                    # actionBttn("Header2Next", "next", style = "fill", color = "primary")
+             #                )
+             #           ),
+             #             div( id = "header3",
+             #                  # uiOutput("ui3")
+             #                  box(width = NULL,
+             #                  lapply(c(1:nrow(x3)), function(i)
+             #                    {
+             #                    eval(parse(text = paste0("hidden(", x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "='",  x3$Default[i],"'", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", "))"))))
+             #                  })
+             #                  )
+             #                  # actionBttn("Header3Next", "next", style = "fill", color = "primary")
+             #                  ),
+             #
+             #
+             #             div( id = "header4",
+             #             # uiOutput("ui4"),
+             #             lapply(c(1:nrow(x4)), function(i) {
+             #
+             #                 eval(parse(text = paste0(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "='", x4$Default[i], "'", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+             #
+             #             })
+             #             # actionBttn("Header4Next", "next", style = "fill", color = "primary")
+             #             ),
+             #
+             #
+             #           hidden(
+             #             div( id = "header5",
+             #             uiOutput("ui5"),
+             #             actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256")))
+             # #;   position: fixed
+             #  )
 
     )),
 
