@@ -472,7 +472,7 @@ StatusCorrectionByTree <- function(
 
             # Remove rows after the death (after correction) (User choice)
             if(RemoveRAfterDeath %in% TRUE)
-              DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
+              DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
 
           }
         }
@@ -511,7 +511,7 @@ StatusCorrectionByTree <- function(
 
               # Remove rows after the death (after correction) (User choice)
               if(RemoveRAfterDeath %in% TRUE)
-                DataTree <- DataTree[-(LastAlive +2:nrow(DataTree)),]
+                DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
 
             } # correction end
 
@@ -625,6 +625,21 @@ StatusCorrectionByTree <- function(
 #'
 FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
 
+  #### Arguments check ####
+  # NewRow
+  if (!inherits(NewRow, "data.table"))
+    stop("'NewRow' argument of the 'FillinInvariantColumns' function must be a data.table")
+
+  # DataTree
+  if (!inherits(DataTree, "data.table"))
+    stop("DataTree must be a data.table")
+
+  # if there are several IdTrees
+  if(length(unique(DataTree$IdTree)) != 1){
+    stop("DataTree must correspond to only 1 same tree so 1 same IdTree
+    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),")")
+  }
+
   # Check if the InvariantColumns name exists in DataTree
   for(c in InvariantColumns){
     if(!c %in% names(DataTree)){
@@ -632,6 +647,13 @@ FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
                  ,c,"is apparently not a dataset's column"))
     }
   }
+
+  # IdTree
+  if (!inherits(IdTree, "character"))
+    stop("'IdTree' argument must be of character class")
+
+
+  #### Function ####
 
   # j = "ScientificName"
   for(j in InvariantColumns){
