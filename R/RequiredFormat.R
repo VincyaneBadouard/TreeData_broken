@@ -123,17 +123,17 @@ RequiredFormat <- function(
 
 
   ## Date of measurement ####
-  if(!input$CensusDate %in% "none"){
+  if(!input$Date %in% "none"){
 
-    CensusDateFormat <- input$CensusDateFormat
-    CensusDateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", CensusDateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-    CensusDateFormat <- gsub("yyy", "Y", CensusDateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+   DateFormat <- input$DateFormat
+   DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+   DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
 
-    Data[, CensusDateOriginal := CensusDate]
-    Data[, CensusDate := as.Date(trimws(as.character(CensusDate)), format = CensusDateFormat)]
+    Data[, DateOriginal := Date]
+    Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
 
-    if(any(!is.na(Data$CensusDateOriginal) & is.na(Data$CensusDate))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+    if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
   }
 
@@ -150,8 +150,8 @@ RequiredFormat <- function(
   # Fill in info in column missing ####
 
   ## Year
-  if(input$CensusYear %in% "none") {
-    if(!input$CensusDate %in% "none") Data[, CensusYear := format(CensusDate, "%Y")] else Data[, CensusYear := input$CensusYearMan]
+  if(input$Year %in% "none") {
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else Data[, Year := input$YearMan]
   }
 
 
