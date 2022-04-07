@@ -8,6 +8,7 @@ library(shinyWidgets)
 library(data.tree)
 library(stringr)
 library(stringdist)
+library(data.table)
 
 # read in csv file that has all we want to ask about the headers
 x <- read.csv("data/interactive_items.csv")
@@ -33,7 +34,7 @@ sidebar <- dashboardSidebar(
               menuItem("Stack tables", tabName = "Stacking", icon = icon("layer-group")),
               menuItem("Merge tables", tabName = "Merging", icon = icon("key")),
               menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
-              menuItem("Identify headers", tabName = "Headers", icon = icon("arrows-alt")),
+              menuItem("Headers and Units", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
               menuItem("Save codes and data", tabName="Save", icon = icon("save")),
@@ -260,7 +261,7 @@ body <- dashboardBody(
                 radioButtons(
               "VariableName",
               "What is the meaning of the repeated column?",
-              choices = c("CensusID", "CensusYear", "POM", "StemID"),
+              choices = c("CensusID", "Year", "POM", "StemID"),
               selected = "",
               inline = FALSE
             ),
@@ -274,7 +275,7 @@ body <- dashboardBody(
             # radioButtons(
             #   "VariableName",
             #   "What is the meaning of the repeated column?",
-            #   choices = c("CensusID", "CensusYear", "POM", "StemID"),
+            #   choices = c("CensusID", "Year", "POM", "StemID"),
             #   selected = "",
             #   inline = FALSE
             # ),
@@ -368,8 +369,20 @@ body <- dashboardBody(
                          eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
                        }),
-                       actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256")
-                     )
+                       actionButton("LaunchFormating", label = "Apply changes!", style = "color: #fff; background-color: #009e60; border-color: #317256")
+                     ),
+
+
+
+                     fluidRow(
+
+                       column(width = 12,
+                              h4("summary of your formated table:"),
+                              verbatimTextOutput("FormatedTableSummary"),
+                              h4("View of your formated table:"),
+                              DTOutput(outputId = "FormatedTable")
+                       ))
+
               )
 
              #           div( id = "header2",

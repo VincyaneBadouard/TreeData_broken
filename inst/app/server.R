@@ -585,13 +585,20 @@ server <- function(input, output, session) {
   }, ignoreInit = T)
 
   # Visualize output
-  output$tabDataFormated <- renderDT({
-    # validate(
-    #   need(req(DataFormated()), "AA")
-    # )
-    DataFormated()
-  }, rownames = FALSE,
-  options = list(pageLength = 8, scrollX=TRUE))
+
+
+  output$FormatedTableSummary <- renderDT(DataFormated(), rownames = FALSE,
+                                 options = list(pageLength = 8, scrollX=TRUE))
+
+  output$TidyTableSummary <- renderPrint(summary(DataFormated()))
+
+  # output$tabDataFormated <- renderDT({
+  #   # validate(
+  #   #   need(req(DataFormated()), "AA")
+  #   # )
+  #   DataFormated()
+  # }, rownames = FALSE,
+  # options = list(pageLength = 8, scrollX=TRUE))
 
   # save final data table
 

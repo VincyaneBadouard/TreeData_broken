@@ -8,8 +8,8 @@
 #'   \item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
 #'   \item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
 #'   \item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot (or subplot) area}
-#'   \item{CensusYear}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Census year}
-#'   \item{CensusDate}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Census Date}
+#'   \item{Year}{Value or column name in data set @ParacouSubset (Year) corresponding to Census year}
+#'   \item{Date}{Value or column name in data set @ParacouSubset (Date) corresponding to Census Date}
 #'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
 #'   \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
 #'   \item{IdStem}{Value or column name in data set @ParacouSubset (none) corresponding to Stem ID}
@@ -41,7 +41,7 @@
 #'   \item{Topography}{Value or column name in data set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
 #'   \item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What the unit for plot area?}
-#'   \item{CensusDateFormat}{Value or column name in data set @ParacouSubset (%Y-%m-%d) corresponding to Census Date format}
+#'   \item{DateFormat}{Value or column name in data set @ParacouSubset (%Y-%m-%d) corresponding to Census Date format}
 #'   \item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
 #'   \item{IsCommercrial}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
 

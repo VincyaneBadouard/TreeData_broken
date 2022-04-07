@@ -10,7 +10,7 @@ if(!interactive()) {
       SubPlot = "SubPlot",
       PlotArea = "PlotArea",
       CensusYear = "CensusYear",
-      CensusDate = "CensusDate",
+      Date = "CensusDate",
       TreeFieldNum = "TreeFieldNum",
       IdTree = "idTree",
       IdStem = "none",
@@ -42,7 +42,7 @@ if(!interactive()) {
       Topography = "none",
       CircUnitMan = "cm",
       PlotAreaUnitMan = "ha",
-      CensusDateFormat = "%Y-%m-%d",
+      DateFormat = "%Y-%m-%d",
       IsLive = TRUE,
       IsCommercrial = TRUE
     )
