@@ -75,9 +75,11 @@ RecruitmentCorrection <- function(
     stop("The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
          of the 'RecruitmentCorrection' function must be 1 numeric value each")
 
-  # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  if(DetectOnly %in% FALSE){
+    # InvariantColumns
+    if (!inherits(InvariantColumns, "character"))
+      stop("'InvariantColumns' argument must be of character class")
+  }
 
   # DetectOnly (logical)
   if(!all(unlist(lapply(list(DetectOnly),
@@ -90,11 +92,13 @@ RecruitmentCorrection <- function(
     stop("The 'DBH' (Diameter at Breast Height) or the 'DBHCor' (corrected Diameter at Breast Height)
            column does't exist in the dataset.")
 
-  # Check if the InvariantColumns name exists in Data
-  for(c in InvariantColumns){
-    if(!c %in% names(Data)){
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,c,"is apparently not a dataset's column"))
+  if(DetectOnly %in% FALSE){
+    # Check if the InvariantColumns name exists in Data
+    for(c in InvariantColumns){
+      if(!c %in% names(Data)){
+        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                   ,c,"is apparently not a dataset's column"))
+      }
     }
   }
 
@@ -231,16 +235,15 @@ RecruitmentCorrectionByTree <- function(
     stop("The 'DetectOnly' argument
          of the 'RecruitmentCorrectionByTree' function must be logicals")
 
+  if(!"DBH" %in% names(DataTree) & !"DBHCor" %in% names(DataTree))
+    stop("The 'DBH' (Diameter at Breast Height) or the 'DBHCor' (corrected Diameter at Breast Height)
+           column does't exist in the dataset.")
+
   if(DetectOnly %in% FALSE){
     # DBHCor column exists
     if(!"DBHCor" %in% names(DataTree))
       warning("The 'DBHCor' (corrected Diameter at Breast Height) column does't exist in the dataset.
          We advise to first correct the diameter measurements before correcting the recruitment")
-
-  }else if(DetectOnly %in% TRUE){
-    if(!"DBH" %in% names(DataTree) & !"DBHCor" %in% names(DataTree))
-      stop("The 'DBH' (Diameter at Breast Height) or the 'DBHCor' (corrected Diameter at Breast Height)
-           column does't exist in the dataset.")
   }
 
   # if there are several IdTrees
@@ -362,7 +365,7 @@ RecruitmentCorrectionByTree <- function(
 
           if(is.na(coef[2])) { # if no slope
             ### if only 1 DBH value: replace all non-recruited DBH by this value
-            DataTree[CensusYear < RecruitYear, DBHCor := coef[1]]
+            DataTree[CensusYear < RecruitYear, DBHCor := unique(DataTree$DBHCor)] # DBHCor := coef[1] (ça donne des pptés à la valeur)
           }
           else {
 
@@ -391,11 +394,14 @@ RecruitmentCorrectionByTree <- function(
   } # end: if the plot have previous censuses
 
   if(!"DBHCor" %in% names(InitialDT)){
-  if(DetectOnly %in% TRUE) DataTree[, DBHCor := NULL] # if detect only, remove DBHCor if it didn't exist before
+    if(DetectOnly %in% TRUE) DataTree[, DBHCor := NULL] # if detect only, remove DBHCor if it didn't exist before
 
-  if(DetectOnly %in% FALSE)
-    DataTree[, DBHCor := ifelse(CorrectedRecruit %in% FALSE, NA, DBHCor)] # keep only recruitment correction
-}
+    if(DetectOnly %in% FALSE)
+      DataTree[, DBHCor := ifelse(CorrectedRecruit %in% FALSE, NA, DBHCor)] # keep only recruitment correction
+  }
+
+  DataTree[is.na(Comment), ("Comment") := ""] # NAs come from NewRow
+
   return(DataTree)
 
 }

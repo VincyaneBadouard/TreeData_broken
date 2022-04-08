@@ -278,9 +278,11 @@ StatusCorrectionByTree <- function(
   if (!inherits(PlotCensuses, c("numeric", "integer")))
     stop("'PlotCensuses' argument must be numeric or integer")
 
-  # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  if(DetectOnly %in% FALSE){
+    # InvariantColumns
+    if (!inherits(InvariantColumns, "character"))
+      stop("'InvariantColumns' argument must be of character class")
+  }
 
   # DeathConfirmation
   if (!inherits(DeathConfirmation, "numeric"))
@@ -303,11 +305,13 @@ StatusCorrectionByTree <- function(
     stop(paste0("Tree ",unique(DataTree$IdTree)," has multiple plots: " ,paste0(unique(DataTree$Plot), collapse = "/")))
   }
 
-  # Check if the InvariantColumns name exists in DataTree
-  for(c in InvariantColumns){
-    if(!c %in% names(DataTree)){
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,c,"is apparently not a dataset's column"))
+  if(DetectOnly %in% FALSE){
+    # Check if the InvariantColumns name exists in DataTree
+    for(c in InvariantColumns){
+      if(!c %in% names(DataTree)){
+        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                   ,c,"is apparently not a dataset's column"))
+      }
     }
   }
 
@@ -665,13 +669,13 @@ FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
       if(length(uni) > 1){ # if the "invariant column is not invariant
         stop("The variable ",
              j,
-             " that you defined as a non-varying column -i.e. supposed to have always the same value for each measurement of the same tree- has multiple values for tree ",
+             " that you defined as a non-varying column -i.e. supposed to have always the same value for each measurement of the same tree- has multiple values for tree '",
              IdTree,
-             " and takes the values ",
+             "' and takes the values ",
              uni)
       }
-      else if(length(uni) == 0){ # no value in the invariant column
-        stop("The variable ",j," has no value for individual ",IdTree)
+      else if(is.na(uni) | length(uni) == 0){ # no value in the invariant column
+        stop("The variable ",j," has no value for individual '",IdTree,"'")
       }
       else{
         NewRow[is.na(get(j)), (j) := uni] # fill the invariant column in NewRow with their (unique) value

@@ -13,7 +13,7 @@
 #' in long format.
 #' Dataset extracted from the Guyafor database *WITH ADDING ERRORS*
 #'
-#' @format A tibble with 4854 rows and 32 variables:
+#' @format A tibble with 4855 rows and 32 variables:
 #' \describe{
 #'   \item{Site}{Site name (character)}
 #'   \item{Plot}{Plot number (character)}

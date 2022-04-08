@@ -26,7 +26,6 @@ DBH : diameter in cm
 
 Tests :
 - DataTree[CorrectedRecruit %in% TRUE, DBHCor] >= MinDBH
-- all(DataTree[, CensusYear] %in% PlotCensuses)
 - if only 1 DBH value : DataTree[CorrectedRecruit %in% TRUE, DBHCor] == DataTree[CorrectedRecruit %in% FALSE, DBHCor]
 - all(cresc < PositiveGrowthThreshold & cresc_abs > NegativeGrowthThreshold) # no aberrant growth
 

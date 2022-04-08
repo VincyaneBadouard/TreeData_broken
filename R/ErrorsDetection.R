@@ -43,8 +43,12 @@
 #'
 ErrorsDetection <- function(
   Data,
+  # Life status error detection
   DeathConfirmation = 2,
-  UseSize = FALSE
+  UseSize = FALSE,
+  # Recruitment error detection
+  MinDBH = 10,
+  PositiveGrowthThreshold = 5
 ){
 
   #### Arguments check ####
@@ -63,7 +67,7 @@ ErrorsDetection <- function(
     stop("The 'UseSize' argument of the 'ErrorsDetection' function must be logicals")
 
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!DBH %in% names(Data)){
+    if(!"DBH" %in% names(Data)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
            the DBH column must be present in the dataset")
     }
@@ -268,7 +272,7 @@ ErrorsDetection <- function(
   #             .(IdTree = sort(IdTree), Xutm, Yutm, Comment)]) # to check
 
 
-  #### Check fix Plot and SubPlot number (A FAIRE) ####
+  #### Check fix Plot and SubPlot number (A FAIRE, Eliot a) ####
   # alerte quand le nombre de sous-parcelles/parcelles varie selon les années
 
   #### Internals ####
@@ -319,31 +323,18 @@ ErrorsDetection <- function(
   #### Life status ####
 
   Data <- StatusCorrection(Data,
-                           InvariantColumns = c("Site", # remplacer les val par dft par les inputs
-                                                "Genus",
-                                                "Species",
-                                                "Family",
-                                                "ScientificName"),
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
-                           DetectOnly = DetectOnly,
-
-                           RemoveRBeforeAlive = FALSE,
-                           RemoveRAfterDeath = FALSE)
+                           DetectOnly = DetectOnly)
 
   #### Diameter ####
 
   #### Recruitment ####
 
   Data <- RecruitmentCorrection(Data,
-                        MinDBH = 10, # remplacer les val par dft par les inputs
-                        PositiveGrowthThreshold = 5,
-                        InvariantColumns = c("Site",
-                                             "Genus",
-                                             "Species",
-                                             "Family",
-                                             "ScientificName"),
-                        DetectOnly = DetectOnly
+                                MinDBH = MinDBH,
+                                PositiveGrowthThreshold = PositiveGrowthThreshold,
+                                DetectOnly = DetectOnly
   )
 
   return(Data)

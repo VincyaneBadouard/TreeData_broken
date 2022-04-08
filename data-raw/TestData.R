@@ -88,8 +88,13 @@ Data[CensusYear == 2020 & IdTree == duplicatedID] # to check
 
 #### Unseen tree but alive tree after ####
 
-#### Abnomal growth ####
-#### Abnomal recruit ####
+#### Abnormal growth ####
+#### Abnormal recruit ####
+
+#### Duplicated row ####
+AddR <- Data[1] # the rows to copy
+
+Data <- rbindlist(list(Data, AddR)) # add rows
 
 #### Save this test data in the package ####
 TestData <- Data

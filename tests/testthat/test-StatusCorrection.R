@@ -63,7 +63,7 @@ test_that("StatusCorrection", {
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
 
   # Ids = "a"
-  i = "d"
+  # i = "d"
   for(i in Ids){
 
     Seq <- Rslt[IdTree %in% i, LifeStatus]
