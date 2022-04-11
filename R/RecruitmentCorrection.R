@@ -295,21 +295,25 @@ RecruitmentCorrectionByTree <- function(
 
   }
 
+  #### Detect the overgrown recruits ####
+
   RecruitYear <- min(DataTree[, CensusYear], na.rm = TRUE) # recruitment year
 
   if(RecruitYear > min(PlotCensuses, na.rm = TRUE) & sum(!is.na(DataTree$DBHCor)) > 0){ # if the 1st census of the plot is smaller than the 1st census of the tree, and there are measured DBH
 
     PrevCens <- PlotCensuses[which(PlotCensuses == RecruitYear)-1] # 1 census before the recruit year among the plot censuses
 
-    #### If the 1st DBH is larger than it would have been if at the previous census it was at the minimum DBH ####
     FirstDBH <- DataTree[!is.na(DBHCor), DBHCor][1] # 1st measured DBH
 
     # if(DataTree$DBHCor[1] > (MinDBH + (RecruitYear - PrevCens) * PositiveGrowthThreshold)){ # ah ben il detecte pas mes oublis pcq il considère l'erreur que si l'écart est superieur à la limite de croissance
 
-    if(length(cresc) > 0){
+    # Growth criteria
+    if(length(cresc) > 0){ # if there are a growth
       Growth <- cresc[1]
     }else{Growth <- PositiveGrowthThreshold} # if only 1 DBH value (no cresc)
 
+    # Detection
+    #### If the 1st DBH is larger than it would have been if at the previous census it was at the minimum DBH
     if(FirstDBH > (MinDBH + (RecruitYear - PrevCens) * Growth)){ # ma proposition
 
       DataTree <- GenerateComment(DataTree,
@@ -363,11 +367,11 @@ RecruitmentCorrectionByTree <- function(
           coef <- stats::lm(
             DataTree[!is.na(DBHCor), DBHCor] ~ DataTree[!is.na(DBHCor), CensusYear])$coefficients
 
-          if(is.na(coef[2])) { # if no slope
-            ### if only 1 DBH value: replace all non-recruited DBH by this value
-            DataTree[CensusYear < RecruitYear, DBHCor := unique(DataTree$DBHCor)] # DBHCor := coef[1] (ça donne des pptés à la valeur)
-          }
-          else {
+          if(is.na(coef[2]) | coef[2] %in% 0) { # if no slope
+            ### if only 1 DBH value: replace all non-recruited DBH by this value (pas sure que ce soit une bonne idée)
+            DataTree[CensusYear < RecruitYear, ("DBHCor") := unique(DataTree[!is.na(DBHCor), DBHCor])] # DBHCor := coef[1] (ça donne des pptés à la valeur)
+
+          }else{
 
             # Estimate the recruits DBHCor with linear extrapolation
             RecruitsDBH <- coef[1] + DataTree[CensusYear < RecruitYear, CensusYear]*coef[2] # y = b + ax. Min entre ces DBH inférés et le 1er DBH

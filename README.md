@@ -14,15 +14,23 @@ The package structure diagrams (TreeData_Structure.drawio.html) can be found in 
 
 # Installation (development version)
 
+```
 devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE) # when it becomes public
+```
 
 # Open the shiny app
+
+```
 TreeData::RunApp()
-or
+# or
 shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")
+```
+
 
 # To cite package ‘TreeData’ in publications use:
+```
 citation("TreeData")
+```
 
 To cite package ‘TreeData’ in publications use:
 

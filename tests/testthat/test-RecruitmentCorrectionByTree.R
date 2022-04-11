@@ -5,7 +5,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   TestData <- data.table(Site = "Imaginary forest",
                          IdTree = "a",
                          CensusYear = seq(2000,2008, by = 2), # 2 years/census
-                         DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
+                         DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year) (if integer, it doesn't match with the linear model outputs)
                          CorrectedRecruit = FALSE, # The initial rows are not corrected recruits
                          Comment = ""
   )
@@ -49,6 +49,9 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   expect_error(StatusCorrectionByTree(TwoInd, PlotCensuses = 2001),
                regexp = "DataTree must correspond to only 1 same tree so 1 same IdTree")
 
+  expect_error(StatusCorrectionByTree(TwoInd, PlotCensuses = 2001),
+               regexp = "the IdTrees: a/b")
+
 
   expect_error(RecruitmentCorrectionByTree(TestData, InvariantColumns = "a", PlotCensuses = 2001),
                regexp = "InvariantColumns argument must contain one or several column names")
@@ -56,9 +59,11 @@ test_that("RecruitmentCorrectionByTreeByTree", {
 
   # Check the function work
   MinDBH = 10
+  PositiveGrowthThreshold = 5
   PlotCensuses = seq(1994,2016, by = 2)
   Rslt <- RecruitmentCorrectionByTree(TestData,
                                       MinDBH = MinDBH,
+                                      PositiveGrowthThreshold = PositiveGrowthThreshold,
                                       InvariantColumns = "Site",
                                       PlotCensuses = PlotCensuses)
 
@@ -76,12 +81,29 @@ test_that("RecruitmentCorrectionByTreeByTree", {
 
     expect_true(all(Rslt[CensusYear %in% MissingCens, CorrectedRecruit] %in% TRUE)) # CorrectedRecruit = TRUE in the missing censuses
 
-  # Fill the 'Comment column' of the "fake" recruit
-  expect_true(!any(is.na(Rslt$Column)))  # No NA but "" in the "Comment" column
+    # Fill the 'Comment column' of the "fake" recruit
+    expect_true(!any(is.na(Rslt$Column)))  # No NA but "" in the "Comment" column
 
-  expect_true(Rslt[CensusYear %in% RecruitYear, Comment] != "")
+    expect_true(Rslt[CensusYear %in% RecruitYear, Comment] != "")
 
   }else{stop("No recruitment error detected in this test!")}
+
+
+  # No aberrant growth
+  DBHCor <- Rslt[,DBHCor]
+  CensusYear <- Rslt[,CensusYear]
+
+  cresc <- cresc_abs <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
+
+  if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
+
+    cresc[which(!is.na(DBHCor))[-1] - 1] <- # 4 cresc for 5 dbh values ([-1]), shift all indices by 1 to the left (-1)
+      diff(DBHCor[!is.na(DBHCor)]) / diff(CensusYear[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
+    cresc_abs[which(!is.na(DBHCor))[-1] - 1] <- diff(DBHCor[!is.na(DBHCor)])
+  }
+
+  NegativeGrowthThreshold = 2
+  expect_true(all(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold))
 
 
   # If only 1 DBH value : keep this value for the forgotten recruits
@@ -93,15 +115,13 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   ForgRecruits <- unique(Rslt[CorrectedRecruit %in% TRUE, DBHCor])
   MesurVal <- unique(OneDBHVal[CorrectedRecruit %in% FALSE, DBHCor])
 
- # (MesurVal==ForgRecruits) # ça renvoie FALSE alors que les 2 sont 13...et numeriques
+  expect_true(MesurVal==ForgRecruits)
 
 })
 
-# Create new rows  and Fill CorrectedRecruit = TRUE for the previous missing censuses (yes)
+# Create new rows and Fill CorrectedRecruit = TRUE for the previous missing censuses (yes)
 # min(Rslt$DBHCor) >= MinDBH (yes)
 # Fill the 'Comment column' (yes)
 # if only 1 DBH value : DataTree[CorrectedRecruit %in% TRUE, DBHCor] == DataTree[CorrectedRecruit %in% FALSE, DBHCor]
-# all(cresc < PositiveGrowthThreshold & cresc_abs > NegativeGrowthThreshold) # no aberrant growth
-
-
-
+# all(cresc < PositiveGrowthThreshold & cresc_abs > NegativeGrowthThreshold) # no aberrant growth (yes)
+# deep ckeck of the correction (A FAIRE)
