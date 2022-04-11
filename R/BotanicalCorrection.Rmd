@@ -1,0 +1,153 @@
+---
+title: "BotanicalCorrection"
+author: "Vincyane Badouard"
+date: "11/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Return: ... and fill the 'Comment' column
+
+Details:
+- No special characters (typography) (*TNRS package*)  
+- Check invariant botanical informations per IdTree (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
+- No family name in the genus and species columns (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?) (sort(unique(data[grep("aceae", data$genus), genus]))))  
+- Family & Scientific names match (*BIOMASS::getTaxonomy*)
+- Scientific & vernacular names match
+- Update the scientific botanical names with the current phylogenetic classification
+
++ **add the correction source!**
+
+Tests:
+- No special characters
+- Invariant botanical informations per IdTree
+- No family name in the genus and species columns 
+- Family & Scientific names match
+- Scientific & vernacular names match
+- Update the scientific botanical names with the current phylogenetic classification
+
+
+# Packages libraries
+```{r, include = FALSE}
+library(TreeData)
+library(data.table)
+library(ggplot2)
+```
+
+# Import data & other inputs
+```{r}
+data("TestData")
+setDT(TestData) # data.frame to data.table
+
+# Args
+
+# ScientificVernaTable ou BotaMatchTable # Scientific-vernacular names match table (data.frame)
+```
+
+# Create data with different type of botanical error
+- No special characters
+- Invariant botanical informations per IdTree
+- No family name in the genus and species columns 
+- Family & Scientific names match
+- Scientific & vernacular names match
+- Old scientific name
+```{r}
+# Fabaceae Dicorynia guianensis (angelique) "a"
+# Lecythidaceae Eschweilera sagotiana (maho noir) "b"
+# Chrysobalanaceae Licania alba (koko) "c"
+# Fabaceae Eperua falcata (wapa) "d"
+Data <- data.table(Site = "Nowhere",
+                   IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4)), # 4 ind
+                   Year = rep(c(2000:2003), 4) # 4 years each
+)
+Data <- Data[order(IdTree, Year)]
+Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4))]
+Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("Eperua", 4))]
+Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4))]
+Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4))]
+
+# Create errors
+## Special characters
+Data[IdTree %in% "a" & Year %in% 2003, ("VernName") := "Angélique"] # good answer: "angelique"
+Data[IdTree %in% "a", ("Family") := "Fabacé"] # good answer: "Fabaceae"
+Data[IdTree %in% "c" & Year %in% 2003, ("Genus") := "Licanï_a"] # good answer: "Licania"
+
+## Variant botanical informations per IdTree
+Data[IdTree %in% "d" & Year %in% 2002, ("Species") := "grandiflora"] # good answer: "falcata"
+
+## Family name in the genus/species columns
+Data[IdTree %in% "b", ("Species") := "Lecythidaceae"] # good answer: "sagotiana"
+
+## Family & Scientific names unmatch
+Data[IdTree %in% "c", ("Family") := "Lecythidaceae"] # good answer: "Chrysobalanaceae"
+
+## Scientific & vernacular names unmatch
+Data[IdTree %in% "d" & Year %in% 2003, ("VernName") := "leaf"]  # good answer: "wapa"
+
+## Old scientific name (A trouver)
+
+Data[, ScientificName := paste(Genus, Species)]
+
+```
+
+# Ask to the user
+
+# Check args
+
+# Special characters (Typographie)
+TNRS package
+é, è or œ
+
+
+# Check invariant botanical informations per IdTree
+"Family", "ScientificName", VernName"
+```{r}
+duplicated_ID <- CorresIDs <- vector("character")
+
+# For each site
+for (s in unique(na.omit(Data$Site))) {
+  
+  BotaIDCombination <- na.omit(unique(
+    Data[Data$Site == s, .(IdTree, Family, ScientificName, VernName)]
+  ))
+  
+  CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+  
+  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+    
+    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+    
+    Data <- GenerateComment(Data,
+                            condition =
+                              Data[,Site] == s
+                            & Data[,IdTree] %in% duplicated_ID,
+                            comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
+  }
+} # end site loop
+
+unique(Data[IdTree %in% duplicated_ID,
+            .(IdTree = sort(IdTree), Family, ScientificName, VernName, Comment)]) # to check 
+
+```
+
+# No family name in the genus and species columns
+(detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
+```{r}
+sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
+sort(unique(Data[grep("aceae", Data$Genus), Genus]))
+sort(unique(Data[grep("aceae", Data$Species), Species]))
+
+
+```
+
+
+# Family & Scientific names match
+(*BIOMASS::getTaxonomy*)
+
+# Scientific & vernacular names match
+
+# Update the scientific botanical names with the current phylogenetic classification
+

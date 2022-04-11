@@ -27,22 +27,9 @@ IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 
 Internals:
 + *Bota*
-- Detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?) (sort(unique(data[grep("aceae", data$genus), genus])))
-- Special characters
-- Typographie
-- Check invariant botanical informations per IdTree
-
 + *Life status*
-- Demande à l’utilisateur : considérer la présence d’une mesure comme le statut vivant de l’arbre (pas si l’on mesure les arbres morts)
-- 1st occurrence: Dead
-- années sautées entre 2 occurrences de vivant (missing trees) (add rows) (idTree absent of the last census, but alive at the previous census)
-- NA/Dead entre 2 vivants (LifeStatus impossibles : Jesus-Christ trees (arbre ressuscite) ou desaparecido (arbre non vu à l'inventaire précédent))  
-
 + *Diameter*
-- Check abnormal increase/decrease tree size  
-
 + *Recruitment*
-- DBH > minDBH + (recrutement year - census before)*positivegrowththreshold  
 
 -> Create a comment ("Comment" column) to inform about the error type.  
 
@@ -259,49 +246,6 @@ unique(Data[IdTree %in% duplicated_ID,
 alerte quand le nombre de sous-parcelles/parcelles varie selon les années
 
 # Internals
-
-## Bota
-### Special characters
-### Typographie
-é, è or œ
-### Check invariant botanical informations per IdTree
-"Family", "ScientificName", VernName"
-```{r}
-duplicated_ID <- CorresIDs <- vector("character")
-
-# For each site
-for (s in unique(na.omit(Data$Site))) {
-  
-  BotaIDCombination <- na.omit(unique(
-    Data[Data$Site == s, .(IdTree, Family, ScientificName, VernName)]
-  ))
-  
-  CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
-  
-  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
-    
-    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
-    
-    Data <- GenerateComment(Data,
-                            condition =
-                              Data[,Site] == s
-                            & Data[,IdTree] %in% duplicated_ID,
-                            comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
-  }
-} # end site loop
-
-unique(Data[IdTree %in% duplicated_ID,
-            .(IdTree = sort(IdTree), Family, ScientificName, VernName, Comment)]) # to check 
-
-```
-
-### Gapfill missing botanical names using vernacular names
-based on probabilities of association of vernacular and botanical names.
-The typographie must already have been corrected.
-```{r}
-
-```
-
 ## Life status
 ### Check missing trees compared to the previous census (add rows)
 *Missing tree* = idTree absent of the last census, but alive at the previous census.
