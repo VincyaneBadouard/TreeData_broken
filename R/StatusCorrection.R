@@ -18,9 +18,10 @@
 #'   tree (character)
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
-#'   to be considered dead (numeric)
+#'   to be considered dead (numeric)  (Default = 2 censuses)
 #'
-#' @param UseSize Use the size presence as a witness of the living status of the tree (logical)
+#' @param UseSize Use the size presence as a witness of the living status of the
+#'   tree (logical) (Default = FALSE)
 #'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)

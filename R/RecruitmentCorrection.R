@@ -5,10 +5,10 @@
 #' 'DBHCor', otherwise the function will take the column "DBH"
 #'
 #' @param MinDBH Minimum diameter of trees inventoried according to your
-#'   protocol (in cm) (numeric, 1 value)
+#'   protocol (in cm) (numeric, 1 value) (Default = 10 cm)
 #'
-#' @param PositiveGrowthThreshold A tree widening by more than x
-#'   cm/year is considered abnormal (numeric, 1 value)
+#' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
+#'   considered abnormal (numeric, 1 value) (Default = 5 cm)
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same

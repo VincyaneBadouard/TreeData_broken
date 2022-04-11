@@ -18,10 +18,10 @@ The dataset should preferably contain the column of corrected diameters:
 'DBHCor', otherwise the function will take the column "DBH"}
 
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
-protocol (in cm) (numeric, 1 value)}
+protocol (in cm) (numeric, 1 value) (Default = 10 cm)}
 
-\item{PositiveGrowthThreshold}{A tree widening by more than x
-cm/year is considered abnormal (numeric, 1 value)}
+\item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
+considered abnormal (numeric, 1 value) (Default = 5 cm)}
 
 \item{InvariantColumns}{Vector with the names of the columns that are
 supposed to have always the same value for each measurement of the same

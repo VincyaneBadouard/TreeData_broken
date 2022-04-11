@@ -28,9 +28,10 @@ supposed to have always the same value for each measurement of the same
 tree (character)}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
-to be considered dead (numeric)}
+to be considered dead (numeric)  (Default = 2 censuses)}
 
-\item{UseSize}{Use the size presence as a witness of the living status of the tree (logical)}
+\item{UseSize}{Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}

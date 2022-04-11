@@ -3,9 +3,16 @@
 #' @param Data (data.frame or data.table)
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
-#'   to be considered dead (numeric)
+#'   to be considered dead (numeric) (Default = 2 censuses)
 #'
-#' @param UseSize Use the size presence as a witness of the living status of the tree (logical)
+#' @param UseSize Use the size presence as a witness of the living status of the
+#'   tree (logical) (Default = FALSE)
+#'
+#' @param MinDBH Minimum diameter of trees inventoried according to your
+#'   protocol (in cm) (numeric, 1 value) (Default = 10 cm)
+#'
+#' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
+#'   considered abnormal (numeric, 1 value) (Default = 5 cm)
 #'
 #' @details Detect errors
 #'   - Remove *duplicated rows*

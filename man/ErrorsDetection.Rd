@@ -4,15 +4,28 @@
 \alias{ErrorsDetection}
 \title{ErrorsDetection}
 \usage{
-ErrorsDetection(Data, DeathConfirmation = 2, UseSize = FALSE)
+ErrorsDetection(
+  Data,
+  DeathConfirmation = 2,
+  UseSize = FALSE,
+  MinDBH = 10,
+  PositiveGrowthThreshold = 5
+)
 }
 \arguments{
 \item{Data}{(data.frame or data.table)}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
-to be considered dead (numeric)}
+to be considered dead (numeric) (Default = 2 censuses)}
 
-\item{UseSize}{Use the size presence as a witness of the living status of the tree (logical)}
+\item{UseSize}{Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)}
+
+\item{MinDBH}{Minimum diameter of trees inventoried according to your
+protocol (in cm) (numeric, 1 value) (Default = 10 cm)}
+
+\item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
+considered abnormal (numeric, 1 value) (Default = 5 cm)}
 }
 \value{
 The input dataset (data.table) with a new \emph{Comment} column with error

@@ -5,7 +5,7 @@
 \alias{TestData}
 \title{Test Data of the TreeData package}
 \format{
-A tibble with 4854 rows and 32 variables:
+A tibble with 4855 rows and 32 variables:
 \describe{
 \item{Site}{Site name (character)}
 \item{Plot}{Plot number (character)}
