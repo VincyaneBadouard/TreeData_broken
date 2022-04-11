@@ -36,8 +36,8 @@ sidebar <- dashboardSidebar(
               menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
               menuItem("Headers and Units", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
-              menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
-              menuItem("Save codes and data", tabName="Save", icon = icon("save")),
+              # menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
+              menuItem("Download formated data", tabName="Save", icon = icon("save")),
               menuItem("Help", tabName = "Manual", icon = icon("book"))
   )
 )
@@ -371,6 +371,12 @@ body <- dashboardBody(
                        }),
                        actionButton("LaunchFormating", label = "Apply changes!", style = "color: #fff; background-color: #009e60; border-color: #317256")
                      ),
+                     hidden( actionBttn(
+                       inputId = "GoToCorrect",
+                       label = "Go To Correct",
+                       style = "material-flat",
+                       color = "success"
+                     )),
 
 
 
@@ -437,7 +443,13 @@ body <- dashboardBody(
     )),
 
     tabItem(tabName = "Correct",
-            radioButtons(inputId = "taper", label = "Apply taper corrections?", choices = list("Yes" = "Yes", "No" = "No"), selected = "No")
+            radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
+            actionBttn(
+              inputId = "GoToDownload",
+              label = "Go To Download",
+              style = "material-flat",
+              color = "success"
+            )
             ),
 
     tabItem(tabName = "Visualise",
@@ -460,22 +472,23 @@ body <- dashboardBody(
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbFile", label = "Save file")),
-                     box(title = "Save profile",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbProfile", label = "Save profile")),
-                     box(title = "Save code",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbCode", label = "Save code")),
-                     box(title = "Save metadata",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbMetadata", label = "Save metadata"))
+                         downloadButton(outputId = "dbFile", label = "Save file")) #,
+                     # box(title = "Save profile",
+                     #     width = NULL,
+                     #     status = "primary",
+                     #     solidHeader = TRUE,
+                     #     downloadButton(outputId = "dbProfile", label = "Save profile")),
+                     # box(title = "Save code",
+                     #     width = NULL,
+                     #     status = "primary",
+                     #     solidHeader = TRUE,
+                     #     downloadButton(outputId = "dbCode", label = "Save code")),
+                     # box(title = "Save metadata",
+                     #     width = NULL,
+                     #     status = "primary",
+                     #     solidHeader = TRUE,
+                     #     downloadButton(outputId = "dbMetadata", label = "Save metadata")
+                         # )
               )
             )
     ) # end of "save" panel

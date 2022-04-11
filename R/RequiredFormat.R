@@ -78,9 +78,9 @@ RequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  idx <- match(colnames(Data), input)
+  idx <- match(colnames(Data), input[x$ItemID])
 
-  colnames(Data) <- names(input)[match(colnames(Data), input)]
+  colnames(Data) <- names(input[x$ItemID])[idx]
 
   ## delete columns we don't want
   Data[which(is.na(idx))] <- NULL
@@ -205,7 +205,7 @@ RequiredFormat <- function(
   AreaUnitOptions <- c("m2", "ha", "km2")
 
   ### DBH in cm ####
-  if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
+  # if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
 

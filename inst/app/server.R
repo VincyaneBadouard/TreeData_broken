@@ -582,15 +582,23 @@ server <- function(input, output, session) {
     error = function(err){
       showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
     })
+
+
+
   }, ignoreInit = T)
+
+  observeEvent(input$LaunchFormating , {
+    shinyjs::show("GoToCorrect")
+    }, ignoreInit = T)
+
 
   # Visualize output
 
 
-  output$FormatedTableSummary <- renderDT(DataFormated(), rownames = FALSE,
+  output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
                                  options = list(pageLength = 8, scrollX=TRUE))
 
-  output$TidyTableSummary <- renderPrint(summary(DataFormated()))
+  output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
   # output$tabDataFormated <- renderDT({
   #   # validate(
@@ -599,6 +607,19 @@ server <- function(input, output, session) {
   #   DataFormated()
   # }, rownames = FALSE,
   # options = list(pageLength = 8, scrollX=TRUE))
+
+
+
+  observeEvent(input$GoToCorrect, {
+    updateTabItems(session, "tabs", "Correct")
+  }, ignoreInit = TRUE)
+
+
+  observeEvent(input$GoToDownload , {
+    updateTabItems(session, "tabs", "Save")
+  }, ignoreInit = T)
+
+
 
   # save final data table
 
