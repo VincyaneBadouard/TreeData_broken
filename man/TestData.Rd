@@ -37,9 +37,9 @@ for the botanical identification (numeric)}
 \item{CommercialSp}{Is the tree considered as a commercial species
 according to the list of species that were logged during the sylvicultural
 treatment in Paracou (TRUE) or not (FALSE) ? (logical)}
-\item{CensusYear}{Census year (numeric)}
-\item{CensusDate}{Census Day (when available) (character)}
-\item{CensusDateCertainty}{Is the CensusDate precise (TRUE) or not (FALSE)?
+\item{Year}{Census year (numeric)}
+\item{Date}{Census Day (when available) (character)}
+\item{DateCertainty}{Is the Date precise (TRUE) or not (FALSE)?
 If FALSE, this information must not be considered for calculation (logical)}
 \item{LifeStatus}{Is the tree alive (TRUE) or dead (FALSE)? (logical)}
 \item{MeasCode}{Information on the method for measuring the circumference

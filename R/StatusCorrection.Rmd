@@ -83,24 +83,24 @@ InvariantColumns = c("Site",
 DataTree <- Data[IdTree == "101623"] # For all deads : 100635
 
 AddR <- DataTree[2:5] # the rows to copy
-AddR[, CensusYear := c(2012:2015)] # the rows to add
+AddR[, Year := c(2012:2015)] # the rows to add
 
 DataTree <- rbindlist(list(DataTree, AddR)) # add rows
 
-DataTree <- DataTree[order(CensusYear)]
+DataTree <- DataTree[order(Year)]
 
 DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)] # write the sequence
 
 
-Data <- DataTree[, .(IdTree, LifeStatus, DBH, CensusYear)]
+Data <- DataTree[, .(IdTree, LifeStatus, DBH, Year)]
 
 ```
 
 ```{r}
 Data <- data.table(IdTree = c("a", "b", "c", "d", "e"), # 5 ind
-                   CensusYear = rep(c(2012:2020), 5), # 9 census
+                   Year = rep(c(2012:2020), 5), # 9 census
                    DBH  = NA_real_)
-Data <- Data[order(IdTree, CensusYear)]
+Data <- Data[order(IdTree, Year)]
 Data[,LifeStatus := c(
   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, # "a"
   FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, # "b"
@@ -115,7 +115,7 @@ Data[IdTree %in% "e", ("DBH") := c(13:21)]
 ## Code
 ```{r}
 # Arrange years in ascending order
-DataTree <- DataTree[order(CensusYear)] # order de dt
+DataTree <- DataTree[order(Year)] # order de dt
 
 
 if(!length(unique(DataTree$Plot)) == 1){ # if there are several plots for the same idtree
@@ -150,18 +150,18 @@ if(UseSize){
 # if tree has ever been recorded alive
 if(any(DataTree$LifeStatusCor %in% TRUE)){
   # The first tree life status in the dataset
-  # FirstStatus <- DataTree[CensusYear == min(CensusYear), LifeStatusCor]
+  # FirstStatus <- DataTree[Year == min(Year), LifeStatusCor]
   
   # The first and last Alive record year
-  FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, CensusYear], na.rm = TRUE)
-  # LastAliveYear <- max(DataTree[LifeStatusCor %in% TRUE, CensusYear], na.rm = TRUE)
+  FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
+  # LastAliveYear <- max(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
   
   # Before/between positions (rows id)
   FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
   LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
   
-  # Before <- which(DataTree$CensusYear < FirstAliveYear) # Before the first alive
-  # Between <- which(DataTree$CensusYear > FirstAliveYear & DataTree$CensusYear < LastAliveYear) # Between the fist and last alive
+  # Before <- which(DataTree$Year < FirstAliveYear) # Before the first alive
+  # Between <- which(DataTree$Year > FirstAliveYear & DataTree$Year < LastAliveYear) # Between the fist and last alive
 }
 ```
 
@@ -176,26 +176,26 @@ if(any(DataTree$LifeStatusCor %in% TRUE)){
   # if tree has ever been recorded dead
   if(any(DataTree$LifeStatusCor %in% FALSE)){
     # The last time where the tree has been recorded dead (in case there are several)
-    LastDeathRecord <- max(DataTree[LifeStatusCor %in% FALSE, CensusYear])
+    LastDeathRecord <- max(DataTree[LifeStatusCor %in% FALSE, Year])
     
-    After <- which(DataTree$CensusYear > LastDeathRecord) # After the last death record
+    After <- which(DataTree$Year > LastDeathRecord) # After the last death record
     
     # If there is any "Alive" report after last reported death
     if(any(DataTree$LifeStatusCor[After] %in% TRUE)) {
       # Absents are the absent record years among the plot censuses from the 1st alive record
-      Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$CensusYear)
+      Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$Year)
       
     }else{
       # Absents are the absent record years between first alive record and the last death record
       Absents <- (Censuses > FirstAliveYear &
                     Censuses < LastDeathRecord & # death = the end 
-                    !Censuses %in% DataTree$CensusYear)
+                    !Censuses %in% DataTree$Year)
     }
     
   }else{ # if tree has not been reported dead yet
     
     # Absents are the absent record years among the plot censuses from the 1st alive record
-    Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$CensusYear)
+    Absents <- (Censuses > FirstAliveYear & !Censuses %in% DataTree$Year)
     
   }
   
@@ -205,9 +205,9 @@ if(any(DataTree$LifeStatusCor %in% TRUE)){
   # La j'ai choisi de ne rajouter les lignes absentes qu'entre le census min et max de l'arbre
   # Si tout est FALSE effectivement ça ne sert à rien de rajouter des lignes apres, mais des lignes avant ? il risque d'en avoir beaucoup, et on ne pourra mettre qu'NA
   # Pour tout est NA, ça aurait un intéret de rajouter des lignes avant-après ?
-  Absents <- (Censuses > min(DataTree$CensusYear, na.rm = TRUE) & # entre les bornes, pas avnt pas après
-                Censuses < max(DataTree$CensusYear, na.rm = TRUE) &
-                !Censuses %in% DataTree$CensusYear)
+  Absents <- (Censuses > min(DataTree$Year, na.rm = TRUE) & # entre les bornes, pas avnt pas après
+                Censuses < max(DataTree$Year, na.rm = TRUE) &
+                !Censuses %in% DataTree$Year)
   
 }
 
@@ -256,7 +256,7 @@ if(DetectOnly %in% FALSE){
   if(Nabs > 0){ # if there are absents
     # if(DataTree$Plot[1] == 1) print(DataTree$Plot[1])
     NewRow <- data.table(IdTree = unique(DataTree$IdTree),     # the idtree
-                         CensusYear = Censuses[Absents],       # absent censuses list
+                         Year = Censuses[Absents],       # absent censuses list
                          LifeStatus = NA,                    # not seen
                          LifeStatusCor = NA,               # no corrected status for now
                          Plot = unique(DataTree$Plot),  # the unique plot in DataTree
@@ -281,7 +281,7 @@ if(DetectOnly %in% FALSE){
     # Add these rows in the dataset
     DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
     
-    DataTree <- DataTree[order(CensusYear)] # order by time
+    DataTree <- DataTree[order(Year)] # order by time
     
   } # end: Nabsents > 0
 }
@@ -499,7 +499,7 @@ c("101433","101435","101436","101437","101438","101439","101440",
 
 ```{r}
 # order IdTrees and times in ascending order
-Data <- Data[order(IdTree, CensusYear)]
+Data <- Data[order(IdTree, Year)]
 
 # IdTre
 Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
@@ -508,7 +508,7 @@ Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
 a <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
   Data[IdTree %in% i], # per IdTree, all censuses
   Censuses = as.vector(na.omit( # rm NA
-    unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
+    unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
   )),
   UseSize = UseSize,
   DetectOnly = DetectOnly,

@@ -17,7 +17,7 @@
 #' @details Detect errors
 #'   - Remove *duplicated rows*
 #'   - Check *missing value* in
-#'      X-Yutm/PlotArea/Plot/SubPlot/CensusYear/TreeFieldNum/
+#'      X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
 #'      IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 #'   - Check *missing value* (NA/0) in the measurement variables
 #'   - Check *duplicated TreeFieldNum* in plot-subplot association in a census
@@ -100,7 +100,7 @@ ErrorsDetection <- function(
 
   # Check bota : Family/Genus/Species/ScientificName/VernName
   # Check size : DBH, POM(?)
-  Vars <- c("Plot", "SubPlot", "CensusYear", "TreeFieldNum", "IdTree",
+  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
             "DBH", "POM", "TreeHeight", "StemHeight", "MeasCode",
             "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
 
@@ -135,8 +135,8 @@ ErrorsDetection <- function(
 
   #### Check duplicated TreeFieldNum in plot-subplot association ####
 
-  # Create "PlotSubNum" = "Site/CensusYear/Plot/SubPlot/TreeFieldNum"
-  Data[, PlotSubNum := paste(Site, CensusYear, Plot, SubPlot, TreeFieldNum, sep = "/")]
+  # Create "PlotSubNum" = "Site/Year/Plot/SubPlot/TreeFieldNum"
+  Data[, PlotSubNum := paste(Site, Year, Plot, SubPlot, TreeFieldNum, sep = "/")]
 
   # y = 2017
   # p=1
@@ -148,13 +148,13 @@ ErrorsDetection <- function(
     # For each site
     for (s in unique(na.omit(Data$Site))) {
       # For each census
-      for (y in unique(na.omit(Data$CensusYear))) {
+      for (y in unique(na.omit(Data$Year))) {
         # For each plot
         for (p in unique(na.omit(Data$Plot))) {
           # For each SubPlot in this plot
           for (c in unique(na.omit(Data[Data$Plot==p, SubPlot]))) {
 
-            num <- Data[Data$Site == s & Data$CensusYear == y
+            num <- Data[Data$Site == s & Data$Year == y
                         & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
 
             # if there are several TreeFieldNum per Plot-SubPlot combination
@@ -163,7 +163,7 @@ ErrorsDetection <- function(
 
               Data <- GenerateComment(Data,
                                       condition =
-                                        Data[,Site] == s & Data[,CensusYear] == y
+                                        Data[,Site] == s & Data[,Year] == y
                                       & Data[,Plot] == p & Data[,SubPlot] == c
                                       & Data[,TreeFieldNum] %in% duplicated_num,
                                       comment = "Duplicate TreeFieldNum in the same Plot and SubPlot")
@@ -178,7 +178,7 @@ ErrorsDetection <- function(
   }
 
   Data[, PlotSubNum := NULL]
-  # Data[TreeFieldNum == duplicated_num,.(CensusYear = sort(CensusYear), Plot, SubPlot, TreeFieldNum, Comment)] # to check (1 duplicate)
+  # Data[TreeFieldNum == duplicated_num,.(Year = sort(Year), Plot, SubPlot, TreeFieldNum, Comment)] # to check (1 duplicate)
 
 
   #### Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum, at the site scale ####
@@ -212,8 +212,8 @@ ErrorsDetection <- function(
 
   #### Check duplicated IdTree in a census ####
 
-  # Create "SitYearID" = "Site/CensusYear/IdTree"
-  Data[, SitYearID := paste(Site, CensusYear, IdTree, sep = "/")]
+  # Create "SitYearID" = "Site/Year/IdTree"
+  Data[, SitYearID := paste(Site, Year, IdTree, sep = "/")]
 
   duplicated_ids <- ids <- vector("character")
 
@@ -222,17 +222,17 @@ ErrorsDetection <- function(
     # For each site
     for (s in unique(na.omit(Data$Site))) {
       # For each census
-      for (y in unique(na.omit(Data$CensusYear))) {
+      for (y in unique(na.omit(Data$Year))) {
 
-        ids <- Data[Data$Site == s & Data$CensusYear == y,]$IdTree # all the IdTree for each Site and CensusYear combination
+        ids <- Data[Data$Site == s & Data$Year == y,]$IdTree # all the IdTree for each Site and Year combination
 
-        # if there are several IdTree per Site and CensusYear combination
+        # if there are several IdTree per Site and Year combination
         if(anyDuplicated(ids) != 0){
           duplicated_ids <- unique(ids[duplicated(ids)])
 
           Data <- GenerateComment(Data,
                                   condition =
-                                    Data[,Site] == s & Data[,CensusYear] == y
+                                    Data[,Site] == s & Data[,Year] == y
                                   & Data[,IdTree] %in% duplicated_ids,
                                   comment = "Duplicated IdTree in the census")
         }
@@ -242,7 +242,7 @@ ErrorsDetection <- function(
 
   Data[, SitYearID := NULL]
 
-  # Data[IdTree == duplicated_ids,.(CensusYear = sort(CensusYear), Plot, SubPlot, TreeFieldNum, IdTree, Comment)] # to check
+  # Data[IdTree == duplicated_ids,.(Year = sort(Year), Plot, SubPlot, TreeFieldNum, IdTree, Comment)] # to check
 
 
   ## Check for trees outside the subplot (A FAIRE)

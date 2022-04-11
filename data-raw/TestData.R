@@ -27,7 +27,7 @@ Data[modif, Yutm := NA]
 # Data[modif] # to check
 
 #### Other missing values ####
-Vars <- c("PlotArea", "Plot", "SubPlot", "CensusYear", "TreeFieldNum", "IdTree",
+Vars <- c("PlotArea", "Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
           "DBH", "LifeStatus", "MeasCode", "Family", "Genus", "Species",
           "VernName", "ScientificName", "CommercialSp")
 
@@ -54,8 +54,8 @@ Data[modif, DBH := DBH + sample(wrong,1)]
 
 #### Resurrected tree ####
 
-Last_census <- Data[CensusYear == 2020]
-Previous_census <- Data[CensusYear == 2019]
+Last_census <- Data[Year == 2020]
+Previous_census <- Data[Year == 2019]
 
 # See if a resurrected tree already exists
 MortPrev <- Previous_census[LifeStatus == 0 & IdTree %in% Last_census[LifeStatus == 1, IdTree], IdTree]
@@ -84,7 +84,7 @@ duplicatedID <- Last_census[!(IdTree %in% idModif), sample(IdTree, 1)] # select 
 
 Data[IdTree %in% idModif, IdTree := duplicatedID] # we duplicate the IdTree on the previous selected IdTree
 
-Data[CensusYear == 2020 & IdTree == duplicatedID] # to check
+Data[Year == 2020 & IdTree == duplicatedID] # to check
 
 #### Unseen tree but alive tree after ####
 

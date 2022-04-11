@@ -58,7 +58,7 @@ TreesCorr <- Rslt[IdTree \%in\% IdCorr]
 
 library(ggplot2)
 ggplot(TreesCorr) +
-aes(x = CensusYear, y = DBHCor) +
+aes(x = Year, y = DBHCor) +
   geom_line(size = 0.5, colour = "#112446") +
   geom_point(shape = "circle", size = 1.5, mapping = aes(color = CorrectedRecruit)) +
   theme_minimal() +

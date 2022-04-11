@@ -5,7 +5,7 @@ test_that("StatusCorrectionByTree", {
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
                          IdTree = "a", # 1 ind
-                         CensusYear = seq(2012,2028, by=2), # 9 census
+                         Year = seq(2012,2028, by=2), # 9 census
                          DBH = NA_real_,
                          LifeStatus = c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA))
 
@@ -15,8 +15,8 @@ test_that("StatusCorrectionByTree", {
   NoDBHData <- TestData[, !c("DBH")]
   TwoInd <- copy(TestData)
   TwoPlot <- copy(TestData)
-  TwoInd[CensusYear == 2014, ("IdTree") := "b"] # a NA in the "e" DBH seq
-  TwoPlot[CensusYear == 2014, ("Plot") := "2"] # a NA in the "e" DBH seq
+  TwoInd[Year == 2014, ("IdTree") := "b"] # a NA in the "e" DBH seq
+  TwoPlot[Year == 2014, ("Plot") := "2"] # a NA in the "e" DBH seq
 
 
 
@@ -56,7 +56,7 @@ test_that("StatusCorrectionByTree", {
                regexp = "the DBH column must be present in the dataset")
 
   # Check the function work
-  Rslt <- StatusCorrectionByTree(TestData, PlotCensuses = TestData$CensusYear, InvariantColumns = "Site",
+  Rslt <- StatusCorrectionByTree(TestData, PlotCensuses = TestData$Year, InvariantColumns = "Site",
                                  RemoveRBeforeAlive = TRUE,
                                  RemoveRAfterDeath = TRUE)
 
@@ -74,7 +74,7 @@ test_that("StatusCorrectionByTree", {
   PlotCensuses = c(2011:2028)
   Rslt <- StatusCorrectionByTree(TestData, PlotCensuses = PlotCensuses, InvariantColumns = "Site")
 
-  all(TestData$CensusYear %in% Rslt$CensusYear)
-  all(Rslt$CensusYear %in% PlotCensuses)
+  all(TestData$Year %in% Rslt$Year)
+  all(Rslt$Year %in% PlotCensuses)
 
 })

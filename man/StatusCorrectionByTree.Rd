@@ -77,11 +77,11 @@ Data <- TestData
 DataTree <- Data[IdTree == "101623"]
 
 AddR <- DataTree[2:5] # the rows to copy
-AddR[, CensusYear := c(2012:2015)] # the rows to add
+AddR[, Year := c(2012:2015)] # the rows to add
 
 DataTree <- rbindlist(list(DataTree, AddR)) # add rows
 
-DataTree <- DataTree[order(CensusYear)] # arrange years in ascending order
+DataTree <- DataTree[order(Year)] # arrange years in ascending order
 
 # Write the sequence
 DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
@@ -90,12 +90,12 @@ Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021))
 
 library(ggplot2)
 ggplot(DataTree) +
-  aes(x = CensusYear, y = LifeStatus) +
+  aes(x = Year, y = LifeStatus) +
   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
   theme_minimal()
 
 ggplot(Rslt) +
-  aes(x = CensusYear, y = LifeStatusCor) +
+  aes(x = Year, y = LifeStatusCor) +
   geom_point(shape = "circle", size = 4L, colour = "#46337E") +
   theme_minimal()
 

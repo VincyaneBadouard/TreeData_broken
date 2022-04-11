@@ -45,7 +45,7 @@
 #'
 #' library(ggplot2)
 #' ggplot(TreesCorr) +
-#' aes(x = CensusYear, y = DBHCor) +
+#' aes(x = Year, y = DBHCor) +
 #'   geom_line(size = 0.5, colour = "#112446") +
 #'   geom_point(shape = "circle", size = 1.5, mapping = aes(color = CorrectedRecruit)) +
 #'   theme_minimal() +
@@ -114,7 +114,7 @@ RecruitmentCorrection <- function(
   }
 
   # Order IdTrees and times in ascending order
-  Data <- Data[order(IdTree, CensusYear)]
+  Data <- Data[order(IdTree, Year)]
 
   # IdTrees vector
   Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
@@ -130,7 +130,7 @@ RecruitmentCorrection <- function(
     PositiveGrowthThreshold = PositiveGrowthThreshold,
     InvariantColumns = InvariantColumns,
     PlotCensuses = as.vector(na.omit( # rm NA
-      unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
+      unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
     )),
     DetectOnly = DetectOnly
   )
@@ -186,7 +186,7 @@ RecruitmentCorrection <- function(
 #' @examples
 #' library(data.table)
 #' DataTree <- data.table(IdTree = "a",
-#'                        CensusYear = seq(2000,2008, by = 2), # 2 years/census
+#'                        Year = seq(2000,2008, by = 2), # 2 years/census
 #'                        DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
 #'                        Site = "Imaginary forest"
 #' )
@@ -280,24 +280,24 @@ RecruitmentCorrectionByTree <- function(
 
   # Arrange year in ascending order
   PlotCensuses <- sort(PlotCensuses, decreasing = FALSE) # order plot census years
-  DataTree <- DataTree[order(CensusYear)] # order years in the data
+  DataTree <- DataTree[order(Year)] # order years in the data
 
   #### Compute annual diameter incrementation ####
   DBHCor <- DataTree[,DBHCor]
-  CensusYear <- DataTree[,CensusYear]
+  Year <- DataTree[,Year]
   # Initialisation
   cresc <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
 
   if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
 
     cresc[which(!is.na(DBHCor))[-1] - 1] <- # 8 cresc for 9 dbh values ([-1]), shift all indices by 1 to the left (-1)
-      diff(DBHCor[!is.na(DBHCor)]) / diff(CensusYear[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
+      diff(DBHCor[!is.na(DBHCor)]) / diff(Year[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
 
   }
 
   #### Detect the overgrown recruits ####
 
-  RecruitYear <- min(DataTree[, CensusYear], na.rm = TRUE) # recruitment year
+  RecruitYear <- min(DataTree[, Year], na.rm = TRUE) # recruitment year
 
   if(RecruitYear > min(PlotCensuses, na.rm = TRUE) & sum(!is.na(DataTree$DBHCor)) > 0){ # if the 1st census of the plot is smaller than the 1st census of the tree, and there are measured DBH
 
@@ -317,7 +317,7 @@ RecruitmentCorrectionByTree <- function(
     if(FirstDBH > (MinDBH + (RecruitYear - PrevCens) * Growth)){ # ma proposition
 
       DataTree <- GenerateComment(DataTree,
-                                  condition = DataTree[, CensusYear]  %in% RecruitYear,
+                                  condition = DataTree[, Year]  %in% RecruitYear,
                                   comment = "This DBH is/was the 1st recorded for this tree,
                                   according to its annual growth and the census done for this plot,
                                   it should have been recruited earlier according to your protocol (MinDBH).")
@@ -330,14 +330,14 @@ RecruitmentCorrectionByTree <- function(
         if(length(MissingCens) > 0){
           if("Plot" %in% names(DataTree)){ # if we have the plot info
             NewRow <- data.table(IdTree = unique(DataTree$IdTree), # the IdTree
-                                 CensusYear = NA, # the censuses to add
+                                 Year = NA, # the censuses to add
                                  Plot = unique(DataTree$Plot), # the unique plot of the tree
                                  CorrectedRecruit = TRUE, # there are corrected recruits
                                  stringsAsFactors = FALSE) # do not convert characters into factors
           }
           else{
             NewRow <- data.table(IdTree = unique(DataTree$IdTree), # the IdTree
-                                 CensusYear = NA, # the censuses to add
+                                 Year = NA, # the censuses to add
                                  CorrectedRecruit = TRUE, # there are corrected recruits
                                  stringsAsFactors = FALSE) # do not convert characters into factors
           }
@@ -355,37 +355,37 @@ RecruitmentCorrectionByTree <- function(
 
           # Multiply this new row the number of times as well as the number of absents
           NewRows <- do.call("rbind", replicate(n = length(MissingCens), NewRow, simplify = FALSE))
-          NewRows[, CensusYear := MissingCens]
+          NewRows[, Year := MissingCens]
 
           # Add these rows in the dataset
           DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
           DataTree[, CorrectedRecruit := ifelse(is.na(CorrectedRecruit), FALSE, CorrectedRecruit)] # FALSE for the other rows
 
-          DataTree <- DataTree[order(CensusYear)] # order by CensusYear
+          DataTree <- DataTree[order(Year)] # order by Year
 
           #### Linear regression (DBH ~ Year) #### with all the DBH values
           coef <- stats::lm(
-            DataTree[!is.na(DBHCor), DBHCor] ~ DataTree[!is.na(DBHCor), CensusYear])$coefficients
+            DataTree[!is.na(DBHCor), DBHCor] ~ DataTree[!is.na(DBHCor), Year])$coefficients
 
           if(is.na(coef[2]) | coef[2] %in% 0) { # if no slope
             ### if only 1 DBH value: replace all non-recruited DBH by this value (pas sure que ce soit une bonne idée)
-            DataTree[CensusYear < RecruitYear, ("DBHCor") := unique(DataTree[!is.na(DBHCor), DBHCor])] # DBHCor := coef[1] (ça donne des pptés à la valeur)
+            DataTree[Year < RecruitYear, ("DBHCor") := unique(DataTree[!is.na(DBHCor), DBHCor])] # DBHCor := coef[1] (ça donne des pptés à la valeur)
 
           }else{
 
             # Estimate the recruits DBHCor with linear extrapolation
-            RecruitsDBH <- coef[1] + DataTree[CensusYear < RecruitYear, CensusYear]*coef[2] # y = b + ax. Min entre ces DBH inférés et le 1er DBH
+            RecruitsDBH <- coef[1] + DataTree[Year < RecruitYear, Year]*coef[2] # y = b + ax. Min entre ces DBH inférés et le 1er DBH
 
             # If estimated DBHCors are higher than the first measured DBHCors, (comment c possible ?)
             # these are replaced by first measured DBHCors.
             for(y in 1: length(RecruitsDBH)){
               RecruitsDBH[y] <- min(RecruitsDBH[y], FirstDBH)
             }
-            DataTree[CensusYear < RecruitYear, ("DBHCor") := RecruitsDBH]
+            DataTree[Year < RecruitYear, ("DBHCor") := RecruitsDBH]
           }
 
           # UselessRows: added trees under the MinDBH
-          UselessRows <- ((DataTree[, DBHCor] < MinDBH) & (DataTree[, CensusYear] %in% MissingCens))
+          UselessRows <- ((DataTree[, DBHCor] < MinDBH) & (DataTree[, Year] %in% MissingCens))
 
           if(any(UselessRows)){
             DataTree <- DataTree[-which(UselessRows)] # remove them

@@ -4,7 +4,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   library(data.table)
   TestData <- data.table(Site = "Imaginary forest",
                          IdTree = "a",
-                         CensusYear = seq(2000,2008, by = 2), # 2 years/census
+                         Year = seq(2000,2008, by = 2), # 2 years/census
                          DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year) (if integer, it doesn't match with the linear model outputs)
                          CorrectedRecruit = FALSE, # The initial rows are not corrected recruits
                          Comment = ""
@@ -15,7 +15,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   # Create test data
   MatrixData <- as.matrix(TestData)
   TwoInd <- copy(TestData)
-  TwoInd[CensusYear == 2002, ("IdTree") := "b"]
+  TwoInd[Year == 2002, ("IdTree") := "b"]
   NoDBHData <- TestData[, !c("DBHCor")]
   NoDBHCorData <- copy(TestData)
   setnames(NoDBHCorData, "DBHCor", "DBH") # only DBH
@@ -71,7 +71,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   expect_true(min(Rslt$DBHCor) >= MinDBH)
 
   # Create new rows  and Fill CorrectedRecruit = TRUE for the previous missing censuses
-  RecruitYear <- min(TestData[, CensusYear])
+  RecruitYear <- min(TestData[, Year])
   FirstDBH <- TestData[!is.na(DBHCor), DBHCor][1] # 1st measured DBH
   PrevCens <- PlotCensuses[which(PlotCensuses == RecruitYear)-1] # 1 census before the recruit year among the plot censuses
 
@@ -79,26 +79,26 @@ test_that("RecruitmentCorrectionByTreeByTree", {
 
     MissingCens <- PlotCensuses[which(PlotCensuses < RecruitYear)] # the previous missing censuses
 
-    expect_true(all(Rslt[CensusYear %in% MissingCens, CorrectedRecruit] %in% TRUE)) # CorrectedRecruit = TRUE in the missing censuses
+    expect_true(all(Rslt[Year %in% MissingCens, CorrectedRecruit] %in% TRUE)) # CorrectedRecruit = TRUE in the missing censuses
 
     # Fill the 'Comment column' of the "fake" recruit
     expect_true(!any(is.na(Rslt$Column)))  # No NA but "" in the "Comment" column
 
-    expect_true(Rslt[CensusYear %in% RecruitYear, Comment] != "")
+    expect_true(Rslt[Year %in% RecruitYear, Comment] != "")
 
   }else{stop("No recruitment error detected in this test!")}
 
 
   # No aberrant growth
   DBHCor <- Rslt[,DBHCor]
-  CensusYear <- Rslt[,CensusYear]
+  Year <- Rslt[,Year]
 
   cresc <- cresc_abs <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
 
   if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
 
     cresc[which(!is.na(DBHCor))[-1] - 1] <- # 4 cresc for 5 dbh values ([-1]), shift all indices by 1 to the left (-1)
-      diff(DBHCor[!is.na(DBHCor)]) / diff(CensusYear[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
+      diff(DBHCor[!is.na(DBHCor)]) / diff(Year[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
     cresc_abs[which(!is.na(DBHCor))[-1] - 1] <- diff(DBHCor[!is.na(DBHCor)])
   }
 

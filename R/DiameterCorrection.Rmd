@@ -57,41 +57,41 @@ DetectOnly = FALSE # (logical)
 # Create data
 ## With regular time between census
 # Data <- data.table(IdTree = c("a", "b", "c", "d"), # 4 ind
-#                    CensusYear = rep(seq(2000,2016, by = 2), 4), # 9 DBH values each (2 years between 2 census)
+#                    Year = rep(seq(2000,2016, by = 2), 4), # 9 DBH values each (2 years between 2 census)
 #                    DBH  = c(13:21), # 1 cm/census (0.5 cm/year)
 #                    POM = 0) # default POM
 
 ## With irregular time between census
 Data <- data.table(IdTree = c("a", "b", "c", "d"), # 4 ind
-                   CensusYear = rep(c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), 4), # 9 DBH values each (2 years between 2 census)
+                   Year = rep(c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), 4), # 9 DBH values each (2 years between 2 census)
                    DBH  = c(13:17, 19:21, 23), # 0.5 cm/year
                    POM = 0) # default POM
 
 # check their growth
 ggplot(Data) +
-  aes(x = CensusYear, y = DBH) +
+  aes(x = Year, y = DBH) +
   geom_line(size = 0.5, colour = "#46337E") +
   geom_point(shape = "circle", size = 1.5, colour = "#112446") +
   theme_minimal() +
   facet_wrap(vars(IdTree), scales = "free")
 
 # Create errors
-Data <- Data[order(IdTree, CensusYear)]
+Data <- Data[order(IdTree, Year)]
 
 ## 1 punctual error : growth > 5 cm DBH/year
-Data[IdTree %in% "a", DBH := ifelse(CensusYear %in% 2008, 16+(5*2)+4, DBH)]
+Data[IdTree %in% "a", DBH := ifelse(Year %in% 2008, 16+(5*2)+4, DBH)]
 
 ## 1 punctual error : growth < -2 cm DBH/census
-Data[IdTree %in% "b", DBH := ifelse(CensusYear %in% 2008, 16-4, DBH)] 
+Data[IdTree %in% "b", DBH := ifelse(Year %in% 2008, 16-4, DBH)] 
 
 ## 2 punctual errors : growth > 5 cm DBH/year & growth < -2 cm DBH/census
-Data[IdTree %in% "a", DBH := ifelse(CensusYear %in% 2014, 19-4, DBH)] 
+Data[IdTree %in% "a", DBH := ifelse(Year %in% 2014, 19-4, DBH)] 
 
 ## 2 shift error with available POM : growth < -2 cm DBH/census with no return to normal
 
-Data[IdTree %in% "c" & CensusYear %in% c(2008:2014), ("POM") := 1]  
+Data[IdTree %in% "c" & Year %in% c(2008:2014), ("POM") := 1]  
 
-Data[IdTree %in% "c" & CensusYear %in% c(2016:2020), ("POM") := 2] 
+Data[IdTree %in% "c" & Year %in% c(2016:2020), ("POM") := 2] 
 
 Data[POM %in% 1, ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # 1st shift, always 0.5cm/yearr
 Data[POM %in% 2, ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
@@ -99,11 +99,11 @@ Data[POM %in% 2, ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
 
 ## 2 shift error without available POM : growth < -2 cm DBH/census with no return to normal
 Data[IdTree %in% "d", ("POM") := NA] # no POM
-Data[IdTree %in% "d" & CensusYear %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # only 1 shift
+Data[IdTree %in% "d" & Year %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # only 1 shift
 
 # check their growth
 ggplot(Data) +
-  aes(x = CensusYear, y = DBH) +
+  aes(x = Year, y = DBH) +
   geom_line(size = 0.5, colour = "#46337E") +
   geom_point(shape = "circle", size = 1.5, colour = "#112446") +
   theme_minimal() +
@@ -113,7 +113,7 @@ ggplot(Data) +
 id <- "c"
 IdTree <- unique(Data[IdTree %in% id, IdTree])
 DBHCor <- DBH <- Data[IdTree %in% id, DBH]
-Time <- Data[IdTree %in% id, CensusYear]
+Time <- Data[IdTree %in% id, Year]
 POM <- Data[IdTree %in% id, POM]
 ```
 
@@ -343,7 +343,7 @@ ggplot() +
 id <- "a"
 IdTree <- unique(Data[IdTree %in% id, IdTree])
 DBHCor <- DBH <- Data[IdTree %in% id, DBH]
-Time <- Data[IdTree %in% id, CensusYear]
+Time <- Data[IdTree %in% id, Year]
 POM <- Data[IdTree %in% id, POM]
 
 # Update cresc (for the i loop)
@@ -462,7 +462,7 @@ TrustMeasSet = c("A", "B","C1","C2")
 id <- "d"
 IdTree <- unique(Data[IdTree %in% id, IdTree])
 DBHCor <- DBH <- Data[IdTree %in% id, DBH]
-Time <- Data[IdTree %in% id, CensusYear]
+Time <- Data[IdTree %in% id, Year]
 POM <- Data[IdTree %in% id, POM]
 
 Scenarios <- vector('list',length(TrustMeasSet))
@@ -587,9 +587,9 @@ for(s in 1:length(Scenarios)){
 ```{r}
 ## 2 shift error without available POM : growth < -2 cm DBH/census with no return to normal
 Data[IdTree %in% "d", ("POM") := NA] # no POM
-# Data[IdTree %in% "d" & CensusYear %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # only 1 shift
-Data[IdTree %in% "d" & CensusYear %in% c(2008:2014), ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # 1st shift, always 0.5cm/year
-Data[IdTree %in% "d" & CensusYear %in% c(2016:2020), ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
+# Data[IdTree %in% "d" & Year %in% c(2008:2020), ("DBH") := c(16-4, (16-4)+2, (16-4)+3, (16-4)+4, (16-4)+6)] # only 1 shift
+Data[IdTree %in% "d" & Year %in% c(2008:2014), ("DBH") := c(16-4, (16-4)+2, (16-4)+3)] # 1st shift, always 0.5cm/year
+Data[IdTree %in% "d" & Year %in% c(2016:2020), ("DBH") := c(15-4, (15-4)+2)] # 2nd shift, always 0.5cm/year
 ```
 
 
@@ -600,7 +600,7 @@ TrustMeasSet = c("A", "B","C1","C2")
 id <- "d"
 IdTree <- unique(Data[IdTree %in% id, IdTree])
 DBHCor <- DBH <- Data[IdTree %in% id, DBH]
-Time <- Data[IdTree %in% id, CensusYear]
+Time <- Data[IdTree %in% id, Year]
 POM <- Data[IdTree %in% id, POM]
 
 Scenarios <- vector('list',length(TrustMeasSet))
@@ -740,7 +740,7 @@ if(!PioneerSp %in% names(Data))
   Data[, PioneerSp := ifelse(VernName %in% Pioneers, TRUE, FALSE)]
 
 # Order IdTrees and times in ascending order
-Data <- Data[order(IdTree, CensusYear)]
+Data <- Data[order(IdTree, Year)]
 
 # IdTrees vector
 Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
@@ -755,7 +755,7 @@ pb <- utils::txtProgressBar(min = 0, max = length(Ids), style = 3) # a progress 
 Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
   Data[IdTree %in% i], # per IdTree, all censuses
   Censuses = as.vector(na.omit( # rm NA
-    unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
+    unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
   )),
   DetectOnly = DetectOnly
 )

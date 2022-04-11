@@ -4,7 +4,6 @@
 #'
 #' @format A tibble
 #' \describe{
-#'   x
 #'   \item{Site}{Site level name}
 #'   \item{Plot}{Plot level name}
 #'   \item{SubPlot}{SubPlot level name}

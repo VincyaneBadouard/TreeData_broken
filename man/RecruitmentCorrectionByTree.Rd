@@ -54,7 +54,7 @@ recommended to correct the DBH before correcting the recruits
 \examples{
 library(data.table)
 DataTree <- data.table(IdTree = "a",
-                       CensusYear = seq(2000,2008, by = 2), # 2 years/census
+                       Year = seq(2000,2008, by = 2), # 2 years/census
                        DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
                        Site = "Imaginary forest"
 )

@@ -31,8 +31,8 @@ test_that("ErrorsDetection", {
   ## Remove *duplicated rows*
   expect_true(anyDuplicated(TestData)!= 0 & anyDuplicated(Rslt) == 0)
 
-  ## Check *missing value* in (X-Yutm/PlotArea/Plot/SubPlot/CensusYear/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName)
-  Vars <- c("Plot", "SubPlot", "CensusYear", "TreeFieldNum", "IdTree",
+  ## Check *missing value* in (X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName)
+  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
             "DBH", "POM", "TreeHeight", "StemHeight", "MeasCode",
             "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
   # v =1
@@ -66,20 +66,20 @@ test_that("ErrorsDetection", {
   # For each site
   for (s in unique(na.omit(Rslt$Site))) {
     # For each census
-    for (y in unique(na.omit(Rslt$CensusYear))) {
+    for (y in unique(na.omit(Rslt$Year))) {
       # For each plot
       for (p in unique(na.omit(Rslt$Plot))) {
         # For each SubPlot in this plot
         for (c in unique(na.omit(Rslt[Rslt$Plot==p, SubPlot]))) {
 
-          num <- Rslt[Rslt$Site == s & Rslt$CensusYear == y
+          num <- Rslt[Rslt$Site == s & Rslt$Year == y
                       & Rslt$Plot == p & Rslt$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
 
           # if there are several TreeFieldNum per Plot-SubPlot combination
           if(anyDuplicated(num) != 0){
             duplicated_num <- unique(num[duplicated(num)])
 
-            DuplFieldNbr <- (Rslt[,Site] == s & Rslt[,CensusYear] == y
+            DuplFieldNbr <- (Rslt[,Site] == s & Rslt[,Year] == y
                              & Rslt[,Plot] == p & Rslt[,SubPlot] == c
                              & Rslt[,TreeFieldNum] %in% duplicated_num)
 
@@ -124,15 +124,15 @@ test_that("ErrorsDetection", {
   # For each site
   for (s in unique(na.omit(Rslt$Site))) {
     # For each census
-    for (y in unique(na.omit(Rslt$CensusYear))) {
+    for (y in unique(na.omit(Rslt$Year))) {
 
-      ids <- Rslt[Rslt$Site == s & Rslt$CensusYear == y,]$IdTree # all the IdTree for each Site and CensusYear combination
+      ids <- Rslt[Rslt$Site == s & Rslt$Year == y,]$IdTree # all the IdTree for each Site and Year combination
 
-      # if there are several IdTree per Site and CensusYear combination
+      # if there are several IdTree per Site and Year combination
       if(anyDuplicated(ids) != 0){
         duplicated_ids <- unique(ids[duplicated(ids)])
 
-        DuplIdTree <- (Rslt[,Site] == s & Rslt[,CensusYear] == y
+        DuplIdTree <- (Rslt[,Site] == s & Rslt[,Year] == y
                  & Rslt[,IdTree] %in% duplicated_ids)
 
         expect_true(all(Rslt$Comment[DuplIdTree] != "")) # Rslt[DuplIdTree]
@@ -158,7 +158,7 @@ test_that("ErrorsDetection", {
 })
 
 # Remove *duplicated rows*
-# Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/CensusYear/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName
+# Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 # Check *missing value* (NA/0) in the measurement variables
 # Check *duplicated TreeFieldNum* in plot-subplot association in a census (at the site scale)
 # Check of the *unique association of the idTree with plot, subplot, TreeFieldNum and coordinates* (at the site scale)

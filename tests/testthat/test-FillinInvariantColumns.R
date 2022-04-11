@@ -6,11 +6,11 @@ test_that("FillinInvariantColumns", {
                          Plot = "1",
                          SubPlot = "3",
                          IdTree = "a", # 1 ind
-                         CensusYear = seq(2012,2028, by=2) # 9 census
+                         Year = seq(2012,2028, by=2) # 9 census
   )
 
   NewRow <- data.table(IdTree = "a",
-                       CensusYear = 2013)
+                       Year = 2013)
 
   InvariantColumns = c("Site", "Plot", "SubPlot")
   NewRow[,(InvariantColumns) := NA] # empty the invariant columns for the added rows
@@ -18,9 +18,9 @@ test_that("FillinInvariantColumns", {
   # Create test data
   MatrixData <- as.matrix(TestData)
   TwoInd <- copy(TestData)
-  TwoInd[CensusYear == 2014, ("IdTree") := "b"]
+  TwoInd[Year == 2014, ("IdTree") := "b"]
   VarPlot <- copy(TestData)
-  VarPlot[CensusYear == 2014, ("Plot") := "2"] # variant data
+  VarPlot[Year == 2014, ("Plot") := "2"] # variant data
   NoVal <- copy(TestData)
   NoVal[, ("SubPlot") := NA] # no value
 

@@ -5,9 +5,9 @@ test_that("StatusCorrection", {
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
-                         CensusYear = rep(c(2012:2020), 5), # 9 census
+                         Year = rep(c(2012:2020), 5), # 9 census
                          DBH = NA_real_)
-  TestData <- TestData[order(IdTree, CensusYear)]
+  TestData <- TestData[order(IdTree, Year)]
   TestData[,LifeStatus := c(
     TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, # "a"
     FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, # "b"
@@ -17,7 +17,7 @@ test_that("StatusCorrection", {
   ]
 
   TestData[IdTree %in% "e", ("DBH") := c(13:21)] # "e" DBH seq
-  TestData[IdTree %in% "e" & CensusYear == 2014, ("DBH") := NA] # a NA in the "e" DBH seq
+  TestData[IdTree %in% "e" & Year == 2014, ("DBH") := NA] # a NA in the "e" DBH seq
 
 
   # Create test data

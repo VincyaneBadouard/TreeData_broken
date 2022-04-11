@@ -64,7 +64,7 @@
 #'
 #' library(ggplot2)
 #' ggplot(Rslt) +
-#' aes(x = CensusYear, y = LifeStatusCor) +
+#' aes(x = Year, y = LifeStatusCor) +
 #'   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
 #'   geom_smooth(span = 0.75) +
 #'   theme_minimal() +
@@ -133,7 +133,7 @@ StatusCorrection <- function(
 
 
   # Order IdTrees and times in ascending order
-  Data <- Data[order(IdTree, CensusYear)]
+  Data <- Data[order(IdTree, Year)]
 
   # IdTrees vector
   Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
@@ -146,7 +146,7 @@ StatusCorrection <- function(
   Data <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
     Data[IdTree %in% i], # per IdTree, all censuses
     PlotCensuses = as.vector(na.omit( # rm NA
-      unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  CensusYear]) # the censuses for the plot in which the tree is
+      unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
     )),
     InvariantColumns = InvariantColumns,
     DeathConfirmation = DeathConfirmation,
@@ -232,11 +232,11 @@ StatusCorrection <- function(
 #' DataTree <- Data[IdTree == "101623"]
 #'
 #' AddR <- DataTree[2:5] # the rows to copy
-#' AddR[, CensusYear := c(2012:2015)] # the rows to add
+#' AddR[, Year := c(2012:2015)] # the rows to add
 #'
 #' DataTree <- rbindlist(list(DataTree, AddR)) # add rows
 #'
-#' DataTree <- DataTree[order(CensusYear)] # arrange years in ascending order
+#' DataTree <- DataTree[order(Year)] # arrange years in ascending order
 #'
 #' # Write the sequence
 #' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
@@ -245,12 +245,12 @@ StatusCorrection <- function(
 #'
 #' library(ggplot2)
 #' ggplot(DataTree) +
-#'   aes(x = CensusYear, y = LifeStatus) +
+#'   aes(x = Year, y = LifeStatus) +
 #'   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
 #'   theme_minimal()
 #'
 #' ggplot(Rslt) +
-#'   aes(x = CensusYear, y = LifeStatusCor) +
+#'   aes(x = Year, y = LifeStatusCor) +
 #'   geom_point(shape = "circle", size = 4L, colour = "#46337E") +
 #'   theme_minimal()
 #'
@@ -333,7 +333,7 @@ StatusCorrectionByTree <- function(
   setDT(DataTree)
 
   # Arrange year in ascending order
-  DataTree <- DataTree[order(CensusYear)] # order de dt
+  DataTree <- DataTree[order(Year)] # order de dt
 
   if(DetectOnly %in% FALSE){
     DataTree[, LifeStatusCor := LifeStatus] # we will work on a new col and keep the original col intact
@@ -358,7 +358,7 @@ StatusCorrectionByTree <- function(
   # if tree has ever been recorded alive
   if(any(DataTree$LifeStatusCor %in% TRUE)){
     # The first Alive record year
-    FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, CensusYear], na.rm = TRUE)
+    FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
 
     # First/last alive positions (rows id)
     FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
@@ -374,26 +374,26 @@ StatusCorrectionByTree <- function(
     # if tree has ever been recorded dead
     if(any(DataTree$LifeStatusCor %in% FALSE)){
       # The last time where the tree has been recorded dead (in case there are several)
-      LastDeathRecord <- max(DataTree[LifeStatusCor %in% FALSE, CensusYear], na.rm = TRUE)
+      LastDeathRecord <- max(DataTree[LifeStatusCor %in% FALSE, Year], na.rm = TRUE)
 
-      After <- which(DataTree$CensusYear > LastDeathRecord) # After the last death record
+      After <- which(DataTree$Year > LastDeathRecord) # After the last death record
 
       # If there is any "Alive" report after last reported death
       if(any(DataTree$LifeStatusCor[After] %in% TRUE)) {
         # Absents are the absent record years among the plot censuses from the 1st alive record
-        Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$CensusYear)
+        Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$Year)
 
       }else{
         # Absents are the absent record years between first alive record and the last death record
         Absents <- (PlotCensuses > FirstAliveYear &
                       PlotCensuses < LastDeathRecord & # death = the end
-                      !PlotCensuses %in% DataTree$CensusYear)
+                      !PlotCensuses %in% DataTree$Year)
       }
 
     }else{ # if tree has not been reported dead yet
 
       # Absents are the absent record years among the plot censuses from the 1st alive record
-      Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$CensusYear)
+      Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$Year)
 
     }
 
@@ -403,9 +403,9 @@ StatusCorrectionByTree <- function(
     # La j'ai choisi de ne rajouter les lignes absentes qu'entre le census min et max de l'arbre
     # Si tout est FALSE effectivement ça ne sert à rien de rajouter des lignes apres, mais des lignes avant ? il risque d'en avoir beaucoup, et on ne pourra mettre qu'NA
     # Pour tout est NA, ça aurait un intéret de rajouter des lignes avant-après ?
-    Absents <- (PlotCensuses > min(DataTree$CensusYear, na.rm = TRUE) & # entre les bornes, pas avnt pas après
-                  PlotCensuses < max(DataTree$CensusYear, na.rm = TRUE) &
-                  !PlotCensuses %in% DataTree$CensusYear)
+    Absents <- (PlotCensuses > min(DataTree$Year, na.rm = TRUE) & # entre les bornes, pas avnt pas après
+                  PlotCensuses < max(DataTree$Year, na.rm = TRUE) &
+                  !PlotCensuses %in% DataTree$Year)
 
   }
 
@@ -438,12 +438,12 @@ StatusCorrectionByTree <- function(
 
       # Multiply this new row the number of times as well as the number of absents
       NewRows <- do.call("rbind", replicate(n = Nabs, NewRow, simplify = FALSE))
-      NewRows[, CensusYear := PlotCensuses[Absents]]
+      NewRows[, Year := PlotCensuses[Absents]]
 
       # Add these rows in the dataset
       DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
 
-      DataTree <- DataTree[order(CensusYear)] # order by time
+      DataTree <- DataTree[order(Year)] # order by time
 
     } # end: Nabsents > 0
   }

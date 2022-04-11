@@ -9,7 +9,7 @@ if(!interactive()) {
       Plot = "Plot",
       SubPlot = "SubPlot",
       PlotArea = "PlotArea",
-      CensusYear = "CensusYear",
+      Year = "CensusYear",
       Date = "CensusDate",
       TreeFieldNum = "TreeFieldNum",
       IdTree = "idTree",

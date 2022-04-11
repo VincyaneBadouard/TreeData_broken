@@ -77,7 +77,7 @@ Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
 
 library(ggplot2)
 ggplot(Rslt) +
-aes(x = CensusYear, y = LifeStatusCor) +
+aes(x = Year, y = LifeStatusCor) +
   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
   geom_smooth(span = 0.75) +
   theme_minimal() +
