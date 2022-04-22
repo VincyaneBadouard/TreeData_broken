@@ -1,5 +1,5 @@
 ---
-title: "DiameterCorrection"
+title: "DiameterCorrection - previous version"
 author: "Vincyane Badouard"
 date: "16/03/2022"
 output:
@@ -40,9 +40,9 @@ setDT(TestData) # with "set" "<-" is not necessary
 # Args
 PositiveGrowthThreshold = 5 # (numeric, 1 value) in cm/year : a tree widening by more than x cm/year is considered abnormal
 NegativeGrowthThreshold = -2 # (numeric, 1 value) in cm/census : The possible positive measurement error (+n) cannot be corrected until the growth appears abnormal, but a negative measurement error can be allowed until -n (a tree does not decrease). Thus the positive measurement error (+n) is "compensated".
-DefaultPOM = 1.3 # (numeric, 1 value) in m
+DefaultHOM = 1.3 # (numeric, 1 value) in m
 Pioneers = c("Cecropia","Pourouma") # verna or scfic names ? (characters vector)
-PioneersTreshold = 7.5  # (numeric, 1 value) in cm
+PioneersGrowthThreshold = 7.5  # (numeric, 1 value) in cm
 IgnorePOM = FALSE # (logical) est-ce que je garde ? on le prend s'il existe
 DetectOnly = FALSE # (logical)
 
@@ -125,12 +125,12 @@ POM <- Data[IdTree %in% id, POM]
 if (!inherits(Data, c("data.table", "data.frame")))
   stop("Data must be a data.frame or data.table")
 
-# PositiveGrowthThreshold/NegativeGrowthThreshold/PioneersTreshold/DefaultPOM (numeric, 1 value)
-if(!all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultPOM, PioneersTreshold),
+# PositiveGrowthThreshold/NegativeGrowthThreshold/PioneersGrowthThreshold/DefaultHOM (numeric, 1 value)
+if(!all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultHOM, PioneersGrowthThreshold),
                       length)) %in% 1) |
-   !all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultPOM, PioneersTreshold),
+   !all(unlist(lapply(list(PositiveGrowthThreshold, NegativeGrowthThreshold, DefaultHOM, PioneersGrowthThreshold),
                       inherits, c("numeric", "integer")))))
-  stop("The 'PositiveGrowthThreshold', 'NegativeGrowthThreshold', 'PioneersTreshold' and 'DefaultPOM' arguments
+  stop("The 'PositiveGrowthThreshold', 'NegativeGrowthThreshold', 'PioneersGrowthThreshold' and 'DefaultHOM' arguments
          of the 'DiameterCorrection' function must be 1 numeric value each")
 
 # Pioneers (characters vector)

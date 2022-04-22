@@ -144,7 +144,7 @@ StatusCorrection <- function(
   # Apply for all the trees
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
-    Data[IdTree %in% i], # per IdTree, all censuses
+    DataTree = Data[IdTree %in% i], # per IdTree, all censuses
     PlotCensuses = as.vector(na.omit( # rm NA
       unique(Data[Plot %in% unique(Data[IdTree %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
     )),
