@@ -140,6 +140,6 @@ DataTree <- data.table(IdTree = "c",
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-DiameterCorrectionByTree(DataTree, TestData)
+Rslt <- DiameterCorrectionByTree(DataTree, TestData)
 
 }

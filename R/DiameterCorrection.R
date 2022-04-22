@@ -94,10 +94,10 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' Rslt <- DiameterCorrection(
-#'   TestData,
-#'   CorrectionType = c("quadratic",
-#'                      "individual", "phylogenetic hierarchical"))
+#' # Rslt <- DiameterCorrection(
+#' #  TestData,
+#' #  CorrectionType = c("quadratic",
+#' #                     "individual", "phylogenetic hierarchical"))
 #'
 DiameterCorrection <- function(
   Data,

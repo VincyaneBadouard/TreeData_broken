@@ -136,6 +136,10 @@ DiameterCorrection
 \examples{
 library(data.table)
 data(TestData)
-DiameterCorrection(TestData)
+
+# Rslt <- DiameterCorrection(
+#  TestData,
+#  CorrectionType = c("quadratic",
+#                     "individual", "phylogenetic hierarchical"))
 
 }
