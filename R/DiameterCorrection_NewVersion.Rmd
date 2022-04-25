@@ -253,7 +253,7 @@ if (Ncresc_abn > 0) { # if there are abnormal values
   } # i loop end
 } # if there are abnormal values
 ```
-## Punctual error coorction by interpolation
+## Punctual error correction by interpolation
 ### Internal function: Replace incorrect punctual abnormal DBH (missing values in corrected col)
 ```{r}
 # Description : Correction of punctual errors by linear interpolation

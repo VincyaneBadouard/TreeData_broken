@@ -155,12 +155,12 @@ DiameterCorrection <- function(
     stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
 
   # WhatToCorrect
-  if(!any(WhatToCorrect == "POM change" || WhatToCorrect == "punctual"|| WhatToCorrect == "shift"))
+  if(!any(WhatToCorrect %in% "POM change" || WhatToCorrect %in% "punctual"|| WhatToCorrect %in% "shift"))
     stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
 
   # CorrectionType
-  if(!any(CorrectionType == "taper" || CorrectionType == "quadratic"|| CorrectionType == "linear"||
-          CorrectionType == "individual"|| CorrectionType == "phylogenetic hierarchical"))
+  if(!any(CorrectionType  %in%  "taper" || CorrectionType %in% "quadratic"|| CorrectionType %in% "linear"||
+          CorrectionType %in% "individual"|| CorrectionType %in% "phylogenetic hierarchical"))
     stop("The 'CorrectionType' argument value must be among
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
@@ -321,13 +321,13 @@ DiameterCorrection <- function(
 #' data(TestData)
 #' # DataTree = Data[IdTree %in% 101433]
 #'
-#' DataTree <- data.table(IdTree = "c",
+#'  DataTree <- data.table(IdTree = "c",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
 #'       DBH = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
 #'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
-#' Rslt <- DiameterCorrectionByTree(DataTree, TestData)
+#' # Rslt <- DiameterCorrectionByTree(DataTree, TestData)
 #'
 DiameterCorrectionByTree <- function(
   DataTree,
@@ -391,15 +391,35 @@ DiameterCorrectionByTree <- function(
   # Correction with POM ---------------------------------------------------------------------------------------------------
   if("POM change" %in% WhatToCorrect){
     ## POM change detection -----------------------------------------------------------------------------------------------
-    if (any(!is.na(DataTree$POM))) { # POM exists?
+    if(any(!is.na(DataTree$POM))) { # POM exists?
 
-      raised = which(diff(c(NA, DataTree$POM)) == 1) # Detection des changements de POM (1ere val = NA car ) (1 = changement de POM)
+      raised = which(diff(c(NA, DataTree$POM)) == 1) # POM change detection (1ere val = NA because it's the default POM) (1 = changement de POM)
       if(length(raised) != 0){ # if there are POM changes
 
         ## 1. DBH[init shift] ---------------------------------------------------------------------------------------------
         if("individual" %in% CorrectionType) {
-          # Estcresc <- RegressionInterpolation()
-          # DBH[init shift] =  previous value + Estcresc
+
+          DBHCor[raised] <- NA # init shift <- NA
+
+          # Compute diameter incrementation without the inits shift
+          cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+          cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+          # Remove incr between 2 shifts (take growth only intra seq)
+          cresc[raised-1]  <- NA # cresc[which(is.na(cresc))+1] <- NA
+          cresc_abs[raised-1] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA (ARRETE ICI)
+
+
+          # Check that only non-abnormal growths are kept
+          if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
+
+            # Replace NA by the correction ------------------------------------------------------------------------------------------
+            cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+
+            for(rs in raised){  # i the inits shift
+              # DBH[init shift] = previous value + Estimated cresc
+              DBHCor[rs] <- DBHCor[rs-1] + cresc_Corr[rs-1]*diff(Time)[rs-1] # Correct with the corrected cresc, the corrected DBH
+            }
+          }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
 
         }
 
@@ -409,6 +429,14 @@ DiameterCorrectionByTree <- function(
         }
         ## 2. DBH[shift] --------------------------------------------------------------------------------------------------
         # DBH[shift] = previous value + their cresc
+        for(rs in 1:length(raised)){  # as many rs as POM changes
+        for(i in (raised[rs]+1): min(raised[rs+1]-1, length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
+          DBHCor[i] <- # then correct the other shift values
+            DBHCor[i-1] + # New position of the previous value
+            cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
+        }
+        }
+
         ## 3. + trunk width reduction factor (if POM change (only?)) ------------------------------------------------------
 
       }# if there are POM changes
@@ -419,7 +447,15 @@ DiameterCorrectionByTree <- function(
 
   # Punctual error detection  + replace with NA ---------------------------------------------------------------------------
   if("punctual" %in% WhatToCorrect){
+
+    # Compute diameter incrementation
+    cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+    cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
     # PunctualErrorDetection()
+    ab_cresc <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)# là il considere le retour à la normale comme une erreur
+    DBHCor[ab_cresc +1] <- NA # abnormal DBH <- NA
+
   }
 
 
@@ -444,10 +480,24 @@ DiameterCorrectionByTree <- function(
   }
 
 
-  if("punctual" %in% WhatToCorrect){
-    # Replace NA by the correction ------------------------------------------------------------------------------------------
-    # Estcresc <- RegressionInterpolation()
-    # DBH[error] =  previous value + Estcresc
+  if("punctual" %in% WhatToCorrect & any(is.na(DBHCor))){ # Na to be replaced
+
+    # Compute diameter incrementation without the abnormal values
+    cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+    cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
+    # Check that only non-abnormal growths are kept
+    if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
+
+      # Replace NA by the correction ------------------------------------------------------------------------------------------
+      cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+
+      for(i in which(is.na(DBHCor))){ # i the abnormal DBH
+        # DBH[error] = previous value + Estimated cresc
+        DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1]*diff(Time)[i-1] # Correct with the corrected cresc, the corrected DBH
+      }
+    }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
+
   }
 
 

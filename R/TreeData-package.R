@@ -18,7 +18,7 @@ utils::globalVariables(c("CensusYear", "Circ", "DBH", "Genus", "NewIdTree",
                          "TreeFieldNum", "TreeHeight", "CensusDateOriginal",
                          "CensusDate", "LifeStatus", "PlotArea", "CommercialSp",
                          "Site", "IdTree", "Xutm", "Yutm", "Family", "VernName",
-                         "DateOriginal", "Date", "Year",
+                         "DateOriginal", "Date", "Year", "Time",
                          ".", ".N", ".SD", "..ColumnsToReturn",
                          "LifeStatusCor", "PlotSubNum", "SitYearID", "Comment",
                          "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth"
