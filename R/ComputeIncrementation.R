@@ -6,7 +6,7 @@
 #'    - "absolute": absolute increment (not divided by time between 2 values)
 #'    - "annual": annual increment
 #'
-#' @param Time Time variable (numeric)
+#' @param Time Time variable if Type = "annual" (numeric)
 #'
 #' @return Absolute or annual incrementation of the variable
 #'
@@ -16,12 +16,12 @@
 #'
 #' DBHCor = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
 #' Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
-#' Rslt <- ComputeIncrementation(Var = DBHCor, Time = Time)
+#' Rslt <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
 #'
 ComputeIncrementation <- function(
   Var,
-  Type = "annual",
-  Time
+  Type,
+  Time = NULL
 ){
 
   #### Arguments check ####
@@ -40,7 +40,7 @@ ComputeIncrementation <- function(
 
   # Time (numeric)
   if(Type %in% "annual"){
-    if(!inherits(Time, "numeric"))
+    if(!inherits(Time, "numeric") & !is.null(Time))
       stop("'Time' argument must be numeric")
   }
 

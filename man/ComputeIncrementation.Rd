@@ -4,7 +4,7 @@
 \alias{ComputeIncrementation}
 \title{ComputeIncrementation}
 \usage{
-ComputeIncrementation(Var, Type = "annual", Time)
+ComputeIncrementation(Var, Type, Time = NULL)
 }
 \arguments{
 \item{Var}{Variable (numeric)}
@@ -15,7 +15,7 @@ ComputeIncrementation(Var, Type = "annual", Time)
 \item "annual": annual increment
 }}
 
-\item{Time}{Time variable (numeric)}
+\item{Time}{Time variable if Type = "annual" (numeric)}
 }
 \value{
 Absolute or annual incrementation of the variable
@@ -27,6 +27,6 @@ ComputeIncrementation
 
 DBHCor = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
 Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
-Rslt <- ComputeIncrementation(Var = DBHCor, Time = Time)
+Rslt <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
 
 }

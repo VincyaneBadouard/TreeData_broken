@@ -149,7 +149,7 @@ if(!"DBH" %in% names(Data))
 
 ```
 
-# Errors detection
+# Missing value detection
 ```{r}
 # Missing measure
 Vars <- c("DBH", "POM")
