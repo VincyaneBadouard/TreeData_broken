@@ -4,7 +4,7 @@
 \alias{ComputeIncrementation}
 \title{ComputeIncrementation}
 \usage{
-ComputeIncrementation(Var, Type = "annual", Time)
+ComputeIncrementation(Var, Type, Time)
 }
 \arguments{
 \item{Var}{Variable (numeric)}

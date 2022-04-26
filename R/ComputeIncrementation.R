@@ -20,7 +20,7 @@
 #'
 ComputeIncrementation <- function(
   Var,
-  Type = "annual",
+  Type,
   Time
 ){
 

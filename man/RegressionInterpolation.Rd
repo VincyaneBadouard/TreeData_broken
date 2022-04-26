@@ -7,15 +7,46 @@
 RegressionInterpolation(Y, X, CorrectionType = "quadratic")
 }
 \arguments{
-\item{Y}{dfghj}
+\item{Y}{Response variable (numeric)}
 
-\item{X}{sdf}
+\item{X}{Explanatory variable (numeric)}
 
-\item{CorrectionType}{sdfg}
+\item{CorrectionType}{"quadratic" and/or "linear" (character)}
 }
 \value{
-qsdf
+Y (numeric)
 }
 \description{
 RegressionInterpolation
+}
+\examples{
+
+DBHCor = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
+Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
+plot(Time, DBHCor)
+
+# Compute all cresc
+cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
+# Replace abnormal cresc by NA in the DBH
+PositiveGrowthThreshold = 5
+NegativeGrowthThreshold = -2
+ab_cresc <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
+DBHCor[ab_cresc +1] <- NA # abnormal DBH <- NA
+
+# Re-compute without the abnormal growth
+cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+
+Y = cresc
+X = Time[-1]
+plot(X,Y)
+
+cresc_Corr <- RegressionInterpolation(Y = Y, X = X, CorrectionType = "quadratic") # Compute the corrected cresc
+
+for(i in which(is.na(DBHCor))){
+DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1]*diff(Time)[i-1] # Correct with the corrected cresc, the corrected DBH
+}
+plot(Time, DBHCor)
+
 }
