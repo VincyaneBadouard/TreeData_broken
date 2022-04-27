@@ -9,6 +9,7 @@ library(data.tree)
 library(stringr)
 library(stringdist)
 library(data.table)
+library(TreeData)
 
 # read in csv file that has all we want to ask about the headers
 x <- read.csv("data/interactive_items.csv")
@@ -18,8 +19,9 @@ x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_no
 x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
 x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
 x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
+x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
 
-if(!all(unlist(sapply(list(x1, x2, x3, x4, x5), "[[", "ItemID")) %in% x$ItemID)) stop ("not all interactive items are implemented in the app")
+if(!all(unlist(sapply(list(x1, x2, x3, x4, x5, x6), "[[", "ItemID")) %in% x$ItemID)) stop ("not all interactive items are implemented in the app")
 
 
 
@@ -311,14 +313,14 @@ body <- dashboardBody(
     tabItem(tabName = "Headers",
             fluidRow(
               # inform if profile already exists
-              # box(width = 12,
-              #     radioButtons(inputId = "predefinedProfile",
-              #                  label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
-              #                  choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
-              #
-              #     # load a profile it one already exists
-              #     fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
-              #     ),
+              box(width = 12,
+                  radioButtons(inputId = "predefinedProfile",
+                               label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
+                               choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
+
+                  # load a profile it one already exists
+                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
+                  ),
 
               # inform if long or wide format
               # box(width = 12,
@@ -364,7 +366,7 @@ body <- dashboardBody(
                          style = "pill",
                          color = "warning")
                        ,   strong("  Fill in information that is not in your columns"),
-                       lapply(which(x$ItemID %in% unlist(sapply(list(x2, x3, x4, x5), "[[", "ItemID"))), function(i) {
+                       lapply(which(x$ItemID %in% unlist(sapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
 
                          eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
@@ -472,12 +474,12 @@ body <- dashboardBody(
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbFile", label = "Save file")) #,
-                     # box(title = "Save profile",
-                     #     width = NULL,
-                     #     status = "primary",
-                     #     solidHeader = TRUE,
-                     #     downloadButton(outputId = "dbProfile", label = "Save profile")),
+                         downloadButton(outputId = "dbFile", label = "Save file")),
+                     box(title = "Save your profile",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbProfile", label = "Save profile")) #,
                      # box(title = "Save code",
                      #     width = NULL,
                      #     status = "primary",
