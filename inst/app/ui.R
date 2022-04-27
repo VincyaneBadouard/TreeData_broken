@@ -62,6 +62,23 @@ body <- dashboardBody(
     tabItem(tabName = "Upload",
 
             fluidRow(
+
+              actionBttn(
+                inputId = "inactivebutton",
+                label = div(
+                  strong("If your connexion is slow and/or your data is very large, you may want to run this app locally. For that, open R Studio and type:"),
+                  br()),
+                style = "stretch",
+                color = "success"),
+              box(width = 12, textOutput("CodeRunApp"),
+                  tags$head(tags$style("#CodeRunApp{
+                  color: red;
+                  font-family: courier;
+                  font-size: 100%;
+                                 }"
+                  ))),
+              br(),
+              br(),
               column(width = 8,
                      actionBttn(
                        inputId = "inactivebutton",
@@ -87,7 +104,9 @@ body <- dashboardBody(
                        style = "pill",
                        color = "warning"),
                      strong("Upload your tables"),
+
                      uiOutput("ui_uploadTables"))),
+
 
 
             fluidRow(

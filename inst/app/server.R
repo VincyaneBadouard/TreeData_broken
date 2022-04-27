@@ -36,6 +36,20 @@ server <- function(input, output, session) {
   # generate the upload UI  ####
   # observeEvent(input$nTable,
   #              {
+#
+#   observeEvent(input$CodeRunApp, {
+#     writeClipboard('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
+#     updateActionButton(session,
+#       inputId = "CodeRunApp",
+#       label = "Code copied! You may directly paste in RStudio now.",
+#       icon = icon("clipboard")
+#
+#       )
+#
+#   })
+
+  output$CodeRunApp <- renderText('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
+
   output$ui_uploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {

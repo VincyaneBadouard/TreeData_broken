@@ -5,10 +5,10 @@ account: valentineherr
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5708669
-bundleId: 5786712
+bundleId: 5844556
 url: https://valentineherr.shinyapps.io/TmFO_AccelNet/
-when: 1649686537.95031
-lastSyncTime: 1649686537.95031
+when: 1651095824.27328
+lastSyncTime: 1651095824.27328
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: data/My_VegX.R|data/VegX.csv|data/VegXtree.R|data/VegXtree.rds|simple_app_backup/server.R|simple_app_backup/ui.R|VegX_app_backup/vegX_server.R|VegX_app_backup/VegX_ui.R
+ignoredFiles: simple_app_backup/server.R|simple_app_backup/ui.R|VegX_app_backup
