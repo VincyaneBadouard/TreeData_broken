@@ -319,8 +319,13 @@ body <- dashboardBody(
                                choices = list("No thanks!" = "No", "ATDN: The Amazon Tree Diversity Network" = "ATDN", "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO", "RBA: Red de Bosques Andinos" = "RBA"),selected = "No"),
 
                   # load a profile it one already exists
-                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds")
-                  ),
+                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
+                  hidden(actionBttn(
+                    inputId = "UseProfile",
+                    label = "Click Twice here to use Profile",
+                    style = "pill",
+                    color = "success")
+                  )),
 
               # inform if long or wide format
               # box(width = 12,

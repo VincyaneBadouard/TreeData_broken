@@ -386,9 +386,22 @@ server <- function(input, output, session) {
 
 
   ### other stuff ####
+  gimme_value <- reactiveVal(0)
 
+observe( {
+  if(input$predefinedProfile != "No" )
+  shinyjs::show("UseProfile")
+  updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+  gimme_value(0)
+})
 
   observeEvent(input$profile, {
+    shinyjs::show("UseProfile")
+    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+    gimme_value(0)
+  })
+
+  observeEvent(input$UseProfile, {
     file <- input$profile
     ext <- tools::file_ext(file$datapath)
 
@@ -398,11 +411,20 @@ server <- function(input, output, session) {
     profile <- readRDS(file$datapath)
 
     for(i in which(x$ItemID %in% names(profile))) {
-      eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
+      eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
+
+      # eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
       # updateTextInput(session, "Site", value = profile$Site)
     }
 
+   if(gimme_value() == 1) {
+      updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
+      }
 
+    if(gimme_value() == 0) {
+      updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
+      gimme_value(gimme_value() + 1)
+    }
 
 
   })
@@ -415,35 +437,18 @@ server <- function(input, output, session) {
   }, rownames = FALSE,
   options = list(pageLength = 8, scrollX=TRUE))
 
-  # Avoid seeing errors
-  text_reactive <- reactiveValues(
-    NoData = "No data has been submitted yet.",
-    NoNeed = "This step does not apply to you, click Next again"
-  )
 
-  output$ui1 <- renderUI({
-    p(text_reactive$NoData)
-  })
-  output$ui2 <- renderUI({
-    p(text_reactive$NoNeed)
-  })
-  output$ui3 <- renderUI({
-    p(text_reactive$NoNeed)
-  })
-  output$ui4 <- renderUI({
-    p(text_reactive$NoNeed)
-  })
 
   # create options to choose from:
 
   ColumnOptions <- eventReactive(TidyTable(), { c("none", colnames(TidyTable())) })
 
   UnitOptions <- eventReactive(TidyTable(),
-                               {c("mm", "cm", "dm", "m")
+                               {c("none", "mm", "cm", "dm", "m")
                                })
 
   AreaUnitOptions <- eventReactive(input$PlotArea,
-                                   {c("m2", "ha", "km2")
+                                   {c("none", "m2", "ha", "km2")
                                    })
 
 
@@ -550,23 +555,6 @@ server <- function(input, output, session) {
     })
 
   })
-
-  # observeEvent(input$Header4Next, {
-  #
-  #   shinyjs::show("header5")
-  #
-  #                output$ui5 <- renderUI({
-  #
-  #                  lapply(c(1:nrow(x5)), function(i) {
-  #                    if(input[[x5$if_X1_is_none[i]]] %in% "none" & input[[x5$if_X2_is_none[i]]] %in% "none" )
-  #
-  #                      eval(parse(text = paste(x5$ItemType[i], "(inputId = x5$ItemID[i], label = ifelse(x5$helpText[i] %in% '', x5$Label[i], paste0(x5$Label[i], ' (', x5$helpText[i], ')')),", x5$argument[i], "= get(x5$argValue[i])()", ifelse(x5$Options[i] != FALSE, paste0(", options = ", x5$Options[i]), ""), ifelse(x5$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-  #
-  #                  })
-  #                })
-  #
-  # })
-
 
 
 
