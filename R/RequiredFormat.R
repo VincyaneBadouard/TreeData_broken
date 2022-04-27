@@ -291,6 +291,34 @@ RequiredFormat <- function(
       Data[, PlotArea := PlotArea*100] # km2 -> ha
   }
 
+  # if area is entered manually, it is supposed to be in ha already
+  if(input$PlotArea %in% "none" & !input$PlotAreaMan %in% "none") {
+    Data[, PlotArea := input$PlotAreaMan]
+  }
+
+  ### SubPlotArea in ha ####
+
+  if(!input$SubPlotArea %in% "none" & !input$SubPlotAreaUnitMan %in% "none") {
+
+    SubPlotAreaUnitMan <- input$SubPlotAreaUnitMan
+
+    if(!SubPlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+
+    if (SubPlotAreaUnitMan %in% AreaUnitOptions){
+
+      if (substr(SubPlotAreaUnitMan, 1, 2) == "m2")
+        Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
+
+
+    if (substr(SubPlotAreaUnitMan, 1, 1) == "km2")
+      Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
+    }
+  }
+
+  # if area is entered manually, it is supposed to be in ha already
+  if(input$SubPlotArea %in% "none" & !input$SubPlotAreaMan %in% "none") {
+    Data[, SubPlotArea := input$SubPlotAreaMan]
+  }
 
 
   # return output ####

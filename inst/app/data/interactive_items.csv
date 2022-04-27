@@ -7,8 +7,10 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 2,textInput,value,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
 4,pickerInput,choices,none,PlotAreaUnitMan,What is the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+5,numericInput,value,,PlotAreaMan,What is your plot area in hectar?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,SubPlotArea,SubPlot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
 4,pickerInput,choices,none,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+5,numericInput,value,,SubPlotAreaMan,What is your subplot area in hectar?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
 1,pickerInput,choices,none,Year,Year of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
 5,numericInput,value,,YearMan,What is your year of measurement?,,Year,Date,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
