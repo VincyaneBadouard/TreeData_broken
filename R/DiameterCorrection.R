@@ -483,8 +483,6 @@ DiameterCorrectionByTree <- function(
                                 comment = paste0("Abnormal diameter value (punctual error)"))
   }
 
-
-
   # Shift Correction ------------------------------------------------------------------------------------------------------
   if("shift" %in% WhatToCorrect){
     ## Init shift detection si PunctualErrorDetection() ne s'en est pas chargé --------------------------------------------
@@ -603,5 +601,4 @@ DiameterCorrectionByTree <- function(
 
   return(DataTree)
 }
-
 

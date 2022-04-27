@@ -6,7 +6,8 @@ rm(list = ls())
 
 # load libraries ####
 library(XML)
-
+library(dplyr)
+require(data.table)
 
 # Load VegX xml files to get data structure and Description
 ## VegX: an exchange standard for plot-based vegetation data
@@ -29,13 +30,60 @@ urls <- c(
 
 
 
-
 VegX <- lapply(urls, function(url) {
+print(url)
   txt <- readLines(url)
-  doc = xmlParse(txt)
+  doc = xmlRoot(xmlTreeParse(txt, useInternalNodes = T))
 
-  els <- getNodeSet(doc, "//xsd:element")
+  nodes <- "//xsd:complexType|//xsd:complexType//xsd:annotation|//xsd:complexType//xsd:sequence//xsd:element|//xsd:complexType//xsd:attribute|//xsd:complexType//xsd:element|//xsd:complexType//xsd:sequence//xsd:element//xsd:complexType"
+  nodes <- paste0(gsub("complexType", "simpleType",nodes),nodes,  collapse = "|")
+  els <- getNodeSet(doc, nodes)
 
+  # els <- getNodeSet(doc, "//xsd:complexType|//xsd:annotation|//xsd:sequence|//xsd:element|xsd:attribute")
+  a <- sapply(els, function(x) c(xmlAttrs(x), value = xmlValue(x)))
+
+  a <- do.call(bind_rows, a)
+  a <- a[!is.na(a$name),]
+  a$element1 <- a$name
+  a <- a[,c("element1","name", "value",  "type", "minOccurs","maxOccurs", "use", "default")]
+  a$value[a$value %in%""] <- NA
+
+  for(i in 1:nrow(a)) {
+    idx <- rev(grep(a$value[i], a$value, fixed = T))[2]
+    if(!is.na(idx)) a$element1[i] <- a$name[idx]
+    if(is.na(idx) & is.na(a$value[i])) a$element1[i] <- a$element1[i-1]# a$element1[i] <- a$name[(which(!is.na(a$value[1:i])))[1]]
+  }
+
+
+  a <- data.table(a)
+  a <- split(a, a$element1, sorted = F)
+  a <- sapply(a, function(x) split(x, by = "name", sorted = F))
+
+
+  for(i in length(a):1) {
+    x <- a[[i]]
+    if(any(sapply(x, nrow) > 1)) stop("There is more nesting")
+    if(tail(names(x),1) %in% names(a)) {
+      idx <- which(names(a) ==tail(names(x),1))
+      if(idx < i ) stop("I have not coded for this case")
+      x[tail(names(x), 1)] <-  a[idx]
+      a[idx] <- NULL
+      }
+    a[[i]] <- x
+  }
+
+  return(a)
+
+})
+
+View(VegX[[1]])
+
+
+
+
+
+
+  sapply(els,xmlValue)
   a <-
     data.frame(element = sapply(els, function(el) xmlGetAttr(el, "name", default = NA)),
                minOccurs = sapply(els, function(el) xmlGetAttr(el, "minOccurs", default = NA)),
@@ -48,12 +96,12 @@ VegX <- lapply(urls, function(url) {
                )
 
   b <- cbind(table = gsub("https://raw.githubusercontent.com/iavs-org/VegX/master/vegxschema/|.xsd", "", url),
-             mainElement = a$element,
-             a, xmlToDataFrame(doc, nodes = els, homogeneous = F, collectNames = T))
+             element1 = a$element,
+             a, xmlValue(els)) #xmlToDataFrame(doc, nodes = els, homogeneous = F, collectNames = T))
 
   for(i in 1:nrow(b)) {
     idx <- rev(grep(b$annotation[i], b$complexType, fixed = T))[1]
-    if(!is.na(idx)) b$mainElement[i] <- b$element[idx]
+    if(!is.na(idx)) b$element1[i] <- b$element[idx]
   }
 
   return(b)

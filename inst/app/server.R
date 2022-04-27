@@ -22,6 +22,7 @@ x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_no
 x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
 x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
 x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
+x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
 
 # for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
@@ -456,7 +457,7 @@ server <- function(input, output, session) {
 
   # enter column names for each element of the RequiredFormat function
         observe({
-                 # output$ui1 <- renderUI({
+
                    lapply(1:nrow(x1), function(i) {
 
                      eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$argument[i],"= get(x1$argValue[i])())")))
@@ -468,36 +469,21 @@ server <- function(input, output, session) {
 
   observe({
 
-#     shinyjs::show("header2")
-    # output$ui2 <- renderUI({
+    lapply(c(1:nrow(x2)), function(i) {
+      if(input[[x2$if_X1_is_none[i]]] %in% "none") {
+        eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$argument[i], "= get(x2$argValue[i])())")))
 
-      # if(any(reactiveValuesToList(input)[x2$if_X1_is_none] %in% "none")) {
+        shinyjs::show( x2$ItemID[i])
 
-        lapply(c(1:nrow(x2)), function(i) {
-          if(input[[x2$if_X1_is_none[i]]] %in% "none") {
-            eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(inputId = x2$ItemID[i],", x2$argument[i], "= get(x2$argValue[i])())")))
+      } else {
+        eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$argument[i], "='",  x2$default[i], "')")))
 
-            shinyjs::show( x2$ItemID[i])
-
-          } else {
-            eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$argument[i], "='",  x2$default[i], "')")))
-
-            shinyjs::hide( x2$ItemID[i])
-          }
-
-        })
-      # } else {
-      #   p(text_reactive$NoNeed)
-      # }
+        shinyjs::hide( x2$ItemID[i])
+      }
 
     })
-  # })
 
-  observe({
 
-    # shinyjs::show("header3")
-
-    # output$ui3 <- renderUI({
     lapply(c(1:nrow(x3)), function(i) {
       if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" ) {
 
@@ -515,56 +501,71 @@ server <- function(input, output, session) {
     })
 
 
+    lapply(c(1:nrow(x4)), function(i) {
+      if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" ) {
+        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "= get(x4$argValue[i])())")))
 
+        shinyjs::show( x4$ItemID[i])
+
+      } else {
+
+        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "='", x4$Default[i], "')")))
+
+        shinyjs::hide( x4$ItemID[i])
+
+      }
+
+    })
+
+    lapply(c(1:nrow(x5)), function(i) {
+      if(input[[x5$if_X1_is_none[i]]] %in% "none" &  input[[x5$if_X2_is_none[i]]] %in% "none") {
+        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$argument[i], "= get(x5$argValue[i])())")))
+
+        shinyjs::show( x5$ItemID[i])
+
+      } else {
+
+        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$argument[i], "='", x5$Default[i], "')")))
+
+        shinyjs::hide( x5$ItemID[i])
+
+      }
+
+    })
+
+   if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
+      if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
+        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$argument[i], "= get(x6$argValue[i])())")))
+
+        shinyjs::show( x6$ItemID[i])
+
+      } else {
+
+        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$argument[i], "='", x6$Default[i], "')")))
+
+        shinyjs::hide( x6$ItemID[i])
+
+      }
+
+    })
 
   })
 
-  observe({
-
-
-    # shinyjs::show("header4")
-                 # output$ui4 <- renderUI({
-
-                   # if(any(!reactiveValuesToList(input)[x4$if_X2_isnot_none] %in% "none" )) {
-                     lapply(c(1:nrow(x4)), function(i) {
-                       if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" ) {
-                         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "= get(x4$argValue[i])())")))
-
-                         shinyjs::show( x4$ItemID[i])
-
-                       } else {
-
-                         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "='", x4$Default[i], "')")))
-
-                         shinyjs::hide( x4$ItemID[i])
-
-                       }
-
-                     })
-                   # } else {
-                   #   p(text_reactive$NoNeed)
-                   # }
-
-
-                 # })
-
-  })
-
-  observeEvent(input$Header4Next, {
-
-    shinyjs::show("header5")
-
-                 output$ui5 <- renderUI({
-
-                   lapply(c(1:nrow(x5)), function(i) {
-                     if(input[[x5$if_X1_is_none[i]]] %in% "none" & input[[x5$if_X2_is_none[i]]] %in% "none" )
-
-                       eval(parse(text = paste(x5$ItemType[i], "(inputId = x5$ItemID[i], label = ifelse(x5$helpText[i] %in% '', x5$Label[i], paste0(x5$Label[i], ' (', x5$helpText[i], ')')),", x5$argument[i], "= get(x5$argValue[i])()", ifelse(x5$Options[i] != FALSE, paste0(", options = ", x5$Options[i]), ""), ifelse(x5$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-
-                   })
-                 })
-
-  })
+  # observeEvent(input$Header4Next, {
+  #
+  #   shinyjs::show("header5")
+  #
+  #                output$ui5 <- renderUI({
+  #
+  #                  lapply(c(1:nrow(x5)), function(i) {
+  #                    if(input[[x5$if_X1_is_none[i]]] %in% "none" & input[[x5$if_X2_is_none[i]]] %in% "none" )
+  #
+  #                      eval(parse(text = paste(x5$ItemType[i], "(inputId = x5$ItemID[i], label = ifelse(x5$helpText[i] %in% '', x5$Label[i], paste0(x5$Label[i], ' (', x5$helpText[i], ')')),", x5$argument[i], "= get(x5$argValue[i])()", ifelse(x5$Options[i] != FALSE, paste0(", options = ", x5$Options[i]), ""), ifelse(x5$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+  #
+  #                  })
+  #                })
+  #
+  # })
 
 
 
