@@ -56,6 +56,9 @@ DetectOnly = FALSE # (logical)
 
 ## With irregular time between census
 Data <- data.table(IdTree = c("a", "b", "c", "d"), # 4 ind
+                   ScientificName = c("A", "B", "C", "D"),
+                   Genus = c("Ananas", "Banane", "Citron", "Dachine"),
+                   Family = c("Bromeliaceae", "Musaceae", "Rutaceae", "Araceae"),
                    Year = rep(c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), 4), # 9 DBH values each (2 years between 2 census)
                    DBH  = c(13:17, 19:21, 23), # 0.5 cm/year
                    POM = 0, # default POM

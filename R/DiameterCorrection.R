@@ -1,4 +1,4 @@
-#' DiameterCorrection
+#' Diameter correction
 #'
 #' @param Data (data.frame or data.table)
 #'   The dataset must contain the columns:
@@ -175,6 +175,15 @@ DiameterCorrection <- function(
   # DetectOnly (logical)
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
+
+  if(any(!is.na(Data$HOM)) & !CorrectionType  %in% "taper") # HOM exists?
+    message("You have the 'HOM' information in your dataset.
+            We advise you to correct your diameters also with the 'taper' correction ('CorrectionType' argument)")
+
+  if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
+     any(!is.na(Data$POM)) & !WhatToCorrect %in% "POM change") # POM exists?
+    message("You have the 'POM' information in your dataset.
+            We advise you to correct your diameters also from the 'POM change' ('WhatToCorrect' argument)")
 
   # In data.table
   setDT(Data)
@@ -491,7 +500,7 @@ DiameterCorrectionByTree <- function(
     cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
     ### Detect abnormal growth --------------------------------------------------------------------------------------------
-    cresc_abn <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # nbr of abnormal values
+    cresc_abn <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # abnormal values indices
     # le retour à la normale est considéré comme une erreur (perte excessive)
 
     if(length(cresc_abn) != 0) { # if there are abnormal values
@@ -509,8 +518,8 @@ DiameterCorrectionByTree <- function(
           ## 1. DBH[init shift] -----------------------------------------------------------------------------------------------
 
           # Remove incr between 2 shifts (take growth only intra seq)
-          cresc[cresc_abn] <- NA # cresc[which(is.na(cresc))+1] <- NA
-          cresc_abs[cresc_abn] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA
+          cresc[cresc_abn] <- NA
+          cresc_abs[cresc_abn] <- NA
 
           # Check that only non-abnormal growths are kept
           if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){

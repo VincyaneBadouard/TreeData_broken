@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiameterCorrection.R
 \name{DiameterCorrection}
 \alias{DiameterCorrection}
-\title{DiameterCorrection}
+\title{Diameter correction}
 \usage{
 DiameterCorrection(
   Data,
@@ -131,7 +131,7 @@ default HOM - \emph{DiameterCorrectionMeth} =
 "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
 }
 \description{
-DiameterCorrection
+Diameter correction
 }
 \examples{
 library(data.table)
