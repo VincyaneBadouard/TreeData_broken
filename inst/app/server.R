@@ -70,16 +70,16 @@ server <- function(input, output, session) {
                  textInput(inputId = paste0("TableName", i),
                            label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
                            value = paste0("Table", i)
-                 ),
+                 )#,
                  # textInput(inputId = paste0("TableDescription", i),
                  #           label = "Give an explicit description of your table.",
                  #           value = paste0("My Table", i)
                  # ),
-                 tags$textarea(id=paste0("TableDescription", i),
-                               label = "Give an explicit description of your table...",
-                               rows=5,
-                               cols = 6,
-                               placeholder = paste0("My Table", i))
+                 # tags$textarea(id=paste0("TableDescription", i),
+                 #               label = "Give an explicit description of your table...",
+                 #               rows=5,
+                 #               cols = 6,
+                 #               placeholder = paste0("My Table", i))
              )
       )
 
