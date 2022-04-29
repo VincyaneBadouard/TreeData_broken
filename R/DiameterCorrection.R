@@ -2,7 +2,7 @@
 #'
 #' @param Data (data.frame or data.table)
 #'   The dataset must contain the columns:
-#'   - 'DBH'
+#'   - 'DBH' (numeric)
 #'   - **'HOM'(Height Of Measurement) (numeric)** if you want to apply the
 #'       **"taper" correction**
 #'   - **'POM'(Point Of Measurement) (factor)** if you want to correct from the
@@ -328,7 +328,7 @@ DiameterCorrection <- function(
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' # DataTree = Data[IdTree %in% 101433]
+#' DataTree = TestData[IdTree %in% 101433]
 #'
 #'  DataTree <- data.table(IdTree = "c",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
@@ -336,7 +336,10 @@ DiameterCorrection <- function(
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
 #'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
-#' # Rslt <- DiameterCorrectionByTree(DataTree, TestData)
+#' Rslt <- DiameterCorrectionByTree(
+#'   DataTree, TestData,
+#'   WhatToCorrect = c("POM change", "punctual", "shift"), # "POM change", "punctual", "shift"
+#'   CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical")) # "taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"
 #'
 DiameterCorrectionByTree <- function(
   DataTree,
@@ -386,6 +389,9 @@ DiameterCorrectionByTree <- function(
 
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # order de dt
+
+  DBHCor <- DBH <-DataTree[, DBH]
+  Time <- DataTree[, Year]
 
   # Taper correction ------------------------------------------------------------------------------------------------------
   if("taper" %in% CorrectionType) {
@@ -456,15 +462,18 @@ DiameterCorrectionByTree <- function(
           }
 
           if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
-            ## 1. DBH[init shift] -------------------------------------------------------------------------------------------
 
-            # Colleaguescresc <- PhylogeneticHierarchicalCorrection()
-            # DBH[init shift] =  previous value + mean(Colleaguescresc)
+            DataTree <- PhylogeneticHierarchicalCorrection(
+              DataTree = DataTree,
+              Data = Data,
+              cresc = cresc, cresc_abs = cresc_abs, cresc_abn = raised-1,
+              DBHCor = DBHCor, Time = Time,
+              PositiveGrowthThreshold = PositiveGrowthThreshold,
+              NegativeGrowthThreshold = NegativeGrowthThreshold,
+              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr)
 
-            ## 2. DBH[shift] --------------------------------------------------------------------------------------------
-            # DBH[shift] = previous value + their cresc_abs
+            DBHCor <- DataTree[,DBHCor]
           }
-
 
           ## 3. + trunk width reduction factor (if POM change (only?)) ------------------------------------------------------
 
@@ -477,7 +486,7 @@ DiameterCorrectionByTree <- function(
 
 
   # Punctual/shift error detection  + replace with NA if punctual ---------------------------------------------------------
-  if("punctual" %in% WhatToCorrect | "shift" %in% WhatToCorrect){
+  if(any("punctual" %in% WhatToCorrect | "shift" %in% WhatToCorrect)){
     DBHCor <- PunctualErrorDetection(
       DBHCor = DBHCor, Time = Time,
       PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
@@ -554,22 +563,16 @@ DiameterCorrectionByTree <- function(
         }
 
         if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
-          ## 1. DBH[init shift] -------------------------------------------------------------------------------------------
+          DataTree <- PhylogeneticHierarchicalCorrection(
+            DataTree = DataTree,
+            Data = Data,
+            cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
+            DBHCor = DBHCor, Time = Time,
+            PositiveGrowthThreshold = PositiveGrowthThreshold,
+            NegativeGrowthThreshold = NegativeGrowthThreshold,
+            DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr)
 
-          # Colleaguescresc <- PhylogeneticHierarchicalCorrection()
-          # DBH[init shift] =  previous value + mean(Colleaguescresc)
-
-          ## 2. DBH[shift] --------------------------------------------------------------------------------------------
-          # for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-          #   # DBH[shift] = previous value + their cresc_abs
-          #   DBHCor[i] <- # then correct the other shift values
-          #     DBHCor[i-1] + # New position of the previous value
-          #     cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
-          #
-          #   # Add the column with the correction method  ------------------------------------------------------------------------
-          #   DataTree[i, DiameterCorrectionMeth := "shift realignment"]
-          #
-          # }
+          DBHCor <- DataTree[,DBHCor]
         }
 
         ## 3. + trunk width reduction factor (if POM change (only?)) ----------------------------------------------------------

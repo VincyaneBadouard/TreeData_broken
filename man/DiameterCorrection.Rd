@@ -30,7 +30,7 @@ DiameterCorrection(
 \item{Data}{(data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'DBH'
+\item 'DBH' (numeric)
 \item \strong{'HOM'(Height Of Measurement) (numeric)} if you want to apply the
 \strong{"taper" correction}
 \item \strong{'POM'(Point Of Measurement) (factor)} if you want to correct from the
