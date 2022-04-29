@@ -416,13 +416,19 @@ observe( {
   })
 
   observeEvent(input$UseProfile, {
-    file <- input$profile
-    ext <- tools::file_ext(file$datapath)
+
+    if(input$predefinedProfile == "No") {
+    file <- input$profile$datapath
+    ext <- tools::file_ext(file)
+    } else {
+      file <- paste0("data/", input$predefinedProfile, "_Profile.rds")
+      ext <- tools::file_ext(file)
+    }
 
     req(file)
     validate(need(ext == "rds", "Please upload a csv file"))
 
-    profile <- readRDS(file$datapath)
+    profile <- readRDS(file)
 
     for(i in which(x$ItemID %in% names(profile))) {
       eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
@@ -671,7 +677,7 @@ observe( {
       Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
 
       # format your data
-      DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
+      DataFormated <- RequiredFormat( Data, input = Profile)
       ")
       writeLines(text_upload, file)
     }
