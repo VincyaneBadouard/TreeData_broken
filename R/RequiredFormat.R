@@ -224,7 +224,7 @@ RequiredFormat <- function(
   }
 
   ### POM in m ####
-  if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
+  # if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
 
