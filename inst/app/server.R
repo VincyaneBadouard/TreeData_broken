@@ -421,7 +421,7 @@ observe( {
     file <- input$profile$datapath
     ext <- tools::file_ext(file)
     } else {
-      file <- paste0("data/", input$predefinedProfile, "_Profile.rds")
+      file <- paste0("data/", input$predefinedProfile, "Profile.rds")
       ext <- tools::file_ext(file)
     }
 
