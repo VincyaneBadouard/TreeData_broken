@@ -70,16 +70,16 @@ server <- function(input, output, session) {
                  textInput(inputId = paste0("TableName", i),
                            label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
                            value = paste0("Table", i)
-                 ),
+                 )#,
                  # textInput(inputId = paste0("TableDescription", i),
                  #           label = "Give an explicit description of your table.",
                  #           value = paste0("My Table", i)
                  # ),
-                 tags$textarea(id=paste0("TableDescription", i),
-                               label = "Give an explicit description of your table...",
-                               rows=5,
-                               cols = 6,
-                               placeholder = paste0("My Table", i))
+                 # tags$textarea(id=paste0("TableDescription", i),
+                 #               label = "Give an explicit description of your table...",
+                 #               rows=5,
+                 #               cols = 6,
+                 #               placeholder = paste0("My Table", i))
              )
       )
 
@@ -416,13 +416,19 @@ observe( {
   })
 
   observeEvent(input$UseProfile, {
-    file <- input$profile
-    ext <- tools::file_ext(file$datapath)
+
+    if(input$predefinedProfile == "No") {
+    file <- input$profile$datapath
+    ext <- tools::file_ext(file)
+    } else {
+      file <- paste0("data/", input$predefinedProfile, "Profile.rds")
+      ext <- tools::file_ext(file)
+    }
 
     req(file)
     validate(need(ext == "rds", "Please upload a csv file"))
 
-    profile <- readRDS(file$datapath)
+    profile <- readRDS(file)
 
     for(i in which(x$ItemID %in% names(profile))) {
       eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
@@ -579,9 +585,9 @@ observe( {
     tryCatch({
       RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
     },
-    warning = function(warn){
-      showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-    },
+    # warning = function(warn){
+    #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+    # },
     error = function(err){
       showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
     })
@@ -671,7 +677,7 @@ observe( {
       Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
 
       # format your data
-      DataFormated <- ParacouSubsetFormated <- RequiredFormat( Data, input = Profile)
+      DataFormated <- RequiredFormat( Data, input = Profile)
       ")
       writeLines(text_upload, file)
     }
