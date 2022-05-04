@@ -25,6 +25,9 @@ if(!all(unlist(sapply(list(x1, x2, x3, x4, x5, x6), "[[", "ItemID")) %in% x$Item
 
 
 
+xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
+
+
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
 
@@ -475,7 +478,20 @@ body <- dashboardBody(
     )),
 
     tabItem(tabName = "Correct",
-            radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
+
+            lapply(unique(xCorr$Function), function(f) {
+              box(
+                title = f,
+                radioButtons(inputId = f, label = paste("Apply", f, "?"), choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
+                hidden(div(id = paste0(f, "Yes"),
+
+                lapply(which(xCorr$Function %in%f), function(i) {
+                  eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = ifelse(xCorr$helpText[i] %in% '', xCorr$Label[i], paste0(xCorr$Label[i], ' (', xCorr$helpText[i], ')')),", xCorr$argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                })
+              )
+              ))
+            }),
+            # radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
             actionBttn(
               inputId = "GoToDownload",
               label = "Go To Download",

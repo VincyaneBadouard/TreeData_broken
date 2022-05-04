@@ -9,11 +9,12 @@ options(shiny.maxRequestSize=10*1024^2)
 # source(paste0(dirname(dirname(getwd())), "/R/RequiredFormat.R")) # ***make this better!!**
 # x <- as.list(formals(RequiredFormat)[-1])
 
-# my function to change first letter in uppercaose (e.g for updatePickerInput)
+# my function to change first letter in uppercase (e.g for updatePickerInput)
 firstUpper <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+
 # read in csv file that has all we want to show in app
 x <- read.csv("data/interactive_items.csv")
 x <- x[x$Activate, ]
@@ -23,6 +24,8 @@ x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_no
 x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
 x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
 x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
+
+xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
 # for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
@@ -480,16 +483,18 @@ observe( {
 
   OtherOptions <- eventReactive(TidyTable(), {""})
 
+  LogicalOptions <- reactive(c(TRUE, FALSE))
+
   # enter column names for each element of the RequiredFormat function
-        observe({
+  observe({
 
-                   lapply(1:nrow(x1), function(i) {
+    lapply(1:nrow(x1), function(i) {
 
-                     eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$argument[i],"= get(x1$argValue[i])())")))
+      eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$argument[i],"= get(x1$argValue[i])())")))
 
-                   })
+    })
 
-               })
+  })
 
 
   observe({
@@ -596,11 +601,21 @@ observe( {
 
   }, ignoreInit = T)
 
+  FormatedColumnOptions <- eventReactive(input$LaunchFormating, { c("none", colnames(DataFormated()))
+  })
+
   observeEvent(input$LaunchFormating , {
     shinyjs::show("GoToCorrect")
-    }, ignoreInit = T)
+       }, ignoreInit = T)
 
+  observeEvent(input$LaunchFormating , {
 
+  lapply(which(xCorr$argument %in% "choices"), function(i) {
+
+    eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], "= get(xCorr$argValue[i])()", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
+  })
+
+  })
   # Visualize output
 
 
@@ -627,6 +642,18 @@ observe( {
   observeEvent(input$GoToDownload , {
     updateTabItems(session, "tabs", "Save")
   }, ignoreInit = T)
+
+
+  # apply corrections
+
+  observe({
+    for(f in unique(xCorr$Function)) {
+      if(input[[f]] %in% "Yes") shinyjs::show(paste0(f, "Yes"))
+      else shinyjs::hide(paste0(f, "Yes"))
+    }
+
+  })
+
 
 
 

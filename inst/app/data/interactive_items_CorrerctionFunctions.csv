@@ -1,0 +1,22 @@
+"Label","helpText","Function","ItemID","Default","ItemType","Multiple","Options","argument","argument2","argValue"
+"DeathConfirmation","Number of times (censuses) needed for an unseen tree
+to be considered dead (numeric) (Default = 2 censuses)","ErrorsDetection","ErrorsDetectionDeathConfirmation","2","numericInput",FALSE,"FALSE","value","FALSE","OtherOptions"
+"UseSize","Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)","ErrorsDetection","ErrorsDetectionUseSize","FALSE","pickerInput",FALSE,"list(`live-search` = TRUE)","choices","selected","LogicalOptions"
+"MinDBH","Minimum diameter of trees inventoried according to your
+protocol (in cm) (numeric, 1 value) (Default = 10 cm)","ErrorsDetection","ErrorsDetectionMinDBH","10","numericInput",FALSE,"FALSE","value","FALSE","OtherOptions"
+"PositiveGrowthThreshold","A tree widening by more than x cm/year is
+considered abnormal (numeric, 1 value) (Default = 5 cm)","ErrorsDetection","ErrorsDetectionPositiveGrowthThreshold","5","numericInput",FALSE,"FALSE","value","FALSE","OtherOptions"
+"InvariantColumns","Vector with the names of the columns that are
+supposed to have always the same value for each measurement of the same
+tree (character)","StatusCorrection","StatusCorrectionInvariantColumns","c(""Site"", ""Genus"", ""Species"", ""Family"", ""ScientificName"")","pickerInput",TRUE,"list( `actions-box` = TRUE)","choices","selected","FormatedColumnOptions"
+"DeathConfirmation","Number of times (censuses) needed for an unseen tree
+to be considered dead (numeric)  (Default = 2 censuses)","StatusCorrection","StatusCorrectionDeathConfirmation","2","numericInput",FALSE,"FALSE","value","FALSE","OtherOptions"
+"UseSize","Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)","StatusCorrection","StatusCorrectionUseSize","FALSE","pickerInput",FALSE,"list(`live-search` = TRUE)","choices","selected","LogicalOptions"
+"DetectOnly","TRUE: Only detect errors, FALSE: detect and correct errors
+(logical)","StatusCorrection","StatusCorrectionDetectOnly","FALSE","pickerInput",FALSE,"list(`live-search` = TRUE)","choices","selected","LogicalOptions"
+"RemoveRBeforeAlive","Do you want to delete the rows about the tree
+before it was seen alive for the 1st time? (logical)","StatusCorrection","StatusCorrectionRemoveRBeforeAlive","FALSE","pickerInput",FALSE,"list(`live-search` = TRUE)","choices","selected","LogicalOptions"
+"RemoveRAfterDeath","After correction do you want to delete the rows
+concerning the tree after its death? (logical)","StatusCorrection","StatusCorrectionRemoveRAfterDeath","FALSE","pickerInput",FALSE,"list(`live-search` = TRUE)","choices","selected","LogicalOptions"
