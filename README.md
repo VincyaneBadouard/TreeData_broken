@@ -15,7 +15,7 @@ The package structure diagrams (TreeData_Structure.drawio.html) can be found in 
 # Installation (development version)
 
 ```
-devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE) # when it becomes public
+devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)
 ```
 
 # Open the shiny app

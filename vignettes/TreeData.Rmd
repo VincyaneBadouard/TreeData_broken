@@ -18,15 +18,28 @@ knitr::opts_chunk$set(
 # Load TreeData and datasets
 **Install TreeData**
 ```{r, eval=F}
-install.packages("TreeData")
+devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)
 ```
-**Load the package**
+**Load the packages**
 ```{r setup}
 library(TreeData)
 library(knitr)
 library(kableExtra)
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+library(shinyWidgets)
+
 # library(ggplot2)
 ```
+
+# Open the shiny app
+```{r, eval = F}
+# TreeData::RunApp() # doest' work, why?
+shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app") # data.tree, stringdist
+```
+
+
 **Load the exemple dataset stored in the package**
 ```{r}
 # data()
@@ -34,7 +47,7 @@ library(kableExtra)
 
 # All the functions of the package
 # Arguments presentation
-# Harmonise and correct in 1 function
+# Harmonise and correct your data
 ## Results summary
 # Only harmonization
 
