@@ -493,11 +493,25 @@ body <- dashboardBody(
             }),
             # radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
             actionBttn(
+              inputId = "ApplyCorrections",
+              label = "Apply Corrections",
+              style = "material-flat",
+              color = "success"
+            ),
+            actionBttn(
               inputId = "GoToDownload",
               label = "Go To Download",
               style = "material-flat",
               color = "success"
-            )
+            ),
+            fluidRow(
+
+              column(width = 12,
+                     h4("summary of your corrected table:"),
+                     verbatimTextOutput("CorrectedTableSummary"),
+                     h4("View of your corrected table:"),
+                     DTOutput(outputId = "CorrectedTable")
+              ))
             ),
 
     tabItem(tabName = "Visualise",
