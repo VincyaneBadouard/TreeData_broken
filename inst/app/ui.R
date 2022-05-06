@@ -10,6 +10,7 @@ library(stringr)
 library(stringdist)
 library(data.table)
 library(TreeData)
+library(shinycssloaders)
 
 # read in csv file that has all we want to ask about the headers
 x <- read.csv("data/interactive_items.csv")
@@ -353,6 +354,16 @@ body <- dashboardBody(
                     style = "pill",
                     color = "success")
                   )),
+              hidden(div( id = "AttentionDates",
+                          box(width = 12,
+                              actionBttn(
+                                inputId = "inactivebutton",
+                                label = "!",
+                                style = "pill",
+                                color = "danger"),
+                              strong("pay attention to your Date format and double check it in step 2, even if you imported a profile."),
+                              p("A sample or your dates look like this:"),
+                              textOutput("sampleDates")))),
 
               # inform if long or wide format
               # box(width = 12,
@@ -369,8 +380,8 @@ body <- dashboardBody(
                        inputId = "inactivebutton",
                        label = "1",
                        style = "pill",
-                       color = "warning")
-                     ,   strong("  Match your columns to ours (when you can)"),
+                       color = "warning"),
+                     strong("  Match your columns to ours (when you can)"),
                      br(),
                      br(),
                      box(
@@ -493,11 +504,25 @@ body <- dashboardBody(
             }),
             # radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
             actionBttn(
+              inputId = "ApplyCorrections",
+              label = "Apply Corrections",
+              style = "material-flat",
+              color = "success"
+            ),
+            actionBttn(
               inputId = "GoToDownload",
               label = "Go To Download",
               style = "material-flat",
               color = "success"
-            )
+            ),
+            fluidRow(
+
+              column(width = 12,
+                     h4("summary of your corrected table:"),
+                     withSpinner(verbatimTextOutput("CorrectedTableSummary"),color="#0dc5c1", id = "spinner"),
+                     h4("View of your corrected table:"),
+                     withSpinner(DTOutput(outputId = "CorrectedTable"),color="#0dc5c1", id = "spinner")
+              ))
             ),
 
     tabItem(tabName = "Visualise",

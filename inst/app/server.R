@@ -333,7 +333,16 @@ server <- function(input, output, session) {
 
 
   observeEvent(input$GoToHeaders | input$SkipTidy, {
-    updateTabItems(session, "tabs", "Headers")}, ignoreInit = T)
+    updateTabItems(session, "tabs", "Headers")
+
+    }, ignoreInit = T)
+
+  observe({
+    if(!input$Date %in% "none")
+      shinyjs::show("AttentionDates")
+    output$sampleDates <- renderText(head(as.character(TidyTable()[[input$Date]])))
+  })
+
 
 
   #   values <- reactiveValues(n_merge = 0)
@@ -650,9 +659,43 @@ observe( {
     for(f in unique(xCorr$Function)) {
       if(input[[f]] %in% "Yes") shinyjs::show(paste0(f, "Yes"))
       else shinyjs::hide(paste0(f, "Yes"))
-    }
 
+    }
   })
+
+  DataCorrected <- eventReactive(input$ApplyCorrections, {
+
+    Rslt <- DataFormated()
+    lapply(
+      unique(xCorr$Function),
+      FUN = function(f){
+       if(input[[f]] %in% "Yes") {
+         cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(xCorr$Label[xCorr$Function %in% f], "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
+         Rslt <<- eval(cl)
+
+
+         tryCatch({
+           eval(cl)
+         },
+         # warning = function(warn){
+         #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+         # },
+         error = function(err){
+           showNotification(err, type = 'err', duration = NULL)
+         })
+       }
+      }
+    )
+    Rslt
+  }, ignoreInit = T)
+
+
+
+    output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
+                                 options = list(pageLength = 8, scrollX=TRUE))
+
+    output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
+
 
 
 
