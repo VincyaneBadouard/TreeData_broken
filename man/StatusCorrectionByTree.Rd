@@ -23,7 +23,8 @@ The \emph{LifeStatus} column must be coded as:
 - FALSE = dead,
 - NA = unseen}
 
-\item{PlotCensuses}{Census years for the plot in which the tree is (integer)}
+\item{PlotCensuses}{Census years for the plot in which the tree is (numeric
+or integer)}
 
 \item{InvariantColumns}{Vector with the names of the columns that are
 supposed to have always the same value for each measurement of the same
@@ -32,7 +33,8 @@ tree (character)}
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)}
 
-\item{UseSize}{Use the size presence as a witness of the living status of the tree (logical)}
+\item{UseSize}{Use the size presence as a witness of the living status of the
+tree (logical)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}

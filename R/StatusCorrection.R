@@ -181,7 +181,8 @@ StatusCorrection <- function(
 #'     - FALSE = dead,
 #'     - NA = unseen
 #'
-#' @param PlotCensuses Census years for the plot in which the tree is (integer)
+#' @param PlotCensuses Census years for the plot in which the tree is (numeric
+#'   or integer)
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same
@@ -190,7 +191,8 @@ StatusCorrection <- function(
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric)
 #'
-#' @param UseSize Use the size presence as a witness of the living status of the tree (logical)
+#' @param UseSize Use the size presence as a witness of the living status of the
+#'   tree (logical)
 #'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
@@ -674,11 +676,11 @@ FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
              IdTree,
              "' and takes the values ",
              uni)
+        # }
+        # else if(is.na(uni) | length(uni) == 0){ # no value in the invariant column
+        #   stop("The variable ",j," has no value for individual '",IdTree,"'")
       }
-      else if(is.na(uni) | length(uni) == 0){ # no value in the invariant column
-        stop("The variable ",j," has no value for individual '",IdTree,"'")
-      }
-      else{
+      else if(!is.na(uni) | length(uni) != 0){
         NewRow[is.na(get(j)), (j) := uni] # fill the invariant column in NewRow with their (unique) value
       }
     }

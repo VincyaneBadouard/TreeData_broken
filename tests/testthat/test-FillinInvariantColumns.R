@@ -45,8 +45,8 @@ test_that("FillinInvariantColumns", {
   expect_error(FillinInvariantColumns(NewRow, InvariantColumns = InvariantColumns, DataTree = VarPlot, IdTree = "a"),
                regexp = "has multiple values")
 
-  expect_error(FillinInvariantColumns(NewRow, InvariantColumns = InvariantColumns, DataTree = NoVal, IdTree = "a"),
-               regexp = "has no value")
+  # expect_error(FillinInvariantColumns(NewRow, InvariantColumns = InvariantColumns, DataTree = NoVal, IdTree = "a"),
+  #              regexp = "has no value")
 
 
   # Check the function work
