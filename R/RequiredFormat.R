@@ -1,6 +1,6 @@
 #'RequiredFormat
 #'
-#'@param Data Forest inventory data set (data.frame or data.table)
+#'@param Data Forest inventory data set (data.frame or data.table) - already stacked, merged and tidyed
 #'
 #'@param input A named list, typically the output of function
 #'  RequiredFormat_interactive, also called site profile. It has information on
@@ -17,8 +17,8 @@
 #'  package. It also generates missing information, when possible (e.g. DBH when
 #'  only circumference is givent, Genus and Species when only scientifique name
 #'  is given etc...). All the decisions are made based on what is provided in
-#'  the input argument. It is a named list, output of function
-#'  RequiredFormat_interactive.
+#'  the input argument, which is a named list, as returned by function
+#'  RequiredFormat_interactive or Profile.rds file downloaded from shiny app
 #'
 #'@return Input inventory (data.frame) in the required package format.
 #'
@@ -152,6 +152,9 @@ RequiredFormat <- function(
   ## Year
   if(input$Year %in% "none") {
     if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else Data[, Year := input$YearMan]
+
+    Data$Year <- as.numeric(as.character(Data$Year))
+
   }
 
 
