@@ -1,16 +1,16 @@
 on:
   push:
-  paths:
-    - 'data-raw/CreateInterractiveItemsForCorrections.R'
-  branches:
-    - master
-pull_request:
-  paths:
-    - 'data-raw/CreateInterractiveItemsForCorrections.R'
-  branches:
-    - master
+    paths:
+      - 'data-raw/CreateInterractiveItemsForCorrections.R'
+    branches:
+      - master
+  pull_request:
+    paths:
+      - 'data-raw/CreateInterractiveItemsForCorrections.R'
+    branches:
+      - master
 
-name: create_interactive_items_CorrerctionFunctions
+name: Update Correrction Functions interactive items
 
 jobs:
   create_interactive_items_CorrerctionFunctions:
