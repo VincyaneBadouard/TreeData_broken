@@ -333,7 +333,16 @@ server <- function(input, output, session) {
 
 
   observeEvent(input$GoToHeaders | input$SkipTidy, {
-    updateTabItems(session, "tabs", "Headers")}, ignoreInit = T)
+    updateTabItems(session, "tabs", "Headers")
+
+    }, ignoreInit = T)
+
+  observe({
+    if(!input$Date %in% "none")
+      shinyjs::show("AttentionDates")
+    output$sampleDates <- renderText(head(as.character(TidyTable()[[input$Date]])))
+  })
+
 
 
   #   values <- reactiveValues(n_merge = 0)
