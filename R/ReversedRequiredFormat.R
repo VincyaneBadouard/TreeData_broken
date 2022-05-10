@@ -1,4 +1,4 @@
-#'ReverseRequiredFormat
+#'ReversedRequiredFormat
 #'
 #'@param Data Standardized data, returned from [RequiredFormat]
 #'
@@ -27,11 +27,11 @@
 #'
 #' data(ParacouSubsetFormated)
 #' data("ForestGEOProfile")
-#' ReverseRequiredFormat(ParacouSubsetFormated, ForestGEOProfile)
+#' ReversedRequiredFormat(ParacouSubsetFormated, ForestGEOProfile)
 #'                }
 #'
 
-ReverseRequiredFormat <- function(
+ReversedRequiredFormat <- function(
   Data,
   input,
   x = NULL,
