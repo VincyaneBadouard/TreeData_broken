@@ -42,7 +42,7 @@ if(!interactive()) {
       Topography = "none",
       CircUnitMan = "cm",
       PlotAreaUnitMan = "ha",
-      DateFormat = "%Y-%m-%d",
+      DateFormat = "yyyy-mm-dd",
       IsLive = TRUE,
       IsCommercrial = TRUE
     )
@@ -93,7 +93,7 @@ if(interactive()) {
 1
 2
 2
-%Y-%m-%d
+yyyy-mm-dd
 2
 2
 }
