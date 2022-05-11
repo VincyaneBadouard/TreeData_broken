@@ -1,15 +1,11 @@
 on:
   push:
-    branches:
-    - master
-    paths:
-    - '!inst/**'
+    paths-ignore:
+     - 'inst/**'
 
   pull_request:
-    branches:
-    - master
-    paths:
-    - '!inst/**'
+    paths-ignore:
+     - 'inst/**'
 
 
 name: test-coverage
