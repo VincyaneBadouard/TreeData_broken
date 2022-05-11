@@ -110,11 +110,13 @@ RequiredFormat <- function(
 
   ### Life status
   if( !input$LifeStatus %in% "none") {
+    Data[, LifeStatusOriginal := LifeStatus]
     Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
   }
 
   ### commercial species
   if( !input$CommercialSp %in% "none") {
+    Data[, CommercialSpOriginal := CommercialSp]
     Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
   }
 
@@ -142,7 +144,7 @@ RequiredFormat <- function(
 
   # make input complete ####
 
-  ## enter all itemID in inptu as "none" so we can refer to them - make sure this happens after standardizing column names otherwise that won't work...
+  ## enter all itemID in input as "none" so we can refer to them - make sure this happens after standardizing column names otherwise that won't work...
   input[setdiff(x$ItemID, names(input))] <- "none"
 
 
@@ -214,16 +216,15 @@ RequiredFormat <- function(
 
     SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
 
-    if(! SizeUnit %in% unitOptions) stop(paste("Your size units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!SizeUnit %in% unitOptions) stop(paste("Your size units are not one of:", paste(unitOptions, collapse = ", ")))
 
-    if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi")
-      Data[, DBH := DBH/10] # mm -> cm
+    if(SizeUnit %in% unitOptions) {
+    if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi") Data[, DBH := DBH/10] # mm -> cm
 
-    if (substr(SizeUnit, 1, 1) == "d")
-      Data[, DBH := DBH*10] # dm -> cm
+    if (substr(SizeUnit, 1, 1) == "d") Data[, DBH := DBH*10] # dm -> cm
 
-    if (substr(SizeUnit, 1, 1) == "m")
-      Data[, DBH := DBH*100] # m -> cm
+    if (substr(SizeUnit, 1, 1) == "m") Data[, DBH := DBH*100] # m -> cm
+    }
   }
 
   ### POM in m ####
@@ -235,17 +236,15 @@ RequiredFormat <- function(
 
     if(!POMUnit %in% unitOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
 
-    if (POMUnit %in% unitOptions)
+    if (POMUnit %in% unitOptions) {
 
-      if (substr(POMUnit, 1, 2) == "mm" | substr(POMUnit, 1, 2) == "mi")
-        Data[, POM := POM/1000] # mm -> m
+      if (substr(POMUnit, 1, 2) == "mm" | substr(POMUnit, 1, 2) == "mi") Data[, POM := POM/1000] # mm -> m
 
-    if (substr(POMUnit, 1, 1) == "m")
-      Data[, POM := POM/100] # cm -> m
+      if (substr(POMUnit, 1, 1) == "m") Data[, POM := POM/100] # cm -> m
 
 
-    if (substr(POMUnit, 1, 1) == "d")
-      Data[, POM := POM/10] # dm -> m
+      if (substr(POMUnit, 1, 1) == "d") Data[, POM := POM/10] # dm -> m
+    }
   }
 
 
@@ -260,17 +259,15 @@ RequiredFormat <- function(
 
     if(! TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
 
-    if (TreeHeightUnit %in% unitOptions)
+    if (TreeHeightUnit %in% unitOptions) {
 
-      if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
-        Data[, TreeHeight := TreeHeight/1000] # mm -> m
+      if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi") Data[, TreeHeight := TreeHeight/1000] # mm -> m
 
-    if (substr(TreeHeightUnit, 1, 1) == "m")
-      Data[, TreeHeight := TreeHeight/100] # cm -> m
+    if (substr(TreeHeightUnit, 1, 1) == "m") Data[, TreeHeight := TreeHeight/100] # cm -> m
 
 
-    if (substr(TreeHeightUnit, 1, 1) == "d")
-      Data[, TreeHeight := TreeHeight/10] # dm -> m
+    if (substr(TreeHeightUnit, 1, 1) == "d") Data[, TreeHeight := TreeHeight/10] # dm -> m
+    }
   }
 
 
@@ -284,14 +281,13 @@ RequiredFormat <- function(
 
     if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
 
-    if (PlotAreaUnit %in% AreaUnitOptions)
+    if (PlotAreaUnit %in% AreaUnitOptions) {
 
-      if (substr(PlotAreaUnit, 1, 2) == "m2")
-        Data[, PlotArea := PlotArea/10000] # m2 -> ha
+      if (substr(PlotAreaUnit, 1, 2) == "m2") Data[, PlotArea := PlotArea/10000] # m2 -> ha
 
 
-    if (substr(PlotAreaUnit, 1, 1) == "km2")
-      Data[, PlotArea := PlotArea*100] # km2 -> ha
+    if (substr(PlotAreaUnit, 1, 1) == "km2") Data[, PlotArea := PlotArea*100] # km2 -> ha
+    }
   }
 
   # if area is entered manually, it is supposed to be in ha already
@@ -309,12 +305,10 @@ RequiredFormat <- function(
 
     if (SubPlotAreaUnitMan %in% AreaUnitOptions){
 
-      if (substr(SubPlotAreaUnitMan, 1, 2) == "m2")
-        Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
+      if (substr(SubPlotAreaUnitMan, 1, 2) == "m2") Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
 
 
-    if (substr(SubPlotAreaUnitMan, 1, 1) == "km2")
-      Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
+    if (substr(SubPlotAreaUnitMan, 1, 1) == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
     }
   }
 
@@ -325,7 +319,7 @@ RequiredFormat <- function(
 
 
   # return output ####
-  ColumnsToReturn <- intersect(x$ItemID, colnames(Data))
+  ColumnsToReturn <- intersect(c(x$ItemID, paste0(x$ItemID, "Original")), colnames(Data))
   return(Data[, ..ColumnsToReturn])
 
 }
