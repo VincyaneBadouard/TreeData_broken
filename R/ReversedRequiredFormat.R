@@ -65,12 +65,15 @@ ReversedRequiredFormat <- function(
   }
 
 
+  ## set as data.table
+  setDT(Data)
+
   ## format date of measurement like output profile ####
   if(!input$Date %in% "none"){
 
     DateFormat <- input$DateFormat
     DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-    DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+    DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
 
     Data[, Date := as.Date(Date)]
@@ -175,17 +178,51 @@ ReversedRequiredFormat <- function(
 
   }
 
-  ## get circumference if needed ####
-  if(!input$Circ %in% "none") Data[, Circ := DBH*pi]
 
-  Data[, DBH := round(Circ/pi, 2)]
 
+
+  # untidy if wanted ####
+  # if(input$Untidy %in% TRUE & input$Tidy > 0) {
+
+    VariableName <- names(input)[input == input$VariableName & names(input) %in% x$ItemID]
+
+    idx = sort(grep("TickedMelt", names(input), value = T))
+    idx = which(unlist(input[idx]))
+
+
+    ValueNames <- sort(grep("^ValueName", names(input), value = T))[idx]
+    ValueNames <- names(input)[input %in% input[ValueNames] & names(input) %in% x$ItemID]
+
+    Variablecolumns <- sort(grep("^Variablecolumns", names(input), value = T))[idx]
+    Variablecolumns <-  unlist(input[Variablecolumns])
+
+
+    # remove Circ or DBH if one or the other is involved in tidy (otherwise that duplicates rows)
+    if("DBH" %in% ValueNames & "Circ" %in% names(Data)) Data$Circ <- NULL
+    if("Circ" %in% ValueNames & "DBH" %in% names(Data)) Data$DBH <- NULL
+
+    Data <- dcast(Data, formula(bquote(...~.(str2lang(VariableName)))), value.var = ValueNames)
+
+    if(!any(grepl("_", Variablecolumns))) {
+      old = grep(paste0(paste0('(', ValueNames, '_)', collapse = "|"), "|", paste0('(_', ValueNames, ')', collapse = "|")) , names(Data), value = TRUE)
+
+      setnames(Data, old, gsub("_", "", old))
+
+      # setnames(Data, old, Variablecolumns)
+    }
+
+
+
+  # ## get (or recalculate) circumference if needed ####
+  # if(!input$Circ %in% "none") Data[, Circ := DBH*pi]
+  #
+  # Data[, DBH := round(Circ/pi, 2)]
 
   # destandardize column names ####
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  m <- match(colnames(Data), names(input))
+  m <- na.omit(match(colnames(Data), names(input)))
   idx_complete <- which(!input[m] %in% "none") # keep standard name when is not asked in the output Profile
 
   colnames(Data)[idx_complete] <- input[m[idx_complete]]

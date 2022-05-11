@@ -347,7 +347,7 @@ body <- dashboardBody(
                                selected = "No"),
 
                   # load a profile it one already exists
-                  fileInput(inputId = "profile", div("Load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
+                  fileInput(inputId = "profile", div("You may also load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
                   hidden(actionBttn(
                     inputId = "UseProfile",
                     label = "Click Twice here to use Profile",
@@ -503,18 +503,24 @@ body <- dashboardBody(
               ))
             }),
             # radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
-            actionBttn(
+            hidden(actionBttn(
               inputId = "ApplyCorrections",
               label = "Apply Corrections",
               style = "material-flat",
               color = "success"
-            ),
+            )),
             actionBttn(
+              inputId = "SkipCorrections",
+              label = "Skip Corrections",
+              style = "material-flat",
+              color = "warning"
+            ),
+            hidden(actionBttn(
               inputId = "GoToDownload",
               label = "Go To Download",
               style = "material-flat",
               color = "success"
-            ),
+            )),
             fluidRow(
 
               column(width = 12,
@@ -525,20 +531,52 @@ body <- dashboardBody(
               ))
             ),
 
-    tabItem(tabName = "Visualise",
-
-            fluidRow(
-
-              column(width = 10,
-                     DTOutput(outputId = "tabDataFormated")
-              ),
-              actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
-            )
-
-
-    ),  ## end of "visualize" panel
+    # tabItem(tabName = "Visualise",
+    #
+    #         fluidRow(
+    #
+    #           column(width = 10,
+    #                  DTOutput(outputId = "tabDataFormated")
+    #           ),
+    #           actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
+    #         )
+    # ),  ## end of "visualize" panel
 
     tabItem(tabName = "Save",
+
+            fluidRow(box(width = 12,
+                         radioButtons(inputId = "predefinedProfileOutput",
+                                      label = div("Use a predifined format for your output?"),
+                                      choices = list("No thanks! I want my data in this app's standards" = "No",
+                                                     # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
+                                                     "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO"#,
+                                                     # "RBA: Red de Bosques Andinos" = "RBA"
+                                      ),
+                                      selected = "No"),
+
+                         # load a profile it one already exists
+                         fileInput(inputId = "profileOutput", div("You may also load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds"),
+                         hidden(actionBttn(
+                           inputId = "UseProfileOuput",
+                           label = "Apply Profile",
+                           style = "pill",
+                           color = "success")),
+                         hidden(actionBttn(
+                           inputId = "DontUseProfileOuput",
+                           label = "Nevermind, go back to this App's standards.",
+                           style = "pill",
+                           color = "success"))
+
+            )
+            ),
+            fluidRow(
+
+              column(width = 12,
+                     h4("summary of your final table:"),
+                     withSpinner(verbatimTextOutput("DataOutputSummary"),color="#0dc5c1", id = "spinner"),
+                     h4("View of your final table:"),
+                     withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
+              )),
             fluidRow(
               column(width = 3,
                      box(title = "Save file",

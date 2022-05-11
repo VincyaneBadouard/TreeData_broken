@@ -5,10 +5,6 @@
 # increase size limit to 10MB
 options(shiny.maxRequestSize=10*1024^2)
 
-# source the REquiredFormat function to get the list of arguments
-# source(paste0(dirname(dirname(getwd())), "/R/RequiredFormat.R")) # ***make this better!!**
-# x <- as.list(formals(RequiredFormat)[-1])
-
 # my function to change first letter in uppercase (e.g for updatePickerInput)
 firstUpper <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
@@ -36,21 +32,6 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
-  # generate the upload UI  ####
-  # observeEvent(input$nTable,
-  #              {
-#
-#   observeEvent(input$CodeRunApp, {
-#     writeClipboard('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
-#     updateActionButton(session,
-#       inputId = "CodeRunApp",
-#       label = "Code copied! You may directly paste in RStudio now.",
-#       icon = icon("clipboard")
-#
-#       )
-#
-#   })
-
   output$CodeRunApp <- renderText('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
 
   output$ui_uploadTables <- renderUI({
@@ -73,16 +54,7 @@ server <- function(input, output, session) {
                  textInput(inputId = paste0("TableName", i),
                            label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
                            value = paste0("Table", i)
-                 )#,
-                 # textInput(inputId = paste0("TableDescription", i),
-                 #           label = "Give an explicit description of your table.",
-                 #           value = paste0("My Table", i)
-                 # ),
-                 # tags$textarea(id=paste0("TableDescription", i),
-                 #               label = "Give an explicit description of your table...",
-                 #               rows=5,
-                 #               cols = 6,
-                 #               placeholder = paste0("My Table", i))
+                 )
              )
       )
 
@@ -92,7 +64,7 @@ server <- function(input, output, session) {
 
 
   })
-  # })
+
 
   # read file(s) ####
 
@@ -176,10 +148,9 @@ server <- function(input, output, session) {
 
 
 
-    # if(is.null(input$TablesToStack)) {
     options_to_merge <- names(Data())
     column_options_list <- lapply(Data(), colnames)
-    # }
+
 
     if(!is.null(input$TablesToStack)){
 
@@ -224,14 +195,6 @@ server <- function(input, output, session) {
 
 
   # tidy tables ####
-
-  # observeEvent(input$submitTables, {
-  #   if(input$nTable == 1 & length(Data()) == 1) {
-  #     updateTabItems(session, "tabs", "Tidying")
-  #     OneTable <<- reactive(Data()[[1]])
-  #
-  #   }
-  # })
   observeEvent(input$GoToTidy | input$SkipMerge, {
     updateTabItems(session, "tabs", "Tidying")}, ignoreInit = T)
 
@@ -253,8 +216,6 @@ server <- function(input, output, session) {
     groupNames <- groupNames[sapply(groupNames, length) > 1]
     names(groupNames) <- sapply(groupNames, function(x) paste(Reduce(intersect, strsplit(x,"")), collapse=""))
 
-    # updatePickerInput(session, "Variablecolumns", choices = groupNames)
-
     output$meltUI <- renderUI({
       lapply(c(1:length(groupNames)), function(i)
       {
@@ -272,12 +233,6 @@ server <- function(input, output, session) {
                      choices = colnames(OneTable()),
                      selected = groupNames[[i]],
                      multiple = T
-                     # status = "primary",
-                     # checkIcon = list(
-                     #   yes = icon("ok",
-                     #              lib = "glyphicon"),
-                     #   no = icon("remove",
-                     #             lib = "glyphicon"))
                    )
             ))
       })
@@ -345,72 +300,6 @@ server <- function(input, output, session) {
 
 
 
-  #   values <- reactiveValues(n_merge = 0)
-  #
-  # # add a merge
-  #   observeEvent(input$addMerge, {
-  #
-  #
-  #     values$n_merge <- values$n_merge + 1
-  #     add <- values$n_merge
-  #
-  #   insertUI(
-  #         selector = "#addMerge",
-  #         where = "afterEnd",
-  #         ui =
-  #           tags$div(
-  #             box(width = 12,
-  #                 column(3, selectInput(paste0("leftTable", input$add), "Take table", choices = options_to_merge)),
-  #                 column(3, selectInput(paste0("rightTable", input$add), "add to it this table", choices = options_to_merge)),
-  #                 column(3, selectInput(paste0("leftKey", input$add), "Using this column(s) from first table", choices = "", multiple = T)),
-  #                 column(3,  selectInput(paste0("rightKey", input$add), "and this column(s) from second table", choices = "", multiple = T))
-  #                 ),
-  #                 box(
-  #                   title = "inputID", width = 12, background = "black",
-  #
-  #                   paste0("Number_Product1_", input$add))  #### inputID's of the selectizeinput "Product 1"
-  #
-  #
-  #           )
-  #       )
-  #
-  #   output$test <- renderText(input$add)
-  #
-  #
-  #   })
-
-
-
-
-
-
-  # # submit tables
-  # observeEvent(input$submit, {
-  #   output$uiheader <- renderUI({
-  #
-  #     lapply(1:isolate(input$nTable), function(i) {
-  #       X <- isolate(colnames(Data()[[i]]))
-  #       title <- isolate(reactiveValuesToList(input)[paste0("TableName", i)])
-  #       box(
-  #         title = title,
-  #         lapply(X, function(x) pickerInput(inputId = paste(title, x, sep = "_"), label = x, choices = choices, multiple = T, options = list(`live-search` =T, width = F), choicesOpt = list(content = subtext), width = '75%'))
-  #
-  #       )
-  #     })
-  #
-  #
-  #   })
-  #
-  #   updateTabItems(session, "tabs", "Headers")
-  #
-  #
-  # })
-
-
-
-
-
-
   ### other stuff ####
   gimme_value <- reactiveVal(0)
 
@@ -438,7 +327,7 @@ observe( {
     }
 
     req(file)
-    validate(need(ext == "rds", "Please upload a csv file"))
+    validate(need(ext == "rds", "Please upload a .rds file"))
 
     profile <- readRDS(file)
 
@@ -625,22 +514,13 @@ observe( {
   })
 
   })
+
+
   # Visualize output
-
-
   output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
                                  options = list(pageLength = 8, scrollX=TRUE))
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
-
-  # output$tabDataFormated <- renderDT({
-  #   # validate(
-  #   #   need(req(DataFormated()), "AA")
-  #   # )
-  #   DataFormated()
-  # }, rownames = FALSE,
-  # options = list(pageLength = 8, scrollX=TRUE))
-
 
 
   observeEvent(input$GoToCorrect, {
@@ -648,7 +528,7 @@ observe( {
   }, ignoreInit = TRUE)
 
 
-  observeEvent(input$GoToDownload , {
+  observeEvent(input$GoToDownload | input$SkipCorrections , {
     updateTabItems(session, "tabs", "Save")
   }, ignoreInit = T)
 
@@ -661,7 +541,19 @@ observe( {
       else shinyjs::hide(paste0(f, "Yes"))
 
     }
+
+    if(any(unlist(reactiveValuesToList(input)[unique(xCorr$Function)]) %in% "Yes")) {
+      shinyjs::show("ApplyCorrections")
+      shinyjs::hide("SkipCorrections")
+    } else {
+      shinyjs::hide("ApplyCorrections")
+      shinyjs::show("SkipCorrections")
+    }
   })
+
+  observeEvent(input$ApplyCorrections,{
+    shinyjs::show("GoToDownload")
+    })
 
   DataCorrected <- eventReactive(input$ApplyCorrections, {
 
@@ -689,7 +581,7 @@ observe( {
     Rslt
   }, ignoreInit = T)
 
-
+  DataCorrected <- eventReactive(input$SkipCorrections, {DataFormated()})
 
     output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
                                  options = list(pageLength = 8, scrollX=TRUE))
@@ -701,6 +593,57 @@ observe( {
 
 
   # save final data table
+
+    DataOutput <- reactiveVal(NULL)
+
+
+    observe( {
+      if(input$predefinedProfileOutput != "No" )
+        shinyjs::show("UseProfileOuput")
+    })
+
+    observeEvent(input$profileOutput, {
+      shinyjs::show("UseProfileOuput")
+    })
+
+    observeEvent(input$UseProfileOuput, {
+      shinyjs::show("DontUseProfileOuput")
+
+
+      if(input$predefinedProfileOutput == "No") {
+        file <- input$profileOutput$datapath
+        ext <- tools::file_ext(file)
+      } else {
+        file <- paste0("data/", input$predefinedProfileOutput, "Profile.rds")
+        ext <- tools::file_ext(file)
+      }
+
+      req(file)
+      validate(need(ext == "rds", "Please upload a .rds file"))
+
+      profileOutput <- readRDS(file)
+
+      DataOutput(
+        ReversedRequiredFormat(DataCorrected(), profileOutput, x, ThisIsShinyApp = T)
+        )
+
+
+    })
+
+    observeEvent(input$DontUseProfileOuput, {
+      shinyjs::hide("DontUseProfileOuput")
+      shinyjs::hide("UseProfileOuput")
+
+      DataOutput(DataCorrected())
+    })
+
+
+    # Visualize output
+    output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
+                                     options = list(pageLength = 8, scrollX=TRUE))
+
+    output$DataOutputSummary <- renderPrint(summary(DataOutput()))
+
 
   output$dbFile <- downloadHandler(
     filename = function() {
@@ -718,7 +661,8 @@ observe( {
       paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
     },
     content = function(file) {
-      inputs_to_save <- names(input)[names(input) %in% x$ItemID]
+      inputs_to_save <- c(names(input)[names(input) %in% x$ItemID],
+                          "Tidy", "VariableName", grep("Variablecolumns|TickedMelt|ValueName", names(input), value = T))
       Profile <- list()
       for(input.i in inputs_to_save){
         Profile[[input.i]] <-  input[[input.i]]
