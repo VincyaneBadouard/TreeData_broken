@@ -1,8 +1,12 @@
 on:
   push:
+    paths:
+      - '!inst/**'
     branches:
       - master
   pull_request:
+    paths:
+      - '!inst/**'
     branches:
       - master
 
@@ -20,7 +24,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - name: Install librarires
+      - name: Install libraries
         run: |
           sudo apt-get install libgdal-dev libudunits2-dev
 
