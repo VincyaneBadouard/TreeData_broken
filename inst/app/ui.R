@@ -555,7 +555,9 @@ body <- dashboardBody(
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbCode", label = "Save code"))#,
+                         downloadButton(outputId = "dbCode", label = "Save code")),
+
+                     p("ATTENTION:, LifeStatus and CommercialSp were not converted to your desired output profile because we cannot interprete TRU/FALSE to your desired profile's code system!")#,
                      # box(title = "Save metadata",
                      #     width = NULL,
                      #     status = "primary",
