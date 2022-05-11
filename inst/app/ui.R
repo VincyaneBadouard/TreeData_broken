@@ -415,7 +415,7 @@ body <- dashboardBody(
                          eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
                        }),
-                       actionButton("LaunchFormating", label = "Apply changes!", style = "color: #fff; background-color: #009e60; border-color: #317256")
+                       actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
                      ),
                      hidden( actionBttn(
                        inputId = "GoToCorrect",
