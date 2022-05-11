@@ -51,7 +51,7 @@ data.frame(class = c("numeric", "logical", "call","text"),
 Fct_args <- cbind(Fct_args, df_moreInfo[match(sapply(Fct_args$Default,class), df_moreInfo$class), -1])
 
 
-# consider default as characher now
+# consider default as character now
 
 Fct_args$Default <- as.character(Fct_args$Default)
 
