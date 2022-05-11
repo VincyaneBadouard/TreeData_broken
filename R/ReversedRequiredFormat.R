@@ -1,6 +1,6 @@
 #'ReversedRequiredFormat
 #'
-#'@param Data Standardized data, returned from [RequiredFormat]
+#'@param Data Standardized data, returned from [RequiredFormat()]
 #'
 #'@param input A named list, typically the output of function
 #'  RequiredFormat_interactive, also called site profile. It has information on

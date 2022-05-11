@@ -7,7 +7,7 @@
 ReversedRequiredFormat(Data, input, x = NULL, ThisIsShinyApp = FALSE)
 }
 \arguments{
-\item{Data}{Standardized data, returned from \link{RequiredFormat}}
+\item{Data}{Standardized data, returned from \code{\link[=RequiredFormat]{RequiredFormat()}}}
 
 \item{input}{A named list, typically the output of function
 RequiredFormat_interactive, also called site profile. It has information on
