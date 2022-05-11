@@ -12,7 +12,7 @@
 #'  (logical)
 #'
 #'
-#'@details This function takes the standardized forest inventory data.table (returned by [RequiredFormat])
+#'@details This function takes the standardized forest inventory data.table (returned by [RequiredFormat()])
 #'  and converts the column names to the names of the profile given as [input]
 #'
 #'@return (data.frame) in the format given the profile selected in input.
