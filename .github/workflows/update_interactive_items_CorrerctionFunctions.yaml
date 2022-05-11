@@ -30,6 +30,7 @@ jobs:
       - name:  Create interactive_items_CorrerctionFunctions
         run: |
           source('data-raw/CreateInterractiveItemsForCorrections.R')
+        shell: Rscript {0}
 
       - name: Commit new files
         run: |
