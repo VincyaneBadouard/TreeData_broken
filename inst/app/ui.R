@@ -56,7 +56,8 @@ body <- dashboardBody(
              top: calc(10%);
              left: calc(25%);
              @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
-             }
+      }
+             .dropdown-menu{z-index:10000 !important;}
              "
       )
     ) # to make notification show up at top of page
