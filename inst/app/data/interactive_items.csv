@@ -42,6 +42,8 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
 1,pickerInput,choices,none,Genus,Genus name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Genus name
 1,pickerInput,choices,none,Species,Species name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Species name
+1,pickerInput,choices,none,Subspecies,Subspecies name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Subspecies name
+1,pickerInput,choices,none,Variety,Variety name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Variety name
 1,pickerInput,choices,none,IdLevel,Deepest taxonomic level for which full identification is known,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Deepest taxonomic level for which full identification is known
 1,pickerInput,choices,none,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Taxonomic authority for the ID level
 1,pickerInput,choices,none,CommercialSp,Commercial species indicator,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
