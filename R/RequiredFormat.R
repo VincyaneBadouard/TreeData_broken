@@ -250,7 +250,7 @@ RequiredFormat <- function(
 
 
   ### TreeHeight in m ####
-  if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
+  # if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
 
 
   if(!input$TreeHeight %in% "none" & !input$TreeHeightUnitMan %in% "none") {
