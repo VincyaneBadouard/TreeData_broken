@@ -7,46 +7,65 @@
 \format{
 A named list
 \describe{
-\item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
-\item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
-\item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
-\item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot (or subplot) area}
-\item{Year}{Value or column name in data set @ParacouSubset (Year) corresponding to Census year}
-\item{Date}{Value or column name in data set @ParacouSubset (Date) corresponding to Census Date}
-\item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
-\item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
-\item{IdStem}{Value or column name in data set @ParacouSubset (none) corresponding to Stem ID}
-\item{IdMeasure}{Value or column name in data set @ParacouSubset (none) corresponding to Measure ID}
-\item{LifeStatus}{Value or column name in data set @ParacouSubset (CodeAlive) corresponding to Life status}
-\item{DBH}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
-\item{DBHUnit}{Value or column name in data set @ParacouSubset (none) corresponding to DBH unit}
-\item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
-\item{CircUnit}{Value or column name in data set @ParacouSubset (none) corresponding to Circumference unit}
-\item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
-\item{POMUnit}{Value or column name in data set @ParacouSubset (mm) corresponding to POM units}
-\item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
-\item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
-\item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
-\item{Yutm}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
-\item{Xfield}{Value or column name in data set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
-\item{Yfield}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
-\item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
-\item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
+\item{TreeHeightUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your tree height unit?}
 \item{Family}{Value or column name in data set @ParacouSubset (Family) corresponding to Family name}
-\item{Genus}{Value or column name in data set @ParacouSubset (Genus) corresponding to Genus name}
-\item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
-\item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
-\item{TreeHeightUnit}{Value or column name in data set @ParacouSubset (mm) corresponding to Tree height units}
-\item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
-\item{Treatment}{Value or column name in data set @ParacouSubset (none) corresponding to Logging treatment}
-\item{SoilType}{Value or column name in data set @ParacouSubset (none) corresponding to Type of soil}
-\item{Topography}{Value or column name in data set @ParacouSubset (none) corresponding to Topographical position (lowland, plateau)}
-\item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
-\item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What the unit for plot area?}
-\item{DateFormat}{Value or column name in data set @ParacouSubset (\%Y-\%m-\%d) corresponding to Census Date format}
-\item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
+\item{Date}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Date of measurement}
+\item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
+\item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What is the unit for plot area?}
+\item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
 \item{IsCommercrial}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
+\item{IdStem}{Value or column name in data set @ParacouSubset (none) corresponding to Stem ID}
+\item{PlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your plot name ?}
+\item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
+\item{ScientificNameSep}{Value or column name in data set @ParacouSubset () corresponding to Character separating Genus and Species in Scientific name}
+\item{Yfield}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
+\item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
+\item{IdMeasure}{Value or column name in data set @ParacouSubset (none) corresponding to Measure ID}
+\item{IdLevel}{Value or column name in data set @ParacouSubset (none) corresponding to Deepest taxonomic level for which full identification is known}
+\item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree unique identifiers}
+\item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
+\item{DateFormat}{Value or column name in data set @ParacouSubset (yyyy-mm-dd) corresponding to What is your date format}
+\item{IdCensus}{Value or column name in data set @ParacouSubset (none) corresponding to Census ID}
+\item{PlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your plot area in hectar?}
+\item{Year}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Year of measurement}
+\item{LifeStatus}{Value or column name in data set @ParacouSubset (CodeAlive) corresponding to Life status}
+\item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot area}
+\item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
+\item{SubPlotAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is the unit for subplot area?}
+\item{Yutm}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
+\item{YearMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your year of measurement?}
+\item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
+\item{SubPlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your subplot area in hectar?}
+\item{SubPlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your subplot name ?}
+\item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
+\item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
+\item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
+\item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
+\item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
+\item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
+\item{SubPlotArea}{Value or column name in data set @ParacouSubset (none) corresponding to SubPlot area}
+\item{SiteMan}{Value or column name in data set @ParacouSubset () corresponding to What is your site name ?}
+\item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
+\item{Authority}{Value or column name in data set @ParacouSubset (none) corresponding to  Taxonomic authority for the ID level}
+\item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
+\item{Genus}{Value or column name in data set @ParacouSubset (Genus) corresponding to Genus name}
+\item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
+\item{DBHUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your DBH unit ?}
+\item{Xfield}{Value or column name in data set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
+\item{DBH}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
+\item{POMUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your POM unit?}
+\item{Tidy}{Some value entered via interaction with the Shiny app}
+\item{ClearValueName}{Some value entered via interaction with the Shiny app}
+\item{TickedMelt3}{Some value entered via interaction with the Shiny app}
+\item{Variablecolumns1}{Some value entered via interaction with the Shiny app}
+\item{TickedMelt1}{Some value entered via interaction with the Shiny app}
+\item{Variablecolumns3}{Some value entered via interaction with the Shiny app}
+\item{ValueName3}{Some value entered via interaction with the Shiny app}
+\item{TickedMelt2}{Some value entered via interaction with the Shiny app}
+\item{Variablecolumns2}{Some value entered via interaction with the Shiny app}
+\item{ValueName2}{Some value entered via interaction with the Shiny app}
+\item{ValueName1}{Some value entered via interaction with the Shiny app}
 ...
 }
 }
