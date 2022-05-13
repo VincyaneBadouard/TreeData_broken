@@ -1,6 +1,6 @@
-## code to prepare `ForestGEOProfile` dataset goes here
+## code to prepare `ForestGeoProfile` dataset goes here
 
-ForestGEOProfile <-
+ForestGeoProfile <-
   list(
     TreeHeightUnitMan = "none",
     Family = "Family",
@@ -69,19 +69,19 @@ ForestGEOProfile <-
                          "SpeciesID"),
     ValueName1 = ""
   )
-usethis::use_data(ForestGEOProfile, overwrite = TRUE)
+usethis::use_data(ForestGeoProfile, overwrite = TRUE)
 
 
-## For ForestGEOProfile.Rmd  run next line of code and paste in the item section of R/ForestGEOProfile.R
+## For ForestGeoProfile.Rmd  run next line of code and paste in the item section of R/ForestGeoProfile.R
 x <- read.csv("inst/app/data/interactive_items.csv")
 
 
 write.csv(
   paste0(
     "#'   \\item{",
-    names(ForestGEOProfile),
-    "}",  ifelse(is.na(x$Label[match(names(ForestGEOProfile), x$ItemID)]), "{Some value entered via interaction with the Shiny app", paste0("{Value or column name in data set @ExampleForestGEO (", ForestGEOProfile, ") corresponding to ",
-                                                                                                                                          x$Label[match(names(ForestGEOProfile), x$ItemID)])),
+    names(ForestGeoProfile),
+    "}",  ifelse(is.na(x$Label[match(names(ForestGeoProfile), x$ItemID)]), "{Some value entered via interaction with the Shiny app", paste0("{Value or column name in data set @ForestGeoSubset (", ForestGeoProfile, ") corresponding to ",
+                                                                                                                                          x$Label[match(names(ForestGeoProfile), x$ItemID)])),
     "}"),
   "clipboard",
   quote = F,
