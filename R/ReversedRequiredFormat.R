@@ -3,17 +3,18 @@
 #'@param Data Standardized data, returned from [RequiredFormat()]
 #'
 #'@param input A named list, typically the output of function
-#'  RequiredFormat_interactive, also called site profile. It has information on
-#'  column names correspondence, size units etc...
+#'  RequiredFormat_interactive, also called site profile with information on
+#'  column names correspondence, size units etc... Chosen to be the output profile the user wants their data turned into
 #'
 #'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp For internal use when function used by Shiny app
-#'  (logical)
+#'@param ThisIsShinyApp For internal use when function used by Shiny app (logical)
+#'
+#'@param untidy (logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)
 #'
 #'
 #'@details This function takes the standardized forest inventory data.table (returned by [RequiredFormat()])
-#'  and converts the column names to the names of the profile given as [input]
+#'  and converts the column names to the names of the profile given as input.
 #'
 #'@return (data.frame) in the format given the profile selected in input.
 #'
@@ -26,8 +27,8 @@
 #'\dontrun{
 #'
 #' data(ParacouSubsetFormated)
-#' data("ForestGEOProfile")
-#' ReversedRequiredFormat(ParacouSubsetFormated, ForestGEOProfile)
+#' data("ForestGeoProfile")
+#' ReversedRequiredFormat(ParacouSubsetFormated, ForestGeoProfile)
 #'                }
 #'
 
@@ -35,12 +36,13 @@ ReversedRequiredFormat <- function(
   Data,
   input,
   x = NULL,
-  ThisIsShinyApp = FALSE
+  ThisIsShinyApp = FALSE,
+  Untidy = FALSE
 ){
   # data(ParacouSubsetFormated)
-  # data("ForestGEOProfile")
+  # data("ForestGeoProfile")
   # Data <- ParacouSubsetFormated
-  # input <- ForestGEOProfile
+  # input <- ForestGeoProfile
 
   # Arguments check
   if (!inherits(Data, c("data.table", "data.frame")))
@@ -182,7 +184,7 @@ ReversedRequiredFormat <- function(
 
 
   # untidy if wanted ####
-  # if(input$Untidy %in% TRUE & input$Tidy > 0) {
+  if(Untidy & input$Tidy > 0) {
 
     VariableName <- names(input)[input == input$VariableName & names(input) %in% x$ItemID]
 
@@ -210,6 +212,8 @@ ReversedRequiredFormat <- function(
 
       # setnames(Data, old, Variablecolumns)
     }
+
+  }
 
 
 

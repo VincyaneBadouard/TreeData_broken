@@ -4,19 +4,26 @@
 \alias{ReversedRequiredFormat}
 \title{ReversedRequiredFormat}
 \usage{
-ReversedRequiredFormat(Data, input, x = NULL, ThisIsShinyApp = FALSE)
+ReversedRequiredFormat(
+  Data,
+  input,
+  x = NULL,
+  ThisIsShinyApp = FALSE,
+  Untidy = FALSE
+)
 }
 \arguments{
 \item{Data}{Standardized data, returned from \code{\link[=RequiredFormat]{RequiredFormat()}}}
 
 \item{input}{A named list, typically the output of function
-RequiredFormat_interactive, also called site profile. It has information on
-column names correspondence, size units etc...}
+RequiredFormat_interactive, also called site profile with information on
+column names correspondence, size units etc... Chosen to be the output profile the user wants their data turned into}
 
 \item{x}{For internal use when function used by Shiny app}
 
-\item{ThisIsShinyApp}{For internal use when function used by Shiny app
-(logical)}
+\item{ThisIsShinyApp}{For internal use when function used by Shiny app (logical)}
+
+\item{untidy}{(logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)}
 }
 \value{
 (data.frame) in the format given the profile selected in input.
@@ -25,15 +32,15 @@ column names correspondence, size units etc...}
 ReversedRequiredFormat
 }
 \details{
-This function takes the standardized forest inventory data.table (returned by \link{RequiredFormat})
-and converts the column names to the names of the profile given as \link{input}
+This function takes the standardized forest inventory data.table (returned by \code{\link[=RequiredFormat]{RequiredFormat()}})
+and converts the column names to the names of the profile given as input.
 }
 \examples{
 \dontrun{
 
 data(ParacouSubsetFormated)
-data("ForestGEOProfile")
-ReversedRequiredFormat(ParacouSubsetFormated, ForestGEOProfile)
+data("ForestGeoProfile")
+ReversedRequiredFormat(ParacouSubsetFormated, ForestGeoProfile)
                }
 
 }
