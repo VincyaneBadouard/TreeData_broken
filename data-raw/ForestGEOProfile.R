@@ -19,7 +19,7 @@ ForestGEOProfile <-
     IdLevel = "IDLevel",
     TreeFieldNum = "tag",
     ScientificName = "Latin",
-    DateFormat = "mm/dd/yyyy",
+    DateFormat = "yyyy-mm-dd",
     IdCensus = "CensusID",
     PlotAreaMan = 25.6,
     Year = "none",
@@ -27,8 +27,8 @@ ForestGEOProfile <-
     PlotArea = "none",
     CommercialSp = "none",
     SubPlotAreaUnitMan = "none",
-    YearMan = NA,
     Yutm = "none",
+    YearMan = NA,
     Circ = "none",
     SubPlotAreaMan = 0.04,
     SubPlotMan = "",
@@ -48,15 +48,43 @@ ForestGEOProfile <-
     DBHUnitMan = "mm",
     Xfield = "gx",
     DBH = "dbh",
-    POMUnitMan = "m"
+    POMUnitMan = "m",
+    Tidy = structure(0L, class = c("integer",
+                                   "shinyActionButtonValue")),
+    ClearValueName = structure(0L, class = c("integer",
+                                             "shinyActionButtonValue")),
+    TickedMelt3 = FALSE,
+    Variablecolumns1 = c("sp",
+                         "gx", "gy"),
+    ValueName4 = "Specis",
+    TickedMelt1 = FALSE,
+    TickedMelt4 = FALSE,
+    Variablecolumns3 = c("DFstatus", "status"),
+    ValueName3 = "stau",
+    TickedMelt2 = FALSE,
+    Variablecolumns2 = c("pom",
+                         "hom"),
+    ValueName2 = "om",
+    Variablecolumns4 = c("Species",
+                         "SpeciesID"),
+    ValueName1 = ""
   )
-
 usethis::use_data(ForestGEOProfile, overwrite = TRUE)
 
 
 ## For ForestGEOProfile.Rmd  run next line of code and paste in the item section of R/ForestGEOProfile.R
 x <- read.csv("inst/app/data/interactive_items.csv")
 
+
 write.csv(
-  paste0("#'   \\item{", names(ForestGEOProfile), "}{Value or column name in data set @ForestGEOProfile (", ForestGEOProfile, ") corresponding to ", x$Label[match(names(ForestGEOProfile), x$ItemID)], "}"), "clipboard",
-  quote = F, row.names = F)
+  paste0(
+    "#'   \\item{",
+    names(ForestGEOProfile),
+    "}",  ifelse(is.na(x$Label[match(names(ForestGEOProfile), x$ItemID)]), "{Some value entered via interaction with the Shiny app", paste0("{Value or column name in data set @ExampleForestGEO (", ForestGEOProfile, ") corresponding to ",
+                                                                                                                                          x$Label[match(names(ForestGEOProfile), x$ItemID)])),
+    "}"),
+  "clipboard",
+  quote = F,
+  row.names = F
+)
+
