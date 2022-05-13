@@ -286,7 +286,7 @@ body <- dashboardBody(
                 radioButtons(
               "VariableName",
               "What is the meaning of the repeated column?",
-              choices = c("CensusID", "Year", "POM", "StemID"),
+              choices = c("CensusID", "Year", "MeasureID", "StemID"),
               selected = "",
               inline = FALSE
             ),

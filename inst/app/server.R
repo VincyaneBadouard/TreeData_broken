@@ -255,7 +255,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$Tidy, {
 
-    Variablecolumns <- reactiveValuesToList(input)[grep("Variablecolumns\\d", names(input))]
+    Variablecolumns <- reactiveValuesToList(input)[grep("Variablecolumns\\d$", names(input))]
     Variablecolumns<- Variablecolumns[order(names(Variablecolumns))]
 
     ValueName <- reactiveValuesToList(input)[grep("ValueName\\d", names(input))]
