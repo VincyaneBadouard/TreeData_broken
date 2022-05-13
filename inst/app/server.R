@@ -185,6 +185,8 @@ server <- function(input, output, session) {
 
   observeEvent(input$Merge, {
 
+    output$mergedTablesSummary <- renderPrint(summary(MergedTables()))
+
     output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE))
 
