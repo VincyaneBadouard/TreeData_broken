@@ -86,7 +86,7 @@ server <- function(input, output, session) {
   Data <- eventReactive(input$submitTables, {
     req(input$file1)
     setNames(
-      sapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
+      lapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
 
         i = which(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)] %in% n)
         file <- input[[paste0("file", i)]]
@@ -98,7 +98,7 @@ server <- function(input, output, session) {
         data.table::fread(file$datapath,
                           header = input[[paste0("header", i)]],
                           sep = input[[paste0("cbSeparator", i)]])
-      }, simplify = F),
+      }),
       reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
 
   })
@@ -255,20 +255,15 @@ server <- function(input, output, session) {
 
   observeEvent(input$Tidy, {
 
-    Variablecolumns <- reactiveValuesToList(input)[grep("Variablecolumns\\d$", names(input))]
-    Variablecolumns<- Variablecolumns[order(names(Variablecolumns))]
+    Variablecolumns <- reactiveValuesToList(input)[sort(grep("Variablecolumns\\d{1,}$", names(input), value = T))]
 
-    ValueName <- reactiveValuesToList(input)[grep("ValueName\\d", names(input))]
-    ValueName <- ValueName[order(names(ValueName))]
+    ValueName <- unlist(reactiveValuesToList(input)[sort(grep("ValueName\\d{1,}$", names(input), value = T))])
 
-    TickedMelt <- unlist(reactiveValuesToList(input)[grep("TickedMelt\\d", names(input))])
-    TickedMelt <- TickedMelt[order(names(TickedMelt))]
+    TickedMelt <- unlist(reactiveValuesToList(input)[sort(grep("TickedMelt\\d{1,}$", names(input), value = T))])
 
-    names(Variablecolumns) <- unlist(ValueName)
+    names(Variablecolumns) <- ValueName
 
-    TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName,  value.name = names(Variablecolumns[TickedMelt]), variable.factor = FALSE))
-
-
+    TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName, variable.factor = FALSE)) #,  value.name = names(Variablecolumns[TickedMelt])
   }, ignoreInit = TRUE)
 
   observeEvent(input$SkipTidy, {

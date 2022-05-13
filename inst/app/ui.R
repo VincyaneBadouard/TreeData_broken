@@ -410,9 +410,9 @@ body <- dashboardBody(
                          color = "warning")
                        ,   strong("  Fill in information that is not in your columns"),
                        p("do this after completing step 1 otherwise it will turn blank again."),
-                       lapply(which(x$ItemID %in% unlist(sapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
+                       lapply(which(x$ItemID %in% unlist(lapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
 
-                         eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                         eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, paste0(", multiple = TRUE, selected = '", x$Default[i], "')"), ")"))))
 
                        }),
                        actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
