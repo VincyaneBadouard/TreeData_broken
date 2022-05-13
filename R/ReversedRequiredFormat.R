@@ -10,7 +10,7 @@
 #'
 #'@param ThisIsShinyApp For internal use when function used by Shiny app (logical)
 #'
-#'@param untidy (logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)
+#'@param Untidy (logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)
 #'
 #'
 #'@details This function takes the standardized forest inventory data.table (returned by [RequiredFormat()])

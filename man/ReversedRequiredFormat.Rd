@@ -23,7 +23,7 @@ column names correspondence, size units etc... Chosen to be the output profile t
 
 \item{ThisIsShinyApp}{For internal use when function used by Shiny app (logical)}
 
-\item{untidy}{(logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)}
+\item{Untidy}{(logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)}
 }
 \value{
 (data.frame) in the format given the profile selected in input.
