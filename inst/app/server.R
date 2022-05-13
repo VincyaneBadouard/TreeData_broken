@@ -12,8 +12,8 @@ firstUpper <- function(x) {
 }
 
 # read in csv file that has all we want to show in app
-x <- read.csv("data/interactive_items.csv")
-x <- x[x$Activate, ]
+xall <- read.csv("data/interactive_items.csv")
+x <- xall[xall$Activate, ]
 x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
 x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
 x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
@@ -595,7 +595,7 @@ observe( {
   # save final data table
 
     DataOutput <- reactiveVal(NULL)
-
+    profileOutput <- reactiveVal(NULL)
 
     observe( {
       if(input$predefinedProfileOutput != "No" )
@@ -627,6 +627,7 @@ observe( {
         ReversedRequiredFormat(DataCorrected(), profileOutput, x, ThisIsShinyApp = T)
         )
 
+      profileOutput(profileOutput)
 
     })
 
@@ -650,7 +651,7 @@ observe( {
       paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
     },
     content = function(file) {
-      write.csv(DataFormated(), file, row.names = FALSE)
+      write.csv(DataOutput(), file, row.names = FALSE)
     }
   )
 
@@ -704,9 +705,29 @@ observe( {
       paste(gsub(".csv", "", input$file1$name), '_Metadata.csv', sep = '')
     },
     content = function(file) {
-      columns_to_save <- colnames(DataFormated())
-      Metadata <- data.frame(Field = columns_to_save,
-                             Description = x$Description[match(columns_to_save, x$ItemID)])
+
+      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataFormated()), xall$ItemID)]]
+      OurStandardColumn <- colnames(DataFormated())
+
+      if(!is.null(profileOutput())) {
+        m <- match(OurStandardColumn, xall$ItemID)
+        OutputColumn <-  profileOutput()[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
+        OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      } else {
+        OutputColumn <- OurStandardColumn
+      }
+
+      YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
+      OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
+
+
+      Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
+                             OurStandardColumn,
+                             OutputColumn = unlist(OutputColumn),
+                             Description = xall$Description[match(OurStandardColumn, xall$ItemID)])
+
+      #remove lines with for columns that are msising in input and output
+      Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),]
 
       write.csv(Metadata, file = file, row.names = F)
     }

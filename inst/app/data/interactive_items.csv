@@ -42,8 +42,8 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
 1,pickerInput,choices,none,Genus,Genus name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Genus name
 1,pickerInput,choices,none,Species,Species name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Species name
-1,pickerInput,choices,none,IdLevel,Deepest taxonomic level for which full identification is known,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
-1,pickerInput,choices,none,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
+1,pickerInput,choices,none,IdLevel,Deepest taxonomic level for which full identification is known,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Deepest taxonomic level for which full identification is known
+1,pickerInput,choices,none,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Taxonomic authority for the ID level
 1,pickerInput,choices,none,CommercialSp,Commercial species indicator,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
 4,pickerInput,choices,,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
@@ -54,3 +54,9 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
 1,pickerInput,choices,none,Topography,"Topographical position (lowland, plateau)",,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,"Topographical position (e.g. lowland, plateau)"
 3,textInput,value,,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+NA,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
+NA,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
+NA,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"
+NA,,,,DBHOriginal,,,,,,,,,FALSE,,-,-,"DBH as it was given in the input table, without any correction db transformation"
+NA,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
+NA,,,,IsCommercrialOriginal,,,,,,,,,FALSE,,-,-,"IsCommercrial as it was given in the input table, without any correction or transformation"
