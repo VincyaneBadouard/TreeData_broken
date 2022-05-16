@@ -31,6 +31,9 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,POM,POM,height of measurement,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement in m
 1,pickerInput,choices,none,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
+1,pickerInput,choices,none,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+3,pickerInput,choices,none,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude in degrees
 1,pickerInput,choices,none,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude in degrees
 1,pickerInput,choices,none,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,X UTM coordinates in m
@@ -51,9 +54,6 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Taxonomic authority for the ID level
 1,pickerInput,choices,none,CommercialSp,Commercial species indicator,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
 4,pickerInput,choices,,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
-1,pickerInput,choices,none,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-3,pickerInput,choices,none,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,LifeForm,Life form,tree/palm/liana/bamboo?,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Life form
 1,pickerInput,choices,none,Treatment,Logging treatment,CL/RIL/control/..,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Treatment type
 1,pickerInput,choices,none,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
