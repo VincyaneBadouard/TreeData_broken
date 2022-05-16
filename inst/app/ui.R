@@ -526,9 +526,9 @@ body <- dashboardBody(
 
               column(width = 12,
                      h4("summary of your corrected table:"),
-                     withSpinner(verbatimTextOutput("CorrectedTableSummary"),color="#0dc5c1", id = "spinner"),
+                     withSpinner(verbatimTextOutput("CorrectedTableSummary"), color="#0dc5c1", id = "spinner"),
                      h4("View of your corrected table:"),
-                     withSpinner(DTOutput(outputId = "CorrectedTable"),color="#0dc5c1", id = "spinner")
+                     withSpinner(DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner")
               ))
             ),
 

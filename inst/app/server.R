@@ -54,7 +54,8 @@ server <- function(input, output, session) {
                  textInput(inputId = paste0("TableName", i),
                            label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
                            value = paste0("Table", i)
-                 )
+                 ),
+                 span(textOutput(outputId = paste0("CSVWarning", i)), style="color:red")
              )
       )
 
@@ -82,6 +83,15 @@ server <- function(input, output, session) {
 
   })
 
+  observe({
+    lapply(1:input$nTable, function(i){
+      file <- input[[paste0("file", i)]]
+      req(file)
+      ext <- tools::file_ext(file$datapath)
+      if(ext != "csv") output[[paste0("CSVWarning", i)]] <-renderText( "This is not a csv file!!")
+    })
+
+  }) # give a red text if not a csv file
 
   Data <- eventReactive(input$submitTables, {
     req(input$file1)
@@ -323,10 +333,17 @@ observe( {
       ext <- tools::file_ext(file)
     }
 
-    req(file)
-    validate(need(ext == "rds", "Please upload a .rds file"))
+    need(ext != "rds", "This is not a .rds file! Please upload a .rds file.")
+    # if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
 
-    profile <- readRDS(file)
+
+    tryCatch({ profile <- readRDS(file)},
+    # warning = function(warn){
+    #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+    # },
+    error = function(err){
+      showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+    })
 
     for(i in which(x$ItemID %in% names(profile))) {
       eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
@@ -553,7 +570,6 @@ observe( {
     })
 
   DataCorrected <- eventReactive(input$ApplyCorrections, {
-
     Rslt <- DataFormated()
     lapply(
       unique(xCorr$Function),
@@ -563,27 +579,25 @@ observe( {
          Rslt <<- eval(cl)
 
 
-         tryCatch({
-           eval(cl)
-         },
-         # warning = function(warn){
-         #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+         # tryCatch({
+         #   eval(cl)
          # },
-         error = function(err){
-           showNotification(err, type = 'err', duration = NULL)
-         })
+         # # warning = function(warn){
+         # #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+         # # },
+         # error = function(err){
+         #   showNotification(err, type = 'err', duration = NULL)
+         # })
        }
       }
     )
     Rslt
-  }, ignoreInit = T)
+  })
 
-  DataCorrected <- eventReactive(input$SkipCorrections, {DataFormated()})
+  output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
+                                    options = list(pageLength = 8, scrollX=TRUE))
 
-    output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
-                                 options = list(pageLength = 8, scrollX=TRUE))
-
-    output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
+  output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
 
 
 
@@ -616,13 +630,17 @@ observe( {
       }
 
       req(file)
-      validate(need(ext == "rds", "Please upload a .rds file"))
 
-      profileOutput <- readRDS(file)
 
-      DataOutput(
-        ReversedRequiredFormat(DataCorrected(), profileOutput, x, ThisIsShinyApp = T)
-        )
+      tryCatch({ profileOutput <- readRDS(file)},
+               # warning = function(warn){
+               #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+               # },
+               error = function(err){
+                 showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+               })
+
+      if(exists("DataCorrected") & any(unlist(reactiveValuesToList(input)[unique(xCorr$Function)]) %in% "Yes")) DataOutput(ReversedRequiredFormat(DataCorrected(), profileOutput, x, ThisIsShinyApp = T)) else DataOutput(ReversedRequiredFormat(DataFormated(), profileOutput, x, ThisIsShinyApp = T))
 
       profileOutput(profileOutput)
 
@@ -630,9 +648,9 @@ observe( {
 
     observeEvent(input$DontUseProfileOuput, {
       shinyjs::hide("DontUseProfileOuput")
-      shinyjs::hide("UseProfileOuput")
+      # shinyjs::hide("UseProfileOuput")
 
-      DataOutput(DataCorrected())
+      if(exists("DataCorrected") & any(unlist(reactiveValuesToList(input)[unique(xCorr$Function)]) %in% "Yes")) DataOutput(DataCorrected()) else DataOutput(DataFormated())
     })
 
 
