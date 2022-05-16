@@ -562,11 +562,11 @@ body <- dashboardBody(
                            label = "Apply Profile",
                            style = "pill",
                            color = "success")),
-                         hidden(actionBttn(
+                         actionBttn(
                            inputId = "DontUseProfileOuput",
-                           label = "Nevermind, go back to this App's standards.",
+                           label = "Don't use profile",
                            style = "pill",
-                           color = "success"))
+                           color = "success")
 
             )
             ),
