@@ -127,14 +127,29 @@ RequiredFormat <- function(
   ## Date of measurement ####
   if(!input$Date %in% "none"){
 
-   DateFormat <- input$DateFormat
-   DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-   DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
-
-
+    # save the orginal dates
     Data[, DateOriginal := Date]
-    Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
 
+    # transform to standard format
+    DateFormat <- trimws(input$DateFormat)
+
+
+    if(grepl("num|dec", DateFormat, ignore.case = T)) {
+
+      if(grepl("num", DateFormat, ignore.case = T)) Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")]
+
+      if(grepl("dec", DateFormat, ignore.case = T)) Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))]
+
+    } else {
+
+      DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+      DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+
+      Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
+
+    }
+
+# send waring if some dates translated as NA
     if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
   }

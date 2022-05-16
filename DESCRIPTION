@@ -37,7 +37,8 @@ Suggests:
     shinydashboard,
     shinyjs,
     shinyWidgets,
-    shinycssloaders
+    shinycssloaders,
+    lubridate
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.6)
