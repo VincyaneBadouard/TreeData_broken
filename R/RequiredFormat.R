@@ -109,49 +109,55 @@ RequiredFormat <- function(
   ## Here we have to use user input to know what is TRUE and what is not
 
   ### Life status
-  if( !input$LifeStatus %in% "none") {
-    Data[, LifeStatusOriginal := LifeStatus]
-    Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
+  if( !is.null(input$LifeStatus)) {
+    if(!input$LifeStatus %in% "none") {
+      Data[, LifeStatusOriginal := LifeStatus]
+      Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
+    }
   }
 
   ### commercial species
-  if( !input$CommercialSp %in% "none") {
+  if( !is.null(input$CommercialSp)) {
+    if( !input$CommercialSp %in% "none") {
     Data[, CommercialSpOriginal := CommercialSp]
     Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
   }
+    }
 
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 
 
   ## Date of measurement ####
-  if(!input$Date %in% "none"){
+  if( !is.null(input$Date)) {
+    if(!input$Date %in% "none"){
 
-    # save the orginal dates
-    Data[, DateOriginal := Date]
+      # save the orginal dates
+      Data[, DateOriginal := Date]
 
-    # transform to standard format
-    DateFormat <- trimws(input$DateFormat)
+      # transform to standard format
+      DateFormat <- trimws(input$DateFormat)
 
 
-    if(grepl("num|dec", DateFormat, ignore.case = T)) {
+      if(grepl("num|dec", DateFormat, ignore.case = T)) {
 
-      if(grepl("num", DateFormat, ignore.case = T)) Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")]
+        if(grepl("num", DateFormat, ignore.case = T)) Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")]
 
-      if(grepl("dec", DateFormat, ignore.case = T)) Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))]
+        if(grepl("dec", DateFormat, ignore.case = T)) Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))]
 
-    } else {
+      } else {
 
-      DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-      DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+        DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+        DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
-      Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
+        Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
+
+      }
+
+      # send waring if some dates translated as NA
+      if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
     }
-
-# send waring if some dates translated as NA
-    if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
-
   }
 
 
