@@ -206,13 +206,11 @@ RequiredFormat <- function(
   ## Genus, Species, ScientificNameSep ####
 
   ### Genus and species if we have ScientificName and ScientificNameSep
-  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none")
-    Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
+  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
-  if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" )
-    Data[, ScientificName := paste(Genus, Species)]
+  if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" ) Data[, ScientificName := paste(Genus, Species)]
 
 
   ## DBH if we have circumference ####
