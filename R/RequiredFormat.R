@@ -214,9 +214,10 @@ RequiredFormat <- function(
 
 
   ## DBH if we have circumference ####
-  if(input$DBH %in% "none" & input$Circ %in% "none") stop("You do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  if(input$DBH %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & nput$BCirc %in% "none") stop("You do not have tree size (DBH, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
   if(input$DBH %in% "none" & !input$Circ %in% "none") Data[, DBH := round(Circ/pi, 2)]
+  if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
 
   # Units changing ####
 
@@ -224,7 +225,7 @@ RequiredFormat <- function(
 
   AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### DBH in cm ####
+  ### DBH and BD in cm ####
   # if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
@@ -242,7 +243,22 @@ RequiredFormat <- function(
     }
   }
 
-  ### POM in m ####
+  if(!input$BD %in% "none" | !input$BCirc %in% "none") {
+
+    BSizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+
+    if(!BSizeUnit %in% unitOptions) stop(paste("Your basal size units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if(BSizeUnit %in% unitOptions) {
+      if (BSizeUnit == "mm") Data[, BD := BD/10] # mm -> cm
+
+      if (BSizeUnit == "dm") Data[, BD := BD*10] # dm -> cm
+
+      if (BSizeUnit == "m") Data[, BD := BD*100] # m -> cm
+    }
+  }
+
+  ### POM and BPOM in m ####
   # if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
@@ -262,6 +278,21 @@ RequiredFormat <- function(
     }
   }
 
+  if(!input$BPOM %in% "none" & !input$BPOMUnitMan %in% "none") {
+
+    BPOMUnit <- input$BPOMUnitMan
+
+    if(!BPOMUnit %in% unitOptions) stop(paste("Your basal POM units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if (BPOMUnit %in% unitOptions) {
+
+      if (BPOMUnit == "mm") Data[, BPOM := BPOM/1000] # mm -> m
+
+      if (BPOMUnit == "cm") Data[, BPOM := BPOM/100] # cm -> m
+
+      if (BPOMUnit == "dm") Data[, BPOM := BPOM/10] # dm -> m
+    }
+  }
 
 
   ### TreeHeight in m ####
