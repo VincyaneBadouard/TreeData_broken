@@ -31,7 +31,7 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,Circ,Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference in cm
 1,pickerInput,choices,none,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,BCirc,Basal Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference in cm
+1,pickerInput,choices,none,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference in cm
 1,pickerInput,choices,none,BCircUnit,Basal Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BCircUnitMan,What is your basal circumference unit?,,none,none,BCirc,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,POM,POM,height of measurement,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement in m
