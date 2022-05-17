@@ -94,14 +94,11 @@ ReversedRequiredFormat <- function(
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
     SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
 
-    if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi")
-      Data[, DBH := DBH*10] # cm -> mm
+    if (SizeUnit == "mm") Data[, DBH := DBH*10] # cm -> mm
 
-    if (substr(SizeUnit, 1, 1) == "d")
-      Data[, DBH := DBH/10] # cm -> dmm
+    if (SizeUnit == "dm") Data[, DBH := DBH/10] # cm -> dm
 
-    if (substr(SizeUnit, 1, 1) == "m")
-      Data[, DBH := DBH/100] # cm -> m
+    if (SizeUnit == "m") Data[, DBH := DBH/100] # cm -> m
   }
 
 
@@ -112,16 +109,12 @@ ReversedRequiredFormat <- function(
 
     POMUnit <- input$POMUnitMan
 
+    if (POMUnit == "mm") Data[, POM := POM*1000] # m -> mm
 
-    if (substr(POMUnit, 1, 2) == "mm" | substr(POMUnit, 1, 2) == "mi")
-      Data[, POM := POM*1000] # m -> mm
-
-    if (substr(POMUnit, 1, 1) == "m")
-      Data[, POM := POM*100] # m -> cm
+    if (POMUnit == "cm") Data[, POM := POM*100] # m -> cm
 
 
-    if (substr(POMUnit, 1, 1) == "d")
-      Data[, POM := POM*10] # m -> dm
+    if (POMUnit == "dm") Data[, POM := POM*10] # m -> dm
   }
 
 
@@ -132,16 +125,11 @@ ReversedRequiredFormat <- function(
 
     TreeHeightUnit <- input$TreeHeightUnitMan
 
+    if (TreeHeightUnit == "mm") Data[, TreeHeight := TreeHeight*1000] # m -> mm
 
-    if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi")
-      Data[, TreeHeight := TreeHeight*1000] # m -> mm
+    if (TreeHeightUnit == "cm") Data[, TreeHeight := TreeHeight*100] # m -> cm
 
-    if (substr(TreeHeightUnit, 1, 1) == "m")
-      Data[, TreeHeight := TreeHeight*100] # m -> cm
-
-
-    if (substr(TreeHeightUnit, 1, 1) == "d")
-      Data[, TreeHeight := TreeHeight*10] # m -> dm
+    if (TreeHeightUnit == "dm") Data[, TreeHeight := TreeHeight*10] # m -> dm
   }
 
 
@@ -153,14 +141,9 @@ ReversedRequiredFormat <- function(
 
     PlotAreaUnit <- input$PlotAreaUnitMan
 
+    if (PlotAreaUnit == "m2") Data[, PlotArea := PlotArea*10000] # ha -> m2
 
-
-    if (substr(PlotAreaUnit, 1, 2) == "m2")
-      Data[, PlotArea := PlotArea*10000] # ha -> m2
-
-
-    if (substr(PlotAreaUnit, 1, 1) == "km2")
-      Data[, PlotArea := PlotArea/100] # ha -> km2
+    if (PlotAreaUnit == "km2") Data[, PlotArea := PlotArea/100] # ha -> km2
   }
 
   ### SubPlotArea in ha ####
@@ -169,14 +152,9 @@ ReversedRequiredFormat <- function(
 
     SubPlotAreaUnitMan <- input$SubPlotAreaUnitMan
 
+    if (SubPlotAreaUnitMan == "m2") Data[, SubPlotArea := SubPlotArea*10000] # ha -> m2
 
-
-      if (substr(SubPlotAreaUnitMan, 1, 2) == "m2")
-        Data[, SubPlotArea := SubPlotArea*10000] # ha -> m2
-
-
-      if (substr(SubPlotAreaUnitMan, 1, 1) == "km2")
-        Data[, SubPlotArea := SubPlotArea/100] # ha -> km2
+    if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea/100] # ha -> km2
 
   }
 
