@@ -212,15 +212,11 @@ RequiredFormat <- function(
   ## DBH if we have circumference ####
   if(input$DBH %in% "none" & input$Circ %in% "none") stop("You do not have tree size (DBH or Circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
-  if(input$DBH %in% "none" & !input$Circ %in% "none")
-    Data[, DBH := round(Circ/pi, 2)]
-
-
-
+  if(input$DBH %in% "none" & !input$Circ %in% "none") Data[, DBH := round(Circ/pi, 2)]
 
   # Units changing ####
 
-  unitOptions <- c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
+  unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
 
   AreaUnitOptions <- c("m2", "ha", "km2")
 
@@ -234,11 +230,11 @@ RequiredFormat <- function(
     if(!SizeUnit %in% unitOptions) stop(paste("Your size units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if(SizeUnit %in% unitOptions) {
-    if (substr(SizeUnit, 1, 2) == "mm" | substr(SizeUnit, 1, 2) == "mi") Data[, DBH := DBH/10] # mm -> cm
+    if (SizeUnit == "mm") Data[, DBH := DBH/10] # mm -> cm
 
-    if (substr(SizeUnit, 1, 1) == "d") Data[, DBH := DBH*10] # dm -> cm
+    if (SizeUnit == "dm") Data[, DBH := DBH*10] # dm -> cm
 
-    if (substr(SizeUnit, 1, 1) == "m") Data[, DBH := DBH*100] # m -> cm
+    if (SizeUnit == "m") Data[, DBH := DBH*100] # m -> cm
     }
   }
 
@@ -253,12 +249,12 @@ RequiredFormat <- function(
 
     if (POMUnit %in% unitOptions) {
 
-      if (substr(POMUnit, 1, 2) == "mm" | substr(POMUnit, 1, 2) == "mi") Data[, POM := POM/1000] # mm -> m
+      if (POMUnit == "mm") Data[, POM := POM/1000] # mm -> m
 
-      if (substr(POMUnit, 1, 1) == "m") Data[, POM := POM/100] # cm -> m
+      if (POMUnit == "cm") Data[, POM := POM/100] # cm -> m
 
 
-      if (substr(POMUnit, 1, 1) == "d") Data[, POM := POM/10] # dm -> m
+      if (POMUnit == "dm") Data[, POM := POM/10] # dm -> m
     }
   }
 
@@ -276,12 +272,11 @@ RequiredFormat <- function(
 
     if (TreeHeightUnit %in% unitOptions) {
 
-      if (substr(TreeHeightUnit, 1, 2) == "mm" | substr(TreeHeightUnit, 1, 2) == "mi") Data[, TreeHeight := TreeHeight/1000] # mm -> m
+      if (TreeHeightUnit == "mm") Data[, TreeHeight := TreeHeight/1000] # mm -> m
 
-    if (substr(TreeHeightUnit, 1, 1) == "m") Data[, TreeHeight := TreeHeight/100] # cm -> m
+      if (TreeHeightUnit == "cm") Data[, TreeHeight := TreeHeight/100] # cm -> m
 
-
-    if (substr(TreeHeightUnit, 1, 1) == "d") Data[, TreeHeight := TreeHeight/10] # dm -> m
+      if (TreeHeightUnit == "dm") Data[, TreeHeight := TreeHeight/10] # dm -> m
     }
   }
 
@@ -298,10 +293,9 @@ RequiredFormat <- function(
 
     if (PlotAreaUnit %in% AreaUnitOptions) {
 
-      if (substr(PlotAreaUnit, 1, 2) == "m2") Data[, PlotArea := PlotArea/10000] # m2 -> ha
+      if (PlotAreaUnit == "m2") Data[, PlotArea := PlotArea/10000] # m2 -> ha
 
-
-    if (substr(PlotAreaUnit, 1, 1) == "km2") Data[, PlotArea := PlotArea*100] # km2 -> ha
+      if (PlotAreaUnit == "km2") Data[, PlotArea := PlotArea*100] # km2 -> ha
     }
   }
 
@@ -320,10 +314,10 @@ RequiredFormat <- function(
 
     if (SubPlotAreaUnitMan %in% AreaUnitOptions){
 
-      if (substr(SubPlotAreaUnitMan, 1, 2) == "m2") Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
+      if (SubPlotAreaUnitMan == "m2") Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
 
 
-    if (substr(SubPlotAreaUnitMan, 1, 1) == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
+    if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
     }
   }
 
