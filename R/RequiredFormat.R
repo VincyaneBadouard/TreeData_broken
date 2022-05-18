@@ -214,7 +214,7 @@ RequiredFormat <- function(
 
 
   ## DBH if we have circumference ####
-  if(input$DBH %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & nput$BCirc %in% "none") stop("You do not have tree size (DBH, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  if(input$DBH %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") stop("You do not have tree size (DBH, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
   if(input$DBH %in% "none" & !input$Circ %in% "none") Data[, DBH := round(Circ/pi, 2)]
   if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
