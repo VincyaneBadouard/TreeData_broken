@@ -733,6 +733,7 @@ observe( {
       }
 
       YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
+      names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
       OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
 
 
