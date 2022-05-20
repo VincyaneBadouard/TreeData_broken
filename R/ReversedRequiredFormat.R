@@ -159,6 +159,79 @@ ReversedRequiredFormat <- function(
   }
 
 
+  ### XY coordinates in m ####
+
+
+  if(!input$Xutm %in% "none" & !input$utmUnitMan %in% "none") {
+
+    utmUnitMan <- input$utmUnitMan
+
+      if (utmUnitMan == "mm") {
+        Data[, Xutm := Xutm*1000] # m -> mm
+        Data[, Yutm := Yutm*1000] # m -> mm
+      }
+
+      if (utmUnitMan == "cm") {
+        Data[, Xutm := Xutm*100] # m -> cm
+        Data[, Yutm := Yutm*100] # m -> cm
+
+      }
+
+      if (utmUnitMan == "dm") {
+        Data[, Xutm := Xutm*10] # m -> dm
+        Data[, Yutm := Yutm*10] # m -> dm
+      }
+
+
+  }
+
+  if(!input$Xplot %in% "none" & !input$plotUnitMan %in% "none") {
+
+    plotUnitMan <- input$plotUnitMan
+
+
+      if (plotUnitMan == "mm") {
+        Data[, Xplot := Xplot*1000] # m -> mm
+        Data[, Yplot := Yplot*1000] # m -> mm
+      }
+
+      if (plotUnitMan == "cm") {
+        Data[, Xplot := Xplot*100] # m -> cm
+        Data[, Yplot := Yplot*100] # m -> cm
+
+      }
+
+      if (plotUnitMan == "dm") {
+        Data[, Xplot := Xplot*10] # m -> dm
+        Data[, Yplot := Yplot*10] # m -> dm
+      }
+
+
+  }
+
+  if(!input$Xsubplot %in% "none" & !input$subplotUnitMan %in% "none") {
+
+    subplotUnitMan <- input$subplotUnitMan
+
+
+      if (subplotUnitMan == "mm") {
+        Data[, Xsubplot := Xsubplot*1000] # m -> mm
+        Data[, Ysubplot := Ysubplot*1000] # m -> mm
+      }
+
+      if (subplotUnitMan == "cm") {
+        Data[, Xsubplot := Xsubplot*100] # m -> cm
+        Data[, Ysubplot := Ysubplot*100] # m -> cm
+
+      }
+
+      if (subplotUnitMan == "dm") {
+        Data[, Xsubplot := Xsubplot*10] # m -> dm
+        Data[, Ysubplot := Ysubplot*10] # m -> dm
+      }
+
+
+  }
 
 
   # untidy if wanted ####

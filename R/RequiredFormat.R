@@ -362,6 +362,89 @@ RequiredFormat <- function(
   }
 
 
+  ### XY coordinates in m ####
+
+
+  if(!input$Xutm %in% "none" & !input$utmUnitMan %in% "none") {
+
+    utmUnitMan <- input$utmUnitMan
+
+    if(!utmUnitMan %in% unitOptions) stop(paste("Your utm units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if (utmUnitMan %in% unitOptions) {
+
+      if (utmUnitMan == "mm") {
+        Data[, Xutm := Xutm/1000] # mm -> m
+        Data[, Yutm := Yutm/1000] # mm -> m
+      }
+
+      if (utmUnitMan == "cm") {
+        Data[, Xutm := Xutm/100] # cm -> m
+        Data[, Yutm := Yutm/100] # cm -> m
+
+        }
+
+      if (utmUnitMan == "dm") {
+        Data[, Xutm := Xutm/10] # dm -> m
+        Data[, Yutm := Yutm/10] # dm -> m
+        }
+
+    }
+  }
+
+  if(!input$Xplot %in% "none" & !input$plotUnitMan %in% "none") {
+
+    plotUnitMan <- input$plotUnitMan
+
+    if(!plotUnitMan %in% unitOptions) stop(paste("Your plot units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if (plotUnitMan %in% unitOptions) {
+
+      if (plotUnitMan == "mm") {
+        Data[, Xplot := Xplot/1000] # mm -> m
+        Data[, Yplot := Yplot/1000] # mm -> m
+      }
+
+      if (plotUnitMan == "cm") {
+        Data[, Xplot := Xplot/100] # cm -> m
+        Data[, Yplot := Yplot/100] # cm -> m
+
+      }
+
+      if (plotUnitMan == "dm") {
+        Data[, Xplot := Xplot/10] # dm -> m
+        Data[, Yplot := Yplot/10] # dm -> m
+      }
+
+    }
+  }
+
+  if(!input$Xsubplot %in% "none" & !input$subplotUnitMan %in% "none") {
+
+    subplotUnitMan <- input$subplotUnitMan
+
+    if(!subplotUnitMan %in% unitOptions) stop(paste("Your suplot units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if (subplotUnitMan %in% unitOptions) {
+
+      if (subplotUnitMan == "mm") {
+        Data[, Xsubplot := Xsubplot/1000] # mm -> m
+        Data[, Ysubplot := Ysubplot/1000] # mm -> m
+      }
+
+      if (subplotUnitMan == "cm") {
+        Data[, Xsubplot := Xsubplot/100] # cm -> m
+        Data[, Ysubplot := Ysubplot/100] # cm -> m
+
+      }
+
+      if (subplotUnitMan == "dm") {
+        Data[, Xsubplot := Xsubplot/10] # dm -> m
+        Data[, Ysubplot := Ysubplot/10] # dm -> m
+      }
+
+    }
+  }
   # return output ####
   ColumnsToReturn <- intersect(c(x$ItemID, paste0(x$ItemID, "Original")), colnames(Data))
   return(Data[, ..ColumnsToReturn])

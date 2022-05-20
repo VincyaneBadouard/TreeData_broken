@@ -728,8 +728,11 @@ observe( {
         m <- match(OurStandardColumn, xall$ItemID)
         OutputColumn <-  profileOutput()[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
         OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[match(OurStandardColumn, xall$ItemID)]),"UnitMan")]), ""))
+
       } else {
         OutputColumn <- OurStandardColumn
+        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", xall$Unit[match(OurStandardColumn, xall$ItemID)]), ""))
       }
 
       YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
@@ -740,7 +743,7 @@ observe( {
       Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
                              OurStandardColumn,
                              OutputColumn = unlist(OutputColumn),
-                             Description = xall$Description[match(OurStandardColumn, xall$ItemID)])
+                             Description = Description)
 
       #remove lines with for columns that are msising in input and output
       Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),]
