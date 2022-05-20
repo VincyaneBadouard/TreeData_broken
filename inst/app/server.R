@@ -103,7 +103,7 @@ server <- function(input, output, session) {
         ext <- tools::file_ext(file$datapath)
 
         req(file)
-        validate(need(ext == "csv", "Please upload a csv file"))
+        # validate(need(ext == "csv", "Please upload a csv file"))
 
         data.table::fread(file$datapath,
                           header = input[[paste0("header", i)]],

@@ -69,7 +69,7 @@ body <- dashboardBody(
             fluidRow(
 
               actionBttn(
-                inputId = "inactivebutton",
+                inputId = "inactivebutton1",
                 label = div(
                   strong("If your connexion is slow and/or your data is very large, you may want to run this app locally. For that, open R Studio and type:"),
                   br()),
@@ -86,7 +86,7 @@ body <- dashboardBody(
               br(),
               column(width = 8,
                      actionBttn(
-                       inputId = "inactivebutton",
+                       inputId = "inactivebutton2",
                        label = "1",
                        style = "pill",
                        color = "warning"),
@@ -104,7 +104,7 @@ body <- dashboardBody(
             fluidRow(
               column(width = 12,
                      actionBttn(
-                       inputId = "inactivebutton",
+                       inputId = "inactivebutton3",
                        label = "2",
                        style = "pill",
                        color = "warning"),
@@ -117,7 +117,7 @@ body <- dashboardBody(
             fluidRow(
               column(width = 3,
                      actionBttn(
-                       inputId = "inactivebutton",
+                       inputId = "inactivebutton4",
                        label = "3",
                        style = "pill",
                        color = "warning"),
@@ -138,7 +138,7 @@ body <- dashboardBody(
               fluidRow(
                 # column(width = 12,
                        actionBttn(
-                         inputId = "inactivebutton",
+                         inputId = "inactivebutton5",
                          label = " ! ",
                          style = "pill",
                          color = "danger"),
@@ -199,7 +199,7 @@ body <- dashboardBody(
             fluidRow(
               # column(width = 12,
               actionBttn(
-                inputId = "inactivebutton",
+                inputId = "inactivebutton6",
                 label = " ! ",
                 style = "pill",
                 color = "danger"),
@@ -358,7 +358,7 @@ body <- dashboardBody(
               hidden(div( id = "AttentionDates",
                           box(width = 12,
                               actionBttn(
-                                inputId = "inactivebutton",
+                                inputId = "inactivebutton7",
                                 label = "!",
                                 style = "pill",
                                 color = "danger"),
@@ -378,7 +378,7 @@ body <- dashboardBody(
               #              choices = list("Long" = "long", "Wide" = "wide"))),
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton",
+                       inputId = "inactivebutton8",
                        label = "1",
                        style = "pill",
                        color = "warning"),
@@ -405,7 +405,7 @@ body <- dashboardBody(
 
                      div(
                        actionBttn(
-                         inputId = "inactivebutton",
+                         inputId = "inactivebutton9",
                          label = "2",
                          style = "pill",
                          color = "warning")
