@@ -186,7 +186,7 @@ body <- dashboardBody(
                        h4("summary of your stacked tables:"),
                        verbatimTextOutput("StackedTablesSummary"),
                        h4("View of your stacked tables:"),
-                       DTOutput(outputId = "StackedTables"),
+                       DTOutput(outputId = "StackedTables")
                 )
                 # ,
                 # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
@@ -262,7 +262,7 @@ body <- dashboardBody(
                      h4("summary of your merged tables:"),
                      verbatimTextOutput("mergedTablesSummary"),
                      h4("View of your stacked tables:"),
-                     DTOutput(outputId = "mergedTables"),
+                     DTOutput(outputId = "mergedTables")
               )
             #   # ,
             #   # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
