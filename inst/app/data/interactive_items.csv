@@ -5,10 +5,10 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 2,textInput,value,,PlotMan,What is your plot name ?,,Plot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,SubPlot,SubPlot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,SubPlot level name
 2,textInput,value,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
+1,pickerInput,choices,none,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
 4,pickerInput,choices,none,PlotAreaUnitMan,What is the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 5,numericInput,value,,PlotAreaMan,What is your plot area in hectar?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,SubPlotArea,SubPlot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot in ha
+1,pickerInput,choices,none,SubPlotArea,SubPlot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
 4,pickerInput,choices,none,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 5,numericInput,value,,SubPlotAreaMan,What is your subplot area in hectar?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
@@ -22,35 +22,38 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
 1,pickerInput,choices,none,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if tree was alive, FALSE if it was dead"
 4,pickerInput,choices,,IsLive,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,DBH,DBH,Diamter at breast height,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Diameter at breast height in cm
+1,pickerInput,choices,none,DBH,DBH,Diamter at breast height,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Diameter at breast height
 1,pickerInput,choices,none,DBHUnit,DBH unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,DBHUnitMan,What is your DBH unit ?,,none,none,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,BD,BD,Basal Diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter in cm
+1,pickerInput,choices,none,BD,BD,Basal Diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
 1,pickerInput,choices,none,BDUnit,BD unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BDUnitMan,What is your BD unit ?,,none,none,BD,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,Circ,Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference in cm
+1,pickerInput,choices,none,Circ,Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference
 1,pickerInput,choices,none,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference in cm
+1,pickerInput,choices,none,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference
 1,pickerInput,choices,none,BCircUnit,Basal Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BCircUnitMan,What is your basal circumference unit?,,none,none,BCirc,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,POM,POM,height of measurement,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement in m
+1,pickerInput,choices,none,POM,POM,height of measurement,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement
 1,pickerInput,choices,none,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,BPOM,Basal POM,height of measurement for basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement of basal diameter in m
+1,pickerInput,choices,none,BPOM,Basal POM,height of measurement for basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement of basal diameter
 1,pickerInput,choices,none,BPOMUnit,Basal POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BPOMUnitMan,What is your Basal POM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height in m
+1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height
 1,pickerInput,choices,none,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude in degrees
-1,pickerInput,choices,none,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude in degrees
-1,pickerInput,choices,none,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,X UTM coordinates in m
-1,pickerInput,choices,none,Yutm,Tree Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Y UTM coordinats in m
-1,pickerInput,choices,none,Xplot,Tree X euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in plot in m
-1,pickerInput,choices,none,Yplot,Tree Y euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in plot in m
-1,pickerInput,choices,none,Xsubplot,Tree X euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in subplot in m
-1,pickerInput,choices,none,Ysubplot,Tree Y euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in subplot in m
+1,pickerInput,choices,none,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude
+1,pickerInput,choices,none,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude
+1,pickerInput,choices,none,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,X UTM coordinates
+1,pickerInput,choices,none,Yutm,Tree Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Y UTM coordinats
+1,pickerInput,choices,m,utmUnitMan,UTM units,,none,none,Xutm,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+1,pickerInput,choices,none,Xplot,Tree X euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in plot
+1,pickerInput,choices,none,Yplot,Tree Y euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in plot
+1,pickerInput,choices,m,plotUnitMan,XY plot coordinates units,,none,none,Xplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+1,pickerInput,choices,none,Xsubplot,Tree X euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in subplot
+1,pickerInput,choices,none,Ysubplot,Tree Y euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in subplot
+1,pickerInput,choices,m,subplotUnitMan,XY subplot coordinates units,,none,none,Xsubplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
 1,pickerInput,choices,none,ScientificName,Scientific name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Scientific name
 1,pickerInput,choices,none,VernName,Vernacular name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Vernacular name
 1,pickerInput,choices,none,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
