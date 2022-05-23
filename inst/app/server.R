@@ -125,7 +125,8 @@ server <- function(input, output, session) {
     shinyjs::hide("SkipStack")
 
     output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
-                                     options = list(pageLength = 8, scrollX=TRUE))
+                                     options = list(pageLength = 8, scrollX=TRUE),
+                                     selection = "none")
 
     output$StackedTablesSummary <- renderPrint(summary(StackedTables()))
 
@@ -198,7 +199,8 @@ server <- function(input, output, session) {
     output$mergedTablesSummary <- renderPrint(summary(MergedTables()))
 
     output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
-                                    options = list(pageLength = 8, scrollX=TRUE))
+                                    options = list(pageLength = 8, scrollX=TRUE),
+                                    selection = "none")
 
 
     shinyjs::show("GoToTidy")
@@ -288,7 +290,8 @@ server <- function(input, output, session) {
     shinyjs::show("GoToHeaders")
 
     output$TidyTable <- renderDT(TidyTable(), rownames = FALSE,
-                                 options = list(pageLength = 8, scrollX=TRUE))
+                                 options = list(pageLength = 8, scrollX=TRUE),
+                                 selection = "none")
 
     output$TidyTableSummary <- renderPrint(summary(TidyTable()))
   })
@@ -370,7 +373,8 @@ observe( {
     if (!is.null(input$file1$name))
       Data()
   }, rownames = FALSE,
-  options = list(pageLength = 8, scrollX=TRUE))
+  options = list(pageLength = 8, scrollX=TRUE),
+  selection = "none")
 
 
 
@@ -532,7 +536,8 @@ observe( {
 
   # Visualize output
   output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
-                                 options = list(pageLength = 8, scrollX=TRUE))
+                                 options = list(pageLength = 8, scrollX=TRUE),
+                                 selection = "none")
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
@@ -595,7 +600,8 @@ observe( {
   })
 
   output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
-                                    options = list(pageLength = 8, scrollX=TRUE))
+                                    options = list(pageLength = 8, scrollX=TRUE),
+                                    selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
 
@@ -656,7 +662,8 @@ observe( {
 
     # Visualize output
     output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
-                                     options = list(pageLength = 8, scrollX=TRUE))
+                                     options = list(pageLength = 8, scrollX=TRUE),
+                                  selection = "none")
 
     output$DataOutputSummary <- renderPrint(summary(DataOutput()))
 
