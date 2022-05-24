@@ -44,7 +44,6 @@ app$setInputs(GoToCorrect = "click")
 app$setInputs(SkipCorrections = "click")
 app$uploadFile(profileOutput = "ForestGEO_Profile.rds") # <-- This should be the path to the file, relative to the app's tests/shinytest directory
 app$setInputs(UseProfileOuput = "click")
-app$snapshotDownload("dbProfile")
 app$snapshot()
 app$snapshotDownload("dbMetadata")
 app$snapshotDownload("dbFile")
