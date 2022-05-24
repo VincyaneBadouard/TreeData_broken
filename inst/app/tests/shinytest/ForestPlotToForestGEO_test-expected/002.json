@@ -21,16 +21,539 @@
 
     ],
     "DataOutput_columns_selected": null,
-    "DataOutput_rows_all": null,
-    "DataOutput_rows_current": null,
+    "DataOutput_rows_all": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130
+    ],
+    "DataOutput_rows_current": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
     "DataOutput_rows_selected": null,
     "DataOutput_search": "",
-    "DataOutput_state": null,
+    "DataOutput_state": {
+      "start": 0,
+      "length": 8,
+      "order": [
+
+      ],
+      "search": {
+        "search": "",
+        "smart": true,
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "columns": [
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        },
+        {
+          "visible": true,
+          "search": {
+            "search": "",
+            "smart": true,
+            "regex": false,
+            "caseInsensitive": true
+          }
+        }
+      ]
+    },
     "Date": "Census Date",
     "DateFormat": "decimal",
     "DBH": "DBH",
     "DBHUnitMan": "mm",
-    "DontUseProfileOuput": 1,
+    "DontUseProfileOuput": 0,
     "ErrorsDetection": "No",
     "ErrorsDetectionDeathConfirmation": 2,
     "ErrorsDetectionMinDBH": 10,
@@ -1766,7 +2289,20 @@
         "0.rds"
       ]
     },
-    "profileOutput": null,
+    "profileOutput": {
+      "name": [
+        "ForestGEO_Profile.rds"
+      ],
+      "size": [
+        817
+      ],
+      "type": [
+        ""
+      ],
+      "datapath": [
+        "0.rds"
+      ]
+    },
     "rightKey": "Plot ID",
     "rightTable": "Table2",
     "ScientificName": "Species",
@@ -1777,7 +2313,7 @@
     "sidebarItemExpanded": null,
     "Site": "none",
     "SiteMan": "ForestPlotExample",
-    "SkipCorrections": 2,
+    "SkipCorrections": 1,
     "SkipMerge": 0,
     "SkipStack": 1,
     "SkipTidy": 0,
@@ -1822,7 +2358,7 @@
     "TickedMelt7": false,
     "TickedMelt8": false,
     "TickedMelt9": false,
-    "Tidy": 2,
+    "Tidy": 1,
     "TidyTable_cell_clicked": {
 
     },
@@ -2992,7 +3528,7 @@
     "TreeHeight": "Height",
     "TreeHeightUnitMan": "m",
     "UseProfile": 2,
-    "UseProfileOuput": 0,
+    "UseProfileOuput": 1,
     "utmUnitMan": "m",
     "ValueName1": "Contie.",
     "ValueName10": "POM",
@@ -3115,7 +3651,7 @@
       "x": {
         "filter": "none",
         "vertical": false,
-        "container": "<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Site<\/th>\n      <th>Plot<\/th>\n      <th>SubPlot<\/th>\n      <th>PlotArea<\/th>\n      <th>SubPlotArea<\/th>\n      <th>IdCensus<\/th>\n      <th>Year<\/th>\n      <th>Date<\/th>\n      <th>TreeFieldNum<\/th>\n      <th>IdTree<\/th>\n      <th>IdStem<\/th>\n      <th>IdMeasure<\/th>\n      <th>LifeStatus<\/th>\n      <th>DBH<\/th>\n      <th>BD<\/th>\n      <th>Circ<\/th>\n      <th>BCirc<\/th>\n      <th>POM<\/th>\n      <th>BPOM<\/th>\n      <th>TreeHeight<\/th>\n      <th>Lat<\/th>\n      <th>Lon<\/th>\n      <th>Xutm<\/th>\n      <th>Yutm<\/th>\n      <th>Xplot<\/th>\n      <th>Yplot<\/th>\n      <th>Xsubplot<\/th>\n      <th>Ysubplot<\/th>\n      <th>ScientificName<\/th>\n      <th>VernName<\/th>\n      <th>Family<\/th>\n      <th>Genus<\/th>\n      <th>Species<\/th>\n      <th>Subspecies<\/th>\n      <th>Variety<\/th>\n      <th>Voucher<\/th>\n      <th>IdLevel<\/th>\n      <th>Authority<\/th>\n      <th>CommercialSp<\/th>\n      <th>LifeForm<\/th>\n      <th>DateOriginal<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>",
+        "container": "<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Site<\/th>\n      <th>Plot<\/th>\n      <th>quadrat<\/th>\n      <th>PlotArea<\/th>\n      <th>SubPlotArea<\/th>\n      <th>CensusID<\/th>\n      <th>Year<\/th>\n      <th>ExactDate<\/th>\n      <th>tag<\/th>\n      <th>treeID<\/th>\n      <th>stemID<\/th>\n      <th>MeasureID<\/th>\n      <th>DFstatus<\/th>\n      <th>dbh<\/th>\n      <th>BD<\/th>\n      <th>Circ<\/th>\n      <th>BCirc<\/th>\n      <th>hom<\/th>\n      <th>BPOM<\/th>\n      <th>TreeHeight<\/th>\n      <th>Lat<\/th>\n      <th>Lon<\/th>\n      <th>Xutm<\/th>\n      <th>Yutm<\/th>\n      <th>Xplot<\/th>\n      <th>Yplot<\/th>\n      <th>Xsubplot<\/th>\n      <th>Ysubplot<\/th>\n      <th>Latin<\/th>\n      <th>VernName<\/th>\n      <th>Family<\/th>\n      <th>Genus<\/th>\n      <th>Species<\/th>\n      <th>Subspecies<\/th>\n      <th>Variety<\/th>\n      <th>Voucher<\/th>\n      <th>IDLevel<\/th>\n      <th>SpeciesID<\/th>\n      <th>CommercialSp<\/th>\n      <th>LifeForm<\/th>\n      <th>DateOriginal<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>",
         "options": {
           "pageLength": 8,
           "scrollX": true,
@@ -3223,7 +3759,7 @@
         }
       ]
     },
-    "DataOutputSummary": "     Site               Plot             SubPlot             PlotArea     \n Length:130         Length:130         Length:130         Min.   :0.5000  \n Class :character   Class :character   Class :character   1st Qu.:1.0000  \n Mode  :character   Mode  :character   Mode  :character   Median :1.0000  \n                                                          Mean   :0.8769  \n                                                          3rd Qu.:1.0000  \n                                                          Max.   :1.0000  \n                                                                          \n  SubPlotArea       IdCensus          Year           Date           \n Min.   :1e+06   Min.   :1.000   Min.   :2001   Min.   :2001-01-01  \n 1st Qu.:1e+06   1st Qu.:2.000   1st Qu.:2006   1st Qu.:2006-04-09  \n Median :1e+06   Median :3.000   Median :2009   Median :2009-03-15  \n Mean   :1e+06   Mean   :3.508   Mean   :2009   Mean   :2009-05-19  \n 3rd Qu.:1e+06   3rd Qu.:5.000   3rd Qu.:2012   3rd Qu.:2012-06-23  \n Max.   :1e+06   Max.   :8.000   Max.   :2018   Max.   :2018-01-18  \n NA's   :56                                                         \n TreeFieldNum          IdTree             IdStem           IdMeasure        \n Length:130         Length:130         Length:130         Length:130        \n Class :character   Class :character   Class :character   Class :character  \n Mode  :character   Mode  :character   Mode  :character   Mode  :character  \n                                                                            \n                                                                            \n                                                                            \n                                                                            \n LifeStatus          DBH              BD           Circ         BCirc    \n Mode:logical   Min.   : 0.00   Min.   : NA   Min.   : NA   Min.   : NA  \n NA's:130       1st Qu.: 5.90   1st Qu.: NA   1st Qu.: NA   1st Qu.: NA  \n                Median :10.20   Median : NA   Median : NA   Median : NA  \n                Mean   :12.12   Mean   :NaN   Mean   :NaN   Mean   :NaN  \n                3rd Qu.:18.30   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA  \n                Max.   :50.30   Max.   : NA   Max.   : NA   Max.   : NA  \n                NA's   :49      NA's   :130   NA's   :130   NA's   :130  \n      POM             BPOM       TreeHeight          Lat           Lon     \n Min.   :0.000   Min.   : NA   Min.   : 3.800   Min.   : NA   Min.   : NA  \n 1st Qu.:0.300   1st Qu.: NA   1st Qu.: 4.525   1st Qu.: NA   1st Qu.: NA  \n Median :1.300   Median : NA   Median : 5.800   Median : NA   Median : NA  \n Mean   :1.051   Mean   :NaN   Mean   : 7.807   Mean   :NaN   Mean   :NaN  \n 3rd Qu.:1.300   3rd Qu.: NA   3rd Qu.:11.000   3rd Qu.: NA   3rd Qu.: NA  \n Max.   :2.900   Max.   : NA   Max.   :20.900   Max.   : NA   Max.   : NA  \n NA's   :49      NA's   :130   NA's   :76       NA's   :130   NA's   :130  \n      Xutm          Yutm         Xplot         Yplot        Xsubplot     \n Min.   : NA   Min.   : NA   Min.   : NA   Min.   : NA   Min.   :  1.50  \n 1st Qu.: NA   1st Qu.: NA   1st Qu.: NA   1st Qu.: NA   1st Qu.: 27.00  \n Median : NA   Median : NA   Median : NA   Median : NA   Median : 32.80  \n Mean   :NaN   Mean   :NaN   Mean   :NaN   Mean   :NaN   Mean   : 91.25  \n 3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.:221.50  \n Max.   : NA   Max.   : NA   Max.   : NA   Max.   : NA   Max.   :225.50  \n NA's   :130   NA's   :130   NA's   :130   NA's   :130   NA's   :82      \n    Ysubplot     ScientificName       VernName            Family         \n Min.   :61.00   Length:130         Length:130         Length:130        \n 1st Qu.:64.00   Class :character   Class :character   Class :character  \n Median :80.10   Mode  :character   Mode  :character   Mode  :character  \n Mean   :76.85                                                           \n 3rd Qu.:81.00                                                           \n Max.   :99.50                                                           \n NA's   :82                                                              \n    Genus             Species           Subspecies          Variety         \n Length:130         Length:130         Length:130         Length:130        \n Class :character   Class :character   Class :character   Class :character  \n Mode  :character   Mode  :character   Mode  :character   Mode  :character  \n                                                                            \n                                                                            \n                                                                            \n                                                                            \n   Voucher            IdLevel           Authority         CommercialSp  \n Length:130         Length:130         Length:130         Mode:logical  \n Class :character   Class :character   Class :character   NA's:130      \n Mode  :character   Mode  :character   Mode  :character                 \n                                                                        \n                                                                        \n                                                                        \n                                                                        \n   LifeForm         DateOriginal      \n Length:130         Length:130        \n Class :character   Class :character  \n Mode  :character   Mode  :character  \n                                      \n                                      \n                                      \n                                      ",
+    "DataOutputSummary": "     Site               Plot             quadrat             PlotArea     \n Length:130         Length:130         Length:130         Min.   :0.5000  \n Class :character   Class :character   Class :character   1st Qu.:1.0000  \n Mode  :character   Mode  :character   Mode  :character   Median :1.0000  \n                                                          Mean   :0.8769  \n                                                          3rd Qu.:1.0000  \n                                                          Max.   :1.0000  \n                                                                          \n  SubPlotArea       CensusID          Year       ExactDate        \n Min.   :1e+06   Min.   :1.000   Min.   :2001   Length:130        \n 1st Qu.:1e+06   1st Qu.:2.000   1st Qu.:2006   Class :character  \n Median :1e+06   Median :3.000   Median :2009   Mode  :character  \n Mean   :1e+06   Mean   :3.508   Mean   :2009                     \n 3rd Qu.:1e+06   3rd Qu.:5.000   3rd Qu.:2012                     \n Max.   :1e+06   Max.   :8.000   Max.   :2018                     \n NA's   :56                                                       \n     tag               treeID             stemID           MeasureID        \n Length:130         Length:130         Length:130         Length:130        \n Class :character   Class :character   Class :character   Class :character  \n Mode  :character   Mode  :character   Mode  :character   Mode  :character  \n                                                                            \n                                                                            \n                                                                            \n                                                                            \n DFstatus            dbh              BD           Circ         BCirc    \n Mode:logical   Min.   :  0.0   Min.   : NA   Min.   : NA   Min.   : NA  \n NA's:130       1st Qu.: 59.0   1st Qu.: NA   1st Qu.: NA   1st Qu.: NA  \n                Median :102.0   Median : NA   Median : NA   Median : NA  \n                Mean   :121.2   Mean   :NaN   Mean   :NaN   Mean   :NaN  \n                3rd Qu.:183.0   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA  \n                Max.   :503.0   Max.   : NA   Max.   : NA   Max.   : NA  \n                NA's   :49      NA's   :130   NA's   :130   NA's   :130  \n      hom             BPOM       TreeHeight          Lat           Lon     \n Min.   :0.000   Min.   : NA   Min.   : 3.800   Min.   : NA   Min.   : NA  \n 1st Qu.:0.300   1st Qu.: NA   1st Qu.: 4.525   1st Qu.: NA   1st Qu.: NA  \n Median :1.300   Median : NA   Median : 5.800   Median : NA   Median : NA  \n Mean   :1.051   Mean   :NaN   Mean   : 7.807   Mean   :NaN   Mean   :NaN  \n 3rd Qu.:1.300   3rd Qu.: NA   3rd Qu.:11.000   3rd Qu.: NA   3rd Qu.: NA  \n Max.   :2.900   Max.   : NA   Max.   :20.900   Max.   : NA   Max.   : NA  \n NA's   :49      NA's   :130   NA's   :76       NA's   :130   NA's   :130  \n      Xutm          Yutm         Xplot         Yplot        Xsubplot     \n Min.   : NA   Min.   : NA   Min.   : NA   Min.   : NA   Min.   :  1.50  \n 1st Qu.: NA   1st Qu.: NA   1st Qu.: NA   1st Qu.: NA   1st Qu.: 27.00  \n Median : NA   Median : NA   Median : NA   Median : NA   Median : 32.80  \n Mean   :NaN   Mean   :NaN   Mean   :NaN   Mean   :NaN   Mean   : 91.25  \n 3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.: NA   3rd Qu.:221.50  \n Max.   : NA   Max.   : NA   Max.   : NA   Max.   : NA   Max.   :225.50  \n NA's   :130   NA's   :130   NA's   :130   NA's   :130   NA's   :82      \n    Ysubplot        Latin             VernName            Family         \n Min.   :61.00   Length:130         Length:130         Length:130        \n 1st Qu.:64.00   Class :character   Class :character   Class :character  \n Median :80.10   Mode  :character   Mode  :character   Mode  :character  \n Mean   :76.85                                                           \n 3rd Qu.:81.00                                                           \n Max.   :99.50                                                           \n NA's   :82                                                              \n    Genus             Species           Subspecies          Variety         \n Length:130         Length:130         Length:130         Length:130        \n Class :character   Class :character   Class :character   Class :character  \n Mode  :character   Mode  :character   Mode  :character   Mode  :character  \n                                                                            \n                                                                            \n                                                                            \n                                                                            \n   Voucher            IDLevel           SpeciesID         CommercialSp  \n Length:130         Length:130         Length:130         Mode:logical  \n Class :character   Class :character   Class :character   NA's:130      \n Mode  :character   Mode  :character   Mode  :character                 \n                                                                        \n                                                                        \n                                                                        \n                                                                        \n   LifeForm         DateOriginal      \n Length:130         Length:130        \n Class :character   Class :character  \n Mode  :character   Mode  :character  \n                                      \n                                      \n                                      \n                                      ",
     "FormatedTable": {
       "x": {
         "filter": "none",

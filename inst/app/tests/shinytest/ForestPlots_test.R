@@ -1,5 +1,6 @@
 library(shinytest)
 #  viewTestDiff("inst/app/", "ForestPlots_test")
+#  snapshotUpdate("inst/app/", "ForestPlots_test")
 
 
 app <- ShinyDriver$new("../../")
