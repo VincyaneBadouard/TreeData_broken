@@ -73,13 +73,25 @@ ReversedRequiredFormat <- function(
   ## format date of measurement like output profile ####
   if(!input$Date %in% "none"){
 
-    DateFormat <- input$DateFormat
-    DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-    DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
-
+    DateFormat <- trimws(input$DateFormat)
 
     Data[, Date := as.Date(Date)]
-    Data[, Date := format(Date, format = DateFormat)]
+
+
+    if(grepl("num|dec", DateFormat, ignore.case = T)) {
+
+      if(grepl("num", DateFormat, ignore.case = T)) Data[, Date := as.numeric(Date)]
+
+      if(grepl("dec", DateFormat, ignore.case = T)) Data[, Date := lubridate::decimal_date(Date)]
+
+    } else {
+
+      DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+      DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+
+      Data[, Date := format(Date, format = DateFormat)]
+
+    }
 
   }
 
