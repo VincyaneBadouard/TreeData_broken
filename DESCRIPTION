@@ -49,5 +49,5 @@ Imports:
     ggplot2 (>= 3.3.5),
     data.tree (>= 1.0.0),
     stringdist (>= 0.9.8)
-    shinytest (>=1.5.1)
+    shinytest (>= 1.5.1)
 BugReports: https://github.com/VincyaneBadouard/TreeData/issues
