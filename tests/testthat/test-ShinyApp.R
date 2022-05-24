@@ -10,5 +10,6 @@ test_that("shiny app works", {
   # Use compareImages=FALSE because the expected image screenshots were created
   # on a Mac, and they will differ from screenshots taken on the CI platform,
   # which runs on Linux.
-  expect_pass(testApp("inst/app/", compareImages = FALSE))
+  appdir <- system.file(package = "TreeData", "inst/app")
+  expect_pass(testApp(appdir, compareImages = FALSE))
 })
