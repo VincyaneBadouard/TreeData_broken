@@ -728,8 +728,8 @@ observe( {
     },
     content = function(file) {
 
-      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataFormated()), xall$ItemID)]]
-      OurStandardColumn <- colnames(DataFormated())
+      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataOutput()), xall$ItemID)]]
+      OurStandardColumn <- colnames(DataOutput())
 
       if(!is.null(profileOutput())) {
         m <- match(OurStandardColumn, xall$ItemID)
