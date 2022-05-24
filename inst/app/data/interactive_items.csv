@@ -77,3 +77,4 @@ NA,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, 
 NA,,,,DBHOriginal,,,,,,,,,FALSE,,-,-,"DBH as it was given in the input table, without any correction db transformation"
 NA,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
 NA,,,,IsCommercrialOriginal,,,,,,,,,FALSE,,-,-,"IsCommercrial as it was given in the input table, without any correction or transformation"
+NA,,,,Comment,,,,,,,,,FALSE,,-,-,information about error
