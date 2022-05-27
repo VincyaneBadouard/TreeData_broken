@@ -32,8 +32,6 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
-  output$CodeRunApp <- renderText('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
-
   output$ui_uploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
@@ -191,7 +189,7 @@ server <- function(input, output, session) {
     if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
     if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
 
-    merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE)
+    merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y"))
   })
 
   observeEvent(input$Merge, {
@@ -204,6 +202,10 @@ server <- function(input, output, session) {
 
 
     shinyjs::show("GoToTidy")
+    shinyjs::show("SelectColumns")
+
+    updatePickerInput(session, "SelectedMergedColumns", choices =colnames(MergedTables()), selected = colnames(MergedTables())[!grepl("\\.y$", colnames(MergedTables()))])
+
 
   })
 
@@ -684,8 +686,7 @@ observe( {
       paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
     },
     content = function(file) {
-      inputs_to_save <- c(names(input)[names(input) %in% x$ItemID],
-                          "Tidy", "VariableName", grep("Variablecolumns|TickedMelt|ValueName", names(input), value = T))
+      inputs_to_save <- names(input) # c(names(input)[names(input) %in% x$ItemID], "Tidy", "VariableName", grep("Variablecolumns|TickedMelt|ValueName", names(input), value = T))
       Profile <- list()
       for(input.i in inputs_to_save){
         Profile[[input.i]] <-  input[[input.i]]

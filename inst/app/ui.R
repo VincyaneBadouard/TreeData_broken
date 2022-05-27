@@ -75,7 +75,18 @@ body <- dashboardBody(
                   br()),
                 style = "stretch",
                 color = "success"),
-              box(width = 12, textOutput("CodeRunApp"),
+              box(width = 12,
+                  # helpText("Some text and then ", code("some code"), "."),
+                  helpText(code('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app"'),
+                           br(),
+                           br(),
+                           '# If you have run this app in the past and you think/know the TreeData package has been updated since, you may need to restart you R session and re-install TreeData package (using code below) before running the app again',
+                           br(),
+                           code('devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)')
+
+
+                           ),
+                  # textOutput("CodeRunApp"),
                   tags$head(tags$style("#CodeRunApp{
                   color: red;
                   font-family: courier;
@@ -222,11 +233,18 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(6,  pickerInput("leftKey", "Using this/these column(s) - ORDER MATTERS", choices = "", multiple = T))),
+                                  column(8,  pickerInput("leftKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(6,  pickerInput("rightKey", "Using this/these column(s) - ORDER MATTERS", choices = "", multiple = T)))
+                                  column(8,  pickerInput("rightKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T)))
+                         ),
+                       hidden(div(id = "SelectColumns",
+                           box(width = 12,
+                               # fluidRow(
+
+                                 pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
+                           ))
                      #
                      #     fluidRow(column(3, pickerInput("rightTable", "Take table", choices = "")),
                      #              column(3,actionBttn("selectRight", "ok")))
@@ -579,7 +597,7 @@ body <- dashboardBody(
                      withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
               )),
             fluidRow(
-              column(width = 3,
+              column(width = 4,
                      box(title = "Save file",
                          width = NULL,
                          status = "primary",
@@ -590,11 +608,11 @@ body <- dashboardBody(
                          status = "primary",
                          solidHeader = TRUE,
                          downloadButton(outputId = "dbProfile", label = "Save profile")),
-                     box(title = "Save code",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbCode", label = "Save code")),
+                     # box(title = "Save code",
+                     #     width = NULL,
+                     #     status = "primary",
+                     #     solidHeader = TRUE,
+                     #     downloadButton(outputId = "dbCode", label = "Save code")),
 
                      # p("ATTENTION:, LifeStatus and CommercialSp were not converted to your desired output profile because we cannot interprete TRU/FALSE to your desired profile's code system!"),
                      box(title = "Save metadata",
