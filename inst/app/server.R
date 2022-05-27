@@ -32,8 +32,6 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
-  output$CodeRunApp <- renderText('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
-
   output$ui_uploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
