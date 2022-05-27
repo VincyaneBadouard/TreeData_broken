@@ -579,7 +579,7 @@ body <- dashboardBody(
                      withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
               )),
             fluidRow(
-              column(width = 3,
+              column(width = 4,
                      box(title = "Save file",
                          width = NULL,
                          status = "primary",
