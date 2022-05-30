@@ -70,8 +70,15 @@ if DeathConfirmation =< unseens -> Dead
 library(data.table)
 data(TestData)
 
-selection <- c("101433","101435","101436","101437","101438","101439","101440",
-"101441","101442","101443","101444","101446","101410","101067")
+selection <- c("101184", "101433","101435","101436")
+
+# Write the sequence
+TestData <- TestData[order(Year)] # arrange years in ascending order
+TestData[IdTree == "101184", LifeStatus := c(TRUE, TRUE, TRUE, TRUE, FALSE)]
+TestData[IdTree == "101433", LifeStatus := c(FALSE, TRUE, TRUE, TRUE, TRUE)]
+TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
+TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
+
 
 Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
 

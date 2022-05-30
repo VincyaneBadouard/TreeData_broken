@@ -57,8 +57,15 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' selection <- c("101433","101435","101436","101437","101438","101439","101440",
-#' "101441","101442","101443","101444","101446","101410","101067")
+#' selection <- c("101184", "101433","101435","101436")
+#'
+#'# Write the sequence
+#' TestData <- TestData[order(Year)] # arrange years in ascending order
+#' TestData[IdTree == "101184", LifeStatus := c(TRUE, TRUE, TRUE, TRUE, FALSE)]
+#' TestData[IdTree == "101433", LifeStatus := c(FALSE, TRUE, TRUE, TRUE, TRUE)]
+#' TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
+#' TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
+#'
 #'
 #' Rslt <- StatusCorrection(TestData[IdTree %in% selection])
 #'
@@ -466,15 +473,15 @@ StatusCorrectionByTree <- function(
 
   #### Enough/not enough occurrences of death to validate it ####
   # If there are things after the last occurrence of life
-  if(any(DataTree$LifeStatusCor %in% NA)){
+  # if(any(DataTree$LifeStatusCor %in% NA)){
     if(any(DataTree$LifeStatusCor %in% TRUE)){
 
 
       # If there are things after the last occurrence of life
       if(LastAlive != nrow(DataTree)){ # if the last seen alive is not the last row of the database
 
-        #### if the one after the last one seen alive is Dead ####
-        if(DataTree[LastAlive +1, LifeStatusCor] %in% FALSE){
+        #### if the one after the last one seen alive is Dead and it's not the last row ####
+        if((DataTree[LastAlive +1, LifeStatusCor] %in% FALSE) & (LastAlive +1 != nrow(DataTree))){
           if(DetectOnly %in% FALSE){
 
             # Remove rows after the death (after correction) (User choice)
@@ -527,7 +534,7 @@ StatusCorrectionByTree <- function(
         }
       } # If there nothing after the last occurrence of life
     } # if there is any alive
-  } # any NA ?
+  # } # any NA ?
 
 
   #### Before the first alive ####
