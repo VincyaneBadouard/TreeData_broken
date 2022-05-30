@@ -38,6 +38,7 @@ Suggests:
     shinyjs,
     shinyWidgets,
     shinycssloaders,
+    shinytest,
     lubridate
 VignetteBuilder: knitr
 Depends: 
@@ -48,6 +49,5 @@ Imports:
     shiny (>= 1.6.0),
     ggplot2 (>= 3.3.5),
     data.tree (>= 1.0.0),
-    stringdist (>= 0.9.8),
-    shinytest (>= 1.5.1)
+    stringdist (>= 0.9.8)
 BugReports: https://github.com/VincyaneBadouard/TreeData/issues

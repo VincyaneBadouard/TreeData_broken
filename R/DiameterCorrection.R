@@ -338,8 +338,9 @@ DiameterCorrection <- function(
 #'
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
-#'   WhatToCorrect = c("POM change", "punctual", "shift"), # "POM change", "punctual", "shift"
-#'   CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical")) # "taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"
+#'   WhatToCorrect = c("POM change", "punctual", "shift"),
+#'   CorrectionType = c("taper", "quadratic", "linear",
+#'                      "individual", "phylogenetic hierarchical"))
 #'
 DiameterCorrectionByTree <- function(
   DataTree,

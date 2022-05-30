@@ -4,24 +4,29 @@
 #'
 #'@param input A named list, typically the output of function
 #'  RequiredFormat_interactive, also called site profile with information on
-#'  column names correspondence, size units etc... Chosen to be the output profile the user wants their data turned into
+#'  column names correspondence, size units etc... Chosen to be the output
+#'  profile the user wants their data turned into
 #'
 #'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp For internal use when function used by Shiny app (logical)
+#'@param ThisIsShinyApp For internal use when function used by Shiny app
+#'  (logical)
 #'
-#'@param Untidy (logical). If TRUE and input$tidy exists, the data will be untidy (changed from long to wide format, according to input information)
+#'@param Untidy (logical). If TRUE and input$tidy exists, the data will be
+#'  untidy (changed from long to wide format, according to input information)
 #'
 #'
-#'@details This function takes the standardized forest inventory data.table (returned by [RequiredFormat()])
-#'  and converts the column names to the names of the profile given as input.
+#'@details This function takes the standardized forest inventory data.table
+#'  (returned by [RequiredFormat()]) and converts the column names to the names
+#'  of the profile given as input.
 #'
 #'@return (data.frame) in the format given the profile selected in input.
 #'
 #'@export
 #'
-#'@importFrom data.table copy setDT setDF melt tstrsplit :=
+#'@importFrom data.table copy setDT setDF dcast setnames melt tstrsplit :=
 #'@importFrom utils read.csv
+#'@importFrom stats formula
 #'
 #' @examples
 #'\dontrun{
