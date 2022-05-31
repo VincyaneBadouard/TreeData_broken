@@ -164,10 +164,6 @@ DiameterCorrection <- function(
     stop("The 'CorrectionType' argument value must be among
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
-  # DefaultHOM
-  if(!inherits(DefaultHOM, "numeric"))
-    stop("The 'DefaultHOM' argument must be numeric")
-
   # Digits
   if(!inherits(Digits, "integer"))
     stop("The 'Digits' argument must be an integer (put an 'L' after your number (eg. 1L)) ")
@@ -187,6 +183,8 @@ DiameterCorrection <- function(
 
   # In data.table
   setDT(Data)
+
+  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
 
   #### Function ####
 
@@ -383,6 +381,9 @@ DiameterCorrectionByTree <- function(
 
   # In data.table
   setDT(DataTree)
+
+  # If not enough DBH values
+  if(sum(!is.na(DataTree$DBH)) > 1){
 
   #### Function ####
 
@@ -612,6 +613,7 @@ DiameterCorrectionByTree <- function(
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
   if(DetectOnly %in% FALSE){ DataTree[,DBHCor := DBHCor] }
 
+}
   return(DataTree)
 }
 

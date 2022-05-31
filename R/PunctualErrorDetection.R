@@ -55,6 +55,12 @@ PunctualErrorDetection <- function(
   cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
   cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
+  # remove the last value if it's a NA (no DBH value so no cresc or cresc_abs)
+  if(is.na(cresc[length(cresc)]) & is.na(cresc_abs[length(cresc)])){
+    cresc <- cresc[-length(cresc)]
+    cresc_abs <- cresc_abs[-length(cresc_abs)]
+  }
+
   # Detect abnormal growth --------------------------------------------------------------------------------------------------
   Ncresc_abn <- sum(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # nbr of abnormal values
   # le retour à la normale est considéré comme une erreur (perte excessive)

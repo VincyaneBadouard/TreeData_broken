@@ -30,10 +30,6 @@ ComputeIncrementation <- function(
   if(!inherits(Var, "numeric"))
     stop("'Var' argument must be numeric")
 
-  # If not enough values
-  if(sum(!is.na(Var)) <= 1)
-    stop("You do not have enough values to calculate an increment (</= 1 value in your data)")
-
   # Type (character)
   if(length(Type) != 1 | !inherits(Type, "character"))
     stop("'Type' argument must be in character")
@@ -45,7 +41,7 @@ ComputeIncrementation <- function(
   }
 
   # Initialisation ----------------------------------------------------------------------------------------------------------
-  incr <- rep(NA, length(Var) - 1) # (cresc[1] corresponds to the 2nd DBH)
+  incr <- rep(NA, length(which(!is.na(Var))) - 1) # (cresc[1] corresponds to the 2nd DBH)
 
   if(Type %in% "absolute"){
     # Absolute diameter increment (not divided by time between census) (cresc_abs) ------------------------------------------
@@ -56,6 +52,8 @@ ComputeIncrementation <- function(
     # Annual diameter increment (cresc) -------------------------------------------------------------------------------------
     incr[which(!is.na(Var))[-1] - 1] <- # 8 cresc for 9 dbh values ([-1]), shift all indices by 1 to the left (-1)
       diff(Var[!is.na(Var)]) / diff(Time[!is.na(Var)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
+
+    incr[is.na(incr)] <- 0 # 0/0 = NaN, replace NaN by 0, except if it's the last value
   }
 
   return(incr)
