@@ -16,19 +16,19 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 5,numericInput,value,,YearMan,What is your year of measurement?,,Year,Date,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,Date,Date of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Date of measurement
 4,textInput,value,,DateFormat,What is your date format?,"e.g. 2016-09-14 would be yyyy-mm-dd, 9/14/2016 would be mm/dd/yyyy, 2016.703 would be decimal and 17058 woulbe numeric (number of days since 1970-01-01)",none,none,Date,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,TreeFieldNum,Tree unique identifiers,matching the tag number in the field. It can be the same as tree ID.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not."
-1,pickerInput,choices,none,IdTree,Tree ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if not provided in the input data
-1,pickerInput,choices,none,IdStem,Stem ID,if each stem of one tree does not get unique tag,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
+1,pickerInput,choices,none,TreeFieldNum,Tree tag,identifiers at the plot level. It can be the same as tree ID if you have only one plot.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field."
+1,pickerInput,choices,none,IdTree,Tree ID,unique tree identifier in the entire dataset,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).
+1,pickerInput,choices,none,IdStem,Stem ID,stem unique identifier within the tree or at the plot level,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
 1,pickerInput,choices,none,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
 1,pickerInput,choices,none,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if tree was alive, FALSE if it was dead"
 4,pickerInput,choices,,IsLive,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,DBH,DBH,Diamter at breast height,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Diameter at breast height
 1,pickerInput,choices,none,DBHUnit,DBH unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,DBHUnitMan,What is your DBH unit ?,,none,none,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,BD,BD,Basal Diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
+1,pickerInput,choices,none,BD,BD,basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
 1,pickerInput,choices,none,BDUnit,BD unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BDUnitMan,What is your BD unit ?,,none,none,BD,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,Circ,Circumference,Circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference
+1,pickerInput,choices,none,Circ,Circumference,circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference
 1,pickerInput,choices,none,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference
