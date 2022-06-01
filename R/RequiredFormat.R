@@ -202,7 +202,13 @@ RequiredFormat <- function(
 
   }
 
+  if (!input$IdTree %in% "none" & any(is.na(Data$IdTree))) {
 
+    # if there is an IdTree but some IDs are NA --> fille those with unique values  - This patch is to handle ForestPlot data, where they have stem level information, so each stem gets a stemID, and IdTree is the stem group ID. if a stem is alone, its stem group ID is NA, so there are some NA's in IdTree.
+   idxNAIdTree <- is.na(Data$IdTree)
+    Data$IdTree[idxNAIdTree] <- paste0(c(1:sum(idxNAIdTree)), "_auto")
+
+  }
   ## Genus, Species, ScientificNameSep ####
 
   ### Genus and species if we have ScientificName and ScientificNameSep
