@@ -368,10 +368,6 @@ StatusCorrectionByTree <- function(
   if(any(DataTree$LifeStatusCor %in% TRUE)){
     # The first Alive record year
     FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
-
-    # First/last alive positions (rows id)
-    FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
-    LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
   }
 
   #### Absents (logical vector of the PlotCensuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
@@ -460,6 +456,11 @@ StatusCorrectionByTree <- function(
 
   #### Alive > *Alive* > Alive ####
   if(any(DataTree$LifeStatusCor %in% TRUE)){
+
+    # First/last alive positions (rows id)
+    FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
+    LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
+
 
     DataTree <- GenerateComment(DataTree,
                                 condition = seq.int(nrow(DataTree)) %in% (FirstAlive:LastAlive) &
