@@ -122,9 +122,13 @@ With:
 }
 \value{
 Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add columns: - \emph{DBHCor}: corrected trees diameter at
-default HOM - \emph{DiameterCorrectionMeth} =
-"taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
+\emph{DetectOnly} = FALSE, add columns:
+\itemize{
+\item \emph{DBHCor}: corrected trees diameter at default HOM
+\item \emph{DiameterCorrectionMeth} = "taper"/"linear"/"quadratic"/"individual"
+/phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
+realignment")
+}
 }
 \description{
 DiameterCorrectionByTree

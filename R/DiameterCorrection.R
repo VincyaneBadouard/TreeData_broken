@@ -317,9 +317,11 @@ DiameterCorrection <- function(
 #'   (Default: FALSE) (logical)
 #'
 #' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns: - *DBHCor*: corrected trees diameter at
-#'   default HOM - *DiameterCorrectionMeth* =
-#'   "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
+#'   *DetectOnly* = FALSE, add columns:
+#'   - *DBHCor*: corrected trees diameter at default HOM
+#'   - *DiameterCorrectionMeth* = "taper"/"linear"/"quadratic"/"individual"
+#'   /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
+#'   realignment")
 #'
 #' @export
 #'

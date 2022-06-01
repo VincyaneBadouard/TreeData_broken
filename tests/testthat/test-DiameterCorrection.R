@@ -59,9 +59,9 @@ test_that("DiameterCorrection", {
   #
   # # No correction, only comments
   # expect_true(!"DBHCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
-  # expect_true(Rslt$DBH == TestData$DBH) # no change in the original column
+  # expect_true(all(Rslt$DBH == TestData$DBH)) # no change in the original column
   #
-  # ## Correction
+  # ## Correction --------------------------------------------------------------------------------------------------------------------
   # Rslt <- DiameterCorrection(
   #   TestData,
   #   PositiveGrowthThreshold = 5,

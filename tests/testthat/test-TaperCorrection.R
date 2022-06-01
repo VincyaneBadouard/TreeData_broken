@@ -20,4 +20,34 @@ test_that("TaperCorrection", {
 
   # Check the function work ---------------------------------------------------------------------------------------------------------
 
+
+  ## Detect Only --------------------------------------------------------------------------------------------------------------------
+  Rslt <- TaperCorrection(DataTree, DetectOnly = T)
+
+  # No correction, only comments
+  expect_true(all(!c("DBHCor", "DiameterCorrectionMeth") %in% names(Rslt)) & "Comment" %in% names(Rslt))
+  expect_true(all(Rslt$DBH == DataTree$DBH)) # no change in the original column
+
+  ## Correction ---------------------------------------------------------------------------------------------------------------------
+  Rslt <- TaperCorrection(DataTree)
+
+  expect_true(all(c("DBHCor", "DiameterCorrectionMeth", "Comment") %in% names(Rslt)))
+
+  # Add a "Comment" and "DiameterCorrectionMeth" value when "DBH" != "DBHCor"
+  Comment <- Rslt[, Comment] != ""
+  Methode <- !is.na(Rslt[, DiameterCorrectionMeth])
+
+  compareNA <- function(v1,v2) { # function to compare values, including NA
+    same <- (v1 == v2) | (is.na(v1) & is.na(v2))
+    same[is.na(same)] <- FALSE
+    return(same)
+  }
+
+  expect_true(all(!compareNA(Rslt$DBH, Rslt$DBHCor) == Comment) & all(Comment == Methode))
+
+  # Check the value of the "DiameterCorrectionMeth" column
+  expect_true(all(Rslt$DiameterCorrectionMeth[!is.na(Rslt$DiameterCorrectionMeth)] == "taper"))
+
+
+
 })

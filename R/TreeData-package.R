@@ -26,7 +26,7 @@ utils::globalVariables(c("CensusYear", "Circ", "DBH", "Genus", "Site", "IdTree",
 
                          "NewIdTree",
 
-                         "BD", "BCirc", "BPOM",
+                         "BD", "BCirc", "BPOM", "BHOM",
 
                          ".", ".N", ".SD", "..ColumnsToReturn",
 

@@ -58,7 +58,7 @@ RegressionInterpolation <- function(
   }
   # X & Y of the same lenght
   if(length(X) != length(Y))
-    stop("The variables X and Y must be of the same length ('RegressionInterpolation()' function) ")
+    stop("The variables X and Y must be of the same length ('RegressionInterpolation()' function)")
 
   # CorrectionType (character)
   if(!any(any(CorrectionType %in% "quadratic") || any(CorrectionType %in% "linear")))
@@ -72,10 +72,10 @@ RegressionInterpolation <- function(
 
   Y[miss] <- sapply(miss, function(i) { # i = each value de miss
 
-    if("quadratic" %in% CorrectionType & length(which(!is.na(Y))) > 3){
+    if("quadratic" %in% CorrectionType & length(which(!is.na(Y))) > 2){
 
       # Degree 2 polynomial regression (= quadratic)
-      reg <- lm(Y ~ poly(X, 2))$coef # 'degree' must be less than number of unique points
+      reg <- lm(Y ~ poly(X, degree = 2, raw = TRUE))$coef # 'degree' must be less than number of unique points
       yi <- reg[1] + reg[2] * X[i] + reg[3] * X[i]^2 # (y = b + ax + cx^2),  DBHi = b + a YEARi + c YEARi^2
 
     }else{ # "linear"
@@ -89,6 +89,6 @@ RegressionInterpolation <- function(
 
   }) # sapply end (for each i)
 
-  return(unlist(Y)) # corrected DBHs
+  return(as.numeric(unlist(Y))) # corrected DBHs
 
 }

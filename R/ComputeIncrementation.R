@@ -53,7 +53,7 @@ ComputeIncrementation <- function(
     incr[which(!is.na(Var))[-1] - 1] <- # 8 cresc for 9 dbh values ([-1]), shift all indices by 1 to the left (-1)
       diff(Var[!is.na(Var)]) / diff(Time[!is.na(Var)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
 
-    incr[is.na(incr)] <- 0 # 0/0 = NaN, replace NaN by 0, except if it's the last value
+    incr[is.nan(incr)] <- 0 # 0/0 = NaN, replace NaN by 0
   }
 
   return(incr)

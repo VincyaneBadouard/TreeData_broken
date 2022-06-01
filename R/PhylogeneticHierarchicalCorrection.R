@@ -1,13 +1,8 @@
-## Phylogenetic hierarchical correction
-# + *init shift*
-#   - Estimate the value that the shifted DBH should have:
-#          EstDBH = previous value + estimated cresc by regression interpolation
-#   - AT species, genus or family level : Colleagues = n ind[EstDBH -DBHRange/2 ; EstDBH +DBHRange/2] > MinIndividualNbr
-#   - DBH[init shift] = previous value +  mean(cresc[Colleagues]
-#
-# + *le shift* : DBH[shift] = previous value + their cresc_abs
-
-#' PhylogeneticHierarchicalCorrection
+#' Phylogenetic Hierarchical Correction
+#'
+#' @description Corrects a series of abnormal diameters of the tree using the
+#'   mean growth of other trees (with a minimum number of trees) of the same
+#'   species/genus/family/stand of the same diameter class.
 #'
 #' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
 #'   measurements (data.table)
@@ -41,7 +36,32 @@
 #' @param MinIndividualNbr Minimum number of individuals to take into account in
 #'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
 #'
-#' @return
+#' @return Fill columns:
+#'   - *DBHCor*: corrected trees diameter at default HOM
+#'   - *DiameterCorrectionMeth* = "species"/"genus"/"family"/"stand"/"shift
+#'   realignment"
+#'
+#' @details It is assumed that these abnormal diameters were measured at a
+#'   different height than the default. We therefore correct the 1st value
+#'   with the mean growth of other trees. The following values are
+#'   corrected from the corrected value of the 1st value, keeping the
+#'   originally measured growth.
+#'
+#' + Correct the 1st value in the series:
+#'   - Estimate the value that the 1st abnormal DBH should have: Estimated DBH =
+#'   previous DBH value + estimated growth by regression interpolation
+#'
+#'   - Find other individual of the the same diameter class (*DBHRange*) and of
+#'   the same species, genus, family or stand than the tree to correct, until
+#'   the minimum number of individuals required to consider the correction is
+#'   reached (*MinIndividualNbr*)
+#'
+#'   - 1st abnormal DBH in the series = previous value + mean growth of the
+#'       other trees
+#'
+#' + Correct the following values in the series: The other abnormal DBH in the
+#'     series = previous value + their original growth.
+#'
 #' @export
 #'
 #' @examples
@@ -49,18 +69,17 @@
 #' DataTree <- TestData[IdTree %in% "100658"]
 #'
 #' # Inputs
-#' Time <-  c(2000, 2002, 2004, 2006, 2008, 2010)
-#' DBHCor <- c(13, 14, 15, 12, 13, 14)
+#' DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008, 2010)
+#' DataTree$DBH <- c(13, 14, 15, 12, 13, 14)
 #' cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
 #' cresc_abs <- c(1, 1, NA, 1, 1)
 #' cresc_abn <- 3
 #'
-#' CorrectionType = "phylogenetic hierarchical"
 #'
 #' DataTree_output <- PhylogeneticHierarchicalCorrection(DataTree = DataTree,
 #'                                                       Data = TestData,
 #'                                                       cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-#'                                                       DBHCor = DBHCor, Time = Time,
+#'                                                       DBHCor = DataTree$DBH, Time = DataTree$Year,
 #'                                                       PositiveGrowthThreshold = 5,
 #'                                                       NegativeGrowthThreshold = -2,
 #'                                                       DBHRange = 10, MinIndividualNbr = 5

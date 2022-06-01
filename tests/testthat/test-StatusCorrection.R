@@ -110,7 +110,7 @@ test_that("StatusCorrection", {
     if(length(DBHprst) > 0){
     expect_true(all(DBHprst %in% which(SeqCor==T)))
 }
-    ## Add a "Comment" column when "LifeStatus" != "LifeStatusCor"
+    ## Add a "Comment" value when "LifeStatus" != "LifeStatusCor"
     Comment <- Rslt[IdTree %in% i, Comment] != ""
 
     compareNA <- function(v1,v2) {
