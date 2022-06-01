@@ -192,13 +192,13 @@ RequiredFormat <- function(
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if (input$TreeFieldNum %in% "none") {
       warning("You do not have a column with unique tree IDs and we are considering that each row within a Plot and SubPlot refers to one unique tree")
-      Data[, IdTree := seq(1, .N) , by = .(Plot, SubPlot)]
+      Data[, IdTree := seq(1, .N)]
     }
 
     # if we have TreeFieldNum, we use it
 
     if (!input$TreeFieldNum %in% "none")
-      Data[, IdTree := paste(Plot, SubPlot, TreeFieldNum, sep = "_")]
+      Data[, IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, sep = "_")]
 
   }
 
