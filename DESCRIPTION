@@ -39,7 +39,8 @@ Suggests:
     shinyWidgets,
     shinycssloaders,
     shinytest,
-    lubridate
+    lubridate,
+    MASS
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.6)
