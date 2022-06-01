@@ -103,7 +103,7 @@ RequiredFormat <- function(
   NumVar <- NumVar[NumVar  %in% colnames(Data)]
 
   Data[, (NumVar) := lapply(.SD, as.character), .SDcols = NumVar] # first as character when the variable is in factor, to preserve information
-  Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create
+  suppressWarnings(Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar]) # () to say that these are existing columns and not new ones to create
 
   ### as.logical
   ## Here we have to use user input to know what is TRUE and what is not
