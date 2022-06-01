@@ -258,39 +258,39 @@ RequiredFormat <- function(
     }
   }
 
-  ### POM and BPOM in m ####
-  # if(!input$POM %in% "none" & !input$POMUnit %in% "none") stop("We have not coded the case where POM units are not constant across your data yet - Please contact us or unify your units first.")
+  ### HOM and BHOM in m ####
+  # if(!input$HOM %in% "none" & !input$HOMUnit %in% "none") stop("We have not coded the case where HOM units are not constant across your data yet - Please contact us or unify your units first.")
 
-  if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
+  if(!input$HOM %in% "none" & !input$HOMUnitMan %in% "none") {
 
-    POMUnit <- input$POMUnitMan
+    HOMUnit <- input$HOMUnitMan
 
-    if(!POMUnit %in% unitOptions) stop(paste("Your POM units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!HOMUnit %in% unitOptions) stop(paste("Your HOM units are not one of:", paste(unitOptions, collapse = ", ")))
 
-    if (POMUnit %in% unitOptions) {
+    if (HOMUnit %in% unitOptions) {
 
-      if (POMUnit == "mm") Data[, POM := POM/1000] # mm -> m
+      if (HOMUnit == "mm") Data[, HOM := HOM/1000] # mm -> m
 
-      if (POMUnit == "cm") Data[, POM := POM/100] # cm -> m
+      if (HOMUnit == "cm") Data[, HOM := HOM/100] # cm -> m
 
 
-      if (POMUnit == "dm") Data[, POM := POM/10] # dm -> m
+      if (HOMUnit == "dm") Data[, HOM := HOM/10] # dm -> m
     }
   }
 
-  if(!input$BPOM %in% "none" & !input$BPOMUnitMan %in% "none") {
+  if(!input$BHOM %in% "none" & !input$BHOMUnitMan %in% "none") {
 
-    BPOMUnit <- input$BPOMUnitMan
+    BHOMUnit <- input$BHOMUnitMan
 
-    if(!BPOMUnit %in% unitOptions) stop(paste("Your basal POM units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!BHOMUnit %in% unitOptions) stop(paste("Your basal HOM units are not one of:", paste(unitOptions, collapse = ", ")))
 
-    if (BPOMUnit %in% unitOptions) {
+    if (BHOMUnit %in% unitOptions) {
 
-      if (BPOMUnit == "mm") Data[, BPOM := BPOM/1000] # mm -> m
+      if (BHOMUnit == "mm") Data[, BHOM := BHOM/1000] # mm -> m
 
-      if (BPOMUnit == "cm") Data[, BPOM := BPOM/100] # cm -> m
+      if (BHOMUnit == "cm") Data[, BHOM := BHOM/100] # cm -> m
 
-      if (BPOMUnit == "dm") Data[, BPOM := BPOM/10] # dm -> m
+      if (BHOMUnit == "dm") Data[, BHOM := BHOM/10] # dm -> m
     }
   }
 

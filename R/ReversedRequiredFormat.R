@@ -120,21 +120,31 @@ ReversedRequiredFormat <- function(
 
 
 
-  ### POM in m ####
+  ### HOM and BHOM in m ####
 
-  if(!input$POM %in% "none" & !input$POMUnitMan %in% "none") {
+  if(!input$HOM %in% "none" & !input$HOMUnitMan %in% "none") {
 
-    POMUnit <- input$POMUnitMan
+    HOMUnit <- input$HOMUnitMan
 
-    if (POMUnit == "mm") Data[, POM := POM*1000] # m -> mm
+    if (HOMUnit == "mm") Data[, HOM := HOM*1000] # m -> mm
 
-    if (POMUnit == "cm") Data[, POM := POM*100] # m -> cm
+    if (HOMUnit == "cm") Data[, HOM := HOM*100] # m -> cm
 
 
-    if (POMUnit == "dm") Data[, POM := POM*10] # m -> dm
+    if (HOMUnit == "dm") Data[, HOM := HOM*10] # m -> dm
   }
 
+  if(!input$BHOM %in% "none" & !input$BHOMUnitMan %in% "none") {
 
+    BHOMUnit <- input$BHOMUnitMan
+
+    if (BHOMUnit == "mm") Data[, BHOM := BHOM*1000] # m -> mm
+
+    if (BHOMUnit == "cm") Data[, BHOM := BHOM*100] # m -> cm
+
+    if (BHOMUnit == "dm") Data[, BHOM := BHOM*10] # m -> dm
+
+  }
 
   ### TreeHeight in m ####
 
