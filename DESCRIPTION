@@ -50,5 +50,5 @@ Imports:
     ggplot2 (>= 3.3.5),
     data.tree (>= 1.0.0),
     stringdist (>= 0.9.8),
-    MASS (<= 7.3-53)
+    MASS
 BugReports: https://github.com/VincyaneBadouard/TreeData/issues

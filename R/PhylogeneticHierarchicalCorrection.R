@@ -76,13 +76,14 @@
 #' cresc_abn <- 3
 #'
 #'
-#' DataTree_output <- PhylogeneticHierarchicalCorrection(DataTree = DataTree,
-#'                                                       Data = TestData,
-#'                                                       cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-#'                                                       DBHCor = DataTree$DBH, Time = DataTree$Year,
-#'                                                       PositiveGrowthThreshold = 5,
-#'                                                       NegativeGrowthThreshold = -2,
-#'                                                       DBHRange = 10, MinIndividualNbr = 5
+#' DataTree_output <- PhylogeneticHierarchicalCorrection(
+#'     DataTree = DataTree,
+#'     Data = TestData,
+#'     cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
+#'     DBHCor = DataTree$DBH, Time = DataTree$Year,
+#'     PositiveGrowthThreshold = 5,
+#'     NegativeGrowthThreshold = -2,
+#'     DBHRange = 10, MinIndividualNbr = 5
 #' )
 
 PhylogeneticHierarchicalCorrection <- function(
