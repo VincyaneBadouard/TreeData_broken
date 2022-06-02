@@ -18,7 +18,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   TwoInd[Year == 2002, ("IdTree") := "b"]
   NoDBHData <- TestData[, !c("DBHCor")]
   NoDBHCorData <- copy(TestData)
-  setnames(NoDBHCorData, "DBHCor", "DBH") # only DBH
+  setnames(NoDBHCorData, "DBHCor", "Diameter") # only Diameter
   OneDBHVal <- copy(TestData)
   OneDBHVal[, ("DBHCor") := 13]
 

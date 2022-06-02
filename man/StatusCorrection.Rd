@@ -55,7 +55,7 @@ Inspired by the code of Nino Page package (ForestData::correct_alive() and
 }
 \details{
 \itemize{
-\item if UseSize : if DBH != NA -> Alive
+\item if UseSize : if Diameter != NA -> Alive
 \item \emph{Dead} > Alive -> NA
 \item add rows for the forgotten censuses between 2 'Alive'
 \item Alive > \emph{Dead}/\emph{NA} > Alive -> Alive

@@ -28,10 +28,13 @@ Data <- setnames(Data, "CodeAlive", "LifeStatus")
 Data <- setnames(Data, "idTree", "IdTree")
 Data <- setnames(Data, "CensusYear", "Year")
 Data <- setnames(Data, "CensusDate", "Date")
+Data <- setnames(Data, "Xfield", "Xplot")
+Data <- setnames(Data, "Yfield", "Yplot")
+Data <- setnames(Data, "MeasCode", "POM")
 
-#### Circ to DBH ####
-if (!"DBH" %in% names(Data) & "Circ" %in% names(Data)) {
-  Data[, DBH := Circ/pi]
+#### Circ to Diameter ####
+if (!"Diameter" %in% names(Data) & "Circ" %in% names(Data)) {
+  Data[, Diameter := Circ/pi]
 }
 
 #### Necessary columns creation from the existing ####
@@ -49,7 +52,7 @@ CharacVar <- c("Plot", "SubPlot", "TreeFieldNum", "IdTree", "ScientificName", "V
 Data[, (CharacVar) := lapply(.SD, as.character), .SDcols = CharacVar] # (CharacVar) to say that these are existing columns and not new ones to create
 
 ### as.numeric
-NumVar <- c("Year", "DBH", "PlotArea", "Xutm", "Yutm") # numeric variables
+NumVar <- c("Year", "Diameter", "PlotArea", "Xutm", "Yutm") # numeric variables
 
 Data[, (NumVar) := lapply(.SD, as.character), .SDcols = NumVar] # first as c haracter when the variable is in factor, to preserve writed information
 Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar] # () to say that these are existing columns and not new ones to create

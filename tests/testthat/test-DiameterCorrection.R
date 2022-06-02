@@ -7,7 +7,7 @@ test_that("DiameterCorrection", {
 
   # Create test data ----------------------------------------------------------------------------------------------------------------
   MatrixData <- as.matrix(TestData)
-  NoDBHData <- TestData[, !c("DBH")]
+  NoDBHData <- TestData[, !c("Diameter")]
 
 
   # Check the function argument -----------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ test_that("DiameterCorrection", {
   #
   # # No correction, only comments
   # expect_true(!"DBHCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
-  # expect_true(all(Rslt$DBH == TestData$DBH)) # no change in the original column
+  # expect_true(all(Rslt$Diameter == TestData$Diameter)) # no change in the original column
   #
   # ## Correction --------------------------------------------------------------------------------------------------------------------
   # Rslt <- DiameterCorrection(

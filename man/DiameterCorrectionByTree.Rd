@@ -59,10 +59,10 @@ appears abnormal, but a negative measurement error can be allowed until -n
 \item{WhatToCorrect}{c("POM change", "punctual", "shift") (character)
 \itemize{
 \item "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-the DBH values from it.
+the Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
-\item "shift": detect if there is a shift of several DBH values and links them
+\item "shift": detect if there is a shift of several Diameter values and links them
 to the trust measurements set (\emph{TrustMeasSet} argument).
 }}
 
@@ -139,8 +139,8 @@ data(TestData)
 DataTree = TestData[IdTree \%in\% 101433]
 
  DataTree <- data.table(IdTree = "c",
-      Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
-      DBH = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+      Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+      Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 

@@ -2,7 +2,7 @@
 #'
 #' @param Data (data.frame or data.table)
 #'   The dataset must contain the columns:
-#'   - 'DBH' (numeric)
+#'   - 'Diameter' (numeric)
 #'   - **'HOM'(Height Of Measurement) (numeric)** if you want to apply the
 #'       **"taper" correction**
 #'   - **'POM'(Point Of Measurement) (factor)** if you want to correct from the
@@ -30,10 +30,10 @@
 #'   (character, 1 value)
 #' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
 #'   - "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-#'                   the DBH values from it.
+#'                   the Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
-#'   - "shift": detect if there is a shift of several DBH values and links them
+#'   - "shift": detect if there is a shift of several Diameter values and links them
 #'              to the trust measurements set (*TrustMeasSet* argument).
 #'
 #' @param CorrectionType c("taper", "linear", "quadratic", "individual",
@@ -131,9 +131,9 @@ DiameterCorrection <- function(
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
-  # DBH column exists
-  if(!"DBH" %in% names(Data))
-    stop("The 'DBH' (Diameter at Breast Height) column does't exist in the dataset")
+  # Diameter column exists
+  if(!"Diameter" %in% names(Data))
+    stop("The 'Diameter' (Diameter at Breast Height) column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
   if(!all(unlist(lapply(list(DefaultHOM, MinDBH, MaxDBH,
@@ -263,10 +263,10 @@ DiameterCorrection <- function(
 #'   (character, 1 value)
 #' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
 #'   - "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-#'                   the DBH values from it.
+#'                   the Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
-#'   - "shift": detect if there is a shift of several DBH values and links them
+#'   - "shift": detect if there is a shift of several Diameter values and links them
 #'              to the trust measurements set (*TrustMeasSet* argument).
 #'
 #' @param CorrectionType c("taper", "linear", "quadratic", "individual",
@@ -331,8 +331,8 @@ DiameterCorrection <- function(
 #' DataTree = TestData[IdTree %in% 101433]
 #'
 #'  DataTree <- data.table(IdTree = "c",
-#'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
-#'       DBH = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+#'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+#'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
 #'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
@@ -384,8 +384,8 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  # If not enough DBH values
-  if(sum(!is.na(DataTree$DBH)) > 1){
+  # If not enough Diameter values
+  if(sum(!is.na(DataTree$Diameter)) > 1){
 
   #### Function ####
 
@@ -394,7 +394,7 @@ DiameterCorrectionByTree <- function(
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # order de dt
 
-  DBHCor <- DBH <-DataTree[, DBH]
+  DBHCor <- Diameter <-DataTree[, Diameter]
   Time <- DataTree[, Year]
 
   # Taper correction ------------------------------------------------------------------------------------------------------
@@ -402,7 +402,6 @@ DiameterCorrectionByTree <- function(
     DataTree <- TaperCorrection(DataTree,
                                 DefaultHOM = DefaultHOM,
                                 TaperParameter = TaperParameter, TaperFormula = TaperFormula,
-                                Digits = Digits,
                                 DetectOnly = DetectOnly)
   }
 
@@ -443,7 +442,7 @@ DiameterCorrectionByTree <- function(
                 DBHCor[raised[rs]] <- DBHCor[raised[rs]-1] + cresc_Corr[raised[rs]-1]*diff(Time)[raised[rs]-1] # Correct with the corrected cresc, the corrected DBH
 
                 # Add the column with the correction method  ------------------------------------------------------------------------
-                if("quadratic" %in% CorrectionType & length(which(!is.na(DBH))) > 3){
+                if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
                   DataTree[raised[rs], DiameterCorrectionMeth := "quadratic"]
                 }else{
                   DataTree[raised[rs], DiameterCorrectionMeth := "linear"]}
@@ -501,7 +500,7 @@ DiameterCorrectionByTree <- function(
     DataTree[,DBHCor := DBHCor]
 
     DataTree <- GenerateComment(DataTree,
-                                condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,DBH])),
+                                condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,Diameter])),
                                 comment = paste0("Abnormal diameter value (punctual error)"))
 
     if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
@@ -550,7 +549,7 @@ DiameterCorrectionByTree <- function(
               DBHCor[cresc_abn[rs]+1] <- DBHCor[cresc_abn[rs]] + cresc_Corr[cresc_abn[rs]]*diff(Time)[cresc_abn[rs]] # Correct with the corrected cresc, the corrected DBH
 
               # Add the column with the correction method  ------------------------------------------------------------------------
-              if("quadratic" %in% CorrectionType & length(which(!is.na(DBH))) > 3){
+              if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
                 DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := "quadratic"]
               }else{
                 DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := "linear"]}
@@ -607,7 +606,7 @@ DiameterCorrectionByTree <- function(
         DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1]*diff(Time)[i-1] # Correct with the corrected cresc, the corrected DBH
 
         # Add the column with the correction method  ------------------------------------------------------------------------
-        if("quadratic" %in% CorrectionType & length(which(!is.na(DBH))) > 3){
+        if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
           DataTree[i, DiameterCorrectionMeth := "quadratic"]
         }else{
           DataTree[i, DiameterCorrectionMeth := "linear"]}

@@ -5,7 +5,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
   DataTree <- TestData[IdTree %in% "100658"]
 
   DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008, 2010)
-  DataTree$DBH <- c(13, 14, 15, 12, 13, 14)
+  DataTree$Diameter <- c(13, 14, 15, 12, 13, 14)
   cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
   cresc_abs <- c(1, 1, NA, 1, 1)
   cresc_abn <- 3
@@ -15,7 +15,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
   Rslt <- PhylogeneticHierarchicalCorrection(DataTree = DataTree,
                                              Data = TestData,
                                              cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-                                             DBHCor = DataTree$DBH, Time = DataTree$Year,
+                                             DBHCor = DataTree$Diameter, Time = DataTree$Year,
                                              PositiveGrowthThreshold = 5,
                                              NegativeGrowthThreshold = -2,
                                              DBHRange = 10, MinIndividualNbr = 5)
@@ -23,7 +23,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
 
   expect_true(all(c("DBHCor", "DiameterCorrectionMeth") %in% names(Rslt)))
 
-  # Add a "DiameterCorrectionMeth" value when "DBH" != "DBHCor"
+  # Add a "DiameterCorrectionMeth" value when "Diameter" != "DBHCor"
   Methode <- !is.na(Rslt[, DiameterCorrectionMeth])
 
   compareNA <- function(v1,v2) { # function to compare values, including NA
@@ -32,7 +32,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
     return(same)
   }
 
-  expect_true(all(!compareNA(Rslt$DBH, Rslt$DBHCor) == Methode))
+  expect_true(all(!compareNA(Rslt$Diameter, Rslt$DBHCor) == Methode))
 
   # Check the value of the "DiameterCorrectionMeth" column
   expect_true(all(Rslt$DiameterCorrectionMeth[!is.na(Rslt$DiameterCorrectionMeth)] %in% c(

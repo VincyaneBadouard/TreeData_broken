@@ -6,7 +6,7 @@ test_that("StatusCorrection", {
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
                          Year = rep(c(2012:2020), 5), # 9 census
-                         DBH = NA_real_)
+                         Diameter = NA_real_)
   TestData <- TestData[order(IdTree, Year)]
   TestData[,LifeStatus := c(
     TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, # "a"
@@ -16,13 +16,13 @@ test_that("StatusCorrection", {
     FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA) # "e"
   ]
 
-  TestData[IdTree %in% "e", ("DBH") := c(13:21)] # "e" DBH seq
-  TestData[IdTree %in% "e" & Year == 2014, ("DBH") := NA] # a NA in the "e" DBH seq
+  TestData[IdTree %in% "e", ("Diameter") := c(13:21)] # "e" Diameter seq
+  TestData[IdTree %in% "e" & Year == 2014, ("Diameter") := NA] # a NA in the "e" Diameter seq
 
 
   # Create test data
   MatrixData <- as.matrix(TestData)
-  NoDBHData <- TestData[, !c("DBH")]
+  NoDBHData <- TestData[, !c("Diameter")]
   NoPlotData <- TestData[, !c("Plot")]
 
 
@@ -54,7 +54,7 @@ test_that("StatusCorrection", {
 
   expect_error(StatusCorrection(Data = NoDBHData, InvariantColumns = "Site",
                                 UseSize = TRUE),
-               regexp = "the DBH column must be present in the dataset")
+               regexp = "the 'Diameter' column must be present in the dataset")
 
   # Check the function work
 
@@ -104,8 +104,8 @@ test_that("StatusCorrection", {
             expect_true(all(SeqCor[Unseen_seq] == FALSE))
     }
 
-    ## If UseSize : if DBH != NA -> Alive
-    Sizes <-!is.na(Rslt[IdTree %in% i, DBH])
+    ## If UseSize : if Diameter != NA -> Alive
+    Sizes <-!is.na(Rslt[IdTree %in% i, Diameter])
     DBHprst <- which(Sizes==T)
     if(length(DBHprst) > 0){
     expect_true(all(DBHprst %in% which(SeqCor==T)))
@@ -129,4 +129,4 @@ test_that("StatusCorrection", {
 # No "NA" between the first and last "alive"
 # after the death always the death (no "NA")
 # if no "dead" but "NA" nbr >= DeathConfirmation -> "dead" in "DBHCor"
-# if UseSize : if DBH != NA -> Alive
+# if UseSize : if Diameter != NA -> Alive

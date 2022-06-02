@@ -6,17 +6,17 @@ test_that("StatusCorrectionByTree", {
                          Plot = "1",
                          IdTree = "a", # 1 ind
                          Year = seq(2012,2028, by=2), # 9 census
-                         DBH = NA_real_,
+                         Diameter = NA_real_,
                          LifeStatus = c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA))
 
 
   # Create test data
   MatrixData <- as.matrix(TestData)
-  NoDBHData <- TestData[, !c("DBH")]
+  NoDBHData <- TestData[, !c("Diameter")]
   TwoInd <- copy(TestData)
   TwoPlot <- copy(TestData)
-  TwoInd[Year == 2014, ("IdTree") := "b"] # a NA in the "e" DBH seq
-  TwoPlot[Year == 2014, ("Plot") := "2"] # a NA in the "e" DBH seq
+  TwoInd[Year == 2014, ("IdTree") := "b"] # a NA in the "e" Diameter seq
+  TwoPlot[Year == 2014, ("Plot") := "2"] # a NA in the "e" Diameter seq
 
 
 
@@ -53,7 +53,7 @@ test_that("StatusCorrectionByTree", {
 
   expect_error(StatusCorrectionByTree(NoDBHData, PlotCensuses = 2010, InvariantColumns = "Site",
                                       UseSize = TRUE),
-               regexp = "the DBH column must be present in the dataset")
+               regexp = "the 'Diameter' column must be present in the dataset")
 
   # Check the function work
   Rslt <- StatusCorrectionByTree(TestData, PlotCensuses = TestData$Year, InvariantColumns = "Site",

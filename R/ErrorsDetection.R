@@ -18,7 +18,7 @@
 #'   - Remove *duplicated rows*
 #'   - Check *missing value* in
 #'      X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
-#'      IdTree/DBH/MeasCode/Family/Genus/Species/VernName
+#'      IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
 #'   - Check *missing value* (NA/0) in the measurement variables
 #'   - Check *duplicated TreeFieldNum* in plot-subplot association in a census
 #'      (at the site scale)
@@ -74,9 +74,9 @@ ErrorsDetection <- function(
     stop("The 'UseSize' argument of the 'ErrorsDetection' function must be logicals")
 
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!"DBH" %in% names(Data)){
+    if(!"Diameter" %in% names(Data)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
-           the DBH column must be present in the dataset")
+           the 'Diameter' column must be present in the dataset")
     }
   }
 
@@ -99,9 +99,9 @@ ErrorsDetection <- function(
   # If the column exists, but have NA values
 
   # Check bota : Family/Genus/Species/ScientificName/VernName
-  # Check size : DBH, POM(?)
+  # Check size : Diameter, POM(?)
   Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
-            "DBH", "POM", "TreeHeight", "StemHeight", "MeasCode",
+            "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
             "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
 
   for (v in 1:length(Vars)) {
@@ -119,7 +119,7 @@ ErrorsDetection <- function(
 
   #### Measurement variables = 0 ####
 
-  Vars <- c("DBH", "POM", "TreeHeight", "StemHeight")
+  Vars <- c("Diameter", "POM", "TreeHeight", "StemHeight")
 
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists

@@ -16,9 +16,9 @@ A tibble with 4854 rows and 32 variables:
 the tag number in the field) (character)}
 \item{IdTree}{Unique tree identifier from the database (character)}
 \item{Protocole}{Protocole name (character)}
-\item{Xfield}{Euclidean position of the tree relative to
+\item{Xplot}{Euclidean position of the tree relative to
 the Southwestern corner of the subplot, in m (numeric)}
-\item{Yfield}{Euclidean position of the tree relative to
+\item{Yplot}{Euclidean position of the tree relative to
 the Southwestern corner of the subplot, in m (numeric)}
 \item{Xutm}{Coordinate X for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
 \item{Yutm}{Coordinate Y for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
@@ -42,9 +42,8 @@ treatment in Paracou (TRUE) or not (FALSE) ? (logical)}
 \item{DateCertainty}{Is the Date precise (TRUE) or not (FALSE)?
 If FALSE, this information must not be considered for calculation (logical)}
 \item{LifeStatus}{Is the tree alive (TRUE) or dead (FALSE)? (logical)}
-\item{MeasCode}{Information on the method for measuring the circumference
-or on the state of the tree (integer)}
-\item{DBH}{Diameter of the tree at 1.30m above ground, in cm (numeric)}
+\item{POM}{Point Of Measurement as a code (integer)}
+\item{Diameter}{Tree diameter in cm (numeric)}
 \item{CircCorr}{Corrected circumference
 (mathematical correction of abnormal circumferences), in cm (numeric)}
 \item{CorrCode}{Information on the reason why and how the circumference has
