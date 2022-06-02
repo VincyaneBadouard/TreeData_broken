@@ -14,9 +14,9 @@
 #'
 #' @examples
 #'
-#' DBHCor = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
+#' DBH = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
 #' Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
-#' Rslt <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+#' Rslt <- ComputeIncrementation(Var = DBH, Type = "annual", Time = Time)
 #'
 ComputeIncrementation <- function(
   Var,
@@ -30,14 +30,27 @@ ComputeIncrementation <- function(
   if(!inherits(Var, "numeric"))
     stop("'Var' argument must be numeric")
 
+  if(length(!is.na(Var)) < 2)
+    stop("To compute 'Var' incrementation, 'Var' must have at least 2 values")
+
   # Type (character)
-  if(length(Type) != 1 | !inherits(Type, "character"))
-    stop("'Type' argument must be in character")
+  if(length(Type) != 1 |
+     !any(Type == "annual" || Type == "absolute"))
+    stop("The 'Type' argument value must be equal to 'annual' or 'absolute'")
 
   # Time (numeric)
   if(Type %in% "annual"){
     if(!inherits(Time, "numeric") & !is.null(Time))
       stop("'Time' argument must be numeric")
+
+    # No repeated years
+    if(any(duplicated(Time)))
+      stop("'Time' argument of the ComputeIncrementation function must have unique values")
+
+    # As many Var as Time
+    if(length(Var)!= length(Time))
+      stop("'Var' and 'Time' arguments of the ComputeIncrementation function must have the same length")
+
   }
 
   # Initialisation ----------------------------------------------------------------------------------------------------------
@@ -53,7 +66,7 @@ ComputeIncrementation <- function(
     incr[which(!is.na(Var))[-1] - 1] <- # 8 cresc for 9 dbh values ([-1]), shift all indices by 1 to the left (-1)
       diff(Var[!is.na(Var)]) / diff(Time[!is.na(Var)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
 
-    incr[is.nan(incr)] <- 0 # 0/0 = NaN, replace NaN by 0
+    # incr[is.nan(incr)] <- 0 # 0/0 = NaN, replace NaN by 0 (pas censé arriver puisque les années répétées sont interdites)
   }
 
   return(incr)

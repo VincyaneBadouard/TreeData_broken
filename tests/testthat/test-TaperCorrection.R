@@ -8,14 +8,26 @@ test_that("TaperCorrection", {
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
+  NoHOM <- copy(DataTree)
+  NoHOM[, HOM := NULL] # remove HOM column
+
 
 
   # Check the function argument -----------------------------------------------------------------------------------------------------
+  expect_error(TaperCorrection(NoHOM),
+               regexp = "You have chosen to make a 'taper' correction,
+       but you do not have the necessary 'HOM' column in your dataset")
+
+
+  expect_error(TaperCorrection(DataTree,
+                               DefaultHOM = "DBH"),
+               regexp = "The 'DefaultHOM' argument must be numeric")
+
+
   expect_error(TaperCorrection(DataTree,
                                TaperParameter = "0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)",
-                               TaperFormula = 2*c(3,8,9)
-  ),
-  regexp = "The 'TaperParameter' and 'TaperFormula' arguments must be functions")
+                               TaperFormula = 2*c(3,8,9)),
+               regexp = "The 'TaperParameter' and 'TaperFormula' arguments must be functions")
 
 
   # Check the function work ---------------------------------------------------------------------------------------------------------

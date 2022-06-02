@@ -25,8 +25,6 @@
 #'   - *DefaultHOM*:  Default Height Of Measurement (in m)
 #'   - *TaperParameter*: Taper parameter (unitless)
 #'
-#' @param Digits Number of decimal places to be used (Default: 1L) (integer)
-#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
@@ -46,7 +44,7 @@
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
 #'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
-#' TaperCorrection(DataTree)
+#' Rslt <- TaperCorrection(DataTree)
 #'
 TaperCorrection <- function(
   DataTree,
@@ -55,15 +53,13 @@ TaperCorrection <- function(
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
 
-  Digits = 1L,
-
   DetectOnly = FALSE
 ){
 
   #### Arguments check ####
-  # DataTree
-  if (!inherits(DataTree, c("data.table", "data.frame")))
-    stop("DataTree must be a data.frame or data.table")
+  # # DataTree
+  # if (!inherits(DataTree, c("data.table", "data.frame")))
+  #   stop("DataTree must be a data.frame or data.table")
 
   # Check if the HOM column exists
   if(!"HOM" %in% names(DataTree)){
@@ -72,10 +68,10 @@ TaperCorrection <- function(
   }
 
   # if there are several IdTrees
-  if(length(unique(DataTree$IdTree)) != 1){
-    stop("DataTree must correspond to only 1 same tree so 1 same IdTree
-    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),")")
-  }
+  # if(length(unique(DataTree$IdTree)) != 1){
+  #   stop("DataTree must correspond to only 1 same tree so 1 same IdTree
+  #   (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),")")
+  # }
 
   # DefaultHOM
   if(!inherits(DefaultHOM, "numeric"))
@@ -86,14 +82,9 @@ TaperCorrection <- function(
                         inherits, "function"))))
     stop("The 'TaperParameter' and 'TaperFormula' arguments must be functions")
 
-  # Digits
-  if(!inherits(Digits, "integer"))
-    stop("The 'Digits' argument must be an integer (put an 'L' after your number (eg. 1L)) ")
-
-
   # DetectOnly (logical)
-  if(!inherits(DetectOnly, "logical"))
-    stop("The 'DetectOnly' argument must be a logical")
+  # if(!inherits(DetectOnly, "logical"))
+  #   stop("The 'DetectOnly' argument must be a logical")
 
   # In data.table
   setDT(DataTree)
@@ -110,10 +101,9 @@ TaperCorrection <- function(
 
       # Apply taper correction  -------------------------------------------------------------------------------------------
       DataTree[HOM == DefaultHOM, ("DBHCor") := ifelse(is.na(DBHCor) | DBHCor == 0, DBH, DBHCor)] # At default POM, keep the measured value
-      DataTree[HOM > DefaultHOM, ("DBHCor") := round(TaperFormula(DAB = DBH,
-                                                                  HOM = HOM,
-                                                                  TaperParameter = TaperParameter(DAB = DBH, HOM = HOM)),
-                                                     digits = Digits)
+      DataTree[HOM > DefaultHOM, ("DBHCor") := TaperFormula(DAB = DBH,
+                                                            HOM = HOM,
+                                                            TaperParameter = TaperParameter(DAB = DBH, HOM = HOM))
       ]
 
 

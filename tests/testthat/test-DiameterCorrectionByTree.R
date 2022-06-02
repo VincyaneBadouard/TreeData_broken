@@ -9,13 +9,13 @@ test_that("DiameterCorrectionByTree", {
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
 
-  # Create test data ----------------------------------------------------------------------------------------------------------------
+  # Create test data ---------------------------------------------------------------------------------------------------
   MatrixData <- as.matrix(TestData)
   TwoInd <- copy(TestData)
   TwoInd[Year == 2014, ("IdTree") := "b"] # a NA in the "e" DBH seq
 
 
-  # Check the function argument -----------------------------------------------------------------------------------------------------
+  # Check the function argument ----------------------------------------------------------------------------------------
 
   expect_error(DiameterCorrectionByTree(MatrixData),
                regexp = "DataTree must be a data.frame or data.table")
@@ -23,7 +23,44 @@ test_that("DiameterCorrectionByTree", {
   expect_error(DiameterCorrectionByTree(TwoInd),
                regexp = "DataTree must correspond to only 1 same tree so 1 same IdTree")
 
-  # Check the function work ---------------------------------------------------------------------------------------------------------
+  # Check the function work --------------------------------------------------------------------------------------------
+
+  ## Case only 1 DBH value ---------------------------------------------------------------------------------------------
+  OnlyOne <- data.table(IdTree = "c",
+                        Year = 2000,
+                        DBH = 12,
+                        POM = 0,
+                        HOM = 1.3)
+
+
+  Rslt <- DiameterCorrectionByTree(OnlyOne,
+                                   TestData,
+                                   WhatToCorrect = c("POM change", "punctual", "shift"),
+                                   CorrectionType = c("taper", "quadratic", "linear",
+                                                      "individual", "phylogenetic hierarchical"))
+
+  expect_true(Rslt$DBH == OnlyOne$DBH) # same DBH value
+  expect_true(!"DBHCor" %in% names(Rslt)) # no correction
+
+  # Taper correction ---------------------------------------------------------------------------------------------------
+
+  # Correction with POM ------------------------------------------------------------------------------------------------
+  ## individual correction ---------------------------------------------------------------------------------------------
+  ## phylogenetic hierarchical correction ------------------------------------------------------------------------------
+
+  # Punctual error -----------------------------------------------------------------------------------------------------
+
+  # Shift error --------------------------------------------------------------------------------------------------------
+  ## individual correction ---------------------------------------------------------------------------------------------
+  ## phylogenetic hierarchical correction ------------------------------------------------------------------------------
+
+  # Mix cases
+  # punctual + shift error
+  # taper + punctual error
+  # taper + shift error
+  # POM change + punctual error
+  # POM change + shift error
+  # taper + POM change
 
 
 })

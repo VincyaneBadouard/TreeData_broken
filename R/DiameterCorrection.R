@@ -501,8 +501,10 @@ DiameterCorrectionByTree <- function(
     DataTree[,DBHCor := DBHCor]
 
     DataTree <- GenerateComment(DataTree,
-                                condition = (is.na(DataTree[,DBHCor])),
+                                condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,DBH])),
                                 comment = paste0("Abnormal diameter value (punctual error)"))
+
+    if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
   }
 
   # Shift Correction ------------------------------------------------------------------------------------------------------
@@ -523,6 +525,9 @@ DiameterCorrectionByTree <- function(
       DataTree <- GenerateComment(DataTree,
                                   condition = as.numeric(rownames(DataTree)) %in% (cresc_abn+1),
                                   comment = paste0("Abnormal diameter value (shift error)"))
+
+      if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
+
 
       if(DetectOnly %in% FALSE){
 
@@ -613,7 +618,7 @@ DiameterCorrectionByTree <- function(
   }
 
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
-  if(DetectOnly %in% FALSE){ DataTree[,DBHCor := DBHCor] }
+  if(DetectOnly %in% FALSE){ DataTree[,DBHCor := round(DBHCor, digits = Digits)] }
 
 }
   return(DataTree)

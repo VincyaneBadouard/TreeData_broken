@@ -56,10 +56,10 @@ PunctualErrorDetection <- function(
   cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
   # remove the last value if it's a NA (no DBH value so no cresc or cresc_abs)
-  if(is.na(cresc[length(cresc)]) & is.na(cresc_abs[length(cresc)])){
-    cresc <- cresc[-length(cresc)]
-    cresc_abs <- cresc_abs[-length(cresc_abs)]
-  }
+  # if(is.na(cresc[length(cresc)]) & is.na(cresc_abs[length(cresc)])){
+  #   cresc <- cresc[-length(cresc)]
+  #   cresc_abs <- cresc_abs[-length(cresc_abs)]
+  # }
 
   # Detect abnormal growth --------------------------------------------------------------------------------------------------
   Ncresc_abn <- sum(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # nbr of abnormal values
@@ -119,11 +119,26 @@ PunctualErrorDetection <- function(
 
           if(TrustMeasSet %in% "first"){
             # trust the 1st one
-            DBHCor[!is.na(DBHCor)][2] <- DBHCor[!is.na(DBHCor)][1]
+            if(DetectOnly %in% FALSE){ # correct now
+
+              DBHCor[!is.na(DBHCor)][2] <- DBHCor[!is.na(DBHCor)][1]
+
+            }else if(DetectOnly %in% TRUE){ # detect only
+              DBHCor[!is.na(DBHCor)][2] <- NA # Put NA to put a comment after (DBHCor will be delete)
+            }
+
           }else if(TrustMeasSet %in% "last"){
             # trust the 2nd one
-            DBHCor[!is.na(DBHCor)][1] <- DBHCor[!is.na(DBHCor)][2]
+            if(DetectOnly %in% FALSE){ # correct now
+
+              DBHCor[!is.na(DBHCor)][1] <- DBHCor[!is.na(DBHCor)][2]
+
+            }else if(DetectOnly %in% TRUE){ # detect only
+              DBHCor[!is.na(DBHCor)][1] <- NA # Put NA to put a comment after (DBHCor will be delete)
+            }
+
           }
+
         }
 
         # Update diameter incrementation (for the i loop)--------------------------------------------------------------------

@@ -10,7 +10,6 @@ TaperCorrection(
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter * (HOM
     - DefaultHOM))),
-  Digits = 1L,
   DetectOnly = FALSE
 )
 }
@@ -46,8 +45,6 @@ With:
 \item \emph{TaperParameter}: Taper parameter (unitless)
 }}
 
-\item{Digits}{Number of decimal places to be used (Default: 1L) (integer)}
-
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}
 }
@@ -69,6 +66,6 @@ DataTree <- data.table(IdTree = "c",
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-TaperCorrection(DataTree)
+Rslt <- TaperCorrection(DataTree)
 
 }
