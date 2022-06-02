@@ -141,9 +141,9 @@ RequiredFormat <- function(
 
       if(grepl("num|dec", DateFormat, ignore.case = T)) {
 
-        if(grepl("num", DateFormat, ignore.case = T)) Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")]
+        if(grepl("num", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")])
 
-        if(grepl("dec", DateFormat, ignore.case = T)) Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))]
+        if(grepl("dec", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))])
 
       } else {
 
@@ -183,9 +183,26 @@ RequiredFormat <- function(
 
 
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
-  if (input$Site %in% "none") Data[, Site :=  input$SiteMan]
-  if (input$Plot %in% "none") Data[, Plot :=  input$PlotMan]
-  if (input$SubPlot %in% "none") Data[, SubPlot := input$SubPlotMan]
+  if (input$Site %in% "none") {
+    if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will call consider you have only one site called 'SiteA'")
+
+    SiteMan <- ifelse(input$SiteMan %in% "", "SiteA", input$SiteMan)
+    Data[, Site :=  SiteMan]
+
+  }
+  if (input$Plot %in% "none") {
+    if(input$PlotMan %in% "")  warning("You did not specify a Plot column or name, we will call consider you have only one plot called 'PlotA'")
+
+    PlotMan <- ifelse(input$PlotMan %in% "", "PlotA", input$PlotMan)
+    Data[, Plot :=  PlotMan]
+  }
+
+  if (input$SubPlot %in% "none"){
+    if(input$SubPlotMan %in% "")  warning("You did not specify a subplot column or name, we will call consider you have only one subplot called 'SubPlotA'")
+
+    SubPlotMan <- ifelse(input$SubPlotMan %in% "", "SubPlotA", input$SubPlotMan)
+    Data[, SubPlot := SubPlotMan]
+    }
 
   if (input$IdTree %in% "none") {
 
@@ -241,12 +258,16 @@ RequiredFormat <- function(
     if(!SizeUnit %in% unitOptions) stop(paste("Your size units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if(SizeUnit %in% unitOptions) {
+
     if (SizeUnit == "mm") Data[, DBH := DBH/10] # mm -> cm
 
     if (SizeUnit == "dm") Data[, DBH := DBH*10] # dm -> cm
 
     if (SizeUnit == "m") Data[, DBH := DBH*100] # m -> cm
     }
+
+    # (re)calculate Circ
+    Data[, Circ := round(DBH*pi, 2)]
   }
 
   if(!input$BD %in% "none" | !input$BCirc %in% "none") {
@@ -262,6 +283,8 @@ RequiredFormat <- function(
 
       if (BSizeUnit == "m") Data[, BD := BD*100] # m -> cm
     }
+
+    Data[, BCirc := round(BD*pi, 2)]
   }
 
   ### HOM and BHOM in m ####
