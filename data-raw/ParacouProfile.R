@@ -5,130 +5,84 @@
 if (!interactive()) {
   ParacouProfile <-
     list(
-      TreeHeightUnitMan = "none",
-      Family = "Family",
-      TreeHeight = "none",
-      Date = "CensusDate",
-      POM = "none",
-      PlotAreaUnitMan = "ha",
-      Xutm = "Xutm",
-      IsCommercrial = "TRUE",
-      IdStem = "none",
-      PlotMan = "",
-      Species = "Species",
-      ScientificNameSep = "",
-      Yfield = "Yfield",
-      CircUnitMan = "cm",
-      IdMeasure = "none",
-      IdLevel = "none",
-      TreeFieldNum = "TreeFieldNum",
-      ScientificName = "none",
-      DateFormat = "yyyy-mm-dd",
-      IdCensus = "none",
-      PlotAreaMan = NA,
-      Year = "CensusYear",
-      LifeStatus = "CodeAlive",
-      PlotArea = "PlotArea",
-      CommercialSp = "CommercialSp",
-      SubPlotAreaUnitMan = "none",
-      Xutm = "Xutm",
-      Yutm = "Yutm",
-      utmUnitMan = "m",
-      YearMan = NA,
-      Circ = "Circ",
-      SubPlotAreaMan = NA,
-      SubPlotMan = "",
-      Site = "Forest",
-      Lon = "Lon",
-      Plot = "Plot",
-      IdTree = "idTree",
-      LifeForm = "none",
-      VernName = "VernName",
-      SubPlotArea = "none",
-      SiteMan = "",
-      IsLive = "TRUE",
       Authority = "none",
-      Lat = "Lat",
-      Genus = "Genus",
-      SubPlot = "SubPlot",
-      DBHUnitMan = "none",
-      Xplot = "Xfield",
-      Yplot = "Yfield",
-      plotUnitMan = "m",
-      Xsubplot = "none",
-      Ysubplot = "none",
-      subplotUnitMan = "none",
-      DBH = "none",
-      POMUnitMan = "none",
-      Tidy = structure(0L, class = c("integer",
-                                     "shinyActionButtonValue")),
+      BCirc = "none",
+      BCircUnitMan = "none",
+      BD = "none",
+      BDUnitMan = "none",
+      Circ = "Circ",
+      CircUnitMan = "cm",
       ClearValueName = structure(0L, class = c("integer",
                                                "shinyActionButtonValue")),
-      TickedMelt3 = FALSE,
-      Variablecolumns1 = c("Xfield",
-                           "Yfield"),
+      CommercialSp = "CommercialSp",
+      Date = "CensusDate",
+      DateFormat = "yyyy-mm-dd",
+      DBH = "none",
+      DBHUnitMan = "none",
+      Family = "Family",
+      Genus = "Genus",
+      HOM = "none",
+      HOMUnitMan = "none",
+      IdCensus = "none",
+      IdLevel = "none",
+      IdMeasure = "none",
+      IdStem = "none",
+      IdTree = "idTree",
+      IsCommercrial = "TRUE",
+      IsLive = "TRUE",
+      Lat = "Lat",
+      LifeForm = "none",
+      LifeStatus = "CodeAlive",
+      Lon = "Lon",
+      Plot = "Plot",
+      PlotArea = "PlotArea",
+      PlotAreaMan = NA,
+      PlotAreaUnitMan = "ha",
+      PlotMan = "",
+      plotUnitMan = "m",
+      POM = "none",
+      ScientificName = "none",
+      ScientificNameSep = "",
+      Site = "Forest",
+      SiteMan = "",
+      Species = "Species",
+      SubPlot = "SubPlot",
+      SubPlotArea = "none",
+      SubPlotAreaMan = NA,
+      SubPlotAreaUnitMan = "none",
+      SubPlotMan = "",
+      subplotUnitMan = "none",
       TickedMelt1 = FALSE,
-      Variablecolumns3 = c("Lat",
-                           "Lon"),
-      ValueName3 = "L",
       TickedMelt2 = FALSE,
+      TickedMelt3 = FALSE,
+      Tidy = structure(0L, class = c("integer",
+                                     "shinyActionButtonValue")),
+      TreeFieldNum = "TreeFieldNum",
+      TreeHeight = "none",
+      TreeHeightUnitMan = "none",
+      utmUnitMan = "m",
+      ValueName1 = "field",
+      ValueName2 = "utm",
+      ValueName3 = "L",
+      Variablecolumns1 = c("Xfield", "Yfield"),
       Variablecolumns2 = c("Xutm",
                            "Yutm"),
-      ValueName2 = "utm",
-      ValueName1 = "field"
+      Variablecolumns3 = c("Lat", "Lon"),
+      VernName = "VernName",
+      Xplot = "Xfield",
+      Xsubplot = "none",
+      Xutm = "Xutm",
+      Xutm = "Xutm",
+      Year = "CensusYear",
+      YearMan = NA,
+      Yfield = "Yfield",
+      Yplot = "Yfield",
+      Ysubplot = "none",
+      Yutm = "Yutm"
     )
 
 }
-# ## 2nd option (interactive) - may need to be updated if interactive_items.csv changes
-#
-# if (interactive()) {
-#   data("ParacouSubset")
-#
-#   ParacouProfile <- RequiredFormat_interactive(ParacouSubset)
-#
-#   "ok" #
-#   2
-#   3
-#   5
-#   4
-#   24
-#   25
-#   6
-#   7
-#   1
-#   1
-#   27
-#   1
-#   1
-#   29
-#   1
-#   1
-#   1
-#   14
-#   15
-#   11
-#   12
-#   9
-#   10
-#   1
-#   22
-#   16
-#   17
-#   18
-#   23
-#   1
-#   1
-#   1
-#   1
-#   1
-#   1
-#   2
-#   2
-#   yyyy - mm - dd
-#   2
-#   2
-# }
-#
+
 # dput(ParacouProfile)
 
 #### Save this data in the package ####
