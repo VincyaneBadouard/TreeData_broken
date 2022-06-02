@@ -27,7 +27,7 @@ The dataset must contain the column: 'IdTree' (character)}
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)
-\item 'DBH' (numeric)
+\item 'Diameter' (numeric)
 \item 'Year' (numeric)
 }}
 
@@ -61,7 +61,7 @@ DBHRange = 10 # DBH range (cm)
 Colleagues <- TestData[
 IdTree != "100658" & # colleagues, not the tree to correct
 ScientificName == "Licania membranacea" & # same species as the tree to be corrected
-(DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2))] # DBH or DBHCor ?
+(Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
 ColleaguesCrescMean <- ComputeColleaguesGrowthMean(Colleagues = Colleagues, Data = TestData,
                                                    EstDBH = EstDBH,

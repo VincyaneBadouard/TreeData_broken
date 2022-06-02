@@ -30,7 +30,7 @@ DiameterCorrection(
 \item{Data}{(data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'DBH' (numeric)
+\item 'Diameter' (numeric)
 \item \strong{'HOM'(Height Of Measurement) (numeric)} if you want to apply the
 \strong{"taper" correction}
 \item \strong{'POM'(Point Of Measurement) (factor)} if you want to correct from the
@@ -63,10 +63,10 @@ appears abnormal, but a negative measurement error can be allowed until -n
 \item{WhatToCorrect}{c("POM change", "punctual", "shift") (character)
 \itemize{
 \item "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-the DBH values from it.
+the Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
-\item "shift": detect if there is a shift of several DBH values and links them
+\item "shift": detect if there is a shift of several Diameter values and links them
 to the trust measurements set (\emph{TrustMeasSet} argument).
 }}
 

@@ -14,7 +14,7 @@
 #' @param Data (data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
-#'   - 'DBH' (numeric)
+#'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
 #' @param EstDBH Estimated value of the diameter to correct (cm)
@@ -45,7 +45,7 @@
 #' Colleagues <- TestData[
 #' IdTree != "100658" & # colleagues, not the tree to correct
 #' ScientificName == "Licania membranacea" & # same species as the tree to be corrected
-#' (DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2))] # DBH or DBHCor ?
+#' (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 #'
 #' ColleaguesCrescMean <- ComputeColleaguesGrowthMean(Colleagues = Colleagues, Data = TestData,
 #'                                                    EstDBH = EstDBH,
@@ -79,7 +79,7 @@ ComputeColleaguesGrowthMean <- function(
 
     # i = "100747"
     ColleaguesCresc <- ComputeIncrementation( # matrix (Rows: ind, Col: cresc)
-      Var = ColleaguesSeq[IdTree %in% i, DBH], # DBH or DBHCor ?
+      Var = ColleaguesSeq[IdTree %in% i, Diameter], # Diameter or DBHCor ?
       Type = "annual",
       Time = ColleaguesSeq[IdTree %in% i, Year]
     )
@@ -88,7 +88,7 @@ ComputeColleaguesGrowthMean <- function(
   }
 
   # Keep only rows with DBH in DBHRange -------------------------------------------------------------------------------------
-  Colleagues <- ColleaguesSeq[DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2)] # DBH or DBHCor ?
+  Colleagues <- ColleaguesSeq[Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
 
   # Compute mean(Colleaguescresc) -------------------------------------------------------------------------------------------
   ColleaguesCrescMean <- mean(

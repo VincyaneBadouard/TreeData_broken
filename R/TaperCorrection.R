@@ -3,7 +3,7 @@
 #' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
 #'   measurements (data.frame or data.table).
 #'   The dataset must contain the columns:
-#'   - 'DBH'
+#'   - 'Diameter'
 #'   - **'HOM'(Height Of Measurement) (numeric)**
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
@@ -39,8 +39,8 @@
 #' library(data.table)
 #'
 #' DataTree <- data.table(IdTree = "c",
-#'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
-#'       DBH = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+#'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+#'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
 #'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
@@ -100,10 +100,10 @@ TaperCorrection <- function(
         DataTree[, DBHCor := numeric(.N) ] # start without value (I can't put NA because it's a logical, so it's a 0)
 
       # Apply taper correction  -------------------------------------------------------------------------------------------
-      DataTree[HOM == DefaultHOM, ("DBHCor") := ifelse(is.na(DBHCor) | DBHCor == 0, DBH, DBHCor)] # At default POM, keep the measured value
-      DataTree[HOM > DefaultHOM, ("DBHCor") := TaperFormula(DAB = DBH,
+      DataTree[HOM == DefaultHOM, ("DBHCor") := ifelse(is.na(DBHCor) | DBHCor == 0, Diameter, DBHCor)] # At default POM, keep the measured value
+      DataTree[HOM > DefaultHOM, ("DBHCor") := TaperFormula(DAB = Diameter,
                                                             HOM = HOM,
-                                                            TaperParameter = TaperParameter(DAB = DBH, HOM = HOM))
+                                                            TaperParameter = TaperParameter(DAB = Diameter, HOM = HOM))
       ]
 
 

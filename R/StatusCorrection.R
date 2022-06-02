@@ -33,7 +33,7 @@
 #'   concerning the tree after its death? (logical)
 #'
 #' @details
-#' - if UseSize : if DBH != NA -> Alive
+#' - if UseSize : if Diameter != NA -> Alive
 #' - *Dead* > Alive -> NA
 #' - add rows for the forgotten censuses between 2 'Alive'
 #' - Alive > *Dead*/*NA* > Alive -> Alive
@@ -125,11 +125,11 @@ StatusCorrection <- function(
     }
   }
 
-  # UseSize-DBH
+  # UseSize-Diameter
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if (!"DBH" %in% names(Data)){
+    if (!"Diameter" %in% names(Data)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
-           the DBH column must be present in the dataset")
+           the 'Diameter' column must be present in the dataset")
     }
   }
 
@@ -211,7 +211,7 @@ StatusCorrection <- function(
 #'   concerning the tree after its death? (logical)
 #'
 #' @details
-#' - if UseSize : if DBH != NA -> Alive
+#' - if UseSize : if Diameter != NA -> Alive
 #' - *Dead* > Alive -> NA
 #' - add rows for the forgotten censuses between 2 'Alive'
 #' - Alive > *Dead*/*NA* > Alive -> Alive
@@ -325,11 +325,11 @@ StatusCorrectionByTree <- function(
     }
   }
 
-  # UseSize-DBH column
+  # UseSize-Diameter column
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!"DBH" %in% names(DataTree)){
+    if(!"Diameter" %in% names(DataTree)){
       stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
-           the DBH column must be present in the dataset")
+           the 'Diameter' column must be present in the dataset")
     }
   }
 
@@ -352,13 +352,13 @@ StatusCorrectionByTree <- function(
   if(UseSize){
 
     DataTree <- GenerateComment(DataTree,
-                                condition = !is.na(DataTree[, DBH]) &
+                                condition = !is.na(DataTree[, Diameter]) &
                                   !DataTree[,LifeStatus] %in% TRUE,
                                 comment = "A measured tree is a living tree")
 
 
     if(DetectOnly %in% FALSE){
-      DataTree[!is.na(DBH), LifeStatusCor := TRUE]
+      DataTree[!is.na(Diameter), LifeStatusCor := TRUE]
     }
 
   }

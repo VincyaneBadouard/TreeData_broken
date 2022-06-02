@@ -17,7 +17,7 @@ RecruitmentCorrectionByTree(
 \item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
 measurements (data.frame or data.table). The dataset should preferably
 contain the column of corrected diameters: 'DBHCor', otherwise the function
-will take the column "DBH"}
+will take the column "Diameter"}
 
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
 protocol (in cm) (numeric, 1 value)}
@@ -47,9 +47,9 @@ RecruitmentCorrectionByTree
 \details{
 If the size of the tree has never changed, or if there is only one
 value the same value is kept for the added forgotten recruits.
-If the DBH has not been corrected (DBCor column does not exist), the
+If the Diameter has not been corrected (DBHCor column does not exist), the
 function will create it for the forgotten recruits. It is strongly
-recommended to correct the DBH before correcting the recruits
+recommended to correct the Diameter before correcting the recruits
 }
 \examples{
 library(data.table)

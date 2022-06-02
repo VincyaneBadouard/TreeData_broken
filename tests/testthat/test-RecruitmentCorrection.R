@@ -6,10 +6,10 @@ test_that("RecruitmentCorrection", {
 
   # Create test data
   MatrixData <- as.matrix(TestData)
-  NoDBHData <- TestData[, !c("DBH")]
+  NoDBHData <- TestData[, !c("Diameter")]
   NoDBHCorData <- TestData
 
-  setnames(TestData, "DBH", "DBHCor") # only DBHCor
+  setnames(TestData, "Diameter", "DBHCor") # only DBHCor
 
 
   # Check the function argument

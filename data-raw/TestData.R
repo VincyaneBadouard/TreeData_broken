@@ -17,7 +17,7 @@ nError <- 1 # number of error to add for each case
 
 #### Tree size = 0 ####
 modif <- Data[, .I[sample(.N, nError)]] # .I = seq_len(nrow(Data)), .N = nrows in the group -> sample 2 rows number in Data
-Data[modif, DBH := 0]
+Data[modif, Diameter := 0]
 # Data[modif] # to check
 
 #### Missing coordinates ####
@@ -28,7 +28,7 @@ Data[modif, Yutm := NA]
 
 #### Other missing values ####
 Vars <- c("PlotArea", "Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
-          "DBH", "LifeStatus", "MeasCode", "Family", "Genus", "Species",
+          "Diameter", "LifeStatus", "POM", "Family", "Genus", "Species",
           "VernName", "ScientificName", "CommercialSp")
 
 modifs <- c()
@@ -48,7 +48,7 @@ for (v in 1:length(Vars)) {
 
 wrong <- c(0.2, 0.3, 0.569, 0.8)
 modif <- Data[, .I[sample(.N, nError)]]
-Data[modif, DBH := DBH + sample(wrong,1)]
+Data[modif, Diameter := Diameter + sample(wrong,1)]
 # Data[modif] # to check
 
 

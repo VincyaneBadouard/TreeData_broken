@@ -40,7 +40,7 @@ Detect errors
 \item Remove \emph{duplicated rows}
 \item Check \emph{missing value} in
 X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
-IdTree/DBH/MeasCode/Family/Genus/Species/VernName
+IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
 \item Check \emph{missing value} (NA/0) in the measurement variables
 \item Check \emph{duplicated TreeFieldNum} in plot-subplot association in a census
 (at the site scale)

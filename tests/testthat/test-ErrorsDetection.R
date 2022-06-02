@@ -7,7 +7,7 @@ test_that("ErrorsDetection", {
   # Create test data
   MatrixData <- as.matrix(TestData)
   MatrixData <- as.matrix(TestData)
-  NoDBHData <- TestData[, !c("DBH")]
+  NoDBHData <- TestData[, !c("Diameter")]
   NoPlotData <- TestData[, !c("Plot")]
 
   # Check the function argument
@@ -22,7 +22,7 @@ test_that("ErrorsDetection", {
 
 
   expect_error(ErrorsDetection(NoDBHData, DeathConfirmation = 2, UseSize = TRUE),
-               regexp = "the DBH column must be present in the dataset")
+               regexp = "the 'Diameter' column must be present in the dataset")
 
 
   # Check the function work
@@ -31,9 +31,9 @@ test_that("ErrorsDetection", {
   ## Remove *duplicated rows*
   expect_true(anyDuplicated(TestData)!= 0 & anyDuplicated(Rslt) == 0)
 
-  ## Check *missing value* in (X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName)
+  ## Check *missing value* in (X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
   Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
-            "DBH", "POM", "TreeHeight", "StemHeight", "MeasCode",
+            "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
             "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
   # v =1
   for (v in 1:length(Vars)) {
@@ -48,7 +48,7 @@ test_that("ErrorsDetection", {
 
 
   ## Check *missing value* (NA/0) in the measurement variables
-  Vars <- c("DBH", "POM", "TreeHeight")
+  Vars <- c("Diameter", "POM", "TreeHeight")
   # v = 1
   for (v in 1:length(Vars)) {
 
@@ -158,7 +158,7 @@ test_that("ErrorsDetection", {
 })
 
 # Remove *duplicated rows*
-# Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/DBH/MeasCode/Family/Genus/Species/VernName
+# Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
 # Check *missing value* (NA/0) in the measurement variables
 # Check *duplicated TreeFieldNum* in plot-subplot association in a census (at the site scale)
 # Check of the *unique association of the idTree with plot, subplot, TreeFieldNum and coordinates* (at the site scale)

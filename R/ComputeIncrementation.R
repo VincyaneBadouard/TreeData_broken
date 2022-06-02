@@ -14,9 +14,9 @@
 #'
 #' @examples
 #'
-#' DBH = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
+#' Diameter = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
 #' Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
-#' Rslt <- ComputeIncrementation(Var = DBH, Type = "annual", Time = Time)
+#' Rslt <- ComputeIncrementation(Var = Diameter, Type = "annual", Time = Time)
 #'
 ComputeIncrementation <- function(
   Var,

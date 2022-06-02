@@ -3,8 +3,8 @@ test_that("TaperCorrection", {
   # Import data ---------------------------------------------------------------------------------------------------------------------
   library(data.table)
   DataTree <- data.table(IdTree = "c",
-                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 DBH values
-                         DBH = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+                         Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
@@ -20,7 +20,7 @@ test_that("TaperCorrection", {
 
 
   expect_error(TaperCorrection(DataTree,
-                               DefaultHOM = "DBH"),
+                               DefaultHOM = "Diameter"),
                regexp = "The 'DefaultHOM' argument must be numeric")
 
 
@@ -38,14 +38,14 @@ test_that("TaperCorrection", {
 
   # No correction, only comments
   expect_true(all(!c("DBHCor", "DiameterCorrectionMeth") %in% names(Rslt)) & "Comment" %in% names(Rslt))
-  expect_true(all(Rslt$DBH == DataTree$DBH)) # no change in the original column
+  expect_true(all(Rslt$Diameter == DataTree$Diameter)) # no change in the original column
 
   ## Correction ---------------------------------------------------------------------------------------------------------------------
   Rslt <- TaperCorrection(DataTree)
 
   expect_true(all(c("DBHCor", "DiameterCorrectionMeth", "Comment") %in% names(Rslt)))
 
-  # Add a "Comment" and "DiameterCorrectionMeth" value when "DBH" != "DBHCor"
+  # Add a "Comment" and "DiameterCorrectionMeth" value when "Diameter" != "DBHCor"
   Comment <- Rslt[, Comment] != ""
   Methode <- !is.na(Rslt[, DiameterCorrectionMeth])
 
@@ -55,7 +55,7 @@ test_that("TaperCorrection", {
     return(same)
   }
 
-  expect_true(all(!compareNA(Rslt$DBH, Rslt$DBHCor) == Comment) & all(Comment == Methode))
+  expect_true(all(!compareNA(Rslt$Diameter, Rslt$DBHCor) == Comment) & all(Comment == Methode))
 
   # Check the value of the "DiameterCorrectionMeth" column
   expect_true(all(Rslt$DiameterCorrectionMeth[!is.na(Rslt$DiameterCorrectionMeth)] == "taper"))

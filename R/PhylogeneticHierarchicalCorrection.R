@@ -10,7 +10,7 @@
 #' @param Data (data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
-#'   - 'DBH' (numeric)
+#'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
 #' @param cresc Annual diameter increment (numeric)
@@ -70,7 +70,7 @@
 #'
 #' # Inputs
 #' DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008, 2010)
-#' DataTree$DBH <- c(13, 14, 15, 12, 13, 14)
+#' DataTree$Diameter <- c(13, 14, 15, 12, 13, 14)
 #' cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
 #' cresc_abs <- c(1, 1, NA, 1, 1)
 #' cresc_abn <- 3
@@ -80,7 +80,7 @@
 #'     DataTree = DataTree,
 #'     Data = TestData,
 #'     cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-#'     DBHCor = DataTree$DBH, Time = DataTree$Year,
+#'     DBHCor = DataTree$Diameter, Time = DataTree$Year,
 #'     PositiveGrowthThreshold = 5,
 #'     NegativeGrowthThreshold = -2,
 #'     DBHRange = 10, MinIndividualNbr = 5
@@ -121,7 +121,7 @@ PhylogeneticHierarchicalCorrection <- function(
         ## Species level
         Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
                              ScientificName == unique(DataTree$ScientificName) &
-                             (DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2))] # DBH or DBHCor ?
+                             (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
         if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "species"
 
@@ -129,7 +129,7 @@ PhylogeneticHierarchicalCorrection <- function(
           ## Genus level
           Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
                                Genus == unique(DataTree$Genus) &
-                               (DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2))] # DBH or DBHCor ?
+                               (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
           if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "genus"
 
@@ -137,14 +137,14 @@ PhylogeneticHierarchicalCorrection <- function(
             ## Family level
             Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
                                  Family == unique(DataTree$Family) &
-                                 (DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2))] # DBH or DBHCor ?
+                                 (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
             if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "family"
 
             }else{
               ## Stand level
               Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
-                                   DBH > (EstDBH - DBHRange/2) & DBH < (EstDBH + DBHRange/2)] # DBH or DBHCor ?
+                                   Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
 
               if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "stand"
 

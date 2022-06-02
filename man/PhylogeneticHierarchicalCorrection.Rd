@@ -26,7 +26,7 @@ measurements (data.table)}
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)
-\item 'DBH' (numeric)
+\item 'Diameter' (numeric)
 \item 'Year' (numeric)
 }}
 
@@ -98,7 +98,7 @@ DataTree <- TestData[IdTree \%in\% "100658"]
 
 # Inputs
 DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008, 2010)
-DataTree$DBH <- c(13, 14, 15, 12, 13, 14)
+DataTree$Diameter <- c(13, 14, 15, 12, 13, 14)
 cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
 cresc_abs <- c(1, 1, NA, 1, 1)
 cresc_abn <- 3
@@ -108,7 +108,7 @@ DataTree_output <- PhylogeneticHierarchicalCorrection(
     DataTree = DataTree,
     Data = TestData,
     cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-    DBHCor = DataTree$DBH, Time = DataTree$Year,
+    DBHCor = DataTree$Diameter, Time = DataTree$Year,
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
     DBHRange = 10, MinIndividualNbr = 5

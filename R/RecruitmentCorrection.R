@@ -19,9 +19,9 @@
 #'
 #' @details If the size of the tree has never changed, or if there is only one
 #'   value the same value is kept for the added forgotten recruits.
-#'   If the DBH has not been corrected (DBCor column does not exist), the
+#'   If the Diameter has not been corrected (DBHCor column does not exist), the
 #'   function will create it for the forgotten recruits. It is strongly
-#'   recommended to correct the DBH before correcting the recruits
+#'   recommended to correct the Diameter before correcting the recruits
 #'
 #' @return  Add rows for forgotten recruits with them estimated DBH in the
 #'   'DBHCor' column, create a 'CorrectedRecruit' col (logical) and fill the
@@ -37,7 +37,7 @@
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' setnames(TestData, "DBH", "DBHCor")
+#' setnames(TestData, "Diameter", "DBHCor")
 #'
 #' Rslt <- RecruitmentCorrection(TestData)
 #' IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
@@ -88,8 +88,8 @@ RecruitmentCorrection <- function(
          of the 'RecruitmentCorrection' function must be logicals")
 
   # DBHCor column exists
-  if(!"DBH" %in% names(Data) & !"DBHCor" %in% names(Data))
-    stop("The 'DBH' (Diameter at Breast Height) or the 'DBHCor' (corrected Diameter at Breast Height)
+  if(!"Diameter" %in% names(Data) & !"DBHCor" %in% names(Data))
+    stop("The 'Diameter' or the 'DBHCor' (corrected Diameter at Breast Height)
            column does't exist in the dataset.")
 
   if(DetectOnly %in% FALSE){
@@ -149,7 +149,7 @@ RecruitmentCorrection <- function(
 #' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
 #'   measurements (data.frame or data.table). The dataset should preferably
 #'   contain the column of corrected diameters: 'DBHCor', otherwise the function
-#'   will take the column "DBH"
+#'   will take the column "Diameter"
 #'
 #' @param MinDBH Minimum diameter of trees inventoried according to your
 #'   protocol (in cm) (numeric, 1 value)
@@ -168,9 +168,9 @@ RecruitmentCorrection <- function(
 #'
 #' @details If the size of the tree has never changed, or if there is only one
 #'   value the same value is kept for the added forgotten recruits.
-#'   If the DBH has not been corrected (DBCor column does not exist), the
+#'   If the Diameter has not been corrected (DBHCor column does not exist), the
 #'   function will create it for the forgotten recruits. It is strongly
-#'   recommended to correct the DBH before correcting the recruits
+#'   recommended to correct the Diameter before correcting the recruits
 #'
 #' @return  Add rows for forgotten recruits with them estimated DBH in the
 #'   'DBHCor' column, create a 'CorrectedRecruit' col (logical) and fill the
@@ -235,8 +235,8 @@ RecruitmentCorrectionByTree <- function(
     stop("The 'DetectOnly' argument
          of the 'RecruitmentCorrectionByTree' function must be logicals")
 
-  if(!"DBH" %in% names(DataTree) & !"DBHCor" %in% names(DataTree))
-    stop("The 'DBH' (Diameter at Breast Height) or the 'DBHCor' (corrected Diameter at Breast Height)
+  if(!"Diameter" %in% names(DataTree) & !"DBHCor" %in% names(DataTree))
+    stop("The 'Diameter' or the 'DBHCor' (corrected Diameter at Breast Height)
            column does't exist in the dataset.")
 
   if(DetectOnly %in% FALSE){
@@ -276,7 +276,7 @@ RecruitmentCorrectionByTree <- function(
   # if there are no 'DBHCor' col, create it from the DBH col
   InitialDT <- copy(DataTree)
   if(!"DBHCor" %in% names(DataTree))
-    DataTree[, DBHCor := DBH]
+    DataTree[, DBHCor := Diameter]
 
   # Arrange year in ascending order
   PlotCensuses <- sort(PlotCensuses, decreasing = FALSE) # order plot census years
