@@ -39,13 +39,13 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 3,pickerInput,choices,none,HOMUnitMan,What is your HOM unit?,,none,none,HOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,POM,POM,"point of diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of tree diameter
 1,pickerInput,choices,none,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-3,pickerInput,choices,none,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+3,pickerInput,choices,none,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
 1,pickerInput,choices,none,BHOM,Basal HOM,"height of basal diameter measurement, as numeric value",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement of basal diameter
 1,pickerInput,choices,none,BHOMUnit,Basal HOM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BHOMUnitMan,What is your BasalHOM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,BPOM,Basal POM,"point of basal diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of basal diameter
 1,pickerInput,choices,none,BPOMUnit,Basal POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-3,pickerInput,choices,none,BPOMUnitMan,What is your Basal POM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+3,pickerInput,choices,none,BPOMUnitMan,What is your Basal POM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
 1,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height
 1,pickerInput,choices,none,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
