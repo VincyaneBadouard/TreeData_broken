@@ -97,53 +97,138 @@ test_that("RequiredFormat", {
 
 
 
-  # make sure measurement units gets converted correctly or throw error if units not selected
+ # make sure measurement units gets converted correctly or throw error if units not selected
  Data$HOM <- 1.3
  input$HOM = "HOM"
+ input$HOMUnitMan = "cm"
  Data$BCirc <- Data[, input$Circ]
  input$BCirc = "BCirc"
+ input$BCircUnitMan = "cm"
  input$BD = "none"
+ Data$BHOM <- 0.1
+ input$BHOM = "BHOM"
+ input$BHOMUnitMan = "cm"
  Data$TreeHeight = 20
  input$TreeHeight = "TreeHeight"
-
+ input$TreeHeightUnitMan = "m"
+ Data$Xsubplot <- Data$Xfield
+ Data$Ysubplot <- Data$yfield
+ input$Xsubplot = "Xsubplot"
+ input$Ysubplot = "Ysubplot"
+ input$subplotUnitMan = "cm"
 
   for(i in c("mm", "cm", "dm", "m", "none")){
-    input$HOMUnitMan = i
-    input$DBHUnitMan = i
-    input$CircUnitMan = i
-    input$BDUnitMan = i
-    input$BCircUnitMan = i
-    input$TreeHeightUnitMan = i
 
 
-    if(i %in% "none") expect_error(RequiredFormat(Data, input ))
-    else {
-      if(!input$HOM %in% "none") expect_equal(RequiredFormat(Data, input )$HOM, Data[,input$HOM] * switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-
-      if(!input$DBH %in% "none")   expect_equal(RequiredFormat(Data, input )$DBH, Data[,input$DBH] * switch(input$DBHUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
-
-      if(!input$Circ %in% "none")  expect_equal(RequiredFormat(Data, input )$Circ, Data[,input$Circ] * switch(input$CircUnitMan, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-
-      if(!input$BD %in% "none")  expect_equal(RequiredFormat(Data, input )$BD, Data[,input$BD] * switch(input$BDUnitMan, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-
-      if(!input$BCirc %in% "none")  expect_equal(RequiredFormat(Data, input )$BCirc, Data[,input$BCirc] * switch(input$BCircUnitMan, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-
-      if(!input$TreeHeight %in% "none")  expect_equal(RequiredFormat(Data, input )$TreeHeight, Data[,input$TreeHeight] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-
+    if(!input$DBH %in% "none") {
+      input$DBHUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$DBH, Data[,input$DBH] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100))
+      input$DBHUnitMan = "cm" # so that does not through an error anymore
     }
+
+    if(!input$Circ %in% "none") {
+      input$CircUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$Circ, Data[,input$Circ] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
+      input$CircUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$HOM %in% "none") {
+      input$HOMUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "HOM units") else expect_equal(RequiredFormat(Data, input )$HOM, Data[,input$HOM] * switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$HOMUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$BD %in% "none") {
+      input$BDUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal size") else expect_equal(RequiredFormat(Data, input )$BD, Data[,input$BD] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
+      input$BDUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$BCirc %in% "none")  {
+      input$BCircUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal size") else expect_equal(RequiredFormat(Data, input )$BCirc, Data[,input$BCirc] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
+      input$BCircUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$BHOM %in% "none") {
+      input$BHOMUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal HOM units") else expect_equal(RequiredFormat(Data, input )$BHOM, Data[,input$BHOM] * switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$BHOMUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$TreeHeight %in% "none")  {
+      input$TreeHeightUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "height units") else expect_equal(RequiredFormat(Data, input )$TreeHeight, Data[,input$TreeHeight] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$TreeHeightUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$Xutm %in% "none")  {
+      input$utmUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "utm units") else expect_equal(RequiredFormat(Data, input )$Xutm, Data[,input$Xutm] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$utmUnitMan = "cm" # so that does not through an error anymore
+    }
+
+    if(!input$Xplot %in% "none") {
+      input$plotUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "\\<plot coordinates units") else expect_equal(RequiredFormat(Data, input )$Xplot, Data[,input$Xplot] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$plotUnitMan = ParacouProfile$plotUnitMan
+    }
+
+    if(!input$Xsubplot %in% "none"){
+      input$subplotUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "subplot coordinates units") else expect_equal(RequiredFormat(Data, input )$Xsubplot, Data[,input$Xsubplot] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
+      input$subplotUnitMan = "cm" # so that does not through an error anymore
+    }
+
   }
 
  # put parameters back to what they were
- input$HOM = ParacouProfile$HOM
- input$BCirc = ParacouProfile$BCirc
- input$BD = ParacouProfile$BD
- input$TreeHeight = ParacouProfile$TreeHeight
- input$HOMUnitMan = ParacouProfile$HOMUnitMan
- input$DBHUnitMan = ParacouProfile$DBHUnitMan
- input$CircUnitMan = ParacouProfile$CircUnitMan
- input$BDUnitMan = ParacouProfile$BDUnitMan
- input$BCircUnitMan = ParacouProfile$BCircUnitMan
- input$TreeHeightUnitMan = ParacouProfile$TreeHeightUnitMan
+ # input$HOM = ParacouProfile$HOM
+ # input$BCirc = ParacouProfile$BCirc
+ # input$BD = ParacouProfile$BD
+ # input$BHOM = ParacouProfile$BHOM
+ # input$TreeHeight = ParacouProfile$TreeHeight
+ # input$HOMUnitMan = ParacouProfile$HOMUnitMan
+ # input$BHOMUnitMan = ParacouProfile$BHOMUnitMan
+ # input$CircUnitMan = ParacouProfile$CircUnitMan
+ # input$BDUnitMan = ParacouProfile$BDUnitMan
+ # input$BCircUnitMan = ParacouProfile$BCircUnitMan
+ # input$TreeHeightUnitMan = ParacouProfile$TreeHeightUnitMan
+ # input$utmUnitMan = ParacouProfile$utmUnitMan
+ # input$plotUnitMan = ParacouProfile$plotUnitMan
+ # input$subplotUnitMan = ParacouProfile$subplotUnitMan
+
+
+
+ # make sure AREA gets converted correctly or throw error if units not selected
+Data$SubPlotArea <- Data$PlotArea
+input$SubPlotArea <- "SubPlotArea"
+input$SubPlotAreaUnitMan <- "ha"
+
+
+
+ for(i in c("m2", "ha", "km2", "none")){
+
+     if(!input$PlotArea %in% "none")   {
+       input$PlotAreaUnitMan = i
+       if(i %in% "none") expect_error(RequiredFormat(Data, input ), "\\<plot area units") else expect_equal(RequiredFormat(Data, input )$PlotArea, Data[,input$PlotArea] * switch(i , m2 = 0.0001, ha = 1, km2 = 100))
+       input$PlotAreaUnitMan = "ha"
+     }
+
+     if(!input$SubPlotArea %in% "none")  {
+       input$SubPlotAreaUnitMan = i
+       if(i %in% "none") expect_error(RequiredFormat(Data, input ), "subplot area units") else expect_equal(RequiredFormat(Data, input )$SubPlotArea, Data[,input$SubPlotArea] *  switch(i , m2 = 0.0001, ha = 1, km2 = 100))
+       input$SubPlotAreaUnitMan = "ha"
+     }
+
+
+ }
+
+ # put parameters back to what they were
+ # input$SubPlotArea = ParacouProfile$SubPlotArea
+ # input$PlotAreaUnitMan = ParacouProfile$PlotAreaUnitMan
+ # input$SubPlotAreaMan = ParacouProfile$SubPlotAreaMan
+
 
   # expect year to be filled
   input$Year = "none"

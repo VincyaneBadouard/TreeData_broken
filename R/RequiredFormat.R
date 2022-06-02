@@ -255,7 +255,7 @@ RequiredFormat <- function(
 
     SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
 
-    if(!SizeUnit %in% unitOptions) stop(paste("Your size units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!SizeUnit %in% unitOptions) stop(paste("Your tree size units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if(SizeUnit %in% unitOptions) {
 
@@ -290,7 +290,9 @@ RequiredFormat <- function(
   ### HOM and BHOM in m ####
   # if(!input$HOM %in% "none" & !input$HOMUnit %in% "none") stop("We have not coded the case where HOM units are not constant across your data yet - Please contact us or unify your units first.")
 
-  if(!input$HOM %in% "none" & !input$HOMUnitMan %in% "none") {
+  if(!input$HOM %in% "none") {
+
+    # if(input$HOMUnitMan %in% "none") stop("we need HOM units")
 
     HOMUnit <- input$HOMUnitMan
 
@@ -307,7 +309,10 @@ RequiredFormat <- function(
     }
   }
 
-  if(!input$BHOM %in% "none" & !input$BHOMUnitMan %in% "none") {
+  if(!input$BHOM %in% "none") {
+
+    # if(input$BHOMUnitMan %in% "none") stop("we need basal HOm units")
+
 
     BHOMUnit <- input$BHOMUnitMan
 
@@ -328,11 +333,13 @@ RequiredFormat <- function(
   # if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
 
 
-  if(!input$TreeHeight %in% "none" & !input$TreeHeightUnitMan %in% "none") {
+  if(!input$TreeHeight %in% "none") {
+
+    # if(input$TreeHeightUnitMan %in% "none") stop("we need tree height units")
 
     TreeHeightUnit <- input$TreeHeightUnitMan
 
-    if(! TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (TreeHeightUnit %in% unitOptions) {
 
@@ -349,11 +356,13 @@ RequiredFormat <- function(
 
   ### PlotArea in ha ####
 
-  if(!input$PlotArea %in% "none" & !input$PlotAreaUnitMan %in% "none") {
+  if(!input$PlotArea %in% "none") {
+
+    # if(input$PlotAreaUnitMan %in% "none") stop("we need Plot Area units")
 
     PlotAreaUnit <- input$PlotAreaUnitMan
 
-    if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+    if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your plot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
 
     if (PlotAreaUnit %in% AreaUnitOptions) {
 
@@ -370,18 +379,16 @@ RequiredFormat <- function(
 
   ### SubPlotArea in ha ####
 
-  if(!input$SubPlotArea %in% "none" & !input$SubPlotAreaUnitMan %in% "none") {
+  if(!input$SubPlotArea %in% "none") {
 
     SubPlotAreaUnitMan <- input$SubPlotAreaUnitMan
 
-    if(!SubPlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your height units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+    if(!SubPlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your subplot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
 
     if (SubPlotAreaUnitMan %in% AreaUnitOptions){
 
       if (SubPlotAreaUnitMan == "m2") Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
-
-
-    if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
+      if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
     }
   }
 
@@ -394,7 +401,7 @@ RequiredFormat <- function(
   ### XY coordinates in m ####
 
 
-  if(!input$Xutm %in% "none" & !input$utmUnitMan %in% "none") {
+  if(!input$Xutm %in% "none") {
 
     utmUnitMan <- input$utmUnitMan
 
@@ -421,11 +428,11 @@ RequiredFormat <- function(
     }
   }
 
-  if(!input$Xplot %in% "none" & !input$plotUnitMan %in% "none") {
+  if(!input$Xplot %in% "none") {
 
     plotUnitMan <- input$plotUnitMan
 
-    if(!plotUnitMan %in% unitOptions) stop(paste("Your plot units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!plotUnitMan %in% unitOptions) stop(paste("Your plot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (plotUnitMan %in% unitOptions) {
 
@@ -448,11 +455,11 @@ RequiredFormat <- function(
     }
   }
 
-  if(!input$Xsubplot %in% "none" & !input$subplotUnitMan %in% "none") {
+  if(!input$Xsubplot %in% "none") {
 
     subplotUnitMan <- input$subplotUnitMan
 
-    if(!subplotUnitMan %in% unitOptions) stop(paste("Your suplot units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(!subplotUnitMan %in% unitOptions) stop(paste("Your subplot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if (subplotUnitMan %in% unitOptions) {
 
