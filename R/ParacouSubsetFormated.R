@@ -7,33 +7,45 @@
 #'   \item{Site}{Site level name}
 #'   \item{Plot}{Plot level name}
 #'   \item{SubPlot}{SubPlot level name}
-#'   \item{PlotArea}{Size of the plot in ha}
-#'   \item{SubPlotArea}{Size of the plot in ha}
+#'   \item{PlotArea}{Size of the plot}
+#'   \item{SubPlotArea}{Size of the plot}
 #'   \item{IdCensus}{Year of measurement}
 #'   \item{Year}{Year of measurement}
 #'   \item{Date, DateOriginal}{Date of measurement}
-#'   \item{TreeFieldNum}{Tree unique identifiers, matching the tag number in the field if that column was provided in the input, automatically generated if not.}
-#'   \item{IdTree}{Tree unique identifiers. This was automatically generated if not provided in the input data}
-#'   \item{LifeStatus, LifeStatusOriginal}{Logical: TRUE is tree was alive, FALSE if it was dead}
-#'   \item{DBH}{Diameter at breast height in cm}
-#'   \item{Circ}{circumference in cm}
-#'   \item{POM}{Height of measurement in m}
-#'   \item{Lat}{Latitude in degrees}
-#'   \item{Lon}{Longitude in degrees}
-#'   \item{Xutm}{X UTM coordinates in m}
-#'   \item{Yutm}{Y UTM coordinats in m}
-#'   \item{Xfield}{Tree X euclidean position in plot in m}
-#'   \item{Yfield}{Tree Y euclidean position in plot in m}
+#'   \item{TreeFieldNum}{Tree unique identifiers, matching the tag number in the field.}
+#'   \item{IdTree}{Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).}
+#'   \item{LifeStatus, LifeStatusOriginal}{Logical: TRUE if tree was alive, FALSE if it was dead}
+#'   \item{DBH}{Tree Diameter}
+#'   \item{BD}{Basal diameter}
+#'   \item{Circ}{Circumference}
+#'   \item{BCirc}{Basal circumference}
+#'   \item{HOM}{Height of measurement}
+#'   \item{POM}{Code for point of measurement of tree diameter}
+#'   \item{BHOM}{Height of measurement of basal diameter}
+#'   \item{BPOM}{Code for point of measurement of basal diameter}
+#'   \item{TreeHeight}{Tree Height}
+#'   \item{Lat}{Latitude}
+#'   \item{Lon}{Longitude}
+#'   \item{Xutm}{X UTM coordinates}
+#'   \item{Yutm}{Y UTM coordinats}
+#'   \item{Xplot}{Tree X euclidean position in plot}
+#'   \item{Yplot}{Tree Y euclidean position in plot}
+#'   \item{Xsubplot}{Tree X euclidean position in subplot}
+#'   \item{Ysubplot}{Tree Y euclidean position in subplot}
 #'   \item{ScientificName}{Scientific name}
 #'   \item{VernName}{Vernacular name}
 #'   \item{Family}{Family name}
 #'   \item{Genus}{Genus name}
 #'   \item{Species}{Species name}
-#'   \item{IdLevel}{Logical: TRUE if species is considered commercial, FALSE if not}
-#'   \item{Authority}{Logical: TRUE if species is considered commercial, FALSE if not}
+#'   \item{Subspecies}{Subspecies name}
+#'   \item{Variety}{Variety name}
+#'   \item{Voucher}{Voucher code for the species}
+#'   \item{IdLevel}{Deepest taxonomic level for which full identification is known}
+#'   \item{Authority}{Taxonomic authority for the ID level}
 #'   \item{CommercialSp, CommercialSpOriginal}{Logical: TRUE if species is considered commercial, FALSE if not}
-#'   \item{TreeHeight}{Tree Height in m}
 #'   \item{LifeForm}{Life form}
+#'   \item{DateOriginal}{Date as it was given in the input table, without any correction or transformation}
+#'   \item{LifeStatusOriginal}{LifeStatus as it was given in the input table, without any correction or transformation}
 #'   ...
 #' }
 
