@@ -7,8 +7,8 @@ library(data.table)
 
 #### Import data ####
 
-data("StandardData") # import data
-Data = StandardData
+data(ParacouSubsetFormated) # import data
+Data = ParacouSubsetFormated
 ## data.frame to data.table
 setDT(Data) # with "set" "<-" is not necessary
 
