@@ -14,7 +14,7 @@
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
 #'  it is, and converts the column names to the standardized names used in this
-#'  package. It also generates missing information, when possible (e.g. DBH when
+#'  package. It also generates missing information, when possible (e.g. Diameter when
 #'  only circumference is givent, Genus and Species when only scientifique name
 #'  is given etc...). All the decisions are made based on what is provided in
 #'  the input argument, which is a named list, as returned by function
@@ -236,10 +236,10 @@ RequiredFormat <- function(
   if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" ) Data[, ScientificName := paste(Genus, Species)]
 
 
-  ## DBH if we have circumference ####
-  if(input$DBH %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") stop("You do not have tree size (DBH, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  ## Diameter if we have circumference ####
+  if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") stop("You do not have tree size (Diameter, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
-  if(input$DBH %in% "none" & !input$Circ %in% "none") Data[, DBH := round(Circ/pi, 2)]
+  if(input$Diameter %in% "none" & !input$Circ %in% "none") Data[, Diameter := round(Circ/pi, 2)]
   if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
 
   # Units changing ####
@@ -248,31 +248,31 @@ RequiredFormat <- function(
 
   AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### DBH and BD in cm ####
-  # if((!input$DBH %in% "none" & !input$DBHUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
+  ### Diameter and BD in cm ####
+  # if((!input$Diameter %in% "none" & !input$DiameterUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
-  if(!input$DBH %in% "none" | !input$Circ %in% "none") {
+  if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
 
-    SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+    SizeUnit <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
 
     if(!SizeUnit %in% unitOptions) stop(paste("Your tree size units are not one of:", paste(unitOptions, collapse = ", ")))
 
     if(SizeUnit %in% unitOptions) {
 
-    if (SizeUnit == "mm") Data[, DBH := DBH/10] # mm -> cm
+    if (SizeUnit == "mm") Data[, Diameter := Diameter/10] # mm -> cm
 
-    if (SizeUnit == "dm") Data[, DBH := DBH*10] # dm -> cm
+    if (SizeUnit == "dm") Data[, Diameter := Diameter*10] # dm -> cm
 
-    if (SizeUnit == "m") Data[, DBH := DBH*100] # m -> cm
+    if (SizeUnit == "m") Data[, Diameter := Diameter*100] # m -> cm
     }
 
     # (re)calculate Circ
-    Data[, Circ := round(DBH*pi, 2)]
+    Data[, Circ := round(Diameter*pi, 2)]
   }
 
   if(!input$BD %in% "none" | !input$BCirc %in% "none") {
 
-    BSizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+    BSizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
 
     if(!BSizeUnit %in% unitOptions) stop(paste("Your basal size units are not one of:", paste(unitOptions, collapse = ", ")))
 

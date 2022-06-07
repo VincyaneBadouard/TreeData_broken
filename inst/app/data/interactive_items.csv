@@ -19,12 +19,12 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 1,pickerInput,choices,none,TreeFieldNum,Tree tag,identifiers at the plot level. It can be the same as tree ID if you have only one plot.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field."
 1,pickerInput,choices,none,IdTree,Tree ID,unique tree identifier in the entire dataset,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).
 1,pickerInput,choices,none,IdStem,Stem ID,stem unique identifier within the tree or at the plot level,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
-1,pickerInput,choices,none,IdMeasure,Measure ID,if you measured more than one DBH per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
+1,pickerInput,choices,none,IdMeasure,Measure ID,if you measured more than one Diameter per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
 1,pickerInput,choices,none,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if tree was alive, FALSE if it was dead"
 4,pickerInput,choices,,IsLive,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
-1,pickerInput,choices,none,DBH,Tree diameter,usually at breast heigh but see POM or HOM,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Tree Diameter
-1,pickerInput,choices,none,DBHUnit,tree diameter units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-3,pickerInput,choices,none,DBHUnitMan,What is your tree diameter unit ?,,none,none,DBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+1,pickerInput,choices,none,Diameter,DBH,usually at breast heigh but see HOM or POM,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Tree Diameter
+1,pickerInput,choices,none,DiameterUnit,DBH units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+3,pickerInput,choices,none,DiameterUnitMan,What is your DBH unit ?,,none,none,Diameter,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 1,pickerInput,choices,none,BD,BD,basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
 1,pickerInput,choices,none,BDUnit,BD unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
 3,pickerInput,choices,none,BDUnitMan,What is your BD unit ?,,none,none,BD,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
@@ -80,7 +80,7 @@ UI,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,i
 NA,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
 NA,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
 NA,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"
-NA,,,,DBHOriginal,,,,,,,,,FALSE,,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
+NA,,,,DiameterOriginal,,,,,,,,,FALSE,,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
 NA,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
 NA,,,,IsCommercrialOriginal,,,,,,,,,FALSE,,-,-,"IsCommercrial as it was given in the input table, without any correction or transformation"
 NA,,,,Comment,,,,,,,,,FALSE,,-,-,information about error

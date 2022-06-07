@@ -106,25 +106,25 @@ ReversedRequiredFormat <- function(
 
   # Units reverting from standard one ####
 
-  ### DBH and Circ in cm ####
+  ### Diameter and Circ in cm ####
 
-  if(!input$DBH %in% "none" | !input$Circ %in% "none") {
+  if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
 
-    SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+    SizeUnit <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
 
-    if (SizeUnit == "mm") Data[, DBH := DBH*10] # cm -> mm
+    if (SizeUnit == "mm") Data[, Diameter := Diameter*10] # cm -> mm
 
-    if (SizeUnit == "dm") Data[, DBH := DBH/10] # cm -> dm
+    if (SizeUnit == "dm") Data[, Diameter := Diameter/10] # cm -> dm
 
-    if (SizeUnit == "m") Data[, DBH := DBH/100] # cm -> m
+    if (SizeUnit == "m") Data[, Diameter := Diameter/100] # cm -> m
 
-    if(!input$Circ %in% "none") Data[, Circ := round(DBH*pi, 2)]
+    if(!input$Circ %in% "none") Data[, Circ := round(Diameter*pi, 2)]
   }
 
   ### BD and BCirc in cm ####
 
   if(!input$BD %in% "none" | !input$BCirc %in% "none") {
-    SizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+    SizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
 
     if (SizeUnit == "mm") Data[, BD := BD*10] # cm -> mm
 
@@ -292,9 +292,9 @@ ReversedRequiredFormat <- function(
     Variablecolumns <-  unlist(input[Variablecolumns])
 
 
-    # remove Circ or DBH if one or the other is involved in tidy (otherwise that duplicates rows)
-    if("DBH" %in% ValueNames & "Circ" %in% names(Data)) Data$Circ <- NULL
-    if("Circ" %in% ValueNames & "DBH" %in% names(Data)) Data$DBH <- NULL
+    # remove Circ or Diameter if one or the other is involved in tidy (otherwise that duplicates rows)
+    if("Diameter" %in% ValueNames & "Circ" %in% names(Data)) Data$Circ <- NULL
+    if("Circ" %in% ValueNames & "Diameter" %in% names(Data)) Data$Diameter <- NULL
 
     Data <- dcast(Data, formula(bquote(...~.(str2lang(VariableName)))), value.var = ValueNames)
 
@@ -311,9 +311,9 @@ ReversedRequiredFormat <- function(
 
 
   # ## get (or recalculate) circumference if needed ####
-  # if(!input$Circ %in% "none") Data[, Circ := DBH*pi]
+  # if(!input$Circ %in% "none") Data[, Circ := Diameter*pi]
   #
-  # Data[, DBH := round(Circ/pi, 2)]
+  # Data[, Diameter := round(Circ/pi, 2)]
 
   # destandardize column names ####
 
