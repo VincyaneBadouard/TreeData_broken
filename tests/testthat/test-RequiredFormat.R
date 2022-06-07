@@ -11,13 +11,13 @@ test_that("RequiredFormat", {
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
 
-  # make sure DBH or Circ units were converted correctly
-  if(!input$DBH %in% "none")   expect_equal(DataFormated$DBH, Data[,input$DBH] * switch(input$DBHUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
+  # make sure Diameter or Circ units were converted correctly
+  if(!input$Diameter %in% "none")   expect_equal(DataFormated$Diameter, Data[,input$Diameter] * switch(input$DiameterUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
   if(!input$Circ %in% "none")   expect_equal(DataFormated$Circ, Data[,input$Circ] * switch(input$CircUnitMan, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.01)
 
 
-  # make sure DBH is calculated correcly if only Circ is given
-  if(input$DBH %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated$DBH, round(DataFormated$Circ / pi, 2))
+  # make sure Diameter is calculated correcly if only Circ is given
+  if(input$Diameter %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated$Diameter, round(DataFormated$Circ / pi, 2))
 
 
   # make sure date format is handled correctly (all are in yyyy-mm-dd format, and if not it is NA)
@@ -31,11 +31,11 @@ test_that("RequiredFormat", {
   # cAREFULL, EDITING DATA OR INPUT AFTER THIS LINE #
 
   # expect error is size units are not correct
-  input$DBHUnitMan = input$CircUnitMan = "centimeter"
+  input$DiameterUnitMan = input$CircUnitMan = "centimeter"
 
   expect_error(RequiredFormat(Data, input ))
 
-  input$DBHUnitMan <- ParacouProfile$DBHUnitMan
+  input$DiameterUnitMan <- ParacouProfile$DiameterUnitMan
   input$CircUnitMan <- ParacouProfile$CircUnitMan
 
   expect_error(expect_error(RequiredFormat(Data, input ))) # don't expect the error anymore
@@ -120,10 +120,10 @@ test_that("RequiredFormat", {
   for(i in c("mm", "cm", "dm", "m", "none")){
 
 
-    if(!input$DBH %in% "none") {
-      input$DBHUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$DBH, Data[,input$DBH] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100))
-      input$DBHUnitMan = "cm" # so that does not through an error anymore
+    if(!input$Diameter %in% "none") {
+      input$DiameterUnitMan = i
+      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$Diameter, Data[,input$Diameter] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100))
+      input$DiameterUnitMan = "cm" # so that does not through an error anymore
     }
 
     if(!input$Circ %in% "none") {
@@ -285,13 +285,13 @@ input$SubPlotAreaUnitMan <- "ha"
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
 
-  # make sure DBH or Circ units were converted correctly
-  if(!input$DBH %in% "none")   expect_equal(DataFormated$DBH, Data[,input$DBH] * switch(input$DBHUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
+  # make sure Diameter or Circ units were converted correctly
+  if(!input$Diameter %in% "none")   expect_equal(DataFormated$Diameter, Data[,input$Diameter] * switch(input$DiameterUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
   if(!input$Circ %in% "none")   expect_equal(DataFormated$Circ, Data[,input$Circ] * switch(input$CircUnitMan, mm = 0.1, cm = 1, dm = 10, m = 100))
 
 
-  # make sure DBH is calculated correcly if only Circ is given
-  if(input$DBH %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated$DBH, round(DataFormated$Circ / pi, 2))
+  # make sure Diameter is calculated correcly if only Circ is given
+  if(input$Diameter %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated$Diameter, round(DataFormated$Circ / pi, 2))
 
 
   # make sure date format is handled correctly (all are in yyyy-mm-dd format, and if not it is NA)

@@ -11,13 +11,13 @@ test_that("ReversedRequiredFormat", {
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated[, get(input$IdTree)])))
 
-  # make sure DBH or Circ units were converted correctly
-  if(!input$DBH %in% "none")   expect_equal(DataFormated[, get(input$DBH)], Data$DBH * switch(input$DBHUnitMan , mm = 10, cm = 1, dm = 0.1, m = 0.01))
+  # make sure Diameter or Circ units were converted correctly
+  if(!input$Diameter %in% "none")   expect_equal(DataFormated[, get(input$Diameter)], Data$Diameter * switch(input$DiameterUnitMan , mm = 10, cm = 1, dm = 0.1, m = 0.01))
   if(!input$Circ %in% "none")   expect_equal(DataFormated$Circ, Data[,input$Circ] * switch(input$CircUnitMan, mm = 10, cm = 1, dm = 0.1, m = 0.01), tolerance = 0.01)
 
 
-  # make sure DBH is calculated correctly if only Circ is given
-  if(input$DBH %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated[, get(input$DBH)], round(DataFormated[, get(input$Circ)]/ pi, 2))
+  # make sure Diameter is calculated correctly if only Circ is given
+  if(input$Diameter %in% "none" & !input$Circ %in% "none") expect_equal(DataFormated[, get(input$Diameter)], round(DataFormated[, get(input$Circ)]/ pi, 2))
 
 
   # cAREFUL, EDITING DATA OR INPUT AFTER THIS LINE #
@@ -39,7 +39,7 @@ test_that("ReversedRequiredFormat", {
   # make sure measurement units gets converted correctly or throw error if units not selected
   Data$HOM <- 1.3
   input$BCirc = "none"
-  Data$BD <- Data$DBH
+  Data$BD <- Data$Diameter
   input$BD = "BD"
   input$BDUnitMan = "cm"
   Data$BHOM <- 0.1
@@ -57,10 +57,10 @@ test_that("ReversedRequiredFormat", {
   for(i in c("mm", "cm", "dm", "m")){
 
 
-    if(!input$DBH %in% "none") {
-      input$DBHUnitMan = i
-      expect_equal(ReversedRequiredFormat(Data, input )[, get(input$DBH)], Data$DBH * switch(i, mm =10, cm = 1, dm = 0.1, m = 0.01))
-      input$DBHUnitMan = "cm" # so that does not through an error anymore
+    if(!input$Diameter %in% "none") {
+      input$DiameterUnitMan = i
+      expect_equal(ReversedRequiredFormat(Data, input )[, get(input$Diameter)], Data$Diameter * switch(i, mm =10, cm = 1, dm = 0.1, m = 0.01))
+      input$DiameterUnitMan = "cm" # so that does not through an error anymore
     }
 
     if(!input$Circ %in% "none") {
