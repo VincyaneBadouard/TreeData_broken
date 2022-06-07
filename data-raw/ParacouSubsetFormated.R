@@ -1,13 +1,13 @@
 ## code to prepare `ParacouSubsetFormated` dataset goes here
-data("ParacouSubset")
-data("ParacouProfile")
+data(ParacouSubset)
+data(ParacouProfile)
 
 ParacouSubsetFormated <- RequiredFormat(
   ParacouSubset,
   input = ParacouProfile)
 
 usethis::use_data(ParacouSubsetFormated, overwrite = TRUE)
-usethis::use_R(ParacouSubsetFormated, overwrite = TRUE)
+# usethis::use_R(ParacouSubsetFormated, overwrite = TRUE)
 
 
 

@@ -37,7 +37,7 @@
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What is the unit for plot area?}
 #'   \item{PlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your plot name ?}
 #'   \item{plotUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to XY plot coordinates units}
-#'   \item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
+#'   \item{POM}{Value or column name in data set @ParacouSubset (MeasCode) corresponding to POM}
 #'   \item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
 #'   \item{ScientificNameSep}{Value or column name in data set @ParacouSubset () corresponding to Character separating Genus and Species in Scientific name}
 #'   \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}

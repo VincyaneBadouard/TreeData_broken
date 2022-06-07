@@ -40,7 +40,7 @@ if (!interactive()) {
       PlotAreaUnitMan = "ha",
       PlotMan = "",
       plotUnitMan = "m",
-      POM = "none",
+      POM = "MeasCode",
       ScientificName = "none",
       ScientificNameSep = "",
       Site = "Forest",
