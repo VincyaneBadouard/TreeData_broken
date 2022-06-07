@@ -74,7 +74,7 @@ ReversedRequiredFormat <- function(
 
   ## set as data.table
   setDT(Data)
-
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
   ## format date of measurement like output profile ####
   if(!input$Date %in% "none"){
 
@@ -106,9 +106,10 @@ ReversedRequiredFormat <- function(
 
   # Units reverting from standard one ####
 
-  ### DBH in cm ####
+  ### DBH and Circ in cm ####
 
   if(!input$DBH %in% "none" | !input$Circ %in% "none") {
+
     SizeUnit <- grep("[^none]", c(input$DBHUnitMan, input$CircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
 
     if (SizeUnit == "mm") Data[, DBH := DBH*10] # cm -> mm
@@ -116,9 +117,23 @@ ReversedRequiredFormat <- function(
     if (SizeUnit == "dm") Data[, DBH := DBH/10] # cm -> dm
 
     if (SizeUnit == "m") Data[, DBH := DBH/100] # cm -> m
+
+    if(!input$Circ %in% "none") Data[, Circ := round(DBH*pi, 2)]
   }
 
+  ### BD and BCirc in cm ####
 
+  if(!input$BD %in% "none" | !input$BCirc %in% "none") {
+    SizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take DBH in priority, otherwise CircUnit (not a big deal since we only care about DBH and we already converted it from Circ if that was the only size we had)
+
+    if (SizeUnit == "mm") Data[, BD := BD*10] # cm -> mm
+
+    if (SizeUnit == "dm") Data[, BD := BD/10] # cm -> dm
+
+    if (SizeUnit == "m") Data[, BD := BD/100] # cm -> m
+
+    if(!input$BCirc %in% "none") Data[, BCirc := round(BD*pi, 2)]
+  }
 
   ### HOM and BHOM in m ####
 
