@@ -89,7 +89,7 @@ RequiredFormat <- function(
   Data[, setdiff(x$ItemID[x$RequiredColumn], colnames(Data))] <- NA
 
   setDT(Data)
-
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environemnt
 
   # coerce to data types ####
   ### as.character
