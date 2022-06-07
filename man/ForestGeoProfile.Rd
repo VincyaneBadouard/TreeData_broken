@@ -60,12 +60,12 @@ A named list
 \item{Lat}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree latitude}
 \item{Genus}{Value or column name in data set @ForestGeoSubset (Genus) corresponding to Genus name}
 \item{SubPlot}{Value or column name in data set @ForestGeoSubset (quadrat) corresponding to SubPlot name}
-\item{DBHUnitMan}{Value or column name in data set @ForestGeoSubset (mm) corresponding to What is your tree diameter unit ?}
+\item{DiameterUnitMan}{Value or column name in data set @ForestGeoSubset (mm) corresponding to What is your DBH unit ?}
 \item{Xplot}{Value or column name in data set @ForestGeoSubset (gx) corresponding to Tree X euclidean position in plot}
 \item{Xsubplot}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree X euclidean position in SUBplot}
 \item{plotUnitMan}{Value or column name in data set @ForestGeoSubset (m) corresponding to XY plot coordinates units}
 \item{subplotUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to XY subplot coordinates units}
-\item{DBH}{Value or column name in data set @ForestGeoSubset (dbh) corresponding to Tree diameter}
+\item{Diameter}{Value or column name in data set @ForestGeoSubset (dbh) corresponding to DBH}
 \item{HOMUnitMan}{Value or column name in data set @ForestGeoSubset (m) corresponding to What is your HOM unit?}
 \item{Variety}{Value or column name in data set @ForestGeoSubset (none) corresponding to Variety name}
 \item{Voucher}{Value or column name in data set @ForestGeoSubset (Voucher) corresponding to Voucher code}

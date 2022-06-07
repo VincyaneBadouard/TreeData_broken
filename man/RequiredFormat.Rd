@@ -27,7 +27,7 @@ RequiredFormat
 \details{
 This function takes the forest inventory data.frame or data.table as
 it is, and converts the column names to the standardized names used in this
-package. It also generates missing information, when possible (e.g. DBH when
+package. It also generates missing information, when possible (e.g. Diameter when
 only circumference is givent, Genus and Species when only scientifique name
 is given etc...). All the decisions are made based on what is provided in
 the input argument, which is a named list, as returned by function

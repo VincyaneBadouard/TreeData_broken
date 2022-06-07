@@ -9,7 +9,7 @@ A named list
 \describe{
 \item{Authority}{Value or column name in data set @ParacouSubset (none) corresponding to  Taxonomic authority for the ID level}
 \item{BCirc}{Value or column name in data set @ParacouSubset (none) corresponding to Basal Circumference}
-\item{CircUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your circumference unit?}
+\item{BCircUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your basal circumference unit?}
 \item{BD}{Value or column name in data set @ParacouSubset (none) corresponding to BD}
 \item{BDUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your BD unit ?}
 \item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
@@ -18,8 +18,8 @@ A named list
 \item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 \item{Date}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Date of measurement}
 \item{DateFormat}{Value or column name in data set @ParacouSubset (yyyy-mm-dd) corresponding to What is your date format?}
-\item{DBH}{Value or column name in data set @ParacouSubset (none) corresponding to Tree diameter}
-\item{DBHUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your tree diameter unit ?}
+\item{Diameter}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
+\item{DiameterUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your DBH unit ?}
 \item{Family}{Value or column name in data set @ParacouSubset (Family) corresponding to Family name}
 \item{Genus}{Value or column name in data set @ParacouSubset (Genus) corresponding to Genus name}
 \item{HOM}{Value or column name in data set @ParacouSubset (none) corresponding to HOM}
