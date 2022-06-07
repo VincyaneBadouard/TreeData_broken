@@ -15,7 +15,7 @@
 #'   \item{TreeFieldNum}{Tree unique identifiers, matching the tag number in the field.}
 #'   \item{IdTree}{Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).}
 #'   \item{LifeStatus, LifeStatusOriginal}{Logical: TRUE if tree was alive, FALSE if it was dead}
-#'   \item{DBH}{Tree Diameter}
+#'   \item{Diameter}{Tree Diameter}
 #'   \item{BD}{Basal diameter}
 #'   \item{Circ}{Circumference}
 #'   \item{BCirc}{Basal circumference}
