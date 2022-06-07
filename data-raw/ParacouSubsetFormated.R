@@ -1,6 +1,6 @@
 ## code to prepare `ParacouSubsetFormated` dataset goes here
-data(ParacouSubset)
-data(ParacouProfile)
+data("ParacouSubset")
+data("ParacouProfile")
 
 ParacouSubsetFormated <- RequiredFormat(
   ParacouSubset,
