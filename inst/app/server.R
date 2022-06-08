@@ -3,7 +3,7 @@
 
 
 # increase size limit to 10MB
-options(shiny.maxRequestSize=10*1024^2)
+options(shiny.maxRequestSize=25*1024^2)
 
 # my function to change first letter in uppercase (e.g for updatePickerInput)
 firstUpper <- function(x) {
