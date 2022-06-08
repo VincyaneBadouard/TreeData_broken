@@ -32,15 +32,15 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
-  output$ui_uploadTables <- renderUI({
+ output$ui_uploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
 
-      column(width = 3,
+      column(width = 6,
              # load button for main data file (csv format)
              box(title = paste("Table", i),
                  width = NULL,
-                 fileInput(inputId = paste0("file", i), "Choose CSV File", accept = ".csv"),
+                 fileInput(inputId = paste0("file", i), "Choose CSV File (max 25MB)", accept = ".csv"),
                  # does the dataframe have a header?
                  checkboxInput( paste0("header", i), "Header", TRUE),
                  # choose separator
@@ -64,9 +64,58 @@ server <- function(input, output, session) {
 
   })
 
+ output$ui_ViewTables <- renderUI({
+   req(input$file1)
+     do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
+       tabPanel(
+         title=i,
+         DTOutput(i)
+       )
+     })))
 
+
+ })
   # read file(s) ####
 
+
+
+
+ # give a red text if not a csv file
+  observe({
+    lapply(1:input$nTable, function(i){
+      file <- input[[paste0("file", i)]]
+      req(file)
+      ext <- tools::file_ext(file$datapath)
+      if(ext != "csv") output[[paste0("CSVWarning", i)]] <-renderText( "This is not a csv file!!")
+    })
+
+  })
+
+  Data <- reactiveVal()
+  observe({
+    req(input$file1)
+    Data(setNames(
+      lapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
+
+        i = which(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)] %in% n)
+        file <- input[[paste0("file", i)]]
+        ext <- tools::file_ext(file$datapath)
+
+        req(file)
+        validate(need(ext == "csv", "Please upload a csv file"))
+
+        data.table::fread(file$datapath,
+                          header = input[[paste0("header", i)]],
+                          sep = input[[paste0("cbSeparator", i)]])
+      }),
+      reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
+    )
+  })
+
+  observe({
+    req(Data)
+    lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]]) )
+  })
 
   observeEvent(input$submitTables, {
 
@@ -80,38 +129,6 @@ server <- function(input, output, session) {
     }
 
   })
-
-  observe({
-    lapply(1:input$nTable, function(i){
-      file <- input[[paste0("file", i)]]
-      req(file)
-      ext <- tools::file_ext(file$datapath)
-      if(ext != "csv") output[[paste0("CSVWarning", i)]] <-renderText( "This is not a csv file!!")
-    })
-
-  }) # give a red text if not a csv file
-
-  Data <- eventReactive(input$submitTables, {
-    req(input$file1)
-    setNames(
-      lapply(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)], function(n) {
-
-        i = which(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)] %in% n)
-        file <- input[[paste0("file", i)]]
-        ext <- tools::file_ext(file$datapath)
-
-        req(file)
-        # validate(need(ext == "csv", "Please upload a csv file"))
-
-        data.table::fread(file$datapath,
-                          header = input[[paste0("header", i)]],
-                          sep = input[[paste0("cbSeparator", i)]])
-      }),
-      reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
-
-  })
-
-
 
   # stack tables ####
 

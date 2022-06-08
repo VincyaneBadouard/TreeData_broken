@@ -113,7 +113,7 @@ body <- dashboardBody(
               )),
 
             fluidRow(
-              column(width = 12,
+              column(width = 6,
                      actionBttn(
                        inputId = "inactivebutton3",
                        label = "2",
@@ -121,12 +121,8 @@ body <- dashboardBody(
                        color = "warning"),
                      strong("Upload your tables"),
 
-                     uiOutput("ui_uploadTables"))),
+                     uiOutput("ui_uploadTables"),
 
-
-
-            fluidRow(
-              column(width = 3,
                      actionBttn(
                        inputId = "inactivebutton4",
                        label = "3",
@@ -137,7 +133,9 @@ body <- dashboardBody(
                        label = "submit",
                        style = "material-flat",
                        color = "success"
-                     ))
+                     )),
+              column(6,
+                     uiOutput("ui_ViewTables"))
 
             )
 
