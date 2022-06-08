@@ -75,6 +75,7 @@ ReversedRequiredFormat <- function(
   ## set as data.table
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
+
   ## format date of measurement like output profile ####
   if(!input$Date %in% "none"){
 
@@ -100,7 +101,13 @@ ReversedRequiredFormat <- function(
 
   }
 
+  if(!input$Month %in% "none" & !input$Day %in% "none") {
 
+    Data[, Date := as.Date(Date)]
+    Data[, Month := format(Date, format = "%m")]
+    Data[, Day := format(Date, format = "%d")]
+
+  }
 
 
 

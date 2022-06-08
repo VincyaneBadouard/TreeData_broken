@@ -129,7 +129,21 @@ RequiredFormat <- function(
 
 
   ## Date of measurement ####
-  if( !is.null(input$Date)) {
+  # concatenate if in 3 different columns
+  if(!input$Month %in% "none" & !input$Day %in% "none" & input$Date %in% "none") {
+    if(!input$Year %in% "none") {
+      Data[, Date := paste(trimws(Year), trimws(Month), trimws(Day), sep = "-")]
+    } else {
+      Data[, Date := paste(trimws(input$YearMan), trimws(Month), trimws(Day), sep = "-")]
+    }
+
+    # overwrite input
+    input$Date = "Date"
+    input$DateFormat = "yyyy-mm-dd"
+  }
+
+  # put in date format
+
     if(!input$Date %in% "none"){
 
       # save the orginal dates
@@ -158,7 +172,7 @@ RequiredFormat <- function(
       if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
     }
-  }
+
 
 
 
