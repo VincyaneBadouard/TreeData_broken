@@ -16,6 +16,8 @@ if (!interactive()) {
                                                "shinyActionButtonValue")),
       CommercialSp = "CommercialSp",
       Date = "CensusDate",
+      Month = "none",
+      Day = "none",
       DateFormat = "yyyy-mm-dd",
       Diameter = "none",
       DiameterUnitMan = "none",

@@ -7,6 +7,8 @@
 #'   \item{Family}{Value or column name in data set @ForestGeoSubset (Family) corresponding to Family name}
 #'   \item{TreeHeight}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree height}
 #'   \item{Date}{Value or column name in data set @ForestGeoSubset (ExactDate) corresponding to Date of measurement}
+#'   \item{Month}{Value or column name in data set @ForestGeoSubset (none) corresponding to Month of measurement}
+#'   \item{Day}{Value or column name in data set @ForestGeoSubset (none) corresponding to Day of measurement}
 #'   \item{POM}{Value or column name in data set @ForestGeoSubset (none) corresponding to POM}
 #'   \item{HOM}{Value or column name in data set @ForestGeoSubset (hom) corresponding to HOM}
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is the unit for plot area?}
@@ -31,7 +33,7 @@
 #'   \item{ScientificName}{Value or column name in data set @ForestGeoSubset (Latin) corresponding to Scientific name}
 #'   \item{DateFormat}{Value or column name in data set @ForestGeoSubset (yyyy-mm-dd) corresponding to What is your date format?}
 #'   \item{IdCensus}{Value or column name in data set @ForestGeoSubset (CensusID) corresponding to Census ID}
-#'   \item{PlotAreaMan}{Value or column name in data set @ForestGeoSubset (25.6) corresponding to What is your plot area in hectar?}
+#'   \item{PlotAreaMan}{Value or column name in data set @ForestGeoSubset (25.6) corresponding to What is your plot area in hectare?}
 #'   \item{Year}{Value or column name in data set @ForestGeoSubset (none) corresponding to Year of measurement}
 #'   \item{LifeStatus}{Value or column name in data set @ForestGeoSubset (DFstatus) corresponding to Life status}
 #'   \item{PlotArea}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot area}
@@ -41,7 +43,7 @@
 #'   \item{utmUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to UTM units}
 #'   \item{YearMan}{Value or column name in data set @ForestGeoSubset (NA) corresponding to What is your year of measurement?}
 #'   \item{Circ}{Value or column name in data set @ForestGeoSubset (none) corresponding to Circumference}
-#'   \item{SubPlotAreaMan}{Value or column name in data set @ForestGeoSubset (0.04) corresponding to What is your subplot area in hectar?}
+#'   \item{SubPlotAreaMan}{Value or column name in data set @ForestGeoSubset (0.04) corresponding to What is your subplot area in hectare?}
 #'   \item{SubPlotMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your subplot name ?}
 #'   \item{Site}{Value or column name in data set @ForestGeoSubset (none) corresponding to Site name}
 #'   \item{Lon}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree longitude}
@@ -79,6 +81,7 @@
 #'   \item{ValueName2}{Some value entered via interaction with the Shiny app}
 #'   \item{Variablecolumns4}{Some value entered via interaction with the Shiny app}
 #'   \item{ValueName1}{Some value entered via interaction with the Shiny app}
+
 #'   ...
 #' }
 

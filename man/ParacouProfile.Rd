@@ -17,6 +17,8 @@ A named list
 \item{ClearValueName}{Some value entered via interaction with the Shiny app}
 \item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 \item{Date}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Date of measurement}
+\item{Month}{Value or column name in data set @ParacouSubset (none) corresponding to Month of measurement}
+\item{Day}{Value or column name in data set @ParacouSubset (none) corresponding to Day of measurement}
 \item{DateFormat}{Value or column name in data set @ParacouSubset (yyyy-mm-dd) corresponding to What is your date format?}
 \item{Diameter}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
 \item{DiameterUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your DBH unit ?}
@@ -37,7 +39,7 @@ A named list
 \item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
 \item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
 \item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot area}
-\item{PlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your plot area in hectar?}
+\item{PlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your plot area in hectare?}
 \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What is the unit for plot area?}
 \item{PlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your plot name ?}
 \item{plotUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to XY plot coordinates units}
@@ -49,7 +51,7 @@ A named list
 \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
 \item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
 \item{SubPlotArea}{Value or column name in data set @ParacouSubset (none) corresponding to SubPlot area}
-\item{SubPlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your subplot area in hectar?}
+\item{SubPlotAreaMan}{Value or column name in data set @ParacouSubset (NA) corresponding to What is your subplot area in hectare?}
 \item{SubPlotAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is the unit for subplot area?}
 \item{SubPlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your subplot name ?}
 \item{subplotUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to XY subplot coordinates units}

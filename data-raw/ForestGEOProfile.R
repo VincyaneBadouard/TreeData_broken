@@ -6,6 +6,8 @@ ForestGeoProfile <-
     Family = "Family",
     TreeHeight = "none",
     Date = "ExactDate",
+    Month = "none",
+    Day = "none",
     POM = "none",
     HOM = "hom",
     PlotAreaUnitMan = "none",
