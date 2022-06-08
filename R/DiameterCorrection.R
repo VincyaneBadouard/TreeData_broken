@@ -617,7 +617,7 @@ DiameterCorrectionByTree <- function(
   }
 
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
-  if(DetectOnly %in% FALSE){ DataTree[,DBHCor := round(DBHCor, digits = Digits)] }
+  if(DetectOnly %in% FALSE){ DataTree[, ("DBHCor"):= as.numeric(round(DBHCor, digits = Digits))] }
 
 }
   return(DataTree)

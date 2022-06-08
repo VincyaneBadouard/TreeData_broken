@@ -2,7 +2,7 @@ test_that("DiameterCorrectionByTree", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
   library(data.table)
-  TestData <- data.table(IdTree = "c",
+  DataTree <- data.table(IdTree = "c",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -10,8 +10,8 @@ test_that("DiameterCorrectionByTree", {
 
 
   # Create test data ---------------------------------------------------------------------------------------------------
-  MatrixData <- as.matrix(TestData)
-  TwoInd <- copy(TestData)
+  MatrixData <- as.matrix(DataTree)
+  TwoInd <- copy(DataTree)
   TwoInd[Year == 2014, ("IdTree") := "b"] # a NA in the "e" Diameter seq
 
 
@@ -34,7 +34,7 @@ test_that("DiameterCorrectionByTree", {
 
 
   Rslt <- DiameterCorrectionByTree(OnlyOne,
-                                   TestData,
+                                   OnlyOne,
                                    WhatToCorrect = c("POM change", "punctual", "shift"),
                                    CorrectionType = c("taper", "quadratic", "linear",
                                                       "individual", "phylogenetic hierarchical"))
@@ -42,16 +42,50 @@ test_that("DiameterCorrectionByTree", {
   expect_true(Rslt$Diameter == OnlyOne$Diameter) # same Diameter value
   expect_true(!"DBHCor" %in% names(Rslt)) # no correction
 
-  ## Case NA in the Diameter column -----------------------------------------------------------------------------------------
 
   # Taper correction ---------------------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+                         Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-  # Correction with POM ------------------------------------------------------------------------------------------------
+  Rslt <- DiameterCorrectionByTree(DataTree,
+                                   DataTree,
+                                   WhatToCorrect = "POM change",
+                                   CorrectionType = "taper")
+
+  expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] == "taper")) # and "taper" in 'DiameterCorrectionMeth'
+
+  # Correction with POM A FAIRE------------------------------------------------------------------------------------------------
   ## individual correction ---------------------------------------------------------------------------------------------
   ## phylogenetic hierarchical correction ------------------------------------------------------------------------------
 
   # Punctual error -----------------------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         Year = seq(2000,2008, by = 2), # 5 censuses
+                         Diameter = c(13, 14, 15, 30, 17), # 0.5 cm/year. The 4th value is abnormal
+                         POM = c(0, 0, 1, 1, 2),
+                         HOM = c(1.3, 1.3, 1.5, 1.5, 2))
 
+  Rslt <- DiameterCorrectionByTree(DataTree,
+                                   DataTree,
+                                   WhatToCorrect = "punctual",
+                                   CorrectionType = "quadratic")
+  # expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
+
+  ## Case NA in the Diameter column -----------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         Year = seq(2000,2008, by = 2), # 5 censuses
+                         Diameter = c(13, 14, 15, NA, 17), # 0.5 cm/year
+                         POM = c(0, 0, 1, 1, 2),
+                         HOM = c(1.3, 1.3, 1.5, 1.5, 2))
+
+  # Rslt <- DiameterCorrectionByTree(DataTree,
+  #                                  DataTree,
+  #                                  WhatToCorrect = "punctual",
+  #                                  CorrectionType = "quadratic")
   # Shift error --------------------------------------------------------------------------------------------------------
   ## individual correction ---------------------------------------------------------------------------------------------
   ## phylogenetic hierarchical correction ------------------------------------------------------------------------------
@@ -64,6 +98,18 @@ test_that("DiameterCorrectionByTree", {
   # POM change + shift error
   # taper + POM change
 
+  ## Case NA in the Diameter column in any case -----------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         Year = seq(2000,2008, by = 2), # 5 censuses
+                         Diameter = c(13, 14, 15, NA, 17), # 0.5 cm/year
+                         POM = c(0, 0, 1, 1, 2),
+                         HOM = c(1.3, 1.3, 1.5, 1.5, 2))
+
+  # Rslt <- DiameterCorrectionByTree(DataTree,
+  #                                  DataTree,
+  #                                  WhatToCorrect = c("POM change", "punctual", "shift"),
+  #                                  CorrectionType = c("taper", "quadratic", "linear",
+  #                                                     "individual", "phylogenetic hierarchical"))
 
 })
 
