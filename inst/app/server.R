@@ -106,8 +106,10 @@ server <- function(input, output, session) {
 
         data.table::fread(file$datapath,
                           header = input[[paste0("header", i)]],
-                          sep = input[[paste0("cbSeparator", i)]])
-      }),
+                          sep = input[[paste0("cbSeparator", i)]],
+                          check.names = T,
+                          encoding = "UTF-8")
+        }),
       reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
     )
   })
@@ -726,7 +728,7 @@ observe( {
       library(TreeData)
 
       # upload the data
-       Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}')
+       Data <- data.table::fread('{input$file1$name}', header = {input$header}, sep = '{input$cbSeparator}', check.names = T, encoding = 'UTF-8')
 
       # upload your profile (saved via shiny app)
       Profile <- readRDS(paste0(gsub('.csv', '', '{input$file1$name}'), '_Profile.rds'))
