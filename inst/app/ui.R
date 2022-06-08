@@ -43,7 +43,7 @@ sidebar <- dashboardSidebar(
               menuItem("Headers and Units", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               # menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
-              menuItem("Download formated data", tabName="Save", icon = icon("save")),
+              menuItem("Download formatted data", tabName="Save", icon = icon("save")),
               menuItem("Help", tabName = "Manual", icon = icon("book"))
   )
 )
@@ -77,7 +77,7 @@ body <- dashboardBody(
                 color = "success"),
               box(width = 12,
                   # helpText("Some text and then ", code("some code"), "."),
-                  helpText(code('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app"'),
+                  helpText(code('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")'),
                            br(),
                            br(),
                            '# If you have run this app in the past and you think/know the TreeData package has been updated since, you may need to restart you R session and re-install TreeData package (using code below) before running the app again',
@@ -153,7 +153,7 @@ body <- dashboardBody(
                          label = " ! ",
                          style = "pill",
                          color = "danger"),
-                       strong("make sure you clicked on 'Sumbit' in Upload tab")
+                       strong("make sure you clicked on 'Submit' in Upload tab")
                        # )
               ),
                 fluidRow(
@@ -448,9 +448,9 @@ body <- dashboardBody(
                      fluidRow(
 
                        column(width = 12,
-                              h4("summary of your formated table:"),
+                              h4("summary of your formatted table:"),
                               verbatimTextOutput("FormatedTableSummary"),
-                              h4("View of your formated table:"),
+                              h4("View of your formatted table:"),
                               DTOutput(outputId = "FormatedTable")
                        ))
 
