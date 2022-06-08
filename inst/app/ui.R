@@ -408,11 +408,25 @@ body <- dashboardBody(
                          # solidHeader = TRUE,
                          # uiOutput("ui1"),
 
-                           lapply(1:nrow(x1), function(i) {
+                        lapply(unique(x1$Group), function(g) {
+                          dropdownButton(label = g,
+                                         icon = icon("sliders", verify_fa = FALSE),
+                                         size = "lg",
+                                         circle = FALSE,
+                           do.call(div, lapply(which(x1$Group %in% g), function(i) {
 
                              eval(parse(text = paste0(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i]," ='",  x1$Default[i],"'", ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
-                           })
+                           }),
+                          )
+                         )
+                         })
+
+                           # lapply(1:nrow(x1), function(i) {
+                           #
+                           #   eval(parse(text = paste0(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i]," ='",  x1$Default[i],"'", ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                           #
+                           # })
 
                          # actionBttn("Header1Next", "next", style = "fill", color = "primary")
                          )
@@ -426,7 +440,7 @@ body <- dashboardBody(
                          style = "pill",
                          color = "warning")
                        ,   strong("  Fill in information that is not in your columns"),
-                       p("do this after completing step 1 otherwise it will turn blank again."),
+                       p("ATTENTION: do this after completing step 1 otherwise it will turn blank again."),
                        lapply(which(x$ItemID %in% unlist(lapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
 
                          eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, paste0(", multiple = TRUE, selected = '", x$Default[i], "')"), ")"))))
