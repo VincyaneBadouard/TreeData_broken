@@ -72,8 +72,10 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "punctual",
-                                   CorrectionType = "quadratic")
-  # expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
+                                   CorrectionType = "linear")
+  expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16
+  expect_true(Rslt[4, Comment] %in% "Abnormal diameter value (punctual error)") # comment
+  expect_true(Rslt[4, DiameterCorrectionMeth] %in% "linear") # correction method
 
   ## Case NA in the Diameter column -----------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
@@ -82,21 +84,39 @@ test_that("DiameterCorrectionByTree", {
                          POM = c(0, 0, 1, 1, 2),
                          HOM = c(1.3, 1.3, 1.5, 1.5, 2))
 
-  # Rslt <- DiameterCorrectionByTree(DataTree,
-  #                                  DataTree,
-  #                                  WhatToCorrect = "punctual",
-  #                                  CorrectionType = "quadratic")
-  # Shift error --------------------------------------------------------------------------------------------------------
+  Rslt <- DiameterCorrectionByTree(DataTree,
+                                   DataTree,
+                                   WhatToCorrect = "punctual",
+                                   CorrectionType = "quadratic")
+
+  expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16
+  expect_true(all(Rslt[, Comment] %in% "")) # no comment
+  expect_true(Rslt[4, DiameterCorrectionMeth] %in% "quadratic") # correction method
+
+  # Shift error A FAIRE--------------------------------------------------------------------------------------------------------
   ## individual correction ---------------------------------------------------------------------------------------------
   ## phylogenetic hierarchical correction ------------------------------------------------------------------------------
 
-  # Mix cases
-  # punctual + shift error
-  # taper + punctual error
-  # taper + shift error
-  # POM change + punctual error
-  # POM change + shift error
-  # taper + POM change
+  # Mix cases ---------------------------------------------------------------------------------------------------------
+  ## punctual + shift error A FAIRE----------------------------------------------------------------------------------------
+  ## taper + punctual error -----------------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+                         Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+
+  Rslt <- DiameterCorrectionByTree(DataTree,
+                                   DataTree,
+                                   WhatToCorrect = c("POM change", "punctual"),
+                                   CorrectionType = c("taper", "quadratic"))
+
+  expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] == "taper")) # and "taper" in 'DiameterCorrectionMeth'
+  ## taper + shift error A FAIRE -------------------------------------------------------------------------------------------------
+  ## POM change + punctual error A FAIRE -------------------------------------------------------------------------------------------------
+  ## POM change + shift error A FAIRE -------------------------------------------------------------------------------------------------
+  ## taper + POM change A FAIRE -------------------------------------------------------------------------------------------------
 
   ## Case NA in the Diameter column in any case -----------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
