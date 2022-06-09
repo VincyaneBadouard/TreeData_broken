@@ -57,8 +57,14 @@ body <- dashboardBody(
              left: calc(25%);
              @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
       }
+
+
              .dropdown-menu{z-index:10000 !important;}
-             "
+             .sw-dropdown-content {z-index: 3000005 !important;}
+             .sw-dropdown-in {z-index: 3000006 !important;}
+
+           "
+
       )
     ) # to make notification show up at top of page
   ),
@@ -407,20 +413,25 @@ body <- dashboardBody(
                          # status = "primary",
                          # solidHeader = TRUE,
                          # uiOutput("ui1"),
+                         div(id="mainWrapper",
 
                         lapply(unique(x1$Group), function(g) {
-                          dropdownButton(label = g,
-                                         icon = icon("sliders", verify_fa = FALSE),
-                                         size = "lg",
-                                         circle = FALSE,
-                           do.call(div, lapply(which(x1$Group %in% g), function(i) {
+                          dropdown(
+                            h3(g),
+                            do.call(div, lapply(which(x1$Group %in% g), function(i) {
 
-                             eval(parse(text = paste0(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i]," ='",  x1$Default[i],"'", ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                              eval(parse(text = paste0(x1$ItemType[i], "(inputId = x1$ItemID[i], label = ifelse(x1$helpText[i] %in% '', x1$Label[i], paste0(x1$Label[i], ' (', x1$helpText[i], ')')),", x1$argument[i]," ='",  x1$Default[i],"'", ifelse(x1$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
 
-                           }),
-                          )
+                            })),
+                            label = g,
+                            icon = icon("sliders", verify_fa = FALSE),
+                            size = "lg",
+                            circle = FALSE,
+                            tooltip = tooltipOptions(title = "Click to see inputs !")
+
                          )
                          })
+                         )
 
                            # lapply(1:nrow(x1), function(i) {
                            #
