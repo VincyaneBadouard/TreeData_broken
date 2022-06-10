@@ -649,8 +649,8 @@ body <- dashboardBody(
     ), # end of "save" panel
     tabItem(tabName = "Help",
             tabsetPanel(
-              tabPanel( title = "General Worflow",
-                        img(src = "data/AppGeneralWorkflow.jpg", alt = "test", width = 12)),
+              tabPanel(title = "General Worflow",
+                     imageOutput("AppGeneralWorkflow")),
               tabPanel(title = "Stack"),
               tabPanel(title = "Merge"),
               tabPanel(title = "Tidy"),
