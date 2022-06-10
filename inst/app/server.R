@@ -570,10 +570,15 @@ observe( {
 
   observeEvent(input$GoToDownload | input$SkipCorrections , {
     updateTabItems(session, "tabs", "Save")
+
+
   }, ignoreInit = T)
 
 
+
   # apply corrections
+
+  # show corrections arguments or not
 
   observe({
     for(f in unique(xCorr$Function)) {
@@ -591,8 +596,17 @@ observe( {
     }
   })
 
+  # place holder to put either corrected data or non corrected data
+  DataDone <- reactiveVal()
+
+  #decide what DataDone is going to be
+
+  observeEvent(input$SkipCorrections,
+               {  DataDone(DataFormated())
+               })
   observeEvent(input$ApplyCorrections,{
     shinyjs::show("GoToDownload")
+    DataDone(DataCorrected())
     })
 
   DataCorrected <- eventReactive(input$ApplyCorrections, {
@@ -625,8 +639,6 @@ observe( {
                                     selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
-
-
 
 
 
@@ -667,7 +679,9 @@ observe( {
                  showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
                })
 
-      if(exists("DataCorrected") & any(unlist(reactiveValuesToList(input)[unique(xCorr$Function)]) %in% "Yes")) DataOutput(ReversedRequiredFormat(DataCorrected(), profileOutput, x, ThisIsShinyApp = T)) else DataOutput(ReversedRequiredFormat(DataFormated(), profileOutput, x, ThisIsShinyApp = T))
+
+
+      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
 
       profileOutput(profileOutput)
 
@@ -677,7 +691,7 @@ observe( {
       shinyjs::hide("DontUseProfileOuput")
       # shinyjs::hide("UseProfileOuput")
 
-      if(exists("DataCorrected") & any(unlist(reactiveValuesToList(input)[unique(xCorr$Function)]) %in% "Yes")) DataOutput(DataCorrected()) else DataOutput(DataFormated())
+      DataOutput(DataDone())
     })
 
 
@@ -748,14 +762,14 @@ observe( {
     },
     content = function(file) {
 
-      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataOutput()), xall$ItemID)]]
-      OurStandardColumn <- colnames(DataOutput())
+      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataDone()), xall$ItemID)]]
+      OurStandardColumn <- colnames(DataDone())
 
       if(!is.null(profileOutput())) {
         m <- match(OurStandardColumn, xall$ItemID)
-        OutputColumn <-  profileOutput()[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
+        OutputColumn <-  profileOutput()[xall$ItemID[m]]
         OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[match(OurStandardColumn, xall$ItemID)]),"UnitMan")]), ""))
+        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
       } else {
         OutputColumn <- OurStandardColumn
@@ -764,7 +778,8 @@ observe( {
 
       YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
       names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
-      OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
+      # OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
+      OutputColumn[OutputColumn%in%"none"] <- NA
 
 
       Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
