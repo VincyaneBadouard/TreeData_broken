@@ -44,7 +44,7 @@ sidebar <- dashboardSidebar(
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               # menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
               menuItem("Download formatted data", tabName="Save", icon = icon("save")),
-              menuItem("Help", tabName = "Manual", icon = icon("book"))
+              menuItem("Help", tabName = "Help", icon = icon("book"))
   )
 )
 
@@ -646,8 +646,20 @@ body <- dashboardBody(
                          )
               )
             )
-    ) # end of "save" panel
+    ), # end of "save" panel
+    tabItem(tabName = "Help",
+            tabsetPanel(
+              tabPanel( title = "General Worflow",
+                        img(src = "data/AppGeneralWorkflow.jpg", alt = "test", width = 12)),
+              tabPanel(title = "Stack"),
+              tabPanel(title = "Merge"),
+              tabPanel(title = "Tidy"),
+              tabPanel(title = "Headers"),
+              tabPanel(title = "Corrections"),
+              tabPanel(title = "Downloads")
+            )
 
+    ) # end of "Help" panel
   )
 )
 
