@@ -405,7 +405,7 @@ body <- dashboardBody(
                          # uiOutput("ui1"),
                          div(id="mainWrapper",
 
-                        lapply(unique(x1$Group), function(g) {
+                        lapply(unique(x1$Group), function(g) {div(h3(g),
                           dropdown(
                             h3(g),
                             do.call(div, lapply(which(x1$Group %in% g), function(i) {
@@ -420,6 +420,7 @@ body <- dashboardBody(
                             tooltip = tooltipOptions(title = "Click to see inputs !")
 
                          )
+                        )
                          })
                          )
 
