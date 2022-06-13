@@ -591,7 +591,7 @@ body <- dashboardBody(
                        img(src = "Merge.gif", width = "100%")),
               tabPanel(title = "Tidy",
                        img(src = "Tidy.gif", width = "100%")),
-              tabPanel(title = "Headers"),
+              tabPanel(title = "Headers",img(src = "Headers.gif", width = "100%")),
               tabPanel(title = "Corrections"),
               tabPanel(title = "Downloads")
             )
