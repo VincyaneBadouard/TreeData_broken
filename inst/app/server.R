@@ -69,7 +69,7 @@ server <- function(input, output, session) {
      do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
        tabPanel(
          title=i,
-         DTOutput(i)
+         DTOutput(outputId = i)
        )
      })))
 
@@ -116,8 +116,21 @@ server <- function(input, output, session) {
 
   observe({
     req(Data)
-    lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]]) )
+    lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]] , rownames = FALSE,
+           options = list(pageLength = 8, scrollX=TRUE),
+           selection = "none")
+    )
   })
+
+
+  # render data table
+  # output$tabData <- renderDT({
+  #   if (!is.null(input$file1$name))
+  #     Data()
+  # }, rownames = FALSE,
+  # options = list(pageLength = 8, scrollX=TRUE),
+  # selection = "none")
+
 
   observeEvent(input$submitTables, {
 
@@ -387,15 +400,6 @@ observe( {
 
 
   })
-
-
-  # render data table
-  output$tabData <- renderDT({
-    if (!is.null(input$file1$name))
-      Data()
-  }, rownames = FALSE,
-  options = list(pageLength = 8, scrollX=TRUE),
-  selection = "none")
 
 
 
@@ -795,13 +799,13 @@ observe( {
   )
 
 # Help stuff
-  output$AppGeneralWorkflow <- renderImage(
-    list(src = "data/AppGeneralWorkflow.png",
-         contentType = "image/png",
-         alt = "test",
-         width = "100%",
-         align = "center"),
-    deleteFile = F)
+  # output$AppGeneralWorkflow <- renderImage(
+  #   list(src = "data/AppGeneralWorkflow.png",
+  #        contentType = "image/png",
+  #        alt = "test",
+  #        width = "100%",
+  #        align = "center"),
+  #   deleteFile = F)
 
 
 }
