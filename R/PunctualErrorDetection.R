@@ -62,8 +62,10 @@ PunctualErrorDetection <- function(
   # }
 
   # Detect abnormal growth --------------------------------------------------------------------------------------------------
-  Ncresc_abn <- sum(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # nbr of abnormal values
+  Ncresc_abn <- sum(cresc[!is.na(cresc)] >= PositiveGrowthThreshold |
+                      cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold) # nbr of abnormal values
   # le retour à la normale est considéré comme une erreur (perte excessive)
+  # don't take into account NA value because there are just missing DBH value
 
   if(Ncresc_abn > 0) { # if there are abnormal values
     for (i in 1:Ncresc_abn) { # for each abnormal value
