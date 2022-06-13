@@ -577,12 +577,21 @@ body <- dashboardBody(
     ), # end of "save" panel
     tabItem(tabName = "Help",
             tabsetPanel(
-              tabPanel(title = "General Worflow",
-                     imageOutput("AppGeneralWorkflow")),
-              tabPanel(title = "Stack"),
-              tabPanel(title = "Merge"),
-              tabPanel(title = "Tidy"),
-              tabPanel(title = "Headers"),
+              tabPanel(title = "General",
+                     img(src = "AppGeneralWorkflow.PNG", width = "100%")),
+              tabPanel(title = "Upload",
+                       img(src = "Upload.gif", width = "100%")),
+              tabPanel(title = "Stack",
+                       p("When you have multiple tables, some of them may need to be stacked on top of eachother, if they have" , strong("same set of colums"), "(with exact same names) but represent measurements for different sets of trees (e.g. at different sites), or maybe different censuses."),
+                       p("In the example below, we uploaded four tables, three of which are individual census tables, with the same set of colums (Tables", code("Census1"),",",code("Census2"), ", and ", code('Census3'), "). The fourth table,", code('SpeciesTable'), ", is different, we will merge the species information in our census data at the next step."),
+                       img(src = "Stack.gif", width = "100%"),
+                       p("To stack our three table, we selection each of them and click 'Stack Tables'. If they are all actually stackable (with the same set of columns, with the same names), you will see the consolidated table appear in the summary below."),
+                       img(src = "Stack2.PNG", width = "100%")),
+              tabPanel(title = "Merge",
+                       img(src = "Merge.gif", width = "100%")),
+              tabPanel(title = "Tidy",
+                       img(src = "Tidy.gif", width = "100%")),
+              tabPanel(title = "Headers",img(src = "Headers.gif", width = "100%")),
               tabPanel(title = "Corrections"),
               tabPanel(title = "Downloads")
             )
