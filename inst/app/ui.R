@@ -388,16 +388,6 @@ body <- dashboardBody(
                               p("A sample or your dates look like this:"),
                               textOutput("sampleDates")))),
 
-              # inform if long or wide format
-              # box(width = 12,
-              #     radioButtons(inputId = "format",
-              #              label = div(actionBttn(
-              #                inputId = "inactivebutton",
-              #                label = "1",
-              #                style = "pill",
-              #                color = "danger"),
-              #                "Is your data in long or wide format?", br(), em("(Wide format not implemented yet)")),
-              #              choices = list("Long" = "long", "Wide" = "wide"))),
               column(width = 6,
                      actionBttn(
                        inputId = "inactivebutton8",
@@ -459,14 +449,17 @@ body <- dashboardBody(
                        }),
                        actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
                      ),
+                     box(title = "Save your profile",
+                         width = NULL,
+                         status = "primary",
+                         solidHeader = TRUE,
+                         downloadButton(outputId = "dbProfile", label = "Save profile")),
                      hidden( actionBttn(
                        inputId = "GoToCorrect",
                        label = "Go To Correct",
                        style = "material-flat",
                        color = "success"
-                     )),
-
-
+                     ))),
 
                      fluidRow(
 
@@ -477,56 +470,6 @@ body <- dashboardBody(
                               DTOutput(outputId = "FormatedTable")
                        ))
 
-              )
-
-             #           div( id = "header2",
-             #                actionBttn(
-             #                  inputId = "inactivebutton",
-             #                  label = "2",
-             #                  style = "pill",
-             #                  color = "warning")
-             #                ,   strong("  Fill in information that is not in your columns"),
-             #                br(),
-             #                br(),
-             #                box(width = NULL,
-             #                    # uiOutput("ui2"),
-             #                    lapply(c(1:nrow(x2)), function(i) {
-             #
-             #                      eval(parse(text = paste0( x2$ItemType[i], "(inputId = x2$ItemID[i], label = ifelse(x2$helpText[i] %in% '', x2$Label[i], paste0(x2$Label[i], ' (', x2$helpText[i], ')')),", x2$argument[i]," = '",  x2$Default[i],"'",  ifelse(x2$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-             #
-             #                    })
-             #                    # actionBttn("Header2Next", "next", style = "fill", color = "primary")
-             #                )
-             #           ),
-             #             div( id = "header3",
-             #                  # uiOutput("ui3")
-             #                  box(width = NULL,
-             #                  lapply(c(1:nrow(x3)), function(i)
-             #                    {
-             #                    eval(parse(text = paste0("hidden(", x3$ItemType[i], "(inputId = x3$ItemID[i], label = ifelse(x3$helpText[i] %in% '', x3$Label[i], paste0(x3$Label[i], ' (', x3$helpText[i], ')')),", x3$argument[i], "='",  x3$Default[i],"'", ifelse(x3$Options[i] != FALSE, paste0(", options = ", x3$Options[i]), ""), ifelse(x3$Multiple[i] %in% TRUE, ", multiple = TRUE)", "))"))))
-             #                  })
-             #                  )
-             #                  # actionBttn("Header3Next", "next", style = "fill", color = "primary")
-             #                  ),
-             #
-             #
-             #             div( id = "header4",
-             #             # uiOutput("ui4"),
-             #             lapply(c(1:nrow(x4)), function(i) {
-             #
-             #                 eval(parse(text = paste0(x4$ItemType[i], "(inputId = x4$ItemID[i], label = ifelse(x4$helpText[i] %in% '', x4$Label[i], paste0(x4$Label[i], ' (', x4$helpText[i], ')')),", x4$argument[i], "='", x4$Default[i], "'", ifelse(x4$Options[i] != FALSE, paste0(", options = ", x4$Options[i]), ""), ifelse(x4$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-             #
-             #             })
-             #             # actionBttn("Header4Next", "next", style = "fill", color = "primary")
-             #             ),
-             #
-             #
-             #           hidden(
-             #             div( id = "header5",
-             #             uiOutput("ui5"),
-             #             actionButton("LaunchFormating", label = "Launch formating!", style = "color: #fff; background-color: #009e60; border-color: #317256")))
-             # #;   position: fixed
-             #  )
 
     )),
 
@@ -573,17 +516,6 @@ body <- dashboardBody(
               ))
             ),
 
-    # tabItem(tabName = "Visualise",
-    #
-    #         fluidRow(
-    #
-    #           column(width = 10,
-    #                  DTOutput(outputId = "tabDataFormated")
-    #           ),
-    #           actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
-    #         )
-    # ),  ## end of "visualize" panel
-
     tabItem(tabName = "Save",
 
             fluidRow(box(width = 12,
@@ -626,11 +558,6 @@ body <- dashboardBody(
                          status = "primary",
                          solidHeader = TRUE,
                          downloadButton(outputId = "dbFile", label = "Save file")),
-                     box(title = "Save your profile",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbProfile", label = "Save profile")),
                      # box(title = "Save code",
                      #     width = NULL,
                      #     status = "primary",
