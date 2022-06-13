@@ -48,7 +48,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v1
 
-      - name: install mvtnorm and mcmcpack for R < 4.3
+      - name: install mvtnorm and mcmcpack for R > 4.3
         if: ${{ env.UPGRADE_PKGS }}
         run: |
           Sys.getenv("UPGRADE_PKGS")
