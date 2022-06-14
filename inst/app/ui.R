@@ -295,10 +295,9 @@ body <- dashboardBody(
 
     tabItem(tabName = "Tidying",
             h3("This is where we want to make your data 'tidy'"),
-            h3("This means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
-            h4("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
-            h5("This is called wide-to-long reshaping."),
-            h4("If you already have one observation per row, skip this step"),
+            p("This means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
+            p("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
+            p("This is called wide-to-long reshaping. If you already have one observation per row, you can skip this step"),
             actionBttn(
               inputId = "SkipTidy",
               label = "Skip this step",
@@ -308,13 +307,14 @@ body <- dashboardBody(
             box(width = 12,
                 radioButtons(
               "VariableName",
-              "What is the meaning of the repeated column?",
-              choices = c("CensusID", "Year", "MeasureID", "StemID"),
+              "Why do you have repeated column?",
+              choices = c("One column per census" = "CensusID", "One column per height of measurement, measurement method, ..." = "MeasureID", "One column per stem" = "StemID", "One column per year" = "Year"),
               selected = "",
               inline = FALSE
             ),
             actionButton("ClearValueName","Clear")),
-            h3("Tick the groupings that should be applied and fix the prefilled information if necessary."),
+            br()
+,            h3("Tick the grouping(s) that should be applied and fix the prefilled information if necessary."),
 
             uiOutput("meltUI"),
 
