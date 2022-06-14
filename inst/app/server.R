@@ -799,13 +799,13 @@ observe( {
   )
 
 # Help stuff
-  # output$AppGeneralWorkflow <- renderImage(
-  #   list(src = "data/AppGeneralWorkflow.png",
-  #        contentType = "image/png",
-  #        alt = "test",
-  #        width = "100%",
-  #        align = "center"),
-  #   deleteFile = F)
+  output$AppGeneralWorkflow <- renderImage(
+    list(src = "www/AppGeneralWorkflow.png",
+         contentType = "image/png",
+         alt = "test",
+         width = "100%",
+         align = "center"),
+    deleteFile = F)
 
 
 }

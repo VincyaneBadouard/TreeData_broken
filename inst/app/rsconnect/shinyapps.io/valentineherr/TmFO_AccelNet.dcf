@@ -5,10 +5,10 @@ account: valentineherr
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5708669
-bundleId: 6002704
+bundleId: 6006775
 url: https://valentineherr.shinyapps.io/TmFO_AccelNet/
-when: 1655124122.68766
-lastSyncTime: 1655124122.68766
+when: 1655217583.58847
+lastSyncTime: 1655217583.58847
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: ~$AppTutorial.pptx|AppTutorial.pptx|simple_app_backup/ForetGEOStandardTestData.R|simple_app_backup/RequireFormat_interactive.R|simple_app_backup/RunApp.R|simple_app_backup/server.R|simple_app_backup/ui.R|tests|VegX_app_backup
+ignoredFiles: ~$AppTutorial.pptx|AppTutorial.pptx|simple_app_backup/ForetGEOStandardTestData.R|simple_app_backup/RunApp.R|simple_app_backup/server.R|simple_app_backup/ui.R|tests|VegX_app_backup

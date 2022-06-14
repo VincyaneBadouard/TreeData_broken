@@ -20,9 +20,9 @@ devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)
 
 # Open the shiny app
 
+Click [here](https://valentineherr.shinyapps.io/TmFO_AccelNet/) for an online version or run the following code in an R Session:
+
 ```
-TreeData::RunApp()
-# or
 shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")
 ```
 

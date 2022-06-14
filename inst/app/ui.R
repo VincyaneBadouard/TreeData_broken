@@ -295,10 +295,9 @@ body <- dashboardBody(
 
     tabItem(tabName = "Tidying",
             h3("This is where we want to make your data 'tidy'"),
-            h3("This means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
-            h4("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
-            h5("This is called wide-to-long reshaping."),
-            h4("If you already have one observation per row, skip this step"),
+            p("This means that we want one row per observation. An observation is one measurement (of one stem, at one census, and one height)."),
+            p("If you have stored several measurements on a same row (for example, you have several DBH columns, one for each census), we need to tidy your data..."),
+            p("This is called wide-to-long reshaping. If you already have one observation per row, you can skip this step"),
             actionBttn(
               inputId = "SkipTidy",
               label = "Skip this step",
@@ -308,13 +307,14 @@ body <- dashboardBody(
             box(width = 12,
                 radioButtons(
               "VariableName",
-              "What is the meaning of the repeated column?",
-              choices = c("CensusID", "Year", "MeasureID", "StemID"),
+              "Why do you have repeated column?",
+              choices = c("One column per census" = "CensusID", "One column per height of measurement, measurement method, ..." = "MeasureID", "One column per stem" = "StemID", "One column per year" = "Year"),
               selected = "",
               inline = FALSE
             ),
             actionButton("ClearValueName","Clear")),
-            h3("Tick the groupings that should be applied and fix the prefilled information if necessary."),
+            br()
+,            h3("Tick the grouping(s) that should be applied and fix the prefilled information if necessary."),
 
             uiOutput("meltUI"),
 
@@ -578,16 +578,23 @@ body <- dashboardBody(
     tabItem(tabName = "Help",
             tabsetPanel(
               tabPanel(title = "General",
-                     img(src = "AppGeneralWorkflow.PNG", width = "100%")),
+                       imageOutput("AppGeneralWorkflow")
+                     # img(src = "AppGeneralWorkflow.PNG", width = "100%")
+                     ),
               tabPanel(title = "Upload",
+                       p("This is an example where we upload two tables, one for tree data and one for plot data."),
+                       p("You can give your tables a name so they re easily recognisable in the next steps."),
                        img(src = "Upload.gif", width = "100%")),
               tabPanel(title = "Stack",
-                       p("When you have multiple tables, some of them may need to be stacked on top of eachother, if they have" , strong("same set of colums"), "(with exact same names) but represent measurements for different sets of trees (e.g. at different sites), or maybe different censuses."),
-                       p("In the example below, we uploaded four tables, three of which are individual census tables, with the same set of colums (Tables", code("Census1"),",",code("Census2"), ", and ", code('Census3'), "). The fourth table,", code('SpeciesTable'), ", is different, we will merge the species information in our census data at the next step."),
-                       img(src = "Stack.gif", width = "100%"),
-                       p("To stack our three table, we selection each of them and click 'Stack Tables'. If they are all actually stackable (with the same set of columns, with the same names), you will see the consolidated table appear in the summary below."),
-                       img(src = "Stack2.PNG", width = "100%")),
+                       p("You can stack multiple tables on top of eachother, if they have the" , strong("same set of colums"), "(with exact same names) but represent measurements for different sets of trees (e.g. at different sites), or maybe different censuses."),
+                       p("In this example, we uploaded four tables. Three of them are individual census tables, with the same set of colums (Tables", code("Census1"),",",code("Census2"), ", and ", code('Census3'), "). The fourth table,", code('SpeciesTable'), ", is different, and we will merge its information at the next step."),
+                       p("To stack our three tables, we select each of them and click 'Stack Tables'. The new 'unified' table appears at the bottom of the page."),
+                       img(src = "Stack.gif", width = "100%")),
               tabPanel(title = "Merge",
+                       p("At this stage, you should only have two tables. They can be the two tables you uploaded (if you skipped the stacking process), or they can be your stacked table and an extra table that as information you need to merge in. The latter case is our situation here."),
+                       p("In this example, we have our stacked tables (", code("StackedTables"), "we stacked data from 3 censuses at the step before), and our species table", code("SpeciesTable"), ", which has information that we want to merge in our inventory data."),
+                         p("Because we want to keep all the rows of the longer data set, with all the inventory data, we first select", code("StackedTables"), "We then indicate what column in that dataset is the 'key' column that should be used to link it to our species table. We then do the same to our species table."),
+                           p("NOTE: If you need multiple columns to indicate the 'key' that links the two tables together, you can select multiple columns. If you are doing so, make sure that you select them in the right order."),
                        img(src = "Merge.gif", width = "100%")),
               tabPanel(title = "Tidy",
                        img(src = "Tidy.gif", width = "100%")),
