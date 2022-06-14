@@ -130,7 +130,7 @@ test_that("DiameterCorrectionByTree", {
   ## phylogenetic hierarchical correction A FAIRE------------------------------------------------------------------------------
 
   # Mix cases
-  # punctual + shift error A FAIRE
+  # punctual + shift error A FAIRE-------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2)) # 0.5 cm/year
@@ -163,7 +163,7 @@ test_that("DiameterCorrectionByTree", {
   # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper")) # "taper" if HOM change
   # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "quadratic")) # and "quadratic"
 
-  # taper + shift error A FAIRE
+  # taper + shift error A FAIRE------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
@@ -179,7 +179,7 @@ test_that("DiameterCorrectionByTree", {
   # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper")) # "taper" if HOM change A FAIRE
   expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% c("linear", "shift realignment"))) # and "linear" or "shift realignment"
 
-  # POM change + punctual error A FAIRE BUG
+  # POM change + punctual error A FAIRE BUG------------------------------------------------------------------------------------
   # DataTree <- data.table(IdTree = "c",
   #                        Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
   #                        Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
@@ -197,8 +197,8 @@ test_that("DiameterCorrectionByTree", {
   # expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 
 
-  # POM change + shift error A FAIRE
-  # taper + POM change A FAIRE
+  # POM change + shift error A FAIRE------------------------------------------------------------------------------------
+  # taper + POM change A FAIRE------------------------------------------------------------------------------------------
 
   ## Case NA in the Diameter column in any case A FAIRE-----------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
