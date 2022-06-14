@@ -30,11 +30,18 @@ DiameterCorrection(
 \item{Data}{(data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
+\item 'IdTree' (character)
 \item 'Diameter' (numeric)
+\item 'Year' (numeric)
 \item \strong{'HOM'(Height Of Measurement) (numeric)} if you want to apply the
 \strong{"taper" correction}
 \item \strong{'POM'(Point Of Measurement) (factor)} if you want to correct from the
 \strong{"POM change}
+If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
+dataset must contain the columns:
+\item 'ScientificName' (character)
+\item 'Genus' (character)
+\item 'Family' (character)
 }}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)

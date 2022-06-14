@@ -2,11 +2,18 @@
 #'
 #' @param Data (data.frame or data.table)
 #'   The dataset must contain the columns:
+#'   - 'IdTree' (character)
 #'   - 'Diameter' (numeric)
+#'   - 'Year' (numeric)
 #'   - **'HOM'(Height Of Measurement) (numeric)** if you want to apply the
 #'       **"taper" correction**
 #'   - **'POM'(Point Of Measurement) (factor)** if you want to correct from the
 #'       **"POM change**
+#'   If you want to apply the **"phylogenetic hierarchical"** correction, the
+#'   dataset must contain the columns:
+#'   - 'ScientificName' (character)
+#'   - 'Genus' (character)
+#'   - 'Family' (character)
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
@@ -239,7 +246,15 @@ DiameterCorrection <- function(
 #' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
 #'   measurements (data.frame or data.table).
 #'
-#' @param Data Complete dataset (data.table)
+#' @param Data Complete dataset (data.table) used if the "phylogenetic
+#'   hierarchical" correction (*CorrectionType* argument) is chosen.
+#'   The dataset must contain the columns:
+#'   - 'IdTree' (character)
+#'   - 'ScientificName' (character)
+#'   - 'Genus' (character)
+#'   - 'Family' (character)
+#'   - 'Diameter' (numeric)
+#'   - 'Year' (numeric)
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
@@ -394,7 +409,7 @@ DiameterCorrectionByTree <- function(
     # Arrange year in ascending order
     DataTree <- DataTree[order(Year)] # order de dt
 
-    DBHCor <- Diameter <-DataTree[, Diameter]
+    DBHCor <- Diameter <- DataTree[, Diameter]
     Time <- DataTree[, Year]
 
     # Taper correction ------------------------------------------------------------------------------------------------------
@@ -403,6 +418,8 @@ DiameterCorrectionByTree <- function(
                                   DefaultHOM = DefaultHOM,
                                   TaperParameter = TaperParameter, TaperFormula = TaperFormula,
                                   DetectOnly = DetectOnly)
+
+      DBHCor <- DataTree[, DBHCor]
     }
 
 
@@ -420,16 +437,24 @@ DiameterCorrectionByTree <- function(
 
           if(DetectOnly %in% FALSE){
 
+            # Check first for punctual error and put NA (to remove any abnormal increments)
+            DBHCor <- PunctualErrorDetection(
+              DBHCor = DBHCor, Time = Time,
+              PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
+              TrustMeasSet = TrustMeasSet,
+              DetectOnly = DetectOnly)
+
+            # Compute diameter incrementation without the inits shift
+            cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+            cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+            # Remove incr between 2 shifts (take growth only intra seq)
+            cresc[raised-1]  <- NA # cresc[which(is.na(cresc))+1] <- NA
+            cresc_abs[raised-1] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA
+
+
             if("individual" %in% CorrectionType) {
 
               ## 1. DBH[init shift] -------------------------------------------------------------------------------------------
-
-              # Compute diameter incrementation without the inits shift
-              cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-              cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
-              # Remove incr between 2 shifts (take growth only intra seq)
-              cresc[raised-1]  <- NA # cresc[which(is.na(cresc))+1] <- NA
-              cresc_abs[raised-1] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA
 
               # Check that only non-abnormal growths are kept
               if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
@@ -530,13 +555,13 @@ DiameterCorrectionByTree <- function(
 
         if(DetectOnly %in% FALSE){
 
+          # Remove incr between 2 shifts (take growth only intra seq)
+          cresc[cresc_abn] <- NA
+          cresc_abs[cresc_abn] <- NA
+
           if("individual" %in% CorrectionType) {
 
             ## 1. DBH[init shift] -----------------------------------------------------------------------------------------------
-
-            # Remove incr between 2 shifts (take growth only intra seq)
-            cresc[cresc_abn] <- NA
-            cresc_abs[cresc_abn] <- NA
 
             # Check that only non-abnormal growths are kept
             if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){

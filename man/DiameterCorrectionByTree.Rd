@@ -31,7 +31,17 @@ DiameterCorrectionByTree(
 \item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
 measurements (data.frame or data.table).}
 
-\item{Data}{Complete dataset (data.table)}
+\item{Data}{Complete dataset (data.table) used if the "phylogenetic
+hierarchical" correction (\emph{CorrectionType} argument) is chosen.
+The dataset must contain the columns:
+\itemize{
+\item 'IdTree' (character)
+\item 'ScientificName' (character)
+\item 'Genus' (character)
+\item 'Family' (character)
+\item 'Diameter' (numeric)
+\item 'Year' (numeric)
+}}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}

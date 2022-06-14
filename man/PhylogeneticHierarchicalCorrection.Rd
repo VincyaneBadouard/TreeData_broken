@@ -20,12 +20,24 @@ PhylogeneticHierarchicalCorrection(
 }
 \arguments{
 \item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
-measurements (data.table)}
-
-\item{Data}{(data.table)
+measurements (data.table)
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)
+\item 'ScientificName' (character)
+\item 'Genus' (character)
+\item 'Family' (character)
+\item 'Diameter' (numeric)
+\item 'Year' (numeric)
+}}
+
+\item{Data}{Complete dataset (data.table)
+The dataset must contain the columns:
+\itemize{
+\item 'IdTree' (character)
+\item 'ScientificName' (character)
+\item 'Genus' (character)
+\item 'Family' (character)
 \item 'Diameter' (numeric)
 \item 'Year' (numeric)
 }}

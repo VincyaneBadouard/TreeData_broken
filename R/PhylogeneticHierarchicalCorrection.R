@@ -6,10 +6,20 @@
 #'
 #' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
 #'   measurements (data.table)
-#'
-#' @param Data (data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
+#'   - 'ScientificName' (character)
+#'   - 'Genus' (character)
+#'   - 'Family' (character)
+#'   - 'Diameter' (numeric)
+#'   - 'Year' (numeric)
+#'
+#' @param Data Complete dataset (data.table)
+#'   The dataset must contain the columns:
+#'   - 'IdTree' (character)
+#'   - 'ScientificName' (character)
+#'   - 'Genus' (character)
+#'   - 'Family' (character)
 #'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
@@ -100,6 +110,17 @@ PhylogeneticHierarchicalCorrection <- function(
   MinIndividualNbr = 5
 ){
 
+  #### Arguments check ####
+
+  # Check if the 'ScientificName' column exists
+  if(!"ScientificName" %in% names(DataTree)){
+    stop("'DataTree' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+  }
+  if(!"ScientificName" %in% names(Data)){
+    stop("'Data' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+  }
+
+
   # Estimate the shifted DBH ------------------------------------------------------------------------------------------------
   if(length(cresc[!is.na(cresc)]) > 0){
     # EstDBH <- previous value + estimated cresc by regression interpolation
@@ -189,7 +210,11 @@ PhylogeneticHierarchicalCorrection <- function(
 
 
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
-  DataTree[,DBHCor := DBHCor]
+  if("DBHCor" %in% names(DataTree)){
+    DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+  }
+
+  DataTree[, DBHCor := DBHCor]
 
   return(DataTree)
 

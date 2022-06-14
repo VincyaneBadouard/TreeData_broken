@@ -1,6 +1,7 @@
 test_that("PhylogeneticHierarchicalCorrection", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
+  library(data.table)
   data(TestData)
   DataTree <- TestData[IdTree %in% "100658"]
 
@@ -9,6 +10,19 @@ test_that("PhylogeneticHierarchicalCorrection", {
   cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
   cresc_abs <- c(1, 1, NA, 1, 1)
   cresc_abn <- 3
+
+  NoSctficDataTree <- DataTree[, !c("ScientificName")]
+  NoSctficData <- TestData[, !c("ScientificName")]
+
+
+  # Check the function argument ----------------------------------------------------------------------------------------
+
+  expect_error(PhylogeneticHierarchicalCorrection(NoSctficDataTree),
+               regexp = "'DataTree' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+
+  expect_error(PhylogeneticHierarchicalCorrection(DataTree, NoSctficData),
+               regexp = "'Data' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+
 
   # Check the function work ---------------------------------------------------------------------------------------------------------
 
