@@ -578,7 +578,9 @@ body <- dashboardBody(
     tabItem(tabName = "Help",
             tabsetPanel(
               tabPanel(title = "General",
-                     img(src = "AppGeneralWorkflow.PNG", width = "100%")),
+                       imageOutput("AppGeneralWorkflow")
+                     # img(src = "AppGeneralWorkflow.PNG", width = "100%")
+                     ),
               tabPanel(title = "Upload",
                        p("This is an example where we upload two tables, one for tree data and one for plot data."),
                        p("You can give your tables a name so they re easily recognisable in the next steps."),
