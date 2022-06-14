@@ -8,6 +8,8 @@
 #'
 #' @return Y (numeric) with interpolated missing values depending on the form of
 #'   model chosen (*CorrectionType*)
+#'
+#'@importFrom stats lm poly
 #' @export
 #'
 #' @examples
