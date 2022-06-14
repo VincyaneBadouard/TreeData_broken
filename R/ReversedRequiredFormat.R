@@ -26,7 +26,6 @@
 #'
 #'@importFrom data.table copy setDT setDF dcast setnames melt tstrsplit :=
 #'@importFrom utils read.csv
-#'@importFrom stats formula
 #'
 #' @examples
 #'\dontrun{
