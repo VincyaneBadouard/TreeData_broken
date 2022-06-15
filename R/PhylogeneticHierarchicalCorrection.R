@@ -131,11 +131,10 @@ PhylogeneticHierarchicalCorrection <- function(
       # Estimate cresc by regression
       cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic")
 
-      EstDBH <- vector("numeric")
       # rs = 1
       for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
         # EstDBH = previous value + estimated cresc by regression interpolation
-        EstDBH[rs] <- DBHCor[cresc_abn[rs]] + cresc_Corr[cresc_abn[rs]]*diff(Time)[cresc_abn[rs]]
+        EstDBH <- DBHCor[cresc_abn[rs]] + cresc_Corr[cresc_abn[rs]]*diff(Time)[cresc_abn[rs]]
 
 
         # Find colleagues ---------------------------------------------------------------------------------------------------------
@@ -193,9 +192,13 @@ PhylogeneticHierarchicalCorrection <- function(
         # Correct the shift -------------------------------------------------------------------------------------------------------
         for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
           # DBH[shift] = previous value + their cresc_abs
+
+          # If NA in cresc_abs replace it by a interpolation value
+          cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "quadratic") # Compute the corrected cresc
+
           DBHCor[i] <- # then correct the other shift values
             DBHCor[i-1] + # New position of the previous value
-            cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
+            cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
           # Add the column with the correction method  ------------------------------------------------------------------------
           DataTree[i, DiameterCorrectionMeth := "shift realignment"]

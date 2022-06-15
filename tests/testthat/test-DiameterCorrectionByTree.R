@@ -238,35 +238,55 @@ test_that("DiameterCorrectionByTree", {
   # POM change + shift error A FAIRE------------------------------------------------------------------------------------
   # taper + POM change A FAIRE------------------------------------------------------------------------------------------
 
-  # All corrections BUG REGLER CE CAS-----------------------------------------------------------------------------------------------
-  # DataTree <- data.table(IdTree = "c",
-  #                        ScientificName = "Pradosia cochlearia",
-  #                        Genus = "Pradosia",
-  #                        Family = "Sapotaceae",
-  #                        Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
-  #                        Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-  #                        POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-  #                        HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
-  #
-  #
-  # Rslt <- DiameterCorrectionByTree(
-  #   DataTree, TestData,
-  #   WhatToCorrect = c("POM change", "punctual", "shift"),
-  #   CorrectionType = c("taper", "quadratic", "linear",
-  #                      "individual", "phylogenetic hierarchical"))
+  # All corrections -----------------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         ScientificName = "Pradosia cochlearia",
+                         Genus = "Pradosia",
+                         Family = "Sapotaceae",
+                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+                         Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-  # Case NA in the Diameter column in any case A FAIRE-----------------------------------------------------------------------------------------
-  # DataTree <- data.table(IdTree = "c",
-  #                        Year = seq(2000,2008, by = 2), # 5 censuses
-  #                        Diameter = c(13, 14, 15, NA, 17), # 0.5 cm/year
-  #                        POM = c(0, 0, 1, 1, 2),
-  #                        HOM = c(1.3, 1.3, 1.5, 1.5, 2))
 
-  # Rslt <- DiameterCorrectionByTree(DataTree,
-  #                                  DataTree,
-  #                                  WhatToCorrect = c("POM change", "punctual", "shift"),
-  #                                  CorrectionType = c("taper", "quadratic", "linear",
-  #                                                     "individual", "phylogenetic hierarchical"))
+  Rslt <- DiameterCorrectionByTree(
+    DataTree, TestData,
+    WhatToCorrect = c("POM change", "punctual", "shift"),
+    CorrectionType = c("taper", "quadratic", "linear", "individual"))
+
+  # Compute corrected diameter incrementation
+  cresc <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "annual", Time = Rslt$Year)
+  cresc_abs <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "absolute", Time = Rslt$Year)
+
+  # Check that no abnormal increments remain
+  expect_true(all(cresc < 5 | cresc_abs > -2))
+
+  # Case NA in the Diameter column in any case -----------------------------------------------------------------------------------------
+  DataTree <- data.table(IdTree = "c",
+                         ScientificName = "Pradosia cochlearia",
+                         Genus = "Pradosia",
+                         Family = "Sapotaceae",
+                         Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
+                         Diameter = c(13, 14, 24, 16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+
+
+  Rslt <- DiameterCorrectionByTree(DataTree,
+                                   TestData,
+                                   WhatToCorrect = c("POM change", "punctual", "shift"),
+                                   CorrectionType = c("taper", "quadratic", "linear", "phylogenetic hierarchical"))
+
+  # Compute corrected diameter incrementation
+  cresc <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "annual", Time = Rslt$Year)
+  cresc_abs <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "absolute", Time = Rslt$Year)
+
+  # Check that no abnormal increments remain
+  expect_true(all(cresc < 5 | cresc_abs > -2))
+
+  expect_true(all(!is.na(Rslt[DBHCor != Diameter, DiameterCorrectionMeth]))) # method when the DBH has been corrected
+
+  expect_true(all(Rslt[DBHCor != Diameter, Comment] != "")) # comment when the DBH has been corrected
 
 })
 

@@ -437,13 +437,6 @@ DiameterCorrectionByTree <- function(
 
           if(DetectOnly %in% FALSE){
 
-            # Check first for punctual error and put NA (to remove any abnormal increments)
-            DBHCor <- PunctualErrorDetection(
-              DBHCor = DBHCor, Time = Time,
-              PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
-              TrustMeasSet = TrustMeasSet,
-              DetectOnly = DetectOnly)
-
             # Compute diameter incrementation without the inits shift
             cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
             cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
@@ -451,6 +444,10 @@ DiameterCorrectionByTree <- function(
             cresc[raised-1]  <- NA # cresc[which(is.na(cresc))+1] <- NA
             cresc_abs[raised-1] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA
 
+            # Put NA if other abnormal incrementation
+            AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
+            cresc[AbnormalCrescs]  <- NA
+            cresc_abs[AbnormalCrescs]  <- NA
 
             if("individual" %in% CorrectionType) {
 
@@ -474,11 +471,14 @@ DiameterCorrectionByTree <- function(
 
 
                   ## 2. DBH[shift] --------------------------------------------------------------------------------------------
+                  # If NA in cresc_abs replace it by a interpolation value
+                  cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+
                   for(i in (raised[rs]+1): min(raised[rs+1]-1, length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
                     # DBH[shift] = previous value + their cresc_abs
                     DBHCor[i] <- # then correct the other shift values
                       DBHCor[i-1] + # New position of the previous value
-                      cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
+                      cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
                     # Add the column with the correction method  ------------------------------------------------------------------------
                     DataTree[i, DiameterCorrectionMeth := "shift realignment"]
@@ -522,6 +522,10 @@ DiameterCorrectionByTree <- function(
         DetectOnly = DetectOnly)
       # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
 
+      if("DBHCor" %in% names(DataTree)){
+        DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+      }
+
       DataTree[,DBHCor := DBHCor]
 
       DataTree <- GenerateComment(DataTree,
@@ -543,6 +547,10 @@ DiameterCorrectionByTree <- function(
       # le retour à la normale est considéré comme une erreur (perte excessive)
 
       if(length(cresc_abn) != 0) { # if there are abnormal values
+
+        if("DBHCor" %in% names(DataTree)){
+          DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+        }
 
         DataTree[,DBHCor := DBHCor]
 
@@ -582,9 +590,13 @@ DiameterCorrectionByTree <- function(
                 ## 2. DBH[shift] --------------------------------------------------------------------------------------------
                 for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
                   # DBH[shift] = previous value + their cresc_abs
-                  DBHCor[i] <- # then correct the other shift values
+
+                  # If NA in cresc_abs replace it by a interpolation value
+                  cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+
+                   DBHCor[i] <- # then correct the other shift values
                     DBHCor[i-1] + # New position of the previous value
-                    cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
+                     cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
                   # Add the column with the correction method  ------------------------------------------------------------------------
                   DataTree[i, DiameterCorrectionMeth := "shift realignment"]
