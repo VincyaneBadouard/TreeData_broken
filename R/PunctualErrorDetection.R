@@ -104,7 +104,7 @@ PunctualErrorDetection <- function(
               isTRUE(down < up & up != ab & cresc[up] * cresc[down] < 0 &
                      # Compute cresc around the error by skipping the error to check if it's normal
                      ((DBHCor[up + 1] - DBHCor[down]) / (Time[up + 1] - Time[down])) <= PositiveGrowthThreshold &
-                     (DBHCor[up + 1] - DBHCor[down]) >= -NegativeGrowthThreshold)) { # different de Nino (tag dirtyhack) (runner ac mon ex)
+                     (DBHCor[up + 1] - DBHCor[down]) >= NegativeGrowthThreshold)) { # different de Nino (tag dirtyhack) (runner ac mon ex) (-NegativeGrowthThreshold)
 
             # Abnormal DBH <- NA and will be replaced later on (by RegressionInterpolation()) -------------------------------
             first <- min(up, down) + 1 # The punctual error: the 1st value with the greatest increment (positive or negative) (+1 to switch from cresc to DBH indices)

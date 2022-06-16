@@ -101,10 +101,13 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' # Rslt <- DiameterCorrection(
-#' #  TestData,
-#' #  CorrectionType = c("quadratic",
-#' #                     "individual", "phylogenetic hierarchical"))
+#' # Remove other errors types (non-unique idTree)
+#' TestData <- TestData[IdTree != "100898"]
+#'
+#' Rslt <- DiameterCorrection(
+#'  TestData,
+#'   WhatToCorrect = c("POM change", "punctual", "shift"),
+#'     CorrectionType = c("quadratic", "phylogenetic hierarchical"))
 #'
 DiameterCorrection <- function(
   Data,
@@ -179,19 +182,27 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
-  if(any(!is.na(Data$HOM)) & !CorrectionType  %in% "taper") # HOM exists?
+  if(any(!is.na(Data$HOM)) & !any(CorrectionType  %in% "taper")) # HOM exists?
     message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with the 'taper' correction ('CorrectionType' argument)")
 
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
-     any(!is.na(Data$POM)) & !WhatToCorrect %in% "POM change") # POM exists?
+     any(!is.na(Data$POM)) & !any(WhatToCorrect %in% "POM change")) # POM exists?
     message("You have the 'POM' information in your dataset.
             We advise you to correct your diameters also from the 'POM change' ('WhatToCorrect' argument)")
 
   # In data.table
   setDT(Data)
 
+  Data <- unique(Data)   # if there are duplicate rows, delete them
+
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+  if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := NA_character_]
+
+  # If no diameter value, write a comment
+  Data <- GenerateComment(Data,
+                          condition = is.na(Data[, Diameter]),
+                          comment = "Missing value in 'Diameter'")
 
   #### Function ####
 
@@ -234,7 +245,7 @@ DiameterCorrection <- function(
   )) # do.call apply the 'rbind' to the lapply result
 
   # Re-put the the rows without IdTree ------------------------------------------------------------------------------------
-  Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
+  Data <- rbindlist(list(Data, DataIDNa), use.names = TRUE, fill = TRUE)
 
 
   return(Data)
@@ -343,7 +354,7 @@ DiameterCorrection <- function(
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' DataTree = TestData[IdTree %in% 101433]
+#' DataTree = TestData[IdTree %in% "101433"]
 #'
 #'  DataTree <- data.table(IdTree = "c",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
@@ -399,18 +410,21 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
+  # print(unique(DataTree[, IdTree])) # to debug
+
   # If not enough Diameter values
   if(sum(!is.na(DataTree$Diameter)) > 1){
 
     #### Function ####
-
-    # print(unique(DataTree[, IdTree])) # to debug
 
     # Arrange year in ascending order
     DataTree <- DataTree[order(Year)] # order de dt
 
     DBHCor <- Diameter <- DataTree[, Diameter]
     Time <- DataTree[, Year]
+
+    # DBH = 0 is impossible
+    DBHCor[DBHCor == 0] <- NA
 
     # Taper correction ------------------------------------------------------------------------------------------------------
     if("taper" %in% CorrectionType) {
@@ -454,7 +468,8 @@ DiameterCorrectionByTree <- function(
               ## 1. DBH[init shift] -------------------------------------------------------------------------------------------
 
               # Check that only non-abnormal growths are kept
-              if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
+              if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold |
+                              cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold)) == 0){
 
                 # Replace NA by the correction --------------------------------------------------------------------------------
                 cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
@@ -469,21 +484,26 @@ DiameterCorrectionByTree <- function(
                   }else{
                     DataTree[raised[rs], DiameterCorrectionMeth := "linear"]}
 
+                  if(length(DBHCor) > (raised[rs])){ # if the init shift is not the last diameter value
 
-                  ## 2. DBH[shift] --------------------------------------------------------------------------------------------
-                  # If NA in cresc_abs replace it by a interpolation value
-                  cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+                    ## 2. DBH[shift] --------------------------------------------------------------------------------------------
+                    # If NA in cresc_abs replace it by a interpolation value
+                    cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
 
-                  for(i in (raised[rs]+1): min(raised[rs+1]-1, length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-                    # DBH[shift] = previous value + their cresc_abs
-                    DBHCor[i] <- # then correct the other shift values
-                      DBHCor[i-1] + # New position of the previous value
-                      cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
+                    for(i in (raised[rs]+1): min(raised[rs+1]-1, length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
+                      # DBH[shift] = previous value + their cresc_abs
+                      DBHCor[i] <- # then correct the other shift values
+                        DBHCor[i-1] + # New position of the previous value
+                        cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
-                    # Add the column with the correction method  ------------------------------------------------------------------------
-                    DataTree[i, DiameterCorrectionMeth := "shift realignment"]
-                  }
-                }
+                      # Add the column with the correction method  ------------------------------------------------------------------------
+                      DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+
+                    } # end i loop
+
+                  } # end : if the init shift is not the last diameter value
+
+                } # end rs loop
 
               }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
 
@@ -594,9 +614,9 @@ DiameterCorrectionByTree <- function(
                   # If NA in cresc_abs replace it by a interpolation value
                   cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
 
-                   DBHCor[i] <- # then correct the other shift values
+                  DBHCor[i] <- # then correct the other shift values
                     DBHCor[i-1] + # New position of the previous value
-                     cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
+                    cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
                   # Add the column with the correction method  ------------------------------------------------------------------------
                   DataTree[i, DiameterCorrectionMeth := "shift realignment"]
@@ -640,7 +660,10 @@ DiameterCorrectionByTree <- function(
 
         for(i in which(is.na(DBHCor))){ # i the abnormal DBH
           # DBH[error] = previous value + Estimated cresc
-          DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1]*diff(Time)[i-1] # Correct with the corrected cresc, the corrected DBH
+
+          if(i == 1){ DBHCor[i] <- DBHCor[i+1] - cresc_Corr[i]*diff(Time)[i] # if we correct the 1st dbh value, take the next one and subtracts the corrected growth
+
+          }else{ DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1]*diff(Time)[i-1]} # Correct with the corrected cresc, the corrected DBH
 
           # Add the column with the correction method  ------------------------------------------------------------------------
           if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
@@ -662,7 +685,10 @@ DiameterCorrectionByTree <- function(
 
       DataTree[, DBHCor := round(DBHCor, digits = Digits)] }
 
+  }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 dbh value
+    DataTree[, DBHCor := NA]
   }
+
   return(DataTree)
 }
 

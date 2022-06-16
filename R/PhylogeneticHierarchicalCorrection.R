@@ -189,21 +189,25 @@ PhylogeneticHierarchicalCorrection <- function(
         # Add the column with the correction method  ------------------------------------------------------------------------
         DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := Method]
 
-        # Correct the shift -------------------------------------------------------------------------------------------------------
-        for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-          # DBH[shift] = previous value + their cresc_abs
+        if(length(DBHCor) > (cresc_abn[rs]+1)){ # if the init shift is not the last diameter value
 
-          # If NA in cresc_abs replace it by a interpolation value
-          cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "quadratic") # Compute the corrected cresc
+          # Correct the shift -------------------------------------------------------------------------------------------------------
+          for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
+            # DBH[shift] = previous value + their cresc_abs
 
-          DBHCor[i] <- # then correct the other shift values
-            DBHCor[i-1] + # New position of the previous value
-            cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
+            # If NA in cresc_abs replace it by a interpolation value
+            cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "quadratic") # Compute the corrected cresc
 
-          # Add the column with the correction method  ------------------------------------------------------------------------
-          DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+            DBHCor[i] <- # then correct the other shift values
+              DBHCor[i-1] + # New position of the previous value
+              cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
-        }
+            # Add the column with the correction method  ------------------------------------------------------------------------
+            DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+
+          } # end i loop
+
+        } # end : if the init shift is not the last diameter value
 
       } # end rs loop
 

@@ -40,7 +40,7 @@ test_that("DiameterCorrectionByTree", {
                                                       "individual", "phylogenetic hierarchical"))
 
   expect_true(Rslt$Diameter == OnlyOne$Diameter) # same Diameter value
-  expect_true(!"DBHCor" %in% names(Rslt)) # no correction
+  expect_true(is.na(Rslt$DBHCor)) # no possible correction
 
 
   # Taper correction ---------------------------------------------------------------------------------------------------

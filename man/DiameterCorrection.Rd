@@ -144,9 +144,12 @@ Diameter correction
 library(data.table)
 data(TestData)
 
-# Rslt <- DiameterCorrection(
-#  TestData,
-#  CorrectionType = c("quadratic",
-#                     "individual", "phylogenetic hierarchical"))
+# Remove other errors types (non-unique idTree)
+TestData <- TestData[IdTree != "100898"]
+
+Rslt <- DiameterCorrection(
+ TestData,
+  WhatToCorrect = c("POM change", "punctual", "shift"),
+    CorrectionType = c("quadratic", "phylogenetic hierarchical"))
 
 }

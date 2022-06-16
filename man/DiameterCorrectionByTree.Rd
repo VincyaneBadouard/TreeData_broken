@@ -146,7 +146,7 @@ DiameterCorrectionByTree
 \examples{
 library(data.table)
 data(TestData)
-DataTree = TestData[IdTree \%in\% 101433]
+DataTree = TestData[IdTree \%in\% "101433"]
 
  DataTree <- data.table(IdTree = "c",
       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
