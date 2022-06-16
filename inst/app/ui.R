@@ -237,12 +237,13 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T)))
-                         ),
+                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+
+
                      #   hidden(div(id = "SelectColumns",
                      #       box(width = 12,
                      #           # fluidRow(
@@ -252,12 +253,34 @@ body <- dashboardBody(
                      #
                      # ),
 
-                     actionBttn(
+                       actionBttn(
                        inputId = "Merge",
                        label = "Merge tables",
                        style = "material-flat",
-                       color = "success"
+                       color = "success")
                      ),
+                     fluidRow(
+                       hidden(actionBttn(inputId = "addMerge",  label =  span(icon("plus"), em("Add a Merging relationship", strong("(You need to end up with only one table)"))),
+                                     style = "material-flat",
+                                     color = "danger")),
+                     ),
+                     hidden(div(id ="Merge2Div", box(width = 12,
+
+                         fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
+                                  column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+
+                         fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
+                                  column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                         actionBttn(
+                           inputId = "Merge2",
+                           label = "Merge tables",
+                           style = "material-flat",
+                           color = "success"
+                         )
+                     ))),
+
                      hidden( actionBttn(
                        inputId = "GoToTidy",
                        label = "Go To Tidy",
