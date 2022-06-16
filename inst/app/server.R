@@ -104,11 +104,12 @@ server <- function(input, output, session) {
         req(file)
         validate(need(ext == "csv", "Please upload a csv file"))
 
-        data.table::fread(file$datapath,
+        x <- data.table::fread(file$datapath,
                           header = input[[paste0("header", i)]],
                           sep = input[[paste0("cbSeparator", i)]],
-                          check.names = T,
-                          encoding = "UTF-8")
+                          check.names = T)
+        colnames(x) <- iconv(colnames(x), from = '', to = 'ASCII//TRANSLIT')
+        return(x)
         }),
       reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
     )
