@@ -101,6 +101,37 @@ body <- dashboardBody(
                   ))),
               br(),
               br(),
+              box(width = 12,
+
+                 dropdownButton(width = NULL,
+
+                   prettyCheckbox(
+                     inputId = "inactivechck1",
+                     label = "Tables that will need to be stacked have the exact same column, in same order and with same names.",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+                   prettyCheckbox(
+                     inputId = "inactivechck2",
+                     label = "The key columns of tables that will be merged have information that is correctly spelled and capitalized.",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+                   prettyCheckbox(
+                     inputId = "inactivechck3",
+                     label = "...",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+
+                circle = TRUE, status = "danger",
+                label  = tags$h2("Checklist before you upload"),
+                icon = icon("cog"),
+                inline =T,
+                tooltip = tooltipOptions(title = "Click to see checklist !")),
+                span("Checklist before you upload")),
+              br(),
+              br(),
               column(width = 8,
                      actionBttn(
                        inputId = "inactivebutton2",
@@ -237,39 +268,50 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  pickerInput("leftKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  pickerInput("rightKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T)))
-                         ),
-                       hidden(div(id = "SelectColumns",
-                           box(width = 12,
-                               # fluidRow(
+                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
 
-                                 pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
-                           ))
-                     #
-                     #     fluidRow(column(3, pickerInput("rightTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectRight", "ok")))
-                     #
-                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectLeft", "ok")))
-                     #
-                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectLeft", "ok")))
-                     #
-                     # column(3, pickerInput("rightTable", "add to it this table", choices = "")),
-                     # column(3, pickerInput("leftKey", "Using this column(s) from first table", choices = "", multiple = T)),
-                     # column(3,  pickerInput("rightKey", "and this column(s) from second table", choices = "", multiple = T))
-                     ),
 
-                     actionBttn(
+                     #   hidden(div(id = "SelectColumns",
+                     #       box(width = 12,
+                     #           # fluidRow(
+                     #
+                     #             pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
+                     #       ))
+                     #
+                     # ),
+
+                       actionBttn(
                        inputId = "Merge",
                        label = "Merge tables",
                        style = "material-flat",
-                       color = "success"
+                       color = "success")
                      ),
+                     fluidRow(
+                       hidden(actionBttn(inputId = "addMerge",  label =  span(icon("plus"), em("Add a Merging relationship", strong("(You need to end up with only one table)"))),
+                                     style = "material-flat",
+                                     color = "danger")),
+                     ),
+                     hidden(div(id ="Merge2Div", box(width = 12,
+
+                         fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
+                                  column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+
+                         fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
+                                  column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
+                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                         actionBttn(
+                           inputId = "Merge2",
+                           label = "Merge tables",
+                           style = "material-flat",
+                           color = "success"
+                         )
+                     ))),
+
                      hidden( actionBttn(
                        inputId = "GoToTidy",
                        label = "Go To Tidy",

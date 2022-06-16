@@ -104,11 +104,12 @@ server <- function(input, output, session) {
         req(file)
         validate(need(ext == "csv", "Please upload a csv file"))
 
-        data.table::fread(file$datapath,
+        x <- data.table::fread(file$datapath,
                           header = input[[paste0("header", i)]],
                           sep = input[[paste0("cbSeparator", i)]],
-                          check.names = T,
-                          encoding = "UTF-8")
+                          check.names = T)
+        colnames(x) <- iconv(colnames(x), from = '', to = 'ASCII//TRANSLIT')
+        return(x)
         }),
       reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
     )
@@ -181,6 +182,7 @@ server <- function(input, output, session) {
 
 
   # merge tables ####
+  n_tables_after_stack <- reactiveVal()
 
   observeEvent(input$GoToMerge | input$SkipStack, {
 
@@ -204,27 +206,106 @@ server <- function(input, output, session) {
     updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
 
     observeEvent(input$selectLeft, {
-      updatePickerInput(session, "leftKey", choices = column_options_list[[input$leftTable]])
+      updateVirtualSelect("leftKey", choices = column_options_list[[input$leftTable]])
     })
 
     observeEvent(input$selectRight, {
-      updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
+      updateVirtualSelect( "rightKey", choices = column_options_list[[input$rightTable]])
     })
+
+
+    n_tables_after_stack(length(options_to_merge))
+
+  }, ignoreInit = T)
+
+  observeEvent("addMerge", {
+
+
+  }, ignoreInit = T)
+
+
+  MergedTables <- reactiveVal()
+
+  observeEvent(input$Merge2, {
+
+    if(input$leftTable2 == "StackedTables") x <-  get(input$leftTable2)()
+    if(input$leftTable2 == "MergedTables") x <-  get(input$leftTable2)()
+    if(input$leftTable2 != "MergedTables" & input$leftTable2 != "StackedTables") x <- Data()[[input$leftTable2]]
+
+
+    if(input$rightTable2 == "StackedTables") y <-  get(input$rightTable2)()
+    if(input$rightTable2 == "MergedTables") y <-  get(input$rightTable2)()
+    if(input$rightTable2 != "MergedTables" & input$rightTable2 != "StackedTables") y <- Data()[[input$rightTable2]]
+
+    MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
+
+    shinyjs::show("GoToTidy")
+    shinyjs::hide("addMerge")
 
 
 
   }, ignoreInit = T)
 
 
-  MergedTables <- eventReactive(input$Merge, {
+
+
+  observeEvent(input$Merge, {
 
     if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
     if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
 
-    merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y"))
-  })
+    MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
 
-  observeEvent(input$Merge, {
+    if(n_tables_after_stack() > 2 ) {
+      shinyjs::show("addMerge")
+      shinyjs::show("Merge2Div")
+      shinyjs::hide("GoToTidy")
+
+
+      options_to_merge <- names(Data())
+      column_options_list <- lapply(Data(), colnames)
+
+
+      if(input$leftTable == "StackedTables" | input$rightTable == "StackedTables"){
+
+        options_to_merge <- c(names(Data())[!names(Data()) %in% c(input$TablesToStack, input$leftTable, input$rightTable)], "MergedTables")
+        column_options_list[names(Data()) %in% c(input$TablesToStack, input$leftTable, input$rightTable)] <- NULL
+        column_options_list <- c(column_options_list, MergedTables = list(colnames(MergedTables())))
+
+      } else {
+        if(!is.null(input$TablesToStack)) {
+          options_to_merge <- c(names(Data())[!names(Data()) %in% c(input$leftTable, input$rightTable)], "MergedTables", "StackedTables")
+          column_options_list[names(Data()) %in% c(input$leftTable, input$rightTable)] <- NULL
+          column_options_list <- c(column_options_list, MergedTables = list(colnames(MergedTables())), StackedTables = list(colnames(StackedTables())))
+        } else {
+          options_to_merge <- c(names(Data())[!names(Data()) %in% c(input$leftTable, input$rightTable)], "MergedTables")
+          column_options_list[names(Data()) %in% c(input$leftTable, input$rightTable)] <- NULL
+          column_options_list <- c(column_options_list, MergedTables = list(colnames(MergedTables())))
+        }
+
+      }
+
+      updatePickerInput(session, "leftTable2", choices = options_to_merge, selected =  "")
+      updatePickerInput(session, "rightTable2", choices = options_to_merge, selected =  "")
+
+      observeEvent(input$selectLeft2, {
+        updateVirtualSelect("leftKey2", choices = column_options_list[[input$leftTable2]])
+      })
+
+      observeEvent(input$selectRight2, {
+        updateVirtualSelect( "rightKey2", choices = column_options_list[[input$rightTable2]])
+      })
+
+
+      # n_tables_after_stack(length(options_to_merge))
+
+    }
+
+    if(n_tables_after_stack() == 2 ) {
+      shinyjs::hide("addMerge")
+      shinyjs::hide("Merge2Div")
+      shinyjs::show("GoToTidy")
+    }
 
     output$mergedTablesSummary <- renderPrint(summary(MergedTables()))
 
@@ -233,13 +314,12 @@ server <- function(input, output, session) {
                                     selection = "none")
 
 
-    shinyjs::show("GoToTidy")
     shinyjs::show("SelectColumns")
 
     updatePickerInput(session, "SelectedMergedColumns", choices =colnames(MergedTables()), selected = colnames(MergedTables())[!grepl("\\.y$", colnames(MergedTables()))])
 
 
-  })
+  }, ignoreInit = T)
 
 
   # tidy tables ####
@@ -251,7 +331,7 @@ server <- function(input, output, session) {
     if(input$nTable == 1 & length(Data()) == 1) {
       Data()[[1]]
     } else {
-      if(exists("MergedTables")) MergedTables() else  StackedTables()
+      if(!is.null(MergedTables())) MergedTables() else  StackedTables()
     }
 
 
@@ -263,6 +343,7 @@ server <- function(input, output, session) {
     groupNames <- split(names(OneTable()), cutree(hclust(stringdistmatrix(names(OneTable()))), h = 2))
     groupNames <- groupNames[sapply(groupNames, length) > 1]
     names(groupNames) <- sapply(groupNames, function(x) paste(Reduce(intersect, strsplit(x,"")), collapse=""))
+    groupNames[(length(groupNames)+1):(length(groupNames)+2)] <- ""
 
     output$meltUI <- renderUI({
       lapply(c(1:length(groupNames)), function(i)
