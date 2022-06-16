@@ -101,6 +101,37 @@ body <- dashboardBody(
                   ))),
               br(),
               br(),
+              box(width = 12,
+
+                 dropdownButton(width = NULL,
+
+                   prettyCheckbox(
+                     inputId = "inactivechck1",
+                     label = "Tables that will need to be stacked have the exact same column, in same order and with same names.",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+                   prettyCheckbox(
+                     inputId = "inactivechck2",
+                     label = "The key columns of tables that will be merged have information that is correctly spelled and capitalized.",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+                   prettyCheckbox(
+                     inputId = "inactivechck3",
+                     label = "...",
+                     value = TRUE,
+                     status = "warning"
+                   ),
+
+                circle = TRUE, status = "danger",
+                label  = tags$h2("Checklist before you upload"),
+                icon = icon("cog"),
+                inline =T,
+                tooltip = tooltipOptions(title = "Click to see checklist !")),
+                span("Checklist before you upload")),
+              br(),
+              br(),
               column(width = 8,
                      actionBttn(
                        inputId = "inactivebutton2",
