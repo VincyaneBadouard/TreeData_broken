@@ -204,11 +204,11 @@ server <- function(input, output, session) {
     updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
 
     observeEvent(input$selectLeft, {
-      updatePickerInput(session, "leftKey", choices = column_options_list[[input$leftTable]])
+      updateVirtualSelect("leftKey", choices = column_options_list[[input$leftTable]])
     })
 
     observeEvent(input$selectRight, {
-      updatePickerInput(session, "rightKey", choices = column_options_list[[input$rightTable]])
+      updateVirtualSelect( "rightKey", choices = column_options_list[[input$rightTable]])
     })
 
 

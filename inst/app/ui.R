@@ -237,32 +237,20 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  pickerInput("leftKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("leftKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  pickerInput("rightKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T)))
+                                  column(8,  virtualSelectInput("rightKey", div("Using this/these column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T)))
                          ),
-                       hidden(div(id = "SelectColumns",
-                           box(width = 12,
-                               # fluidRow(
-
-                                 pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
-                           ))
+                     #   hidden(div(id = "SelectColumns",
+                     #       box(width = 12,
+                     #           # fluidRow(
                      #
-                     #     fluidRow(column(3, pickerInput("rightTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectRight", "ok")))
+                     #             pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
+                     #       ))
                      #
-                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectLeft", "ok")))
-                     #
-                     #     fluidRow(column(3, pickerInput("leftTable", "Take table", choices = "")),
-                     #              column(3,actionBttn("selectLeft", "ok")))
-                     #
-                     # column(3, pickerInput("rightTable", "add to it this table", choices = "")),
-                     # column(3, pickerInput("leftKey", "Using this column(s) from first table", choices = "", multiple = T)),
-                     # column(3,  pickerInput("rightKey", "and this column(s) from second table", choices = "", multiple = T))
-                     ),
+                     # ),
 
                      actionBttn(
                        inputId = "Merge",
