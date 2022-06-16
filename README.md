@@ -49,3 +49,5 @@ A BibTeX entry for LaTeX users is
 # To contribute
 
 How do you correct your forest data? Survey: https://forms.gle/huFGUo1TR31bEMKp8
+
+If you want to give us feedback on the app, you can fill out this form: https://forms.gle/ULFH9gUXJJZL7rmR8.
