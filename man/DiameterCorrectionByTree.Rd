@@ -12,7 +12,7 @@ DiameterCorrectionByTree(
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
-  Pioneers = c("Cecropia", "Pourouma"),
+  Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
   TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
@@ -28,7 +28,7 @@ DiameterCorrectionByTree(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
+\item{DataTree}{A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
 measurements (data.frame or data.table).}
 
 \item{Data}{Complete dataset (data.table) used if the "phylogenetic
@@ -36,6 +36,7 @@ hierarchical" correction (\emph{CorrectionType} argument) is chosen.
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)
+\item 'IdStem' (character) if \emph{ByStem} argument = TRUE
 \item 'ScientificName' (character)
 \item 'Genus' (character)
 \item 'Family' (character)
@@ -50,18 +51,20 @@ The dataset must contain the columns:
 
 \item{MaxDBH}{Maximum possible DBH of your stand in cm (numeric, 1 value)}
 
-\item{PositiveGrowthThreshold}{in cm/year : a tree
+\item{PositiveGrowthThreshold}{in cm/year: a tree
 widening by more than x cm/year is considered abnormal (numeric, 1 value)}
 
-\item{NegativeGrowthThreshold}{in cm/census : The possible
+\item{NegativeGrowthThreshold}{in cm/census: the possible
 positive measurement error (+n) cannot be corrected until the growth
 appears abnormal, but a negative measurement error can be allowed until -n
 (a tree does not decrease). Thus the positive measurement error (+n) is
 "compensated". (numeric, 1 value)}
 
-\item{Pioneers}{(characters vector)}
+\item{Pioneers}{Scientific names of the pioneer species of the site, as in
+the 'ScientificName' column (characters vector)}
 
-\item{PioneersGrowthThreshold}{in cm (numeric, 1 value)}
+\item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
+widens by more than x cm/year is considered abnormal (numeric, 1 value)}
 
 \item{TrustMeasSet}{Trust measurements set: the "first" or the "last" set
 (character, 1 value)}
