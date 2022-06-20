@@ -2,6 +2,9 @@
 #'
 #' @param Data (data.frame or data.table)
 #'
+#' @param ByStem TRUE if your inventory contains the stem level, FALSE if not,
+#'   and in this case the correction is done by tree.
+#'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric) (Default = 2 censuses)
 #'
@@ -50,6 +53,9 @@
 #'
 ErrorsDetection <- function(
   Data,
+
+  ByStem = FALSE,
+
   # Life status error detection
   DeathConfirmation = 2,
   UseSize = FALSE,
@@ -68,7 +74,7 @@ ErrorsDetection <- function(
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath
+  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath/ByStem
   if(!all(unlist(lapply(list(UseSize),
                         inherits, "logical"))))
     stop("The 'UseSize' argument of the 'ErrorsDetection' function must be logicals")
@@ -100,7 +106,7 @@ ErrorsDetection <- function(
 
   # Check bota : Family/Genus/Species/ScientificName/VernName
   # Check size : Diameter, POM(?)
-  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
+  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree", "IdStem",
             "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
             "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
 
@@ -119,7 +125,7 @@ ErrorsDetection <- function(
 
   #### Measurement variables = 0 ####
 
-  Vars <- c("Diameter", "POM", "TreeHeight", "StemHeight")
+  Vars <- c("Diameter", "HOM", "TreeHeight", "StemHeight")
 
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
@@ -155,7 +161,7 @@ ErrorsDetection <- function(
           for (c in unique(na.omit(Data[Data$Plot==p, SubPlot]))) {
 
             num <- Data[Data$Site == s & Data$Year == y
-                        & Data$Plot == p & Data$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
+                        & Data$Plot == p & Data$SubPlot == c]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
 
             # if there are several TreeFieldNum per Plot-SubPlot combination
             if(anyDuplicated(num) != 0){
@@ -210,31 +216,37 @@ ErrorsDetection <- function(
   #             .(IdTree = sort(IdTree), Plot, SubPlot, TreeFieldNum, Comment)]) # to check
 
 
-  #### Check duplicated IdTree in a census ####
+  #### Check duplicated IdTree/IdStem in a census ####
 
-  # Create "SitYearID" = "Site/Year/IdTree"
-  Data[, SitYearID := paste(Site, Year, IdTree, sep = "/")]
+  if(ByStem == TRUE){
+    ID <- "IdStem"
+  }else if (ByStem == FALSE) {
+    ID <- "IdTree"
+  }
+
+  # Create "SitYearID" = "Site/Year/ID"
+  Data[, SitYearID := paste(Site, Year, get(ID), sep = "/")]
 
   duplicated_ids <- ids <- vector("character")
 
-  # if any duplicats in this col
+  # if any duplicates in this col
   if(anyDuplicated(Data$SitYearID) != 0){
     # For each site
     for (s in unique(na.omit(Data$Site))) {
       # For each census
       for (y in unique(na.omit(Data$Year))) {
 
-        ids <- Data[Data$Site == s & Data$Year == y,]$IdTree # all the IdTree for each Site and Year combination
+        ids <- Data[Data$Site == s & Data$Year == y, get(ID)] # all the IDs for each Site and Year combination
 
-        # if there are several IdTree per Site and Year combination
+        # if there are several IdTree/IdStem per Site and Year combination
         if(anyDuplicated(ids) != 0){
           duplicated_ids <- unique(ids[duplicated(ids)])
 
           Data <- GenerateComment(Data,
                                   condition =
                                     Data[,Site] == s & Data[,Year] == y
-                                  & Data[,IdTree] %in% duplicated_ids,
-                                  comment = "Duplicated IdTree in the census")
+                                  & Data[,get(ID)] %in% duplicated_ids,
+                                  comment = paste0("Duplicated '", ID, "' in the census"))
         }
       } # end year loop
     } # end site loop
@@ -250,7 +262,7 @@ ErrorsDetection <- function(
   # Si aire du MCP > x% plotArea -> error
 
 
-  #### Check invariant coordinates per IdTree ####
+  #### Check invariant coordinates per IdTree/IdStem ####
 
   duplicated_ID <- CorresIDs <- vector("character")
 
@@ -258,10 +270,10 @@ ErrorsDetection <- function(
   for (s in unique(na.omit(Data$Site))) {
 
     CoordIDCombination <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Xutm, Yutm)]
+      Data[Data$Site == s, c(ID, "Xutm", "Yutm"), with = FALSE]
     ))
 
-    CorresIDs <- CoordIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+    CorresIDs <- CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
 
     if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 
@@ -270,8 +282,8 @@ ErrorsDetection <- function(
       Data <- GenerateComment(Data,
                               condition =
                                 Data[,Site] == s
-                              & Data[,IdTree] %in% duplicated_ID,
-                              comment = "Different coordinates (Xutm, Yutm) for a same IdTree")
+                              & Data[,get(ID)] %in% duplicated_ID,
+                              comment = paste0("Different coordinates (Xutm, Yutm) for a same '", ID,"'"))
     }
   } # end site loop
 
@@ -289,7 +301,7 @@ ErrorsDetection <- function(
   ### Typographie
   # é, è or œ
 
-  #### Check invariant botanical informations per IdTree ####
+  #### Check invariant botanical informations per IdTree/IdStem ####
   # "Family", "ScientificName", VernName"
 
   duplicated_ID <- CorresIDs <- vector("character")
@@ -298,10 +310,10 @@ ErrorsDetection <- function(
   for (s in unique(na.omit(Data$Site))) {
 
     BotaIDCombination <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Family, ScientificName, VernName)]
+      Data[Data$Site == s, c(ID, "Family", "ScientificName", "VernName"), with = FALSE]
     ))
 
-    CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+    CorresIDs <- BotaIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
 
     if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 
@@ -310,8 +322,8 @@ ErrorsDetection <- function(
       Data <- GenerateComment(Data,
                               condition =
                                 Data[,Site] == s
-                              & Data[,IdTree] %in% duplicated_ID,
-                              comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
+                              & Data[,get(ID)] %in% duplicated_ID,
+                              comment = paste0("Different botanical informations (Family, ScientificName or VernName) for a same '", ID,"'"))
     }
   } # end site loop
 
@@ -320,11 +332,7 @@ ErrorsDetection <- function(
 
 
 
-  ### Gapfill missing botanical names using vernacular names ####
-  # based on probabilities of association of vernacular and botanical names.
-  # The typographie must already have been corrected.
-
-
+  #### Botanical informations ####
 
 
   #### Life status ####
@@ -336,6 +344,33 @@ ErrorsDetection <- function(
 
   #### Diameter ####
 
+  # Data <- DiameterCorrection(Data,
+  #
+  #                            ByStem = ByStem,
+  #
+  #                            DefaultHOM = DefaultHOM,
+  #                            MinDBH = MinDBH,
+  #                            MaxDBH = MaxDBH,
+  #                            PositiveGrowthThreshold = PositiveGrowthThreshold,
+  #                            NegativeGrowthThreshold = NegativeGrowthThreshold,
+  #
+  #                            Pioneers = Pioneers,
+  #                            PioneersGrowthThreshold = PioneersGrowthThreshold,
+  #
+  #                            TrustMeasSet = TrustMeasSet,
+  #                            WhatToCorrect = WhatToCorrect,
+  #                            CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"),
+  #
+  #                            DBHRange = 10,
+  #                            MinIndividualNbr = 5,
+  #                            Digits = 1L,
+  #
+  #                            TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
+  #                            TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
+  #
+  #
+  #                            DetectOnly = DetectOnly)
+
   #### Recruitment ####
 
   Data <- RecruitmentCorrection(Data,
@@ -343,6 +378,7 @@ ErrorsDetection <- function(
                                 PositiveGrowthThreshold = PositiveGrowthThreshold,
                                 DetectOnly = DetectOnly
   )
+
 
   return(Data)
 }

@@ -19,8 +19,8 @@ PhylogeneticHierarchicalCorrection(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
-measurements (data.table)
+\item{DataTree}{A dataset corresponding to a single tree/stem's (1
+IdTree/IdStem) measurements (data.table)
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)

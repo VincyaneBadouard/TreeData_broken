@@ -36,7 +36,7 @@ test_that("DiameterCorrection", {
          of the 'DiameterCorrection' function must be 1 numeric value each")
 
   expect_error(DiameterCorrection(TestData, Pioneers = T),
-               regexp = "'Pioneers' argument must be a characters vector")
+               regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
   expect_error(DiameterCorrection(TestData, TrustMeasSet = T),
                regexp = "The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")

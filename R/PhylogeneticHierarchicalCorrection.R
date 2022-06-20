@@ -4,8 +4,8 @@
 #'   mean growth of other trees (with a minimum number of trees) of the same
 #'   species/genus/family/stand of the same diameter class.
 #'
-#' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
-#'   measurements (data.table)
+#' @param DataTree A dataset corresponding to a single tree/stem's (1
+#'   IdTree/IdStem) measurements (data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
 #'   - 'ScientificName' (character)

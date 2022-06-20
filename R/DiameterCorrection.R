@@ -3,6 +3,8 @@
 #' @param Data (data.frame or data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
+#'   - 'IdStem' (character) if *ByStem* argument = TRUE
+#'   - 'ScientificName' (character)
 #'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'   - **'HOM'(Height Of Measurement) (numeric)** if you want to apply the
@@ -11,9 +13,11 @@
 #'       **"POM change**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must contain the columns:
-#'   - 'ScientificName' (character)
 #'   - 'Genus' (character)
 #'   - 'Family' (character)
+#'
+#' @param ByStem TRUE if your inventory contains the stem level, FALSE if not,
+#'   and in this case the correction is done by tree.
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
@@ -21,20 +25,24 @@
 #' @param MinDBH Minimum census DBH of your protocol in cm (numeric, 1 value)
 #' @param MaxDBH Maximum possible DBH of your stand in cm (numeric, 1 value)
 #'
-#' @param PositiveGrowthThreshold in cm/year : a tree
+#' @param PositiveGrowthThreshold in cm/year: a tree
 #'   widening by more than x cm/year is considered abnormal (numeric, 1 value)
 #'
-#' @param NegativeGrowthThreshold in cm/census : The possible
+#' @param NegativeGrowthThreshold in cm/census: the possible
 #'   positive measurement error (+n) cannot be corrected until the growth
 #'   appears abnormal, but a negative measurement error can be allowed until -n
 #'   (a tree does not decrease). Thus the positive measurement error (+n) is
 #'   "compensated". (numeric, 1 value)
 #'
-#' @param Pioneers (characters vector)
-#' @param PioneersGrowthThreshold in cm (numeric, 1 value)
+#' @param Pioneers Scientific names of the pioneer species of the site, as in
+#'   the 'ScientificName' column (characters vector)
+#'
+#' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
+#'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
 #'
 #' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
 #'   (character, 1 value)
+#'
 #' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
 #'   - "POM change": detect POM change in the column 'POM' or 'HOM' and correct
 #'                   the Diameter values from it.
@@ -112,13 +120,15 @@
 DiameterCorrection <- function(
   Data,
 
+  ByStem = FALSE,
+
   DefaultHOM = 1.3,
   MinDBH = 10,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
 
-  Pioneers = c("Cecropia","Pourouma"),
+  Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
   TrustMeasSet = "first",
@@ -156,8 +166,8 @@ DiameterCorrection <- function(
          of the 'DiameterCorrection' function must be 1 numeric value each")
 
   # Pioneers (characters vector)
-  if(!inherits(Pioneers, "character"))
-    stop("'Pioneers' argument must be a characters vector")
+  if(!inherits(Pioneers, "character") & !is.null(Pioneers))
+    stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # TrustMeasSet
   if(length(TrustMeasSet) != 1 |
@@ -206,19 +216,25 @@ DiameterCorrection <- function(
 
   #### Function ####
 
-  # Order IdTrees and times in ascending order ----------------------------------------------------------------------------
-  Data <- Data[order(IdTree, Year)]
+  if(ByStem == TRUE){
+    ID <- "IdStem"
+  }else if (ByStem == FALSE) {
+    ID <- "IdTree"
+  }
 
-  # IdTrees vector --------------------------------------------------------------------------------------------------------
-  Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
+  # Order IDs and times in ascending order ----------------------------------------------------------------------------
+  Data <- Data[order(get(ID), Year)]
 
-  # Dataset with the rows without IdTree ----------------------------------------------------------------------------------
-  DataIDNa <-  Data[is.na(IdTree)]
+  # IDs vector --------------------------------------------------------------------------------------------------------
+  Ids <- as.vector(na.omit(unique(Data[, get(ID)]))) # Tree Ids
+
+  # Dataset with the rows without IDS ----------------------------------------------------------------------------------
+  DataIDNa <-  Data[is.na(get(ID))]
 
   # Apply for all the trees -----------------------------------------------------------------------------------------------
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
-    DataTree = Data[IdTree %in% i], # per IdTree, all censuses
+    DataTree = Data[get(ID) %in% i], # per ID, all censuses
     Data = Data,
 
     DefaultHOM = DefaultHOM,
@@ -244,8 +260,19 @@ DiameterCorrection <- function(
   )
   )) # do.call apply the 'rbind' to the lapply result
 
-  # Re-put the the rows without IdTree ------------------------------------------------------------------------------------
+  # Re-put the the rows without ID ------------------------------------------------------------------------------------
   Data <- rbindlist(list(Data, DataIDNa), use.names = TRUE, fill = TRUE)
+
+
+
+  if(DetectOnly %in% FALSE){
+
+    # Data[, POMcor := DefaultPOM] # Corrected diameter is at default POM
+
+    Data[, HOMcor := DefaultHOM] # Corrected diameter is at default HOM
+
+  }
+
 
 
   return(Data)
@@ -254,13 +281,14 @@ DiameterCorrection <- function(
 
 #' DiameterCorrectionByTree
 #'
-#' @param DataTree A dataset corresponding to a single tree's (1 IdTree)
+#' @param DataTree A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
 #'   measurements (data.frame or data.table).
 #'
 #' @param Data Complete dataset (data.table) used if the "phylogenetic
 #'   hierarchical" correction (*CorrectionType* argument) is chosen.
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
+#'   - 'IdStem' (character) if *ByStem* argument = TRUE
 #'   - 'ScientificName' (character)
 #'   - 'Genus' (character)
 #'   - 'Family' (character)
@@ -273,17 +301,20 @@ DiameterCorrection <- function(
 #' @param MinDBH Minimum census DBH of your protocol in cm (numeric, 1 value)
 #' @param MaxDBH Maximum possible DBH of your stand in cm (numeric, 1 value)
 #'
-#' @param PositiveGrowthThreshold in cm/year : a tree
+#' @param PositiveGrowthThreshold in cm/year: a tree
 #'   widening by more than x cm/year is considered abnormal (numeric, 1 value)
 #'
-#' @param NegativeGrowthThreshold in cm/census : The possible
+#' @param NegativeGrowthThreshold in cm/census: the possible
 #'   positive measurement error (+n) cannot be corrected until the growth
 #'   appears abnormal, but a negative measurement error can be allowed until -n
 #'   (a tree does not decrease). Thus the positive measurement error (+n) is
 #'   "compensated". (numeric, 1 value)
 #'
-#' @param Pioneers (characters vector)
-#' @param PioneersGrowthThreshold in cm (numeric, 1 value)
+#' @param Pioneers Scientific names of the pioneer species of the site, as in
+#'   the 'ScientificName' column (characters vector)
+#'
+#' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
+#'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
 #'
 #' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
 #'   (character, 1 value)
@@ -349,6 +380,8 @@ DiameterCorrection <- function(
 #'   /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
 #'   realignment")
 #'
+#'@importFrom stats na.omit
+#'
 #' @export
 #'
 #' @examples
@@ -378,7 +411,7 @@ DiameterCorrectionByTree <- function(
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
 
-  Pioneers = c("Cecropia","Pourouma"),
+  Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
   TrustMeasSet = "first",
@@ -402,9 +435,10 @@ DiameterCorrectionByTree <- function(
     stop("DataTree must be a data.frame or data.table")
 
   # if there are several IdTrees
-  if(length(unique(DataTree$IdTree)) != 1){
-    stop("DataTree must correspond to only 1 same tree so 1 same IdTree
-    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),")")
+  if(length(unique(DataTree$IdTree)) != 1 & length(unique(DataTree$IdStem)) != 1){
+    stop("DataTree must correspond to only 1 same tree/stem so 1 same IdTree/IdStem
+    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),",
+     the IdStems: " ,paste0(unique(DataTree$IdStem), collapse = "/"),")")
   }
 
   # In data.table
@@ -423,8 +457,17 @@ DiameterCorrectionByTree <- function(
     DBHCor <- Diameter <- DataTree[, Diameter]
     Time <- DataTree[, Year]
 
+    # Pioneers species case
+    if(any(na.omit(unique(DataTree[, ScientificName]) == Pioneers))){ # if it's a pioneer species
+
+      PositiveGrowthThreshold <- PioneersGrowthThreshold # take the Pioneers growth threshold
+    }
+
     # DBH = 0 is impossible
     DBHCor[DBHCor == 0] <- NA
+
+    # DBH > MaxDBH → DBH = NA
+    DBHCor[DBHCor > MaxDBH] <- NA
 
     # Taper correction ------------------------------------------------------------------------------------------------------
     if("taper" %in% CorrectionType) {

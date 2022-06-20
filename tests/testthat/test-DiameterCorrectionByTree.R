@@ -3,6 +3,7 @@ test_that("DiameterCorrectionByTree", {
   # Import data ---------------------------------------------------------------------------------------------------------------------
   library(data.table)
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -21,12 +22,13 @@ test_that("DiameterCorrectionByTree", {
                regexp = "DataTree must be a data.frame or data.table")
 
   expect_error(DiameterCorrectionByTree(TwoInd),
-               regexp = "DataTree must correspond to only 1 same tree so 1 same IdTree")
+               regexp = "DataTree must correspond to only 1 same tree/stem so 1 same IdTree/IdStem")
 
   # Check the function work --------------------------------------------------------------------------------------------
 
-  ## Case only 1 Diameter value ---------------------------------------------------------------------------------------------
+  ## Case only 1 Diameter value ----------------------------------------------------------------------------------------
   OnlyOne <- data.table(IdTree = "c",
+                        ScientificName = "A",
                         Year = 2000,
                         Diameter = 12,
                         POM = 0,
@@ -45,6 +47,7 @@ test_that("DiameterCorrectionByTree", {
 
   # Taper correction ---------------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -60,6 +63,7 @@ test_that("DiameterCorrectionByTree", {
 
   # Punctual error -----------------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = seq(2000,2008, by = 2), # 5 censuses
                          Diameter = c(13, 14, 15, 30, 17), # 0.5 cm/year. The 4th value is abnormal
                          POM = c(0, 0, 1, 1, 2),
@@ -78,6 +82,7 @@ test_that("DiameterCorrectionByTree", {
 
   ## Case NA in the Diameter column -----------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = seq(2000,2008, by = 2), # 5 censuses
                          Diameter = c(13, 14, 15, NA, 17), # 0.5 cm/year
                          POM = c(0, 0, 1, 1, 2),
@@ -96,6 +101,7 @@ test_that("DiameterCorrectionByTree", {
 
   # Correction with POM ------------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))
@@ -132,6 +138,7 @@ test_that("DiameterCorrectionByTree", {
   # Shift error --------------------------------------------------------------------------------------------------------
   ## individual correction ---------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))
@@ -169,6 +176,7 @@ test_that("DiameterCorrectionByTree", {
   # Mix cases -------------------------------------------------------------------------------------------------------
   # punctual + shift error -------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2)) # 0.5 cm/year
 
@@ -186,6 +194,7 @@ test_that("DiameterCorrectionByTree", {
 
   # taper + punctual error Attend MethCol--------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -202,6 +211,7 @@ test_that("DiameterCorrectionByTree", {
 
   # taper + shift error Attend MethCol------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -218,6 +228,7 @@ test_that("DiameterCorrectionByTree", {
 
   # POM change + punctual error ------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
+                         ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))

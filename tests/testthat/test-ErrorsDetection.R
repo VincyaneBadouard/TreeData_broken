@@ -48,7 +48,7 @@ test_that("ErrorsDetection", {
 
 
   ## Check *missing value* (NA/0) in the measurement variables
-  Vars <- c("Diameter", "POM", "TreeHeight")
+  Vars <- c("Diameter", "HOM", "TreeHeight")
   # v = 1
   for (v in 1:length(Vars)) {
 

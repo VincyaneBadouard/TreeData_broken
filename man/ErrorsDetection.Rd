@@ -6,6 +6,7 @@
 \usage{
 ErrorsDetection(
   Data,
+  ByStem = FALSE,
   DeathConfirmation = 2,
   UseSize = FALSE,
   MinDBH = 10,
@@ -14,6 +15,9 @@ ErrorsDetection(
 }
 \arguments{
 \item{Data}{(data.frame or data.table)}
+
+\item{ByStem}{TRUE if your inventory contains the stem level, FALSE if not,
+and in this case the correction is done by tree.}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric) (Default = 2 censuses)}
