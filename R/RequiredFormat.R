@@ -139,7 +139,7 @@ RequiredFormat <- function(
 
     # overwrite input
     input$Date = "Date"
-    input$DateFormat = "yyyy-mm-dd"
+    input$DateFormatMan = "yyyy-mm-dd"
   }
 
   # put in date format
@@ -150,7 +150,7 @@ RequiredFormat <- function(
       Data[, DateOriginal := Date]
 
       # transform to standard format
-      DateFormat <- trimws(input$DateFormat)
+      DateFormat <- trimws(input$DateFormatMan)
 
 
       if(grepl("num|dec", DateFormat, ignore.case = T)) {
@@ -162,7 +162,7 @@ RequiredFormat <- function(
       } else {
 
         DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-        DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+        DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
         Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
 
@@ -240,10 +240,10 @@ RequiredFormat <- function(
     Data$IdTree[idxNAIdTree] <- paste0(c(1:sum(idxNAIdTree)), "_auto")
 
   }
-  ## Genus, Species, ScientificNameSep ####
+  ## Genus, Species, ScientificNameSepMan ####
 
-  ### Genus and species if we have ScientificName and ScientificNameSep
-  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
+  ### Genus and species if we have ScientificName and ScientificNameSepMan
+  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
@@ -262,7 +262,7 @@ RequiredFormat <- function(
 
   AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### Diameter and BD in cm ####
+  ### Diameter, MinDBH and BD in cm ####
   # if((!input$Diameter %in% "none" & !input$DiameterUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
@@ -299,6 +299,23 @@ RequiredFormat <- function(
     }
 
     Data[, BCirc := round(BD*pi, 2)]
+  }
+
+  if(!input$MinDBH %in% "none") {
+
+    SizeUnit <- input$MinDBHUnitMan
+
+    if(!SizeUnit %in% unitOptions) stop(paste("Your minimum DBH size units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if(SizeUnit %in% unitOptions) {
+
+      if (SizeUnit == "mm") Data[, MinDBH := MinDBH/10] # mm -> cm
+
+      if (SizeUnit == "dm") Data[, MinDBH := MinDBH*10] # dm -> cm
+
+      if (SizeUnit == "m") Data[, MinDBH := MinDBH*100] # m -> cm
+    }
+
   }
 
   ### HOM and BHOM in m ####
