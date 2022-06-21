@@ -522,7 +522,8 @@ observe( {
     sort(unique(TidyTable()[[input$CommercialSp]]))
     })
 
-  OtherOptions <- eventReactive(TidyTable(), {""})
+  OtherNumericOptions <- reactiveVal(-999)
+  OtherCharacterOptions <- reactiveVal("")
 
   LogicalOptions <- reactive(c(TRUE, FALSE))
 
