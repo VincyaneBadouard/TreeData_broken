@@ -12,8 +12,8 @@ A named list
 \item{Family}{Value or column name in data set @ForestGeoSubset (Family) corresponding to Family name}
 \item{TreeHeight}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree height}
 \item{Date}{Value or column name in data set @ForestGeoSubset (ExactDate) corresponding to Date of measurement}
-\item{Month}{Value or column name in data set @ForestGeoSubset (none) corresponding to Month of measurement \link{1-12}}
-\item{Day}{Value or column name in data set @ForestGeoSubset (none) corresponding to Day of measurement \link{1-31}}
+\item{Month}{Value or column name in data set @ForestGeoSubset (none) corresponding to Month of measurement}
+\item{Day}{Value or column name in data set @ForestGeoSubset (none) corresponding to Day of measurement}
 \item{POM}{Value or column name in data set @ForestGeoSubset (none) corresponding to POM}
 \item{HOM}{Value or column name in data set @ForestGeoSubset (hom) corresponding to HOM}
 \item{PlotAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is the unit for plot area?}
@@ -38,7 +38,7 @@ A named list
 \item{ScientificName}{Value or column name in data set @ForestGeoSubset (Latin) corresponding to Scientific name}
 \item{DateFormatMan}{Value or column name in data set @ForestGeoSubset (yyyy-mm-dd) corresponding to What is your date format?}
 \item{IdCensus}{Value or column name in data set @ForestGeoSubset (CensusID) corresponding to Census ID}
-\item{PlotAreaMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your plot area in hectare?}
+\item{PlotAreaMan}{Value or column name in data set @ForestGeoSubset (-999) corresponding to What is your plot area in hectare?}
 \item{Year}{Value or column name in data set @ForestGeoSubset (none) corresponding to Year of measurement}
 \item{LifeStatus}{Value or column name in data set @ForestGeoSubset (DFstatus) corresponding to Life status}
 \item{PlotArea}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot area}
@@ -46,9 +46,9 @@ A named list
 \item{SubPlotAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is the unit for subplot area?}
 \item{Yutm}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree Y UTM coordinate}
 \item{utmUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree UTM units}
-\item{YearMan}{Value or column name in data set @ForestGeoSubset (NA) corresponding to What is your year of measurement?}
+\item{YearMan}{Value or column name in data set @ForestGeoSubset (-999) corresponding to What is your year of measurement?}
 \item{Circ}{Value or column name in data set @ForestGeoSubset (none) corresponding to Circumference}
-\item{SubPlotAreaMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your subplot area in hectare?}
+\item{SubPlotAreaMan}{Value or column name in data set @ForestGeoSubset (-999) corresponding to What is your subplot area in hectare?}
 \item{SubPlotMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your subplot name ?}
 \item{Site}{Value or column name in data set @ForestGeoSubset (none) corresponding to Site name}
 \item{Lon}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree longitude}
