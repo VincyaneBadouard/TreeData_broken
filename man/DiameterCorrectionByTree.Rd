@@ -149,9 +149,9 @@ DiameterCorrectionByTree
 \examples{
 library(data.table)
 data(TestData)
-DataTree = TestData[IdTree \%in\% "101433"]
 
  DataTree <- data.table(IdTree = "c",
+      ScientificName = "A",
       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -160,7 +160,7 @@ DataTree = TestData[IdTree \%in\% "101433"]
 Rslt <- DiameterCorrectionByTree(
   DataTree, TestData,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("taper", "quadratic", "linear",
-                     "individual", "phylogenetic hierarchical"))
+  CorrectionType = c("quadratic", "linear", "individual")
+  )
 
 }

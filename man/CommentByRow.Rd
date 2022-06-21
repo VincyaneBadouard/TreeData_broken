@@ -4,27 +4,28 @@
 \alias{CommentByRow}
 \title{CommentByRow}
 \usage{
-CommentByRow(row, comment)
+CommentByRow(row, comment, column = "Comment")
 }
 \arguments{
-\item{row}{A 1 row data.table (data.table)}
+\item{row}{A 1 row dataset (data.frame)}
 
-\item{comment}{The string to add in the "Comment" column (character)}
+\item{comment}{The string to add in the chosen column (character)}
+
+\item{column}{Column name to fill (character)}
 }
 \value{
-The input data.table with the filled "Comment" column.
+The input data.frame with the filled chosen column.
 }
 \description{
-Add a string in the "Comment" column of a data.table.
+Add a string in a chosen column of a dataset.
 If there is already a value, the string is pasted after the "/" separator.
 }
 \examples{
 \dontrun{
-library(data.table)
-dt <- data.table(A = c(2), B = c(6))
+dt <- data.frame(A = c(2), B = c(6))
 
-dt <- CommentByRow(dt, comment = "A = 2") # 1st comment
+dt <- CommentByRow(dt, comment = "A = 2", column = "information") # 1st comment
 
-CommentByRow(dt, comment = "B = 6")
+CommentByRow(dt, comment = "B = 6", column = "information")
 }
 }

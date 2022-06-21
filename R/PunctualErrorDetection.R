@@ -55,12 +55,6 @@ PunctualErrorDetection <- function(
   cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
   cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
-  # remove the last value if it's a NA (no DBH value so no cresc or cresc_abs)
-  # if(is.na(cresc[length(cresc)]) & is.na(cresc_abs[length(cresc)])){
-  #   cresc <- cresc[-length(cresc)]
-  #   cresc_abs <- cresc_abs[-length(cresc_abs)]
-  # }
-
   # Detect abnormal growth --------------------------------------------------------------------------------------------------
   Ncresc_abn <- sum(cresc[!is.na(cresc)] >= PositiveGrowthThreshold |
                       cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold) # nbr of abnormal values
@@ -77,7 +71,7 @@ PunctualErrorDetection <- function(
       # Check if there is a return to normal --------------------------------------------------------------------------------
       if(length(ab) == 1) {
         # With 4 values surrounding ab
-        surround <- c(ab - 2, ab - 1, ab + 1, ab + 2) # the 4 values, 2 before & 2 after the error
+        surround <- c(ab - 1, ab + 1) # 1 value before, 1 value after. Previous version : c(ab - 2, ab - 1, ab + 1, ab + 2) : the 4 values, 2 before & 2 after the error
         # In the DBH seq
         surround <- surround[surround > 0 &
                                surround <= length(cresc)] # de taille maximale [0;longueur de l'incrémentation = length(dbh) -1)]
@@ -98,13 +92,13 @@ PunctualErrorDetection <- function(
                      # Compute cresc around the error by skipping the error to check if it's normal
                      # (cresc and down are cresc indices, to have the corresponding DBH index add +1)
                      ((DBHCor[down + 1] - DBHCor[up]) / (Time[down + 1] - Time[up])) <= PositiveGrowthThreshold &
-                     (DBHCor[down + 1] - DBHCor[up]) >= NegativeGrowthThreshold) | # Nino a mis un else plutot qu'un "ou" (ce qui semble mieux)
+                     DBHCor[down + 1] - DBHCor[up] >= NegativeGrowthThreshold) |
 
               # the max positive growth is after the min negative growth (decrease then increase) and ab is before the other value
               isTRUE(down < up & up != ab & cresc[up] * cresc[down] < 0 &
                      # Compute cresc around the error by skipping the error to check if it's normal
                      ((DBHCor[up + 1] - DBHCor[down]) / (Time[up + 1] - Time[down])) <= PositiveGrowthThreshold &
-                     (DBHCor[up + 1] - DBHCor[down]) >= NegativeGrowthThreshold)) { # different de Nino (tag dirtyhack) (runner ac mon ex) (-NegativeGrowthThreshold)
+                     round(DBHCor[up + 1] - DBHCor[down], digits = 0) > NegativeGrowthThreshold)) { # it must be increased more than -2, otherwise with the value corrected from the previous value an abnomal value remains behind
 
             # Abnormal DBH <- NA and will be replaced later on (by RegressionInterpolation()) -------------------------------
             first <- min(up, down) + 1 # The punctual error: the 1st value with the greatest increment (positive or negative) (+1 to switch from cresc to DBH indices)

@@ -4,21 +4,23 @@
 \alias{GenerateComment}
 \title{GenerateComment}
 \usage{
-GenerateComment(Data, condition, comment)
+GenerateComment(Data, condition, comment, column = "Comment")
 }
 \arguments{
-\item{Data}{(data.table)}
+\item{Data}{Dataset (data.table)}
 
 \item{condition}{Vector of logicals}
 
-\item{comment}{The string to add in the "Comment" column (character)}
+\item{comment}{The string to add in the column (character)}
+
+\item{column}{Column name to fill (character)}
 }
 \value{
-The input data.table with the filled "Comment" column.
+The input data.table with the filled column.
 }
 \description{
 For all rows concerned by the condition, the function add a
-string in the "Comment" column of a data.table. If there is already a
+string in the chosen column of a data.table. If there is already a
 value, the string is pasted after the "/" separator.
 }
 \examples{
@@ -27,8 +29,8 @@ library(data.table)
 dt <- data.table(A = c(2, 1, 3), B = c(6, 10, 6))
 
 dt[A == 2,
-   "Comment" := paste0("A = 2")] # 1st comment
+   "information" := paste0("A = 2")] # 1st comment
 
-GenerateComment(dt, condition = dt$B == 6, comment = "B = 6")
+GenerateComment(dt, condition = dt[,B] == 6, comment = "B = 6", column = "information")
 }
 }

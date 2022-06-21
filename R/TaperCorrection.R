@@ -108,7 +108,11 @@ TaperCorrection <- function(
 
 
       # Add the column with the correction method  ------------------------------------------------------------------------
-      DataTree[HOM > DefaultHOM & !is.na(DBHCor), DiameterCorrectionMeth := "taper"]
+
+      DataTree <- GenerateComment(DataTree,
+                                  condition = ( DataTree[,HOM] > DefaultHOM & !is.na(DataTree[, DBHCor]) ),
+                                  comment = "taper",
+                                  column = "DiameterCorrectionMeth")
 
 
     } # end of the correction

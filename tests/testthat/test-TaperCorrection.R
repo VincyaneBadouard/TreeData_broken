@@ -47,7 +47,7 @@ test_that("TaperCorrection", {
 
   # Add a "Comment" and "DiameterCorrectionMeth" value when "Diameter" != "DBHCor"
   Comment <- Rslt[, Comment] != ""
-  Methode <- !is.na(Rslt[, DiameterCorrectionMeth])
+  Methode <- Rslt[, DiameterCorrectionMeth] != ""
 
   compareNA <- function(v1,v2) { # function to compare values, including NA
     same <- (v1 == v2) | (is.na(v1) & is.na(v2))
@@ -58,7 +58,7 @@ test_that("TaperCorrection", {
   expect_true(all(!compareNA(Rslt$Diameter, Rslt$DBHCor) == Comment) & all(Comment == Methode))
 
   # Check the value of the "DiameterCorrectionMeth" column
-  expect_true(all(Rslt$DiameterCorrectionMeth[!is.na(Rslt$DiameterCorrectionMeth)] == "taper"))
+  expect_true(all(Rslt$DiameterCorrectionMeth[Methode] == "taper"))
 
 
 

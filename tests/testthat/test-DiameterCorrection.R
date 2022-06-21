@@ -4,8 +4,8 @@ test_that("DiameterCorrection", {
   library(data.table)
   data("TestData")
 
-  # Remove other errors types (non-unique idTree)
-  TestData <- TestData[IdTree != "100898"]
+  # Remove other errors types (non-unique idTree, missing Year)
+  TestData <- TestData[!IdTree %in% c("100898", "101686")]
 
   # Create test data ----------------------------------------------------------------------------------------------------------------
   MatrixData <- as.matrix(TestData)

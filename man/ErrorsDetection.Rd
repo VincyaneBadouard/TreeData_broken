@@ -41,23 +41,24 @@ ErrorsDetection
 \details{
 Detect errors
 \itemize{
-\item Remove \emph{duplicated rows}
-\item Check \emph{missing value} in
+\item Remove \strong{duplicated rows}
+\item Check \strong{missing value} in
 X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
-IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
-\item Check \emph{missing value} (NA/0) in the measurement variables
-\item Check \emph{duplicated TreeFieldNum} in plot-subplot association in a census
+IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
+\item Check \strong{missing value} (NA/0) in the measurement variables: "Diameter",
+"HOM", "TreeHeight", "StemHeight"
+\item Check \strong{duplicated TreeFieldNum} in plot-subplot association in a census
 (at the site scale)
 \item Check of the \emph{unique association of the idTree with plot, subplot and
 TreeFieldNum} (at the site scale)
-\item Check \emph{duplicated idTree} in a census (at the site scale)
-\item Check for trees \emph{outside the subplot}
-\item Check \emph{invariant coordinates per IdTree}
-\item Check \emph{fix Plot and SubPlot number}
-\item Check botanical identification (BotanicalCorrection)
-\item Check the life status evolution of the trees (StatusCorrection)
-\item Check diameter evolution of the trees (DiameterCorrection)
-\item Check recruitment (RecruitmentCorrection)
+\item Check \strong{duplicated idTree/IdStem} in a census (at the site scale)
+\item Check for trees \strong{outside the subplot}
+\item Check \strong{invariant coordinates per IdTree/IdStem}
+\item Check \strong{fix Plot and SubPlot number}
+\item Check botanical identification (\emph{BotanicalCorrection})
+\item Check the life status evolution of the trees (\emph{StatusCorrection})
+\item Check diameter evolution of the trees (\emph{DiameterCorrection})
+\item Check recruitment (\emph{RecruitmentCorrection})
 }
 }
 \examples{

@@ -53,13 +53,20 @@ test_that("DiameterCorrectionByTree", {
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-  Rslt <- DiameterCorrectionByTree(DataTree,
+  Rslt <- suppressWarnings(DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "POM change",
                                    CorrectionType = "taper")
+  )
 
   expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] == "taper")) # and "taper" in 'DiameterCorrectionMeth'
+  expect_warning(DiameterCorrectionByTree(DataTree,
+                                         DataTree,
+                                         WhatToCorrect = "POM change",
+                                         CorrectionType = "taper"),
+                 regexp = "There are still abnormal growths")
+
 
   # Punctual error -----------------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
@@ -77,7 +84,7 @@ test_that("DiameterCorrectionByTree", {
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
   expect_true(Rslt[4, DiameterCorrectionMeth] == "linear") # and "linear" in 'DiameterCorrectionMeth'
   expect_true(Rslt[4, Comment] == "Abnormal diameter value (punctual error)") # info in 'Comment'
-  expect_true(all(is.na(Rslt[-4, DiameterCorrectionMeth]))) # no correction meth for the other values
+  expect_true(all(Rslt[-4, DiameterCorrectionMeth] == "")) # no correction meth for the other values
   expect_true(all(Rslt[-4, Comment] == "")) # no comment for the other values
 
   ## Case NA in the Diameter column -----------------------------------------------------------------------------------------
@@ -96,7 +103,7 @@ test_that("DiameterCorrectionByTree", {
   expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
   expect_true(Rslt[4, DiameterCorrectionMeth] == "quadratic") # and "linear" in 'DiameterCorrectionMeth'
-  expect_true(all(is.na(Rslt[-4, DiameterCorrectionMeth]))) # no correction meth for the other values
+  expect_true(all(Rslt[-4, DiameterCorrectionMeth] == "")) # no correction meth for the other values
   expect_true(all(Rslt[, Comment] == "")) # no comment because no error
 
   # Correction with POM ------------------------------------------------------------------------------------------------
@@ -192,24 +199,30 @@ test_that("DiameterCorrectionByTree", {
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 
 
-  # taper + punctual error Attend MethCol--------------------------------------------------------------------------------------------
+  # taper + punctual error --------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
-                         Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-  Rslt <- DiameterCorrectionByTree(DataTree,
+  Rslt <- suppressWarnings(DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = c("POM change", "punctual"),
                                    CorrectionType = c("taper", "quadratic"))
+                          )
 
-  # expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
-  # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper")) # "taper" if HOM change
-  # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "quadratic")) # and "quadratic"
+  expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper"))
+  expect_true(Rslt[3, DiameterCorrectionMeth] %in% "quadratic") # and "quadratic"
+  expect_warning(DiameterCorrectionByTree(DataTree,
+                                          DataTree,
+                                          WhatToCorrect = c("POM change", "punctual"),
+                                          CorrectionType = c("taper", "quadratic")),
+                 regexp = "There are still abnormal growths")
 
-  # taper + shift error Attend MethCol------------------------------------------------------------------------------------
+  # taper + shift error ------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
@@ -222,9 +235,11 @@ test_that("DiameterCorrectionByTree", {
                                    WhatToCorrect = c("POM change", "shift"),
                                    CorrectionType = c("taper", "individual", "linear"))
 
+  Meth <- Rslt[HOM != 1.3, DiameterCorrectionMeth]
+
   expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
-  # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper")) # "taper" if HOM change A FAIRE
-  expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% c("linear", "shift realignment"))) # and "linear" or "shift realignment"
+  expect_true(all(grepl("taper", Meth, fixed = TRUE))) # "taper" if HOM change
+  expect_true(all(grepl("linear", Meth, fixed = TRUE) | grepl("shift realignment", Meth, fixed = TRUE))) # and "linear" or "shift realignment"
 
   # POM change + punctual error ------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",
@@ -295,7 +310,7 @@ test_that("DiameterCorrectionByTree", {
   # Check that no abnormal increments remain
   expect_true(all(cresc < 5 | cresc_abs > -2))
 
-  expect_true(all(!is.na(Rslt[DBHCor != Diameter, DiameterCorrectionMeth]))) # method when the DBH has been corrected
+  expect_true(all(Rslt[DBHCor != Diameter, DiameterCorrectionMeth] != "")) # method when the DBH has been corrected
 
   expect_true(all(Rslt[DBHCor != Diameter, Comment] != "")) # comment when the DBH has been corrected
 

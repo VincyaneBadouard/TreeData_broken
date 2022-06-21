@@ -109,8 +109,8 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' # Remove other errors types (non-unique idTree)
-#' TestData <- TestData[IdTree != "100898"]
+#' # Remove other errors types (non-unique idTree, missing Year)
+#' TestData <- TestData[!IdTree %in% c("100898", "101686")]
 #'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
@@ -175,12 +175,12 @@ DiameterCorrection <- function(
     stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
 
   # WhatToCorrect
-  if(!any(WhatToCorrect %in% "POM change" || WhatToCorrect %in% "punctual"|| WhatToCorrect %in% "shift"))
+  if(!any(WhatToCorrect %in% "POM change" | WhatToCorrect %in% "punctual"| WhatToCorrect %in% "shift"))
     stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
 
   # CorrectionType
-  if(!any(CorrectionType  %in%  "taper" || CorrectionType %in% "quadratic"|| CorrectionType %in% "linear"||
-          CorrectionType %in% "individual"|| CorrectionType %in% "phylogenetic hierarchical"))
+  if(!any(CorrectionType  %in%  "taper" | CorrectionType %in% "quadratic"| CorrectionType %in% "linear"|
+          CorrectionType %in% "individual"| CorrectionType %in% "phylogenetic hierarchical"))
     stop("The 'CorrectionType' argument value must be among
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
@@ -207,7 +207,7 @@ DiameterCorrection <- function(
   Data <- unique(Data)   # if there are duplicate rows, delete them
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
-  if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := NA_character_]
+  if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
 
   # If no diameter value, write a comment
   Data <- GenerateComment(Data,
@@ -387,9 +387,9 @@ DiameterCorrection <- function(
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' DataTree = TestData[IdTree %in% "101433"]
 #'
 #'  DataTree <- data.table(IdTree = "c",
+#'       ScientificName = "A",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
 #'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
@@ -398,8 +398,8 @@ DiameterCorrection <- function(
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'   CorrectionType = c("taper", "quadratic", "linear",
-#'                      "individual", "phylogenetic hierarchical"))
+#'   CorrectionType = c("quadratic", "linear", "individual")
+#'   )
 #'
 DiameterCorrectionByTree <- function(
   DataTree,
@@ -466,7 +466,7 @@ DiameterCorrectionByTree <- function(
     # DBH = 0 is impossible
     DBHCor[DBHCor == 0] <- NA
 
-    # DBH > MaxDBH → DBH = NA
+    # DBH > MaxDBH -> DBH = NA
     DBHCor[DBHCor > MaxDBH] <- NA
 
     # Taper correction ------------------------------------------------------------------------------------------------------
@@ -523,9 +523,18 @@ DiameterCorrectionByTree <- function(
 
                   # Add the column with the correction method  ------------------------------------------------------------------------
                   if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
-                    DataTree[raised[rs], DiameterCorrectionMeth := "quadratic"]
+
+                    Meth <- "quadratic"
+
                   }else{
-                    DataTree[raised[rs], DiameterCorrectionMeth := "linear"]}
+
+                    Meth <-  "linear"
+                  }
+
+                  DataTree <- GenerateComment(DataTree,
+                                              condition = as.numeric(rownames(DataTree)) %in% (raised[rs]),
+                                              comment = Meth,
+                                              column = "DiameterCorrectionMeth")
 
                   if(length(DBHCor) > (raised[rs])){ # if the init shift is not the last diameter value
 
@@ -540,7 +549,11 @@ DiameterCorrectionByTree <- function(
                         cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
                       # Add the column with the correction method  ------------------------------------------------------------------------
-                      DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+                      # DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+                      DataTree <- GenerateComment(DataTree,
+                                                  condition = as.numeric(rownames(DataTree)) %in% (i),
+                                                  comment = "shift realignment",
+                                                  column = "DiameterCorrectionMeth")
 
                     } # end i loop
 
@@ -646,9 +659,15 @@ DiameterCorrectionByTree <- function(
 
                 # Add the column with the correction method  ------------------------------------------------------------------------
                 if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
-                  DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := "quadratic"]
+                  Meth <- "quadratic"
                 }else{
-                  DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := "linear"]}
+                  Meth <- "linear"
+                }
+
+                DataTree <- GenerateComment(DataTree,
+                                            condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
+                                            comment = Meth,
+                                            column = "DiameterCorrectionMeth")
 
                 ## 2. DBH[shift] --------------------------------------------------------------------------------------------
                 for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
@@ -662,7 +681,13 @@ DiameterCorrectionByTree <- function(
                     cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
                   # Add the column with the correction method  ------------------------------------------------------------------------
-                  DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+                  # DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+
+                  DataTree <- GenerateComment(DataTree,
+                                              condition = as.numeric(rownames(DataTree)) %in% (i),
+                                              comment = "shift realignment",
+                                              column = "DiameterCorrectionMeth")
+
 
                 }
               }
@@ -695,6 +720,11 @@ DiameterCorrectionByTree <- function(
       cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
       cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
+      # Put NA if other abnormal incrementation
+      AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
+      cresc[AbnormalCrescs]  <- NA
+      cresc_abs[AbnormalCrescs]  <- NA
+
       # Check that only non-abnormal growths are kept
       if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
 
@@ -710,14 +740,46 @@ DiameterCorrectionByTree <- function(
 
           # Add the column with the correction method  ------------------------------------------------------------------------
           if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
-            DataTree[i, DiameterCorrectionMeth := "quadratic"]
+            Meth <- "quadratic"
           }else{
-            DataTree[i, DiameterCorrectionMeth := "linear"]}
+            Meth <- "linear"
+          }
+
+          DataTree <- GenerateComment(DataTree,
+                                      condition = as.numeric(rownames(DataTree)) %in% (i),
+                                      comment = Meth,
+                                      column = "DiameterCorrectionMeth")
 
         }
-      }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
+      }else{warning("There are still abnormal growths. Either the selected methods are insufficient
+                    or the method needs to be improved")}
 
     }
+
+    if(DetectOnly %in% FALSE){
+      # Check that there are no more abnormal growths -----------------------------------------------------------------------------
+      cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+      cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
+      if(any(na.omit(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold))){
+
+        if("IdStem" %in% names(DataTree)){
+          ID <- unique(DataTree[, IdStem])
+        }else{
+          ID <- unique(DataTree[, IdTree])
+        }
+
+        warning("There are still abnormal growths for the tree/stem ", ID,". Either the selected methods are insufficient
+                    or the method needs to be improved")
+      }
+    }
+
+
+
+
+
+
+
 
     # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
     if(DetectOnly %in% FALSE){

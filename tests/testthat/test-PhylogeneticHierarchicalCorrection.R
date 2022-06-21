@@ -38,7 +38,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
   expect_true(all(c("DBHCor", "DiameterCorrectionMeth") %in% names(Rslt)))
 
   # Add a "DiameterCorrectionMeth" value when "Diameter" != "DBHCor"
-  Methode <- !is.na(Rslt[, DiameterCorrectionMeth])
+  Methode <- Rslt[, DiameterCorrectionMeth] != ""
 
   compareNA <- function(v1,v2) { # function to compare values, including NA
     same <- (v1 == v2) | (is.na(v1) & is.na(v2))
@@ -49,7 +49,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
   expect_true(all(!compareNA(Rslt$Diameter, Rslt$DBHCor) == Methode))
 
   # Check the value of the "DiameterCorrectionMeth" column
-  expect_true(all(Rslt$DiameterCorrectionMeth[!is.na(Rslt$DiameterCorrectionMeth)] %in% c(
+  expect_true(all(Rslt$DiameterCorrectionMeth[Methode] %in% c(
     "species","genus","family","stand","shift realignment")
   ))
 

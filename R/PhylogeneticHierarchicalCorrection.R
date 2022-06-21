@@ -187,7 +187,11 @@ PhylogeneticHierarchicalCorrection <- function(
         DBHCor[cresc_abn[rs]+1] <- DBHCor[cresc_abn[rs]] + ColleaguesCrescMean*diff(Time)[cresc_abn[rs]] # Correct with the corrected cresc, the corrected DBH
 
         # Add the column with the correction method  ------------------------------------------------------------------------
-        DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := Method]
+
+        DataTree <- GenerateComment(DataTree,
+                                    condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
+                                    comment = Method,
+                                    column = "DiameterCorrectionMeth")
 
         if(length(DBHCor) > (cresc_abn[rs]+1)){ # if the init shift is not the last diameter value
 
@@ -203,7 +207,11 @@ PhylogeneticHierarchicalCorrection <- function(
               cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
             # Add the column with the correction method  ------------------------------------------------------------------------
-            DataTree[i, DiameterCorrectionMeth := "shift realignment"]
+
+            DataTree <- GenerateComment(DataTree,
+                                        condition = as.numeric(rownames(DataTree)) %in% (i),
+                                        comment = "shift realignment",
+                                        column = "DiameterCorrectionMeth")
 
           } # end i loop
 

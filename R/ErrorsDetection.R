@@ -18,24 +18,25 @@
 #'   considered abnormal (numeric, 1 value) (Default = 5 cm)
 #'
 #' @details Detect errors
-#'   - Remove *duplicated rows*
-#'   - Check *missing value* in
+#'   - Remove **duplicated rows**
+#'   - Check **missing value** in
 #'      X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
-#'      IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
-#'   - Check *missing value* (NA/0) in the measurement variables
-#'   - Check *duplicated TreeFieldNum* in plot-subplot association in a census
+#'      IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
+#'   - Check **missing value** (NA/0) in the measurement variables: "Diameter",
+#'      "HOM", "TreeHeight", "StemHeight"
+#'   - Check **duplicated TreeFieldNum** in plot-subplot association in a census
 #'      (at the site scale)
 #'   - Check of the *unique association of the idTree with plot, subplot and
 #'      TreeFieldNum* (at the site scale)
-#'   - Check *duplicated idTree* in a census (at the site scale)
-#'   - Check for trees *outside the subplot*
-#'   - Check *invariant coordinates per IdTree*
-#'   - Check *fix Plot and SubPlot number*
+#'   - Check **duplicated idTree/IdStem** in a census (at the site scale)
+#'   - Check for trees **outside the subplot**
+#'   - Check **invariant coordinates per IdTree/IdStem**
+#'   - Check **fix Plot and SubPlot number**
 #'
-#'   - Check botanical identification (BotanicalCorrection)
-#'   - Check the life status evolution of the trees (StatusCorrection)
-#'   - Check diameter evolution of the trees (DiameterCorrection)
-#'   - Check recruitment (RecruitmentCorrection)
+#'   - Check botanical identification (*BotanicalCorrection*)
+#'   - Check the life status evolution of the trees (*StatusCorrection*)
+#'   - Check diameter evolution of the trees (*DiameterCorrection*)
+#'   - Check recruitment (*RecruitmentCorrection*)
 #'
 #'
 #' @seealso \code{\link{StatusCorrection}}
