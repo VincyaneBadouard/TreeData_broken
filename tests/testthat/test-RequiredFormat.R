@@ -242,7 +242,7 @@ input$SubPlotAreaUnitMan <- "ha"
   Data$Species = NULL
   input$ScientificName = "Latin"
   input$Genus =  input$Species = "none"
-  input$ScientificNameSep = " "
+  input$ScientificNameSepMan = " "
 
   DataFormated <- RequiredFormat(Data, input )
 
@@ -250,12 +250,12 @@ input$SubPlotAreaUnitMan <- "ha"
 
   # make sure date format is handled correctly even when numeric or decimal
   Data[,  input$Date] <- as.numeric(DataFormated$Date)
-  input$DateFormat = "numeric"
+  input$DateFormatMan = "numeric"
   expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)) |  all(is.na(RequiredFormat(Data, input )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)])))
 
 
   Data[,  input$Date] <- lubridate::decimal_date(DataFormated$Date)
-  input$DateFormat = "decimal"
+  input$DateFormatMan = "decimal"
   expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)) |  all(is.na(RequiredFormat(Data, input )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}",RequiredFormat(Data, input )$Date)])))
 
 

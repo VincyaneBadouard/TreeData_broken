@@ -26,7 +26,7 @@ test_that("ReversedRequiredFormat", {
   # make sure date format is handled correctly
 
   for(DateFormat in c("yyyy-mm-dd", "dd/mm/yyyy", "decimal", "numeric")){
-    input$DateFormat = DateFormat
+    input$DateFormatMan = DateFormat
     if(DateFormat %in% "yyyy-mm-dd") expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", ReversedRequiredFormat(Data, input )[, get(input$Date)])) | all(is.na(ReversedRequiredFormat(Data, input )[, get(input$Date)][!grepl("\\d{4}-\\d{2}-\\d{2}", ReversedRequiredFormat(Data, input )[, get(input$Date)])])))
     if(DateFormat %in% "dd/mm/yyyy") expect_true(all(grepl("\\d{2}/\\d{2}/\\d{4}", ReversedRequiredFormat(Data, input )[, get(input$Date)])) | all(is.na(ReversedRequiredFormat(Data, input )[, get(input$Date)][!grepl("\\d{4}-\\d{2}-\\d{2}", ReversedRequiredFormat(Data, input )[, get(input$Date)])])))
     if(DateFormat %in% "numeric") expect_true(all(grepl("^\\d{5}$", ReversedRequiredFormat(Data, input )[, get(input$Date)])) | all(is.na(ReversedRequiredFormat(Data, input )[, get(input$Date)][!grepl("^\\d{5}$", ReversedRequiredFormat(Data, input )[, get(input$Date)])])))
@@ -34,7 +34,7 @@ test_that("ReversedRequiredFormat", {
 
   }
 
-  input$DateFormat = ForestGeoProfile$DateFormat
+  input$DateFormatMan = ForestGeoProfile$DateFormat
 
   # make sure measurement units gets converted correctly or throw error if units not selected
   Data$HOM <- 1.3
