@@ -463,7 +463,25 @@ observe( {
       showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
     })
 
-    for(i in which(x$ItemID %in% names(profile))) {
+    MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
+    MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
+
+    if(length(MissingItemIDProfile) > 0 & gimme_value() == 1) {
+      showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
+    }
+
+    ValidItemID <- names(profile)[(profile %in% c(names(TidyTable()), "none")) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
+
+    InValidItemID <- setdiff(names(profile), ValidItemID)
+    InValidItemID <- InValidItemID[InValidItemID %in% x$ItemID]
+
+    if(length(InValidItemID) > 0 & gimme_value() == 1) {
+      showNotification(paste("The profile you selected does not seem to correspond to your data. The items that do not match your data are:", paste0(InValidItemID, " (in ", x$Group[match(InValidItemID, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand (or make sure you picked the right profile). Also, please double check that the info in the second column is filled out properly."), type = 'err', duration = NULL)
+    }
+    #
+    # for(i in which(x$ItemID %in% names(profile) & reactiveValuesToList(input)[x$ItemID] %in% names(TidyTable()))) {
+
+    for(i in which(x$ItemID %in% ValidItemID)) {    # used to be for(i in which(x$ItemID %in% names(profile)))
       eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
 
       # eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
@@ -501,9 +519,11 @@ observe( {
     sort(unique(TidyTable()[[input$LifeStatus]]))})
 
   CommercialOptions <- eventReactive(input$CommercialSp, {
-    sort(unique(TidyTable()[[input$CommercialSp]]))})
+    sort(unique(TidyTable()[[input$CommercialSp]]))
+    })
 
-  OtherOptions <- eventReactive(TidyTable(), {""})
+  OtherNumericOptions <- reactiveVal(-999)
+  OtherCharacterOptions <- reactiveVal("")
 
   LogicalOptions <- reactive(c(TRUE, FALSE))
 
@@ -560,7 +580,6 @@ observe( {
         shinyjs::show( x4$ItemID[i])
 
       } else {
-
         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "='", x4$Default[i], "')")))
 
         shinyjs::hide( x4$ItemID[i])
@@ -585,7 +604,7 @@ observe( {
 
     })
 
-   if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
+    if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
       if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
         eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$argument[i], "= get(x6$argValue[i])())")))
 
@@ -605,7 +624,7 @@ observe( {
 
 
 
-  # format data usin the input
+  # format data using the input
 
   DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
@@ -622,9 +641,6 @@ observe( {
 
 
   }, ignoreInit = T)
-
-  FormatedColumnOptions <- eventReactive(input$LaunchFormating, { c("none", colnames(DataFormated()))
-  })
 
   observeEvent(input$LaunchFormating , {
     shinyjs::show("GoToCorrect")

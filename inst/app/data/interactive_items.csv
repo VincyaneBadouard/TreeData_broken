@@ -1,88 +1,103 @@
-Group,ItemType,argument,Default,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,if_X2_isnot_none,argValue,Options,Multiple,Activate,RequiredColumn,DataType,Unit,Description
-Plot info,pickerInput,choices,none,Site,Site name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Site level name
-NA,textInput,value,,SiteMan,What is your site name ?,,Site,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Plot info,pickerInput,choices,none,Plot,Plot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Plot level name
-NA,textInput,value,,PlotMan,What is your plot name ?,,Plot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Plot info,pickerInput,choices,none,SubPlot,SubPlot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,SubPlot level name
-NA,textInput,value,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Plot info,pickerInput,choices,none,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
-NA,pickerInput,choices,none,PlotAreaUnitMan,What is the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-NA,numericInput,value,,PlotAreaMan,What is your plot area in hectare?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Plot info,pickerInput,choices,none,SubPlotArea,SubPlot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
-NA,pickerInput,choices,none,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-NA,numericInput,value,,SubPlotAreaMan,What is your subplot area in hectare?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Census info,pickerInput,choices,none,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,-,Census identifier
-Census info,pickerInput,choices,none,Year,Year of measurement,"if your Year is decimal, leave as ""none"" and match it to ""Date of measurement""",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
-NA,numericInput,value,,YearMan,What is your year of measurement?,,Year,Date,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Census info,pickerInput,choices,none,Month,Month of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Month of measurement
-Census info,pickerInput,choices,none,Day,Day of measurement,"different than date, see Date",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Day of measurement
-Census info,pickerInput,choices,none,Date,Date of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Date of measurement
-NA,textInput,value,,DateFormat,What is your date format?,"e.g. 2016-09-14 would be yyyy-mm-dd, 9/14/2016 would be mm/dd/yyyy, 2016.703 would be decimal and 17058 woulbe numeric (number of days since 1970-01-01)",none,none,Date,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-Census info,pickerInput,choices,none,TreeFieldNum,Tree tag,identifiers at the plot level. It can be the same as tree ID if you have only one plot.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field."
-Census info,pickerInput,choices,none,IdTree,Tree ID,unique tree identifier in the entire dataset,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).
-Census info,pickerInput,choices,none,IdStem,Stem ID,stem unique identifier within the tree or at the plot level,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
-Census info,pickerInput,choices,none,IdMeasure,Measure ID,if you measured more than one Diameter per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
-Tree measurements,pickerInput,choices,none,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if tree was alive, FALSE if it was dead"
-NA,pickerInput,choices,,IsLive,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,Diameter,DBH,usually at breast heigh but see HOM or POM,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Tree Diameter
-Tree measurements,pickerInput,choices,none,DiameterUnit,DBH units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,DiameterUnitMan,What is your DBH unit ?,,none,none,Diameter,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,BD,BD,basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
-Tree measurements,pickerInput,choices,none,BDUnit,BD unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,BDUnitMan,What is your BD unit ?,,none,none,BD,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,Circ,Circumference,circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference
-Tree measurements,pickerInput,choices,none,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference
-Tree measurements,pickerInput,choices,none,BCircUnit,Basal Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,BCircUnitMan,What is your basal circumference unit?,,none,none,BCirc,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,HOM,HOM,"height of diameter measurement, as numeric value",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement
-Tree measurements,pickerInput,choices,none,HOMUnit,HOM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,HOMUnitMan,What is your HOM unit?,,none,none,HOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,POM,POM,"point of diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of tree diameter
-Tree measurements,pickerInput,choices,none,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,BHOM,Basal HOM,"height of basal diameter measurement, as numeric value",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement of basal diameter
-Tree measurements,pickerInput,choices,none,BHOMUnit,Basal HOM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,BHOMUnitMan,What is your BasalHOM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,BPOM,Basal POM,"point of basal diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of basal diameter
-Tree measurements,pickerInput,choices,none,BPOMUnit,Basal POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,BPOMUnitMan,What is your Basal POM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
-Tree measurements,pickerInput,choices,none,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height
-Tree measurements,pickerInput,choices,none,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
-NA,pickerInput,choices,none,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-Tree coordinates,pickerInput,choices,none,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Latitude
-Tree coordinates,pickerInput,choices,none,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Longitude
-Tree coordinates,pickerInput,choices,none,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,X UTM coordinates
-Tree coordinates,pickerInput,choices,none,Yutm,Tree Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Y UTM coordinats
-Tree coordinates,pickerInput,choices,m,utmUnitMan,UTM units,,none,none,Xutm,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
-Tree coordinates,pickerInput,choices,none,Xplot,Tree X euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in plot
-Tree coordinates,pickerInput,choices,none,Yplot,Tree Y euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in plot
-Tree coordinates,pickerInput,choices,m,plotUnitMan,XY plot coordinates units,,none,none,Xplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
-Tree coordinates,pickerInput,choices,none,Xsubplot,Tree X euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in subplot
-Tree coordinates,pickerInput,choices,none,Ysubplot,Tree Y euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in subplot
-Tree coordinates,pickerInput,choices,m,subplotUnitMan,XY subplot coordinates units,,none,none,Xsubplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
-Tree botanical information,pickerInput,choices,none,ScientificName,Scientific name,Latin binomial,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Scientific name
-Tree botanical information,pickerInput,choices,none,VernName,Vernacular name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Vernacular name
-Tree botanical information,pickerInput,choices,none,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
-Tree botanical information,pickerInput,choices,none,Genus,Genus name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Genus name
-Tree botanical information,pickerInput,choices,none,Species,Species name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Species name
-Tree botanical information,pickerInput,choices,none,Subspecies,Subspecies name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Subspecies name
-Tree botanical information,pickerInput,choices,none,Variety,Variety name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Variety name
-Tree botanical information,pickerInput,choices,none,Voucher,Voucher code,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Voucher code for the species
-Tree botanical information,pickerInput,choices,none,IdLevel,Deepest taxonomic level for which full identification is known,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Deepest taxonomic level for which full identification is known
-Tree botanical information,pickerInput,choices,none,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Taxonomic authority for the ID level
-Tree botanical information,pickerInput,choices,none,CommercialSp,Commercial species indicator,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
-NA,pickerInput,choices,,IsCommercrial,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
-Tree botanical information,pickerInput,choices,none,LifeForm,Life form,tree/palm/liana/bamboo?,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Life form
-Plot info,pickerInput,choices,none,Treatment,Logging treatment,CL/RIL/control/..,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Treatment type
-Plot info,pickerInput,choices,none,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
-Plot info,pickerInput,choices,none,Topography,"Topographical position (lowland, plateau)",,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,"Topographical position (e.g. lowland, plateau)"
-NA,textInput,value,,ScientificNameSep,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-NA,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
-NA,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
-NA,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"
-NA,,,,DiameterOriginal,,,,,,,,,FALSE,,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
-NA,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
-NA,,,,IsCommercrialOriginal,,,,,,,,,FALSE,,-,-,"IsCommercrial as it was given in the input table, without any correction or transformation"
-NA,,,,Comment,,,,,,,,,FALSE,,-,-,information about error
+Group,ItemType,argument,Default,AppDefaultProfile,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,if_X2_isnot_none,argValue,Options,Multiple,Activate,RequiredColumn,DataType,Unit,Description
+Plot info,pickerInput,choices,none,Site,Site,Site name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Site level name
+second column,textInput,value,,,SiteMan,What is your site name ?,,Site,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot info,pickerInput,choices,none,Plot,Plot,Plot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Plot level name
+second column,textInput,value,,,PlotMan,What is your plot name ?,,Plot,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot info,pickerInput,choices,none,SubPlot,SubPlot,SubPlot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,SubPlot level name
+second column,textInput,value,,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot coordinates,pickerInput,choices,none,PlotLat,PlotLat,Plot latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Plot's latitude
+Plot coordinates,pickerInput,choices,none,PlotLon,PlotLon,Plot longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Plot's longitude
+Plot coordinates,pickerInput,choices,none,PlotXutm,PlotXutm,Plot X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Plot's X UTM coordinates
+Plot coordinates,pickerInput,choices,none,PlotYutm,PlotYutm,Plot Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Plot's Y UTM coordinats
+Plot info,pickerInput,choices,none,PlotArea,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
+second column,pickerInput,choices,none,ha,PlotAreaUnitMan,What is the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,PlotAreaMan,What is your plot area in hectare?,,PlotArea,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot info,pickerInput,choices,none,PlotElevation,PlotElevation,Plot elevation,meters above sea leavel,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,plot's elevation above sea level
+second column,numericInput,value,-999,,PlotElevationMan,What is your plot elevation in meters above sea level?,,PlotElevation,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot coordinates,pickerInput,choices,none,SubPlotLat,SubPlotLat,Subplot latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Subplot's latitude
+Plot coordinates,pickerInput,choices,none,SubPlotLon,SubPlotLon,Subplot longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Subplot's longitude
+Plot coordinates,pickerInput,choices,none,SubPlotXutm,SubPlotXutm,Subplot X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Subplot's X UTM coordinates
+Plot coordinates,pickerInput,choices,none,SubPlotYutm,SubPlotYutm,Subplot Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Subplot's Y UTM coordinats
+Plot info,pickerInput,choices,none,SubPlotArea,SubPlotArea,SubPlot area,none,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
+second column,pickerInput,choices,none,ha,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,SubPlotAreaMan,What is your subplot area in hectare?,,PlotArea,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot info,pickerInput,choices,none,MinDBH,MinDBH,Minimum DBH, minimum diameter of trees included in your inventory,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,cm,The minimum diameter of trees included in the inventory
+second column,pickerInput,choices,none,cm,MinDBHUnitMan,What is your unit for the column indicating the minimum DBH?,,none,none,MinDBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,MinDBHMan,What is the minimum diameter of trees included in your inventory?,in cm,MinDBH,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Plot measurements,pickerInput,choices,none,SpeciesAbundance,SpeciesAbundance,Species abundance,"Total number of individuals for a species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,-,"Total number of individuals for a species, per sampling unit"
+Plot measurements,pickerInput,choices,none,SpeciesBasalArea,SpeciesBasalArea,Species Basal area,"Total cross-sectional area of all stems of the species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,sqr cm per sqr meter,"Total cross-sectional area of all stems of the species, per sampling unit"
+Census info,pickerInput,choices,none,IdCensus,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,-,Census identifier
+Census info,pickerInput,choices,none,Year,Year,Year of measurement,"if your Year is decimal, leave as ""none"" and match it to ""Date of measurement""",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
+second column,numericInput,value,-999,,YearMan,What is your year of measurement?,,Year,Date,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Census info,pickerInput,choices,none,Month,Month,Month of measurement,numeric from 1 to 12,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Month of measurement
+Census info,pickerInput,choices,none,Day,Day,Day of measurement,"numeric from 1 to 31, different than date, see Date",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Day of measurement
+Census info,pickerInput,choices,none,Date,Date,Date of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Date of measurement
+second column,textInput,value,,yyyy-mm-dd,DateFormatMan,What is your date format?,"e.g. 2016-09-14 would be yyyy-mm-dd, 9/14/2016 would be mm/dd/yyyy, 2016.703 would be decimal and 17058 woulbe numeric (number of days since 1970-01-01)",none,none,Date,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Census info,pickerInput,choices,none,TreeFieldNum,TreeFieldNum,Tree tag,identifiers at the plot level. It can be the same as tree ID if you have only one plot.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field."
+Census info,pickerInput,choices,none,IdTree,IdTree,Tree ID,unique tree identifier in the entire dataset,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).
+Census info,pickerInput,choices,none,IdStem,IdStem,Stem ID,stem unique identifier within the tree or at the plot level,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
+Census info,pickerInput,choices,none,IdMeasure,IdMeasure,Measure ID,if you measured more than one Diameter per tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,measure unique identifier if you had more than one measure per stem per year
+Tree measurements,pickerInput,choices,none,LifeStatus,LifeStatus,Life status,where you say the tree is dead or alive,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if tree was alive, FALSE if it was dead"
+second column,pickerInput,choices,none,TRUE,IsLiveMan,Which of your status(es) represent a LIVE tree?,,none,none,LifeStatus,LifeStatusOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,Diameter,Diameter,DBH,usually at breast heigh but see HOM or POM,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Tree Diameter
+Tree measurements,pickerInput,choices,none,DiameterUnit,DiameterUnit,DBH units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,cm,DiameterUnitMan,What is your DBH unit ?,,none,none,Diameter,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,BD,BD,BD,basal diameter,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal diameter
+Tree measurements,pickerInput,choices,none,BDUnit,BDUnit,BD unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,cm,BDUnitMan,What is your BD unit ?,,none,none,BD,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,Circ,Circ,Circumference,circumference of the tree,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Circumference
+Tree measurements,pickerInput,choices,none,CircUnit,CircUnit,Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,cm,CircUnitMan,What is your circumference unit?,,none,none,Circ,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,BCirc,BCirc,Basal Circumference,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,cm,Basal circumference
+Tree measurements,pickerInput,choices,none,BCircUnit,BCircUnit,Basal Circumference unit,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,cm,BCircUnitMan,What is your basal circumference unit?,,none,none,BCirc,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,HOM,HOM,HOM,"height of diameter measurement, as numeric value",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement
+Tree measurements,pickerInput,choices,none,HOMUnit,HOMUnit,HOM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,m,HOMUnitMan,What is your HOM unit?,,none,none,HOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,POM,POM,POM,"point of diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of tree diameter
+Tree measurements,pickerInput,choices,none,POMUnit,POMUnit,POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,,POMUnitMan,What is your POM unit?,,none,none,POM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,BHOM,BHOM,Basal HOM,"height of basal diameter measurement, as numeric value",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Height of measurement of basal diameter
+Tree measurements,pickerInput,choices,none,BHOMUnit,BHOMUnit,Basal HOM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,m,BHOMUnitMan,What is your BasalHOM unit?,,none,none,BHOM,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,BPOM,BPOM,Basal POM,"point of basal diameter measurement, as a code",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Code for point of measurement of basal diameter
+Tree measurements,pickerInput,choices,none,BPOMUnit,BPOMUnit,Basal POM units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,,BPOMUnitMan,What is your Basal POM unit?,,none,none,BPOM,UnitOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,TreeHeight,TreeHeight,Tree height,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Height
+Tree measurements,pickerInput,choices,none,TreeHeightUnit,TreeHeightUnit,Tree height units,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,-
+second column,pickerInput,choices,none,m,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+Tree coordinates,pickerInput,choices,none,Lat,Lat,Tree latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Tree Latitude
+Tree coordinates,pickerInput,choices,none,Lon,Lon,Tree longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Tree Longitude
+Tree coordinates,pickerInput,choices,none,Xutm,Xutm,Tree X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X UTM coordinates
+Tree coordinates,pickerInput,choices,none,Yutm,Yutm,Tree Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y UTM coordinats
+Tree coordinates,pickerInput,choices,none,m,utmUnitMan,Tree UTM units,,none,none,Xutm,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+Tree coordinates,pickerInput,choices,none,Xplot,Xplot,Tree X euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in plot
+Tree coordinates,pickerInput,choices,none,Yplot,Yplot,Tree Y euclidean position in plot,"position of the tree relative to the Southwestern corner of the plot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in plot
+Tree coordinates,pickerInput,choices,none,m,plotUnitMan,Tree XY plot coordinates units,,none,none,Xplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+Tree coordinates,pickerInput,choices,none,Xsubplot,Xsubplot,Tree X euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree X euclidean position in subplot
+Tree coordinates,pickerInput,choices,none,Ysubplot,Ysubplot,Tree Y euclidean position in SUBplot,"position of the tree relative to the Southwestern corner of the SUBplot, in meters",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Tree Y euclidean position in subplot
+Tree coordinates,pickerInput,choices,none,m,subplotUnitMan,Tree XY subplot coordinates units,,none,none,Xsubplot,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,-
+Tree botanical information,pickerInput,choices,none,ScientificName,ScientificName,Scientific name,Latin binomial,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Scientific name
+Tree botanical information,pickerInput,choices,none,VernName,VernName,Vernacular name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Vernacular name
+Tree botanical information,pickerInput,choices,none,Family,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Family name
+Tree botanical information,pickerInput,choices,none,Genus,Genus,Genus name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Genus name
+Tree botanical information,pickerInput,choices,none,Species,Species,Species name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Species name
+Tree botanical information,pickerInput,choices,none,Subspecies,Subspecies,Subspecies name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Subspecies name
+Tree botanical information,pickerInput,choices,none,Variety,Variety,Variety name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Variety name
+Tree botanical information,pickerInput,choices,none,Voucher,Voucher,Voucher code,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Voucher code for the species
+Tree botanical information,pickerInput,choices,none,IdLevel,IdLevel,Deepest taxonomic level for which full identification is known,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Deepest taxonomic level for which full identification is known
+Tree botanical information,pickerInput,choices,none,Authority,Authority, Taxonomic authority for the ID level,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Taxonomic authority for the ID level
+Tree botanical information,pickerInput,choices,none,CommercialSp,CommercialSp,Commercial species indicator,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,logical,-,"Logical: TRUE if species is considered commercial, FALSE if not"
+second column,pickerInput,choices,none,TRUE,IsCommercialMan,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
+Tree botanical information,pickerInput,choices,none,LifeForm,LifeForm,Life form,tree/palm/liana/bamboo?,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Life form
+Plot info,pickerInput,choices,none,Treatment,Treatment,Logging treatment,CL/RIL/control/..,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Treatment type
+Plot info,pickerInput,choices,none,SoilType,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
+Plot info,pickerInput,choices,none,Topography,Topography,"Topographical position (lowland, plateau)",,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,"Topographical position (e.g. lowland, plateau)"
+second column,textInput,value,, ,ScientificNameSepMan,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+NA,,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
+NA,,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
+NA,,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"
+NA,,,,,DiameterOriginal,,,,,,,,,FALSE,,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
+NA,,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
+NA,,,,,CommercialSpOriginal,,,,,,,,,FALSE,,-,-,"IsCommercial as it was given in the input table, without any correction or transformation"
+NA,,,,,Comment,,,,,,,,,FALSE,,-,-,information about error

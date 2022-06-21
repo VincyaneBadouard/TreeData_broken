@@ -15,7 +15,7 @@ ForestGeoProfile <-
     IdStem = "stemID",
     PlotMan = "ForestGEO",
     Species = "Species",
-    ScientificNameSep = "",
+    ScientificNameSepMan = "",
     Yplot = "gy",
     Ysubplot = "none",
     CircUnitMan = "none",
@@ -30,9 +30,9 @@ ForestGeoProfile <-
     IdLevel = "IDLevel",
     TreeFieldNum = "tag",
     ScientificName = "Latin",
-    DateFormat = "yyyy-mm-dd",
+    DateFormatMan = "yyyy-mm-dd",
     IdCensus = "CensusID",
-    PlotAreaMan = 25.6,
+    PlotAreaMan = -999,
     Year = "none",
     LifeStatus = "DFstatus",
     PlotArea = "none",
@@ -40,9 +40,9 @@ ForestGeoProfile <-
     SubPlotAreaUnitMan = "none",
     Yutm = "none",
     utmUnitMan = "none",
-    YearMan = NA,
+    YearMan = -999,
     Circ = "none",
-    SubPlotAreaMan = 0.04,
+    SubPlotAreaMan = -999,
     SubPlotMan = "",
     Site = "none",
     Lon = "none",
@@ -51,13 +51,16 @@ ForestGeoProfile <-
     LifeForm = "none",
     VernName = "none",
     SubPlotArea = "none",
-    SiteMan = "SCBI",
-    IsLive = c("alive", "broken below"),
+    SiteMan = "",
+    IsLiveMan = c("alive", "broken below"),
     Authority = "SpeciesID",
     Lat = "none",
     Genus = "Genus",
     SubPlot = "quadrat",
     DiameterUnitMan = "mm",
+    MinDBH = "none",
+    MinDBHMan = 10,
+    MinDBHUnitMan = "none",
     Xplot = "gx",
     Xsubplot = "none",
     plotUnitMan = "m",
@@ -65,7 +68,7 @@ ForestGeoProfile <-
     Diameter = "dbh",
     HOMUnitMan = "m",
     Variety = "none",
-    Voucher = "Voucher",
+    Voucher = "none",
     Tidy = structure(0L, class = c("integer",
                                    "shinyActionButtonValue")),
     ClearValueName = structure(0L, class = c("integer",
@@ -88,6 +91,8 @@ ForestGeoProfile <-
   )
 usethis::use_data(ForestGeoProfile, overwrite = TRUE)
 
+# also save for the app
+saveRDS(ForestGeoProfile, "inst/app/data/ForestGeoProfile.rds")
 
 ## For ForestGeoProfile.Rmd  run next line of code and paste in the item section of R/ForestGeoProfile.R
 x <- read.csv("inst/app/data/interactive_items.csv")

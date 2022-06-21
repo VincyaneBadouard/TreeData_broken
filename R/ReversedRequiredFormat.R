@@ -79,7 +79,7 @@ ReversedRequiredFormat <- function(
   ## format date of measurement like output profile ####
   if(!input$Date %in% "none"){
 
-    DateFormat <- trimws(input$DateFormat)
+    DateFormat <- trimws(input$DateFormatMan)
 
     Data[, Date := as.Date(Date)]
 
@@ -113,7 +113,7 @@ ReversedRequiredFormat <- function(
 
   # Units reverting from standard one ####
 
-  ### Diameter and Circ in cm ####
+  ### Diameter and Circ, BD, BCirc and MinDBH in cm ####
 
   if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
 
@@ -128,7 +128,6 @@ ReversedRequiredFormat <- function(
     if(!input$Circ %in% "none") Data[, Circ := round(Diameter*pi, 2)]
   }
 
-  ### BD and BCirc in cm ####
 
   if(!input$BD %in% "none" | !input$BCirc %in% "none") {
     SizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
@@ -140,6 +139,18 @@ ReversedRequiredFormat <- function(
     if (SizeUnit == "m") Data[, BD := BD/100] # cm -> m
 
     if(!input$BCirc %in% "none") Data[, BCirc := round(BD*pi, 2)]
+  }
+
+  if(!input$MinDBH %in% "none") {
+
+    SizeUnit <- input$MinDBHUnitMan
+
+    if (SizeUnit == "mm") Data[, MinDBH := MinDBH*10] # cm -> mm
+
+    if (SizeUnit == "dm") Data[, MinDBH := MinDBH/10] # cm -> dm
+
+    if (SizeUnit == "m") Data[, MinDBH := MinDBH/100] # cm -> m
+
   }
 
   ### HOM and BHOM in m ####
@@ -326,10 +337,13 @@ ReversedRequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  m <- na.omit(match(colnames(Data), names(input)))
+  m <- match(colnames(Data), names(input))
   idx_complete <- which(!input[m] %in% "none") # keep standard name when is not asked in the output Profile
 
-  colnames(Data)[idx_complete] <- input[m[idx_complete]]
+  NewNames <- sapply(input[m[idx_complete]], function(x) ifelse(is.null(x), NA, x))
+  NewNames[is.na(NewNames)] <-  colnames(Data)[idx_complete][is.na(NewNames)]
+
+  colnames(Data)[idx_complete] <- NewNames
 
 
   setDT(Data)

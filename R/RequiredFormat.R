@@ -134,12 +134,12 @@ RequiredFormat <- function(
     if(!input$Year %in% "none") {
       Data[, Date := paste(trimws(Year), trimws(Month), trimws(Day), sep = "-")]
     } else {
-      Data[, Date := paste(trimws(input$YearMan), trimws(Month), trimws(Day), sep = "-")]
+      if(!input$YearMan %in% -999) Data[, Date := paste(input$YearMan, trimws(Month), trimws(Day), sep = "-")] else warning("You did not provide a Year or date.")
     }
 
     # overwrite input
     input$Date = "Date"
-    input$DateFormat = "yyyy-mm-dd"
+    input$DateFormatMan = "yyyy-mm-dd"
   }
 
   # put in date format
@@ -150,7 +150,7 @@ RequiredFormat <- function(
       Data[, DateOriginal := Date]
 
       # transform to standard format
-      DateFormat <- trimws(input$DateFormat)
+      DateFormat <- trimws(input$DateFormatMan)
 
 
       if(grepl("num|dec", DateFormat, ignore.case = T)) {
@@ -162,7 +162,7 @@ RequiredFormat <- function(
       } else {
 
         DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-        DateFormat <- gsub("yyy", "Y",DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+        DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
         Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
 
@@ -188,7 +188,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else Data[, Year := input$YearMan]
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else waring("You did not provide Date or Year")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
@@ -240,10 +240,10 @@ RequiredFormat <- function(
     Data$IdTree[idxNAIdTree] <- paste0(c(1:sum(idxNAIdTree)), "_auto")
 
   }
-  ## Genus, Species, ScientificNameSep ####
+  ## Genus, Species, ScientificNameSepMan ####
 
-  ### Genus and species if we have ScientificName and ScientificNameSep
-  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSep %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSep , fixed = TRUE, keep  = c(1,2))]
+  ### Genus and species if we have ScientificName and ScientificNameSepMan
+  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
@@ -256,13 +256,30 @@ RequiredFormat <- function(
   if(input$Diameter %in% "none" & !input$Circ %in% "none") Data[, Diameter := round(Circ/pi, 2)]
   if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
 
+
+  ## MinDBH if we don't have it
+  if(input$MinDBH %in% "none") {
+
+    if(!input$MinDBHMan %in% -999) {
+      Data[, MinDBH := input$MinDBHMan]
+      input$MinDBHUnitMan <- "cm" # if MinDBH given by hand, it should be in cm
+
+    }
+    if(input$MinDBHMan %in% -999) {
+    Data[, MinDBH := min(Diameter)]
+    input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
+    warning("MinDBH was calculated.")
+    }
+  }
+
+
   # Units changing ####
 
   unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
 
   AreaUnitOptions <- c("m2", "ha", "km2")
 
-  ### Diameter and BD in cm ####
+  ### Diameter, MinDBH and BD in cm ####
   # if((!input$Diameter %in% "none" & !input$DiameterUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
 
   if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
@@ -299,6 +316,23 @@ RequiredFormat <- function(
     }
 
     Data[, BCirc := round(BD*pi, 2)]
+  }
+
+  if(!input$MinDBH %in% "none") {
+
+    SizeUnit <- input$MinDBHUnitMan
+
+    if(!SizeUnit %in% unitOptions) stop(paste("Your minimum DBH size units are not one of:", paste(unitOptions, collapse = ", ")))
+
+    if(SizeUnit %in% unitOptions) {
+
+      if (SizeUnit == "mm") Data[, MinDBH := MinDBH/10] # mm -> cm
+
+      if (SizeUnit == "dm") Data[, MinDBH := MinDBH*10] # dm -> cm
+
+      if (SizeUnit == "m") Data[, MinDBH := MinDBH*100] # m -> cm
+    }
+
   }
 
   ### HOM and BHOM in m ####
@@ -387,8 +421,10 @@ RequiredFormat <- function(
   }
 
   # if area is entered manually, it is supposed to be in ha already
-  if(input$PlotArea %in% "none" & !input$PlotAreaMan %in% "none") {
-    Data[, PlotArea := input$PlotAreaMan]
+  if(input$PlotArea %in% "none") {
+    if(!input$PlotAreaMan %in% -999) Data[, PlotArea := input$PlotAreaMan]
+
+    if(input$PlotAreaMan %in% -999) warning("You did not specify a plot area")
   }
 
   ### SubPlotArea in ha ####
@@ -407,10 +443,13 @@ RequiredFormat <- function(
   }
 
   # if area is entered manually, it is supposed to be in ha already
-  if(input$SubPlotArea %in% "none" & !input$SubPlotAreaMan %in% "none") {
-    Data[, SubPlotArea := input$SubPlotAreaMan]
-  }
+  if(input$SubPlotArea %in% "none") {
 
+    if(!input$SubPlotAreaMan %in% -999) Data[, SubPlotArea := input$SubPlotAreaMan]
+
+    if(input$SubPlotAreaMan %in% -999) warning("You did not specify a subplot area")
+
+  }
 
   ### XY coordinates in m ####
 

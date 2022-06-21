@@ -62,6 +62,8 @@ body <- dashboardBody(
              .dropdown-menu{z-index:10000 !important;}
              .sw-dropdown-content {z-index: 3000005 !important;}
              .sw-dropdown-in {z-index: 3000006 !important;}
+             .vscomp-search-container {z-index: 3000005 !important;}
+             .vscomp-dropbox-container {z-index: 3000005 !important;}
 
            "
 
@@ -268,11 +270,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
 
                      #   hidden(div(id = "SelectColumns",
@@ -299,11 +301,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T))),
+                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
                          actionBttn(
                            inputId = "Merge2",
                            label = "Merge tables",
@@ -406,7 +408,8 @@ body <- dashboardBody(
                                label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
                                choices = list("No thanks!" = "No",
                                               # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
-                                              "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO"#,
+                                              "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO",
+                                              "App's profile (if the data you upload was downloaded from this app, using this app's standards)" = "App"#,
                                               # "RBA: Red de Bosques Andinos" = "RBA"
                                ),
                                selected = "No"),
