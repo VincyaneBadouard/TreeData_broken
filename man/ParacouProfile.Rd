@@ -19,7 +19,7 @@ A named list
 \item{Date}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Date of measurement}
 \item{Month}{Value or column name in data set @ParacouSubset (none) corresponding to Month of measurement}
 \item{Day}{Value or column name in data set @ParacouSubset (none) corresponding to Day of measurement}
-\item{DateFormat}{Value or column name in data set @ParacouSubset (yyyy-mm-dd) corresponding to What is your date format?}
+\item{DateFormatMan}{Value or column name in data set @ParacouSubset (yyyy-mm-dd) corresponding to What is your date format?}
 \item{Diameter}{Value or column name in data set @ParacouSubset (none) corresponding to DBH}
 \item{DiameterUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your DBH unit ?}
 \item{Family}{Value or column name in data set @ParacouSubset (Family) corresponding to Family name}
@@ -31,7 +31,7 @@ A named list
 \item{IdMeasure}{Value or column name in data set @ParacouSubset (none) corresponding to Measure ID}
 \item{IdStem}{Value or column name in data set @ParacouSubset (none) corresponding to Stem ID}
 \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
-\item{IsCommercrial}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
+\item{IsCommercialMan}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
 \item{IsLive}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of your status(es) represent a LIVE tree?}
 \item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
 \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
@@ -45,7 +45,7 @@ A named list
 \item{plotUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to XY plot coordinates units}
 \item{POM}{Value or column name in data set @ParacouSubset (MeasCode) corresponding to POM}
 \item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
-\item{ScientificNameSep}{Value or column name in data set @ParacouSubset () corresponding to Character separating Genus and Species in Scientific name}
+\item{ScientificNameSepMan}{Value or column name in data set @ParacouSubset () corresponding to Character separating Genus and Species in Scientific name}
 \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
 \item{SiteMan}{Value or column name in data set @ParacouSubset () corresponding to What is your site name ?}
 \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
