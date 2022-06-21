@@ -16,7 +16,7 @@
 #'   \item{IdStem}{Value or column name in data set @ForestGeoSubset (stemID) corresponding to Stem ID}
 #'   \item{PlotMan}{Value or column name in data set @ForestGeoSubset (ForestGEO) corresponding to What is your plot name ?}
 #'   \item{Species}{Value or column name in data set @ForestGeoSubset (Species) corresponding to Species name}
-#'   \item{ScientificNameSep}{Value or column name in data set @ForestGeoSubset () corresponding to Character separating Genus and Species in Scientific name}
+#'   \item{ScientificNameSepMan}{Value or column name in data set @ForestGeoSubset () corresponding to Character separating Genus and Species in Scientific name}
 #'   \item{Yplot}{Value or column name in data set @ForestGeoSubset (gy) corresponding to Tree Y euclidean position in plot}
 #'   \item{Ysubplot}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree Y euclidean position in SUBplot}
 #'   \item{CircUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your circumference unit?}
@@ -31,7 +31,7 @@
 #'   \item{IdLevel}{Value or column name in data set @ForestGeoSubset (IDLevel) corresponding to Deepest taxonomic level for which full identification is known}
 #'   \item{TreeFieldNum}{Value or column name in data set @ForestGeoSubset (tag) corresponding to Tree tag}
 #'   \item{ScientificName}{Value or column name in data set @ForestGeoSubset (Latin) corresponding to Scientific name}
-#'   \item{DateFormat}{Value or column name in data set @ForestGeoSubset (yyyy-mm-dd) corresponding to What is your date format?}
+#'   \item{DateFormatMan}{Value or column name in data set @ForestGeoSubset (yyyy-mm-dd) corresponding to What is your date format?}
 #'   \item{IdCensus}{Value or column name in data set @ForestGeoSubset (CensusID) corresponding to Census ID}
 #'   \item{PlotAreaMan}{Value or column name in data set @ForestGeoSubset (25.6) corresponding to What is your plot area in hectare?}
 #'   \item{Year}{Value or column name in data set @ForestGeoSubset (none) corresponding to Year of measurement}
