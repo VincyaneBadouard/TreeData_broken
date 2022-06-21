@@ -134,7 +134,7 @@ RequiredFormat <- function(
     if(!input$Year %in% "none") {
       Data[, Date := paste(trimws(Year), trimws(Month), trimws(Day), sep = "-")]
     } else {
-      Data[, Date := paste(trimws(input$YearMan), trimws(Month), trimws(Day), sep = "-")]
+      if(!input$YearMan %in% -999) Data[, Date := paste(input$YearMan, trimws(Month), trimws(Day), sep = "-")] else warning("You did not provide a Year or date.")
     }
 
     # overwrite input
@@ -188,7 +188,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else Data[, Year := input$YearMan]
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else waring("You did not provide Date or Year")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
@@ -255,6 +255,23 @@ RequiredFormat <- function(
 
   if(input$Diameter %in% "none" & !input$Circ %in% "none") Data[, Diameter := round(Circ/pi, 2)]
   if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
+
+
+  ## MinDBH if we don't have it
+  if(input$MinDBH %in% "none") {
+
+    if(!input$MinDBHMan %in% -999) {
+      Data[, MinDBH := input$MinDBHMan]
+      input$MinDBHUnitMan <- "cm" # if MinDBH given by hand, it should be in cm
+
+    }
+    if(input$MinDBHMan %in% -999) {
+    Data[, MinDBH := min(Diameter)]
+    input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
+    warning("MinDBH was calculated.")
+    }
+  }
+
 
   # Units changing ####
 
@@ -404,8 +421,10 @@ RequiredFormat <- function(
   }
 
   # if area is entered manually, it is supposed to be in ha already
-  if(input$PlotArea %in% "none" & !input$PlotAreaMan %in% "none") {
-    Data[, PlotArea := input$PlotAreaMan]
+  if(input$PlotArea %in% "none") {
+    if(!input$PlotAreaMan %in% -999) Data[, PlotArea := input$PlotAreaMan]
+
+    if(input$PlotAreaMan %in% -999) warning("You did not specify a plot area")
   }
 
   ### SubPlotArea in ha ####
@@ -424,10 +443,13 @@ RequiredFormat <- function(
   }
 
   # if area is entered manually, it is supposed to be in ha already
-  if(input$SubPlotArea %in% "none" & !input$SubPlotAreaMan %in% "none") {
-    Data[, SubPlotArea := input$SubPlotAreaMan]
-  }
+  if(input$SubPlotArea %in% "none") {
 
+    if(!input$SubPlotAreaMan %in% -999) Data[, SubPlotArea := input$SubPlotAreaMan]
+
+    if(input$SubPlotAreaMan %in% -999) warning("You did not specify a subplot area")
+
+  }
 
   ### XY coordinates in m ####
 

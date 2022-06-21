@@ -1,38 +1,38 @@
 Group,ItemType,argument,Default,AppDefaultProfile,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,if_X2_isnot_none,argValue,Options,Multiple,Activate,RequiredColumn,DataType,Unit,Description
 Plot info,pickerInput,choices,none,Site,Site,Site name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Site level name
-second column,textInput,value,,,SiteMan,What is your site name ?,,Site,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,textInput,value,,,SiteMan,What is your site name ?,,Site,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot info,pickerInput,choices,none,Plot,Plot,Plot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Plot level name
-second column,textInput,value,,,PlotMan,What is your plot name ?,,Plot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,textInput,value,,,PlotMan,What is your plot name ?,,Plot,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot info,pickerInput,choices,none,SubPlot,SubPlot,SubPlot name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,SubPlot level name
-second column,textInput,value,,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,textInput,value,,,SubPlotMan,What is your subplot name ?,,SubPlot,none,none,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot coordinates,pickerInput,choices,none,PlotLat,PlotLat,Plot latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Plot's latitude
 Plot coordinates,pickerInput,choices,none,PlotLon,PlotLon,Plot longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Plot's longitude
 Plot coordinates,pickerInput,choices,none,PlotXutm,PlotXutm,Plot X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Plot's X UTM coordinates
 Plot coordinates,pickerInput,choices,none,PlotYutm,PlotYutm,Plot Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Plot's Y UTM coordinats
 Plot info,pickerInput,choices,none,PlotArea,PlotArea,Plot area,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
 second column,pickerInput,choices,none,ha,PlotAreaUnitMan,What is the unit for plot area?,,none,none,PlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-second column,numericInput,value,,,PlotAreaMan,What is your plot area in hectare?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,PlotAreaMan,What is your plot area in hectare?,,PlotArea,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot info,pickerInput,choices,none,PlotElevation,PlotElevation,Plot elevation,meters above sea leavel,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,plot's elevation above sea level
-second column,numericInput,value,,,PlotElevationMan,What is your plot elevation in meters above sea level?,,PlotElevation,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,PlotElevationMan,What is your plot elevation in meters above sea level?,,PlotElevation,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot coordinates,pickerInput,choices,none,SubPlotLat,SubPlotLat,Subplot latitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Subplot's latitude
 Plot coordinates,pickerInput,choices,none,SubPlotLon,SubPlotLon,Subplot longitude,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,degrees,Subplot's longitude
 Plot coordinates,pickerInput,choices,none,SubPlotXutm,SubPlotXutm,Subplot X UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Subplot's X UTM coordinates
 Plot coordinates,pickerInput,choices,none,SubPlotYutm,SubPlotYutm,Subplot Y UTM coordinate,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,m,Subplot's Y UTM coordinats
 Plot info,pickerInput,choices,none,SubPlotArea,SubPlotArea,SubPlot area,none,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,ha,Size of the plot
 second column,pickerInput,choices,none,ha,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-second column,numericInput,value,,,SubPlotAreaMan,What is your subplot area in hectare?,,PlotArea,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,SubPlotAreaMan,What is your subplot area in hectare?,,PlotArea,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot info,pickerInput,choices,none,MinDBH,MinDBH,Minimum DBH, minimum diameter of trees included in your inventory,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,cm,The minimum diameter of trees included in the inventory
 second column,pickerInput,choices,none,cm,MinDBHUnitMan,What is your unit for the column indicating the minimum DBH?,,none,none,MinDBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
-second column,numericInput,value,,,MinDBHMan,What is the minimum diameter of trees included in your inventory?,in cm,MinDBH,none,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,MinDBHMan,What is the minimum diameter of trees included in your inventory?,in cm,MinDBH,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot measurements,pickerInput,choices,none,SpeciesAbundance,SpeciesAbundance,Species abundance,"Total number of individuals for a species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,-,"Total number of individuals for a species, per sampling unit"
 Plot measurements,pickerInput,choices,none,SpeciesBasalArea,SpeciesBasalArea,Species Basal area,"Total cross-sectional area of all stems of the species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,sqr cm per sqr meter,"Total cross-sectional area of all stems of the species, per sampling unit"
 Census info,pickerInput,choices,none,IdCensus,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,-,Census identifier
 Census info,pickerInput,choices,none,Year,Year,Year of measurement,"if your Year is decimal, leave as ""none"" and match it to ""Date of measurement""",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,numeric,year,Year of measurement
-second column,numericInput,value,,,YearMan,What is your year of measurement?,,Year,Date,none,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,numericInput,value,-999,,YearMan,What is your year of measurement?,,Year,Date,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Census info,pickerInput,choices,none,Month,Month,Month of measurement [1-12],,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Month of measurement
 Census info,pickerInput,choices,none,Day,Day,Day of measurement [1-31],"different than date, see Date",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Day of measurement
 Census info,pickerInput,choices,none,Date,Date,Date of measurement,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Date of measurement
-second column,textInput,value,,yyyy-mm-dd,DateFormatMan,What is your date format?,"e.g. 2016-09-14 would be yyyy-mm-dd, 9/14/2016 would be mm/dd/yyyy, 2016.703 would be decimal and 17058 woulbe numeric (number of days since 1970-01-01)",none,none,Date,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,textInput,value,,yyyy-mm-dd,DateFormatMan,What is your date format?,"e.g. 2016-09-14 would be yyyy-mm-dd, 9/14/2016 would be mm/dd/yyyy, 2016.703 would be decimal and 17058 woulbe numeric (number of days since 1970-01-01)",none,none,Date,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Census info,pickerInput,choices,none,TreeFieldNum,TreeFieldNum,Tree tag,identifiers at the plot level. It can be the same as tree ID if you have only one plot.,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,"Tree unique identifiers, matching the tag number in the field."
 Census info,pickerInput,choices,none,IdTree,IdTree,Tree ID,unique tree identifier in the entire dataset,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,character,-,Tree unique identifiers. This was automatically generated if it was not provided in the input data (using plot and tree tag information).
 Census info,pickerInput,choices,none,IdStem,IdStem,Stem ID,stem unique identifier within the tree or at the plot level,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,character,-,Stem unique identifier
@@ -93,7 +93,7 @@ Tree botanical information,pickerInput,choices,none,LifeForm,LifeForm,Life form,
 Plot info,pickerInput,choices,none,Treatment,Treatment,Logging treatment,CL/RIL/control/..,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Treatment type
 Plot info,pickerInput,choices,none,SoilType,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
 Plot info,pickerInput,choices,none,Topography,Topography,"Topographical position (lowland, plateau)",,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,"Topographical position (e.g. lowland, plateau)"
-second column,textInput,value,, ,ScientificNameSepMan,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+second column,textInput,value,, ,ScientificNameSepMan,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 NA,,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
 NA,,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
 NA,,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"
