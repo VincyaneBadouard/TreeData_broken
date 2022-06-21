@@ -337,10 +337,13 @@ ReversedRequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  m <- na.omit(match(colnames(Data), names(input)))
+  m <- match(colnames(Data), names(input))
   idx_complete <- which(!input[m] %in% "none") # keep standard name when is not asked in the output Profile
 
-  colnames(Data)[idx_complete] <- input[m[idx_complete]]
+  NewNames <- sapply(input[m[idx_complete]], function(x) ifelse(is.null(x), NA, x))
+  NewNames[is.na(NewNames)] <-  colnames(Data)[idx_complete][is.na(NewNames)]
+
+  colnames(Data)[idx_complete] <- NewNames
 
 
   setDT(Data)
