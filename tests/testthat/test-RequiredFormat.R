@@ -6,7 +6,7 @@ test_that("RequiredFormat", {
   Data <- ParacouSubset
   input <- ParacouProfile
 
-  DataFormated <- RequiredFormat(Data, input )
+  expect_warning(DataFormated <- RequiredFormat(Data, input ), "MinDBH was calculated")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
@@ -29,20 +29,20 @@ test_that("RequiredFormat", {
 
 
   # cAREFULL, EDITING DATA OR INPUT AFTER THIS LINE #
-
+ input$MinDBHMan = 1 # adding this so we don't get warnings
   # expect error is size units are not correct
   input$DiameterUnitMan = input$CircUnitMan = "centimeter"
 
-  expect_error(RequiredFormat(Data, input ))
+  expect_error(RequiredFormat(Data, input ), "Your tree size units are not one of: mm, cm, dm, m")
 
   input$DiameterUnitMan <- ParacouProfile$DiameterUnitMan
   input$CircUnitMan <- ParacouProfile$CircUnitMan
 
-  expect_error(expect_error(RequiredFormat(Data, input ))) # don't expect the error anymore
+  expect_error(expect_error(RequiredFormat(Data, input ))) # don't expect the error anymore, but still warning
 
   # expect warning if no IdTree and no Tree Tag
   input$IdTree = input$TreeFieldNum = "none"
-  expect_warning(RequiredFormat(Data, input ))
+  expect_warning(RequiredFormat(Data, input ), "You do not have a column with unique tree IDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
@@ -269,7 +269,7 @@ input$SubPlotAreaUnitMan <- "ha"
   Data <- ForestGeoSubset
   input <- ForestGeoProfile
 
-  DataFormated <- RequiredFormat(Data, input )
+  expect_warning(expect_warning(expect_warning(RequiredFormat(Data, input), "did not specify a Site column or name"), "did not specify a plot area"), "did not specify a subplot area")
 
 
 
@@ -279,6 +279,11 @@ input$SubPlotAreaUnitMan <- "ha"
   Data <- merge( data.table::fread(paste0(appdir, "/tests/shinytest/ForestPlots_test2_trees_small.csv")),
                  data.table::fread(paste0(appdir, "/tests/shinytest/ForestPlots_test2_plots_small.csv")), by.x= "PlotID", by.y = "Plot ID", suffixes = c("", ".y"))
   input <- readRDS(paste0(appdir, "/tests/shinytest/ForestPlots_test2_trees_small_Profile.rds"))
+  input$MinDBH = "none"
+  input$MinDBHMan =1
+  input$MinDBHUnitMan = "none"
+  input$DateFormatMan = input$DateFormat
+  input$DateFormat = NULL
 
   DataFormated <- RequiredFormat(Data, input )
 
