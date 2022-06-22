@@ -631,9 +631,9 @@ observe( {
     tryCatch({
       RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
     },
-    # warning = function(warn){
-    #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-    # },
+    warning = function(warn){
+      showNotification(paste(gsub("simpleWarning in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\), :", "", warn), collapse = ". "), type = 'warning', duration = NULL)
+    },
     error = function(err){
       showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
     })
@@ -641,6 +641,9 @@ observe( {
 
 
   }, ignoreInit = T)
+
+  FormatedColumnOptions <- reactiveVal()
+  observe({FormatedColumnOptions(names(DataFormated()))})
 
   observeEvent(input$LaunchFormating , {
     shinyjs::show("GoToCorrect")
