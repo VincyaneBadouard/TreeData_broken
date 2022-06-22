@@ -455,7 +455,7 @@ observe( {
     # if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
 
 
-    tryCatch({ profile <- readRDS(file)},
+    profile <- tryCatch({ readRDS(file)},
     # warning = function(warn){
     #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
     # },
@@ -628,7 +628,7 @@ observe( {
 
   DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
-    tryCatch({
+    withCallingHandlers({
       RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
     },
     warning = function(warn){
@@ -775,7 +775,7 @@ observe( {
       req(file)
 
 
-      tryCatch({ profileOutput <- readRDS(file)},
+      profileOutput <- tryCatch({ readRDS(file)},
                # warning = function(warn){
                #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
                # },
