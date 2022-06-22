@@ -42,7 +42,7 @@ test_that("RequiredFormat", {
 
   # expect warning if no IdTree and no Tree Tag
   input$IdTree = input$TreeFieldNum = "none"
-  expect_warning(RequiredFormat(Data, input ), "You do not have a column with unique tree IDs")
+  expect_warning(RequiredFormat(Data, input ), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
@@ -50,7 +50,7 @@ test_that("RequiredFormat", {
 
   # expect IdTree to be have Tree Tag if IdTree is "none"
   input$IdTree =  "none"
-  if( input$IdTree %in% "none" & !  input$TreeFieldNum %in% "none") expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) grepl(x["TreeFieldNum"] , x["IdTree"]))))
+  if( input$IdTree %in% "none" & !  input$TreeFieldNum %in% "none") expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) grepl(x["TreeFieldNum"] , x["IdTree"])))), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
@@ -59,18 +59,18 @@ test_that("RequiredFormat", {
   # expect IdTree to be filled with "auto" if is NA
   Data[, input$IdTree][sample(10)] <- NA
 
-  expect_true(all(grepl("_auto", RequiredFormat(Data, input )$IdTree[is.na(Data[, input$IdTree])])))
+  expect_warning(expect_true(all(grepl("_auto", RequiredFormat(Data, input )$IdTree[is.na(Data[, input$IdTree])]))), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
-  expect_error(expect_warning(RequiredFormat(Data, input ))) # don't expect the warning anymore
+  # expect_error(expect_warning(RequiredFormat(Data, input ))) # don't expect the warning anymore
 
   # expect IdTree to have Site, Plot and Subplot name, even when those are not in columns
   input$IdTree =  "none"
-  expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
+  expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
     grepl(x["Site"] , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
-      grepl(x["SubPlot"] , x["IdTree"]))})))
+      grepl(x["SubPlot"] , x["IdTree"]))}))), "You are missing treeIDs")
 
   input$Site <- "none"
   input$SiteMan = ""
@@ -79,10 +79,10 @@ test_that("RequiredFormat", {
   input$SubPlot <- "none"
   input$SubPlotMan = ""
 
-  expect_warning(expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
+  expect_warning(expect_warning(expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
     grepl("SiteA" , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
-      grepl("SubPlotA" , x["IdTree"]))}))), "SiteA"), "SubPlotA")
+      grepl("SubPlotA" , x["IdTree"]))}))), "SiteA"), "SubPlotA"), "You are missing treeIDs")
 
   # RequiredFormat(Data, input )$IdTree
 
