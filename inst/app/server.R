@@ -32,7 +32,7 @@ library(TreeData)
 
 server <- function(input, output, session) {
 
- output$ui_uploadTables <- renderUI({
+ output$uiUploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
 
@@ -64,7 +64,7 @@ server <- function(input, output, session) {
 
   })
 
- output$ui_ViewTables <- renderUI({
+ output$uiViewTables <- renderUI({
    req(input$file1)
      do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
        tabPanel(
@@ -345,7 +345,7 @@ server <- function(input, output, session) {
     names(groupNames) <- sapply(groupNames, function(x) paste(Reduce(intersect, strsplit(x,"")), collapse=""))
     groupNames[(length(groupNames)+1):(length(groupNames)+2)] <- ""
 
-    output$meltUI <- renderUI({
+    output$uiMelt <- renderUI({
       lapply(c(1:length(groupNames)), function(i)
       {
         box(width = 12,
@@ -666,6 +666,23 @@ observe( {
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
+  ## codes ####
+  all_codes <- reactiveVal()
+
+  observe({
+    req(!input$TreeCodes %in% "none")
+    all_codes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" ), "Definition" = ""))
+  })
+
+  output$CodeTable <- renderDT(all_codes(), rownames = FALSE, selection  = "none", editable =list(target = "cell", disable = list(columns = c(0))))
+
+  # edit a column
+  # observeEvent(input$all_codes_cell_edit, {
+  #   all_codes() <<- editData(all_codes(), input$all_codes_cell_edit, 'CodeTable')
+  # })
+
+
+  # Correct ####
 
   observeEvent(input$GoToCorrect, {
     updateTabItems(session, "tabs", "Correct")

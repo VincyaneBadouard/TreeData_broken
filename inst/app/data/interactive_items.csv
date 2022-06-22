@@ -94,6 +94,7 @@ Plot info,pickerInput,choices,none,Treatment,Treatment,Logging treatment,CL/RIL/
 Plot info,pickerInput,choices,none,SoilType,SoilType,Type of soil,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,Type of soil
 Plot info,pickerInput,choices,none,Topography,Topography,"Topographical position (lowland, plateau)",,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,FALSE,FALSE,character,-,"Topographical position (e.g. lowland, plateau)"
 second column,textInput,value,, ,ScientificNameSepMan,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
+Tree measurements,pickerInput,choices,none,TreeCodes,TreeCodes,Select all the columns that give information about your tree,"e.g. health, leaning, liana load, crown position...",none,none,none,ColumnOptions,list(`live-search` = TRUE),TRUE,TRUE,FALSE,character,,"Codes associated to tree, separated by commas. The definition of each code is given in ..."
 NA,,,,,LifeStatusOriginal,,,,,,,,,FALSE,,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
 NA,,,,,ScientificNameOriginal,,,,,,,,,FALSE,,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
 NA,,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table, without any correction or transformation"

@@ -41,6 +41,7 @@ sidebar <- dashboardSidebar(
               menuItem("Merge tables", tabName = "Merging", icon = icon("key")),
               menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
               menuItem("Headers and Units", tabName = "Headers", icon = icon("arrows-alt")),
+              menuItem("Codes", tabName = "Codes", icon = icon("table", verify_fa = F)),
               menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
               # menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
               menuItem("Download formatted data", tabName="Save", icon = icon("save")),
@@ -160,7 +161,7 @@ body <- dashboardBody(
                        color = "warning"),
                      strong("Upload your tables"),
 
-                     uiOutput("ui_uploadTables"),
+                     uiOutput("uiUploadTables"),
 
                      actionBttn(
                        inputId = "inactivebutton4",
@@ -174,7 +175,7 @@ body <- dashboardBody(
                        color = "success"
                      )),
               column(6,
-                     uiOutput("ui_ViewTables"))
+                     uiOutput("uiViewTables"))
 
             )
 
@@ -360,7 +361,7 @@ body <- dashboardBody(
             br()
 ,            h3("Tick the grouping(s) that should be applied and fix the prefilled information if necessary."),
 
-            uiOutput("meltUI"),
+            uiOutput("uiMelt"),
 
             # box(
             # textInput("ValueName", "What type of measurement is repeated horizontally? (Give a column name without space)", value = "DBH"),
@@ -518,6 +519,11 @@ body <- dashboardBody(
 
 
     )),
+tabItem("Codes",
+        h3("This is where we are going to try to understand the tree codes you have..."),
+        strong("This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel"),
+        uiOutput("uiCodes"),
+        DTOutput("CodeTable")),
 
     tabItem(tabName = "Correct",
 
