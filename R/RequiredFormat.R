@@ -198,7 +198,7 @@ RequiredFormat <- function(
 
   ## IdTree (unique along Plot, SubPlot, TreeFieldNum) ####
   if (input$Site %in% "none") {
-    if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will call consider you have only one site called 'SiteA'")
+    if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will consider you have only one site called 'SiteA'")
 
     SiteMan <- ifelse(input$SiteMan %in% "", "SiteA", input$SiteMan)
     Data[, Site :=  SiteMan]
