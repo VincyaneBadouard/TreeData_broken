@@ -239,12 +239,12 @@ RequiredFormat <- function(
 
     if (!input$TreeFieldNum %in% "none") {
       if(input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column Census ID. But you did specify a column for tree tag, so we are considering that each row without a tree ID within a Site, plot and subplot  refers to one unique tree.")
+        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column Census ID. But you did specify a column for tree tag, so we are considering that each row without a tree ID within a Site, plot and subplot refers to one unique tree, and we are using your tree field number to construct the tree ID.")
         Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_")]
       }
 
       if(!input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specify a column for tree tag and census ID, so we are considering that each row within a Site, plot, subplot and census ID refers to one unique tree. This is assuming the order of your trees is consistent accross censuses.")
+        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specify a column for tree tag and census ID, so we are considering that each row within a Site, plot, subplot and census ID refers to one unique tree, and we are using your tree field number to construct the tree ID.")
         Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
       }
     }
