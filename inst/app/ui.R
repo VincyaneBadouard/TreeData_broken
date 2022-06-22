@@ -142,8 +142,6 @@ body <- dashboardBody(
                        style = "pill",
                        color = "warning"),
                      strong("How many tables do you wish to upload?"),
-                     h4("Select this before you move to step 2."),
-                     h4("Changing this value after uploading a table will clear the upload."),
                      numericInput(inputId = "nTable",
                                   label = "",
                                   value = 1,
