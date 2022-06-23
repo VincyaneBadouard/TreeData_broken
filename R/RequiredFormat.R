@@ -78,7 +78,7 @@ RequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  idx <- match(colnames(Data), input[x$ItemID])
+  idx <- match(gsub("[[:punct:]]| ", "", colnames(Data)), gsub("[[:punct:]]| ", "", input[x$ItemID]))
 
   colnames(Data) <- names(input[x$ItemID])[idx]
 
@@ -86,7 +86,7 @@ RequiredFormat <- function(
   Data[which(is.na(idx))] <- NULL
 
   ## add columns missing
-  Data[, setdiff(x$ItemID[x$RequiredColumn], colnames(Data))] <- NA
+  Data[, setdiff(gsub("[[:punct:]]| ", "", x$ItemID[x$RequiredColumn]), gsub("[[:punct:]]| ", "", colnames(Data)))] <- NA
 
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environemnt

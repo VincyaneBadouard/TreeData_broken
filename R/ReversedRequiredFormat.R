@@ -337,7 +337,7 @@ ReversedRequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
-  m <- match(colnames(Data), names(input))
+  m <- match(gsub("[[:punct:]]| ", "",colnames(Data)), gsub("[[:punct:]]| ", "",names(input)))
   idx_complete <- which(!input[m] %in% "none") # keep standard name when is not asked in the output Profile
 
   NewNames <- sapply(input[m[idx_complete]], function(x) ifelse(is.null(x), NA, x))
