@@ -667,20 +667,24 @@ observe( {
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
   ## codes ####
-  all_codes <- reactiveVal()
+  AllCodes <- reactiveVal()
 
   observe({
     req(!input$TreeCodes %in% "none")
-    all_codes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" ), "Definition" = ""))
+    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" ), "Definition" = ""))
   })
 
-  output$CodeTable <- renderDT(all_codes(), rownames = FALSE, selection  = "none", editable =list(target = "cell", disable = list(columns = c(0))),   options = list(bPaginate = FALSE), fillContainer = T)
+  output$CodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "single", editable =list(target = "cell", disable = list(columns = c(0))),   options = list(bPaginate = FALSE,  buttons = c('csv', 'new'),   dom = 'Bfrtip'), extensions = 'Buttons')
 
   # edit a column
-  # observeEvent(input$all_codes_cell_edit, {
-  #   all_codes() <<- editData(all_codes(), input$all_codes_cell_edit, 'CodeTable')
-  # })
+  observeEvent(input$CodeTable_cell_edit, {
+    req(input$CodeTable_cell_edit)
+    dToEdit <- AllCodes()
+    dToEdit[input$CodeTable_cell_edit$row,input$CodeTable_cell_edit$col+1] <- input$CodeTable_cell_edit$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
+    AllCodes(dToEdit)
+  })
 
+  output$NewCodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "none")
 
   # Correct ####
 

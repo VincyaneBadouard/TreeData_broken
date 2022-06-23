@@ -526,7 +526,8 @@ tabItem("Codes",
 
         uiOutput("uiCodes"),
 
-        DTOutput("CodeTable", height =  "600px")),
+        DTOutput("CodeTable", height =  "600px"),
+        DTOutput("NewCodeTable")),
 
     tabItem(tabName = "Correct",
 
