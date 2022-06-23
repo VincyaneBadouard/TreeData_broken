@@ -519,9 +519,14 @@ body <- dashboardBody(
     )),
 tabItem("Codes",
         h3("This is where we are going to try to understand the tree codes you have..."),
-        strong("This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel"),
+        strong(style = "color:red", "This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel)"),
+
+        h4("Please, manually edit the Definitions column."),
+
+
         uiOutput("uiCodes"),
-        DTOutput("CodeTable")),
+
+        DTOutput("CodeTable", height =  "600px")),
 
     tabItem(tabName = "Correct",
 

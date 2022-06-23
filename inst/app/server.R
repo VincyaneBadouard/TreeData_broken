@@ -470,7 +470,7 @@ observe( {
       showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
     }
 
-    ValidItemID <- names(profile)[(profile %in% c(names(TidyTable()), "none")) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
+    ValidItemID <- names(profile)[sapply(profile, function(p) all(p %in% c(names(TidyTable()), "none"))) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
 
     InValidItemID <- setdiff(names(profile), ValidItemID)
     InValidItemID <- InValidItemID[InValidItemID %in% x$ItemID]
@@ -674,7 +674,7 @@ observe( {
     all_codes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" ), "Definition" = ""))
   })
 
-  output$CodeTable <- renderDT(all_codes(), rownames = FALSE, selection  = "none", editable =list(target = "cell", disable = list(columns = c(0))))
+  output$CodeTable <- renderDT(all_codes(), rownames = FALSE, selection  = "none", editable =list(target = "cell", disable = list(columns = c(0))),   options = list(bPaginate = FALSE), fillContainer = T)
 
   # edit a column
   # observeEvent(input$all_codes_cell_edit, {
