@@ -23,6 +23,56 @@ x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_no
 
 xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
+
+CodeOptions <-  c("Code definition 1", "Code definition 2")
+
+
+
+selector <- function(id, values, items = values){ # --- this is to edit CODES table
+  options <- HTML(paste0(mapply(
+    function(i, item){
+      value <- values[i]
+      if(i == 1L){
+        opt <- tags$option(value = value, selected = "selected", item)
+      }else{
+        opt <- tags$option(value = value, item)
+      }
+      as.character(opt)
+    }, seq_along(values), items
+  ), collapse = ""))
+  as.character(tags$select(id = id, options))
+}
+
+js <- c( # --- this is to edit CODES table
+  "function(settings) {",
+  "  var table = this.api().table();",
+  "  var $tbl = $(table.table().node());",
+  "  var id = $tbl.closest('.datatables').attr('id');",
+  "  var nrows = table.rows().count();",
+  "  function selectize(i) {",
+  "    var $slct = $('#slct' + i);",
+  "    $slct.select2({",
+  "      width: '100%',",
+  "      tags: true,",
+  "      closeOnSelect: true",
+  "    });",
+  "    $slct.on('change', function(e) {",
+  "      var info = [{",
+  "        row: i,",
+  "        col: 4,",
+  "        value: $slct.val()",
+  "      }];",
+  "      Shiny.setInputValue(id + '_cell_selection:DT.cellInfo', info);",
+  "    });",
+  "  }",
+  "  for(var i = 1; i <= nrows; i++) {",
+  "    selectize(i);",
+  "  }",
+  "}"
+)
+
+
+
 # for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
 
 # install TreeData package
@@ -30,7 +80,7 @@ xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 library(TreeData)
 
 
-server <- function(input, output, session) {
+server <- function(input, output, session) { # server ####
 
  output$uiUploadTables <- renderUI({
 
@@ -667,24 +717,115 @@ observe( {
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
   ## codes ####
-  AllCodes <- reactiveVal()
+
+
+  AllCodes <- reactiveVal(data.frame(Column = "You have not selected columns for codes yet",
+                                     Value = "You have not selected columns for codes yet",
+                                     Definition = "You have not selected columns for codes yet"))
 
   observe({
-    req(!input$TreeCodes %in% "none")
-    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" ), "Definition" = ""))
+    req(input$TreeCodes)
+    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(Value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "Column" ), Definition = ""))
+
   })
 
-  output$CodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "single", editable =list(target = "cell", disable = list(columns = c(0))),   options = list(bPaginate = FALSE,  buttons = c('csv', 'new'),   dom = 'Bfrtip'), extensions = 'Buttons')
 
-  # edit a column
-  observeEvent(input$CodeTable_cell_edit, {
-    req(input$CodeTable_cell_edit)
+  observe({
+    dat <- AllCodes()
+    # AllCodes(dat)
+
+     for(i in 1L:nrow(dat)){
+    dat$Definition_selector[i] <-
+      selector(id = paste0("slct", i), values = CodeOptions)
+     }
+
+    AllCodes(dat)
+
+  })
+
+
+  output[["CodeTable"]] <- renderDT({
+    datatable(
+      data = AllCodes(),
+      selection = "none",
+      escape = FALSE,
+      rownames = FALSE,
+      options = list(
+        initComplete = JS(js),
+        preDrawCallback = JS(
+          "function() { Shiny.unbindAll(this.api().table().node()); }"
+        ),
+        drawCallback = JS(
+          "function() { Shiny.bindAll(this.api().table().node()); }"
+        )
+      )
+    )
+  }, server = TRUE)
+
+  observeEvent(input[["CodeTable_cell_selection"]], {
+    info <- input[["CodeTable_cell_selection"]]
     dToEdit <- AllCodes()
-    dToEdit[input$CodeTable_cell_edit$row,input$CodeTable_cell_edit$col+1] <- input$CodeTable_cell_edit$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
+    dToEdit[info$row,info$col-1] <- info$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
     AllCodes(dToEdit)
   })
 
-  output$NewCodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "none")
+
+  output[["NewCodeTable"]] <- renderTable({
+    AllCodes()[, c(1:3)]
+  })
+
+
+  # AllCodes <- reactiveVal()
+  #
+  # observe({
+  #   req(input$TreeCodes)
+  #   dat <- rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" )
+  #   dat$Definition = ""
+  #   AllCodes(dat)
+  #   dat <- cbind(dat, "DefinitionSelector" =  selector(id = paste0("slct",nrow(AllCodes())), values = c("Def 1", "Def 2")))
+  #
+  #   output[["CodeTable"]] <- renderDT({
+  #     datatable(
+  #       data = dat,
+  #       selection = "none",
+  #       escape = FALSE,
+  #       rownames = FALSE,
+  #       options = list(
+  #         initComplete = JS(js) #,
+  #         # preDrawCallback = JS(
+  #         #   "function() { Shiny.unbindAll(this.api().table().node()); }"
+  #         # ),
+  #         # drawCallback = JS(
+  #         #   "function() { Shiny.bindAll(this.api().table().node()); }"
+  #         # )
+  #       )
+  #     )
+  #   }, server = TRUE)
+  #
+  # })
+  #
+  #
+  #
+  #
+  # # output$CodeTable <- renderDT(AllCodes())
+  #
+  # # edit a column
+  # # observeEvent(input$CodeTable_cell_edit, {
+  # #   req(input$CodeTable_cell_edit)
+  # #   dToEdit <- AllCodes()
+  # #   dToEdit[input$CodeTable_cell_edit$row,input$CodeTable_cell_edit$col+1] <- input$CodeTable_cell_edit$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
+  # #   AllCodes(dToEdit)
+  # # })
+  #
+  # observeEvent(input[["CodeTable_cell_selection"]], {
+  #   info <- input[["CodeTable_cell_selection"]]
+  #   dat <- editData(dat, info, rownames = FALSE)
+  #
+  #   AllCodes(dat)
+  #   # AllCodes(editData(AllCodes(), info, rownames = FALSE))
+  # })
+  #
+  # output$NewCodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "none",  escape = FALSE)
 
   # Correct ####
 

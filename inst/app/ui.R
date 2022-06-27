@@ -29,6 +29,10 @@ if(!all(unlist(sapply(list(x1, x2, x3, x4, x5, x6), "[[", "ItemID")) %in% x$Item
 xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
 
+CodeDefinitions <- HTML(paste0('<select class="form-control" multiple="multiple">',
+                               paste0('<option>',c("First definition", "second definition"), '</option>', collapse = ""),
+                               '</select>'))
+
 # header with title
 header <- dashboardHeader(title = "Data harmonisation")
 
@@ -51,6 +55,9 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tags$head(
+
+    tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),# this is to edit Codes table
+    tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"), # this is to edit Codes table
     tags$style(
       HTML(".shiny-notification {
              position:fixed;
@@ -524,10 +531,15 @@ tabItem("Codes",
         h4("Please, manually edit the Definitions column."),
 
 
-        uiOutput("uiCodes"),
-
+        # uiOutput("uiCodes"),
+        br(),
         DTOutput("CodeTable", height =  "600px"),
-        DTOutput("NewCodeTable")),
+        tags$hr(),
+        h2("Edited table:"),
+        tableOutput("NewCodeTable")
+
+        # tableOutput("NewCodeTable")
+        ),
 
     tabItem(tabName = "Correct",
 
