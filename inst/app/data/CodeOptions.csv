@@ -1,0 +1,16 @@
+Definition,Source
+"large buttress, requiring ladder to measure",ForestGEO code B
+multiple stems,ForestGEO code M
+"POM at alternative height, not breast height",ForestGEO code A
+stem irregular where measured,ForestGEO code I
+any problem requiring further attention,ForestGEO code P
+stem leaning,ForestGEO code L
+stem broken above breast height,ForestGEO code Q
+stem broken below breast height,ForestGEO code X
+POM has changed since prior census,ForestGEO code C
+prostrate stem,ForestGEO code Y
+resprout (main stem broken but resprouted since last census),ForestGEO code R
+"dead, stem standing",ForestGEO code DS
+"dead, stem fallen",ForestGEO code DC
+"dead, only tag found",ForestGEO code DT
+"presumed dead, no tag nor stem",ForestGEO code DN

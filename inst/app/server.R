@@ -24,7 +24,7 @@ x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_no
 xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
 
-CodeOptions <-  c("Code definition 1", "Code definition 2")
+CodeOptions <-  read.csv("data/CodeOptions.csv")
 
 
 
@@ -736,7 +736,7 @@ observe( {
 
      for(i in 1L:nrow(dat)){
     dat$Definition_selector[i] <-
-      selector(id = paste0("slct", i), values = CodeOptions)
+      selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition))
      }
 
     AllCodes(dat)
@@ -751,6 +751,7 @@ observe( {
       escape = FALSE,
       rownames = FALSE,
       options = list(
+        paging = F,
         initComplete = JS(js),
         preDrawCallback = JS(
           "function() { Shiny.unbindAll(this.api().table().node()); }"
@@ -990,6 +991,7 @@ observe( {
       for(input.i in inputs_to_save){
         Profile[[input.i]] <-  input[[input.i]]
       }
+      Profile[["AllCodes"]] <- AllCodes()
       saveRDS( Profile, file = file)
     }
   )
