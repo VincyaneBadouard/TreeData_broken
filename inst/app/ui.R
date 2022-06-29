@@ -625,7 +625,8 @@ tabItem("Codes",
             )
             ),
             fluidRow(hidden(div(id = "CodeTranslationsDiv", box(width = 12,
-              h3("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes wiht the same difinition, but your need to double check and fill out the rest of the codes"),
+              h4("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes with the same difinition, but you need to double check and fill out the rest of the codes"),
+              strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
               uiOutput("uiCodeTranslations"))))),
             fluidRow(
 

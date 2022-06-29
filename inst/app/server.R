@@ -941,7 +941,32 @@ server <- function(input, output, session) { # server ####
     if(!is.null(profileOutput$AllCodes) & !AllCodes()[1,1] %in% "You have not selected columns for codes") {
       shinyjs::show("CodeTranslationsDiv")
       output$uiCodeTranslations <- renderUI(DTOutput("CodeTranslationTable"))
-      output$CodeTranslationTable <- renderDT(profileOutput$AllCodes)
+
+      AllCodesInput <- AllCodes()
+      AllCodesOutput <- profileOutput$AllCodes
+
+      CodeTranslationTable <- matrix(AllCodesOutput$Value, ncol = nrow(AllCodesOutput),
+             nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
+
+      for (i in seq_len(nrow(CodeTranslationTable))) {
+        CodeTranslationTable[i, ] = sprintf(
+          '<input type="radio" name="%s" value="%s"/>',
+          AllCodesInput$Value[i], CodeTranslationTable[i, ]
+        )
+      }
+      output$CodeTranslationTable <- renderDT(
+        CodeTranslationTable, escape = FALSE, selection = 'none', server = FALSE,
+        options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE),
+        callback = JS("table.rows().every(function(i, tab, row) {
+          var $this = $(this.node());
+          $this.attr('id', this.data()[0]);
+          $this.addClass('shiny-input-radiogroup');
+        });
+        Shiny.unbindAll(table.table().node());
+        Shiny.bindAll(table.table().node());")
+      )
+
+      # output$CodeTranslationTable <- renderDT(profileOutput$AllCodes)
     }
 
     profileOutput(profileOutput)
