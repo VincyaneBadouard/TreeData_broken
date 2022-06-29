@@ -1,16 +1,17 @@
 OptionGroup,Definition,Source
-POM info,"large buttress, requiring ladder to measure",ForestGEO code B
-Stem info,multiple stems,ForestGEO code M
-POM info,"POM at alternative height, not breast height",ForestGEO code A
-POM info,stem irregular where measured,ForestGEO code I
-Other info,any problem requiring further attention,ForestGEO code P
-Stem info,stem leaning,ForestGEO code L
-Stem info,stem broken above breast height,ForestGEO code Q
-POM info,stem broken below breast height,ForestGEO code X
-POM info,POM has changed since prior census,ForestGEO code C
-Stem info,prostrate stem,ForestGEO code Y
-Stem info,resprout (main stem broken but resprouted since last census),ForestGEO code R
+,[select or enter a definition],unselectable option
 Dead tree codes,"dead, stem standing",ForestGEO code DS
 Dead tree codes,"dead, stem fallen",ForestGEO code DC
 Dead tree codes,"dead, only tag found",ForestGEO code DT
 Dead tree codes,"presumed dead, no tag nor stem",ForestGEO code DN
+Other info,any problem requiring further attention,ForestGEO code P
+POM info,"large buttress, requiring ladder to measure",ForestGEO code B
+POM info,"POM at alternative height, not breast height",ForestGEO code A
+POM info,stem irregular where measured,ForestGEO code I
+POM info,stem broken below breast height,ForestGEO code X
+POM info,POM has changed since prior census,ForestGEO code C
+Stem info,multiple stems,ForestGEO code M
+Stem info,stem leaning,ForestGEO code L
+Stem info,stem broken above breast height,ForestGEO code Q
+Stem info,prostrate stem,ForestGEO code Y
+Stem info,resprout (main stem broken but resprouted since last census),ForestGEO code R
