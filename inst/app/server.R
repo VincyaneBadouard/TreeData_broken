@@ -27,20 +27,24 @@ xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 CodeOptions <-  read.csv("data/CodeOptions.csv")
 
 
+selector <- function(id, CodeOptions){ # --- this is to edit CODES table
+  CodeOptionSplit <- split(CodeOptions, CodeOptions$OptionGroup)
 
-selector <- function(id, values, items = values, titles = ""){ # --- this is to edit CODES table
-  options <- HTML(paste0(mapply(
-    function(i, item){
-      value <- values[i]
-      title = titles[i]
-      if(i == 1L){
-        opt <- tags$option(value = value, title=title, selected = "selected", item)
-      }else{
-        opt <- tags$option(value = value, title = title, item)
-      }
-      as.character(opt)
-    }, seq_along(values), items
-  ), collapse = ""))
+  options <- HTML(paste0(unlist(lapply(1:length(CodeOptionSplit), function(I) {
+
+    opt <- tags$optgroup(label = names(CodeOptionSplit)[I],
+                         lapply( 1:nrow(CodeOptionSplit[[I]]),
+                                 function(i){
+                                   value <- CodeOptionSplit[[I]]$Definition[i]
+                                   title <- CodeOptionSplit[[I]]$Source[i]
+                                   if(i == 1L & I == 1){
+                                     tags$option(value = value, title=title, selected = "selected", value)
+                                   }else{
+                                     tags$option(value = value, title = title, value)
+                                   }
+                                 } ))
+    as.character(opt)
+  })), collapse = ""))
   as.character(tags$select(id = id, options))
 }
 
@@ -764,7 +768,8 @@ server <- function(input, output, session) { # server ####
     # AllCodes(dat)
     for(i in 1L:nrow(dat)){
       dat$DefinitionSelector[i] <-
-        selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition), titles = c("", CodeOptions$Source))
+        # selector(id = paste0("slct", i), values = CodeOptions$Definition, titles = CodeOptions$Source)
+        selector(id=paste0("slct", i), CodeOptions = CodeOptions)
     }
 
     AllCodes(dat)
