@@ -46,9 +46,10 @@ sidebar <- dashboardSidebar(
               menuItem("Tidy table", tabName = "Tidying", icon = icon("check")),
               menuItem("Headers and Units", tabName = "Headers", icon = icon("arrows-alt")),
               menuItem("Codes", tabName = "Codes", icon = icon("table", verify_fa = F)),
-              menuItem("Apply corrections", tabName = "Correct", icon = icon("check-circle")),
+              menuItem("Corrections", tabName = "Correct", icon = icon("check-circle")),
+              menuItem("Output format", tabName = "OutputFormat", icon = icon("sign-out", verify_fa = FALSE)),
               # menuItem("Visualise results", tabName="Visualise", icon = icon("eye")),
-              menuItem("Download formatted data", tabName="Save", icon = icon("save")),
+              menuItem("Download", tabName="Save", icon = icon("save")),
               menuItem("Help", tabName = "Help", icon = icon("book"))
   )
 )
@@ -584,7 +585,7 @@ tabItem("Codes",
               ))
             ),
 
-    tabItem(tabName = "Save",
+    tabItem(tabName = "OutputFormat",
 
             fluidRow(box(width = 12,
                          radioButtons(inputId = "predefinedProfileOutput",
@@ -618,30 +619,32 @@ tabItem("Codes",
                      withSpinner(verbatimTextOutput("DataOutputSummary"),color="#0dc5c1", id = "spinner"),
                      h4("View of your final table:"),
                      withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
-              )),
-            fluidRow(
-              column(width = 4,
-                     box(title = "Save file",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbFile", label = "Save file")),
-                     # box(title = "Save code",
-                     #     width = NULL,
-                     #     status = "primary",
-                     #     solidHeader = TRUE,
-                     #     downloadButton(outputId = "dbCode", label = "Save code")),
+              ))
 
-                     # p("ATTENTION:, LifeStatus and CommercialSp were not converted to your desired output profile because we cannot interprete TRU/FALSE to your desired profile's code system!"),
-                     box(title = "Save metadata",
-                         width = NULL,
-                         status = "primary",
-                         solidHeader = TRUE,
-                         downloadButton(outputId = "dbMetadata", label = "Save metadata")
-                         )
-              )
-            )
-    ), # end of "save" panel
+    ), # end of "OutputFormat" panel
+tabItem(tabName = "Save",
+        fluidRow(
+          column(width = 4,
+                 box(title = "Save file",
+                     width = NULL,
+                     status = "primary",
+                     solidHeader = TRUE,
+                     downloadButton(outputId = "dbFile", label = "Save file")),
+                 box(title = "Save code",
+                     width = NULL,
+                     status = "primary",
+                     solidHeader = TRUE,
+                     downloadButton(outputId = "dbCode", label = "Save code")),
+
+                 # p("ATTENTION:, LifeStatus and CommercialSp were not converted to your desired output profile because we cannot interprete TRU/FALSE to your desired profile's code system!"),
+                 box(title = "Save metadata",
+                     width = NULL,
+                     status = "primary",
+                     solidHeader = TRUE,
+                     downloadButton(outputId = "dbMetadata", label = "Save metadata")
+                 )
+          )
+        )), # end of "save" panel
     tabItem(tabName = "Help",
             tabsetPanel(
               tabPanel(title = "General",
