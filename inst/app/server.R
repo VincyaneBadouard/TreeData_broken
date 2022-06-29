@@ -491,6 +491,9 @@ observe( {
     gimme_value(0)
   })
 
+
+  UserProfile <- reactiveVal()
+
   observeEvent(input$UseProfile, {
 
     if(input$predefinedProfile == "No") {
@@ -512,6 +515,9 @@ observe( {
     error = function(err){
       showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
     })
+
+    if(!is.null(profile$AllCodes)) shinyjs::show("UseProfileCodes")
+
 
     MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
     MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
@@ -547,7 +553,7 @@ observe( {
       gimme_value(gimme_value() + 1)
     }
 
-
+    UserProfile(profile)
   })
 
 
@@ -722,6 +728,10 @@ observe( {
   AllCodes <- reactiveVal(data.frame(Column = "You have not selected columns for codes yet",
                                      Value = "You have not selected columns for codes yet",
                                      Definition = "You have not selected columns for codes yet"))
+
+  observeEvent(input$UseProfileCodes, {
+    AllCodes(UserProfile()$AllCodes)
+  })
 
   observe({
     req(input$TreeCodes)

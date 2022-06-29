@@ -528,15 +528,15 @@ tabItem("Codes",
         h3("This is where we are going to try to understand the tree codes you have..."),
         strong(style = "color:red", "This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel)"),
 
-        h4("Please, manually edit the Definitions column."),
-
+        h4("Please, fill-out the", code("Definition"), "by selecting a pre-written denfinition or manually writting yours."),
+        hidden(actionBttn(inputId = "UseProfileCodes" , label = "Use your profile")),
 
         # uiOutput("uiCodes"),
         br(),
-        DTOutput("CodeTable", height =  "600px"),
-        tags$hr(),
-        h2("Edited table:"),
-        tableOutput("NewCodeTable")
+        DTOutput("CodeTable", height =  "600px")
+        # tags$hr(),
+        # h2("Edited table:"),
+        # tableOutput("NewCodeTable")
 
         # tableOutput("NewCodeTable")
         ),
