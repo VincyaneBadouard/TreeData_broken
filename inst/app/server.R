@@ -82,7 +82,7 @@ library(TreeData)
 
 server <- function(input, output, session) { # server ####
 
- output$uiUploadTables <- renderUI({
+  output$uiUploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
 
@@ -114,23 +114,23 @@ server <- function(input, output, session) { # server ####
 
   })
 
- output$uiViewTables <- renderUI({
-   req(input$file1)
-     do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
-       tabPanel(
-         title=i,
-         DTOutput(outputId = i)
-       )
-     })))
+  output$uiViewTables <- renderUI({
+    req(input$file1)
+    do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
+      tabPanel(
+        title=i,
+        DTOutput(outputId = i)
+      )
+    })))
 
 
- })
+  })
   # read file(s) ####
 
 
 
 
- # give a red text if not a csv file
+  # give a red text if not a csv file
   observe({
     lapply(1:input$nTable, function(i){
       file <- input[[paste0("file", i)]]
@@ -155,12 +155,12 @@ server <- function(input, output, session) { # server ####
         validate(need(ext == "csv", "Please upload a csv file"))
 
         x <- data.table::fread(file$datapath,
-                          header = input[[paste0("header", i)]],
-                          sep = input[[paste0("cbSeparator", i)]],
-                          check.names = T)
+                               header = input[[paste0("header", i)]],
+                               sep = input[[paste0("cbSeparator", i)]],
+                               check.names = T)
         colnames(x) <- iconv(colnames(x), from = '', to = 'ASCII//TRANSLIT')
         return(x)
-        }),
+      }),
       reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)])
     )
   })
@@ -168,8 +168,8 @@ server <- function(input, output, session) { # server ####
   observe({
     req(Data)
     lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]] , rownames = FALSE,
-           options = list(pageLength = 8, scrollX=TRUE),
-           selection = "none")
+                                                              options = list(pageLength = 8, scrollX=TRUE),
+                                                              selection = "none")
     )
   })
 
@@ -465,7 +465,7 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$GoToHeaders | input$SkipTidy, {
     updateTabItems(session, "tabs", "Headers")
 
-    }, ignoreInit = T)
+  }, ignoreInit = T)
 
   observe({
     if(!input$Date %in% "none")
@@ -478,12 +478,12 @@ server <- function(input, output, session) { # server ####
   ### other stuff ####
   gimme_value <- reactiveVal(0)
 
-observe( {
-  if(input$predefinedProfile != "No" )
-  shinyjs::show("UseProfile")
-  updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
-  gimme_value(0)
-})
+  observe( {
+    if(input$predefinedProfile != "No" )
+      shinyjs::show("UseProfile")
+    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+    gimme_value(0)
+  })
 
   observeEvent(input$profile, {
     shinyjs::show("UseProfile")
@@ -497,8 +497,8 @@ observe( {
   observeEvent(input$UseProfile, {
 
     if(input$predefinedProfile == "No") {
-    file <- input$profile$datapath
-    ext <- tools::file_ext(file)
+      file <- input$profile$datapath
+      ext <- tools::file_ext(file)
     } else {
       file <- paste0("data/", input$predefinedProfile, "Profile.rds")
       ext <- tools::file_ext(file)
@@ -509,12 +509,12 @@ observe( {
 
 
     profile <- tryCatch({ readRDS(file)},
-    # warning = function(warn){
-    #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-    # },
-    error = function(err){
-      showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
-    })
+                        # warning = function(warn){
+                        #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+                        # },
+                        error = function(err){
+                          showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                        })
 
     if(!is.null(profile$AllCodes)) shinyjs::show("UseProfileCodes")
 
@@ -544,9 +544,9 @@ observe( {
       # updateTextInput(session, "Site", value = profile$Site)
     }
 
-   if(gimme_value() == 1) {
+    if(gimme_value() == 1) {
       updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
-      }
+    }
 
     if(gimme_value() == 0) {
       updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
@@ -576,7 +576,7 @@ observe( {
 
   CommercialOptions <- eventReactive(input$CommercialSp, {
     sort(unique(TidyTable()[[input$CommercialSp]]))
-    })
+  })
 
   OtherNumericOptions <- reactiveVal(-999)
   OtherCharacterOptions <- reactiveVal("")
@@ -703,22 +703,22 @@ observe( {
 
   observeEvent(input$LaunchFormating , {
     shinyjs::show("GoToCorrect")
-       }, ignoreInit = T)
+  }, ignoreInit = T)
 
   observeEvent(input$LaunchFormating , {
 
-  lapply(which(xCorr$argument %in% "choices"), function(i) {
+    lapply(which(xCorr$argument %in% "choices"), function(i) {
 
-    eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], "= get(xCorr$argValue[i])()", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
-  })
+      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], "= get(xCorr$argValue[i])()", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
+    })
 
   })
 
 
   # Visualize output
   output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
-                                 options = list(pageLength = 8, scrollX=TRUE),
-                                 selection = "none")
+                                   options = list(pageLength = 8, scrollX=TRUE),
+                                   selection = "none")
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
@@ -729,9 +729,7 @@ observe( {
                                      Value = "You have not selected columns for codes yet",
                                      Definition = "You have not selected columns for codes yet"))
 
-  observeEvent(input$UseProfileCodes, {
-    AllCodes(UserProfile()$AllCodes)
-  })
+
 
   observe({
     req(input$TreeCodes)
@@ -739,15 +737,29 @@ observe( {
 
   })
 
+  observeEvent(input$UseProfileCodes, {
+    dat <- AllCodes()
+    m <- match(dat$Value, UserProfile()$AllCodes$Value)
+
+    if(any(is.na(m))) showNotification(paste("WARNING: The following codes are not in your profile, you will need to fill them manually in the table:", paste(paste(dat$Value[is.na(m)], "in column", dat$Column[is.na(m)]), collapse = ", ")), type = 'err', duration = NULL)
+
+    ExtraCodesInProfile <- setdiff(UserProfile()$AllCodes$Value, dat$Value)
+
+    if(length(ExtraCodesInProfile)>0) showNotification(paste("WARNING: The following codes are not in your profile, but are not currently in your data. They will be ignored:", paste(paste(ExtraCodesInProfile, "in column", UserProfile()$AllCodes$Column[match(ExtraCodesInProfile, UserProfile()$AllCodes$Value)]), collapse = ", ")), type = 'err', duration = NULL)
+
+
+    dat$Definition <- UserProfile()$AllCodes$Definition[m]
+    AllCodes(dat)
+  })
+
 
   observe({
     dat <- AllCodes()
     # AllCodes(dat)
-
-     for(i in 1L:nrow(dat)){
-    dat$Definition_selector[i] <-
-      selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition))
-     }
+    for(i in 1L:nrow(dat)){
+      dat$Definition_selector[i] <-
+        selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition))
+    }
 
     AllCodes(dat)
 
@@ -884,28 +896,28 @@ observe( {
   observeEvent(input$ApplyCorrections,{
     shinyjs::show("GoToDownload")
     DataDone(DataCorrected())
-    })
+  })
 
   DataCorrected <- eventReactive(input$ApplyCorrections, {
     Rslt <- DataFormated()
     lapply(
       unique(xCorr$Function),
       FUN = function(f){
-       if(input[[f]] %in% "Yes") {
-         cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(xCorr$Label[xCorr$Function %in% f], "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
-         Rslt <<- eval(cl)
+        if(input[[f]] %in% "Yes") {
+          cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(xCorr$Label[xCorr$Function %in% f], "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
+          Rslt <<- eval(cl)
 
 
-         # tryCatch({
-         #   eval(cl)
-         # },
-         # # warning = function(warn){
-         # #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-         # # },
-         # error = function(err){
-         #   showNotification(err, type = 'err', duration = NULL)
-         # })
-       }
+          # tryCatch({
+          #   eval(cl)
+          # },
+          # # warning = function(warn){
+          # #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+          # # },
+          # error = function(err){
+          #   showNotification(err, type = 'err', duration = NULL)
+          # })
+        }
       }
     )
     Rslt
@@ -921,63 +933,63 @@ observe( {
 
   # save final data table
 
-    DataOutput <- reactiveVal(NULL)
-    profileOutput <- reactiveVal(NULL)
+  DataOutput <- reactiveVal(NULL)
+  profileOutput <- reactiveVal(NULL)
 
-    observe( {
-      if(input$predefinedProfileOutput != "No" )
-        shinyjs::show("UseProfileOuput")
-    })
-
-    observeEvent(input$profileOutput, {
+  observe( {
+    if(input$predefinedProfileOutput != "No" )
       shinyjs::show("UseProfileOuput")
-    })
+  })
 
-    observeEvent(input$UseProfileOuput, {
-      shinyjs::show("DontUseProfileOuput")
+  observeEvent(input$profileOutput, {
+    shinyjs::show("UseProfileOuput")
+  })
 
-
-      if(input$predefinedProfileOutput == "No") {
-        file <- input$profileOutput$datapath
-        ext <- tools::file_ext(file)
-      } else {
-        file <- paste0("data/", input$predefinedProfileOutput, "Profile.rds")
-        ext <- tools::file_ext(file)
-      }
-
-      req(file)
+  observeEvent(input$UseProfileOuput, {
+    shinyjs::show("DontUseProfileOuput")
 
 
-      profileOutput <- tryCatch({ readRDS(file)},
-               # warning = function(warn){
-               #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-               # },
-               error = function(err){
-                 showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
-               })
+    if(input$predefinedProfileOutput == "No") {
+      file <- input$profileOutput$datapath
+      ext <- tools::file_ext(file)
+    } else {
+      file <- paste0("data/", input$predefinedProfileOutput, "Profile.rds")
+      ext <- tools::file_ext(file)
+    }
+
+    req(file)
+
+
+    profileOutput <- tryCatch({ readRDS(file)},
+                              # warning = function(warn){
+                              #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+                              # },
+                              error = function(err){
+                                showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                              })
 
 
 
-      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
+    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
 
-      profileOutput(profileOutput)
+    profileOutput(profileOutput)
 
-    })
+  })
 
-    observeEvent(input$DontUseProfileOuput, {
-      shinyjs::hide("DontUseProfileOuput")
-      # shinyjs::hide("UseProfileOuput")
+  observeEvent(input$DontUseProfileOuput, {
+    shinyjs::hide("DontUseProfileOuput")
+    # shinyjs::hide("UseProfileOuput")
 
-      DataOutput(DataDone())
-    })
+    DataOutput(DataDone())
+  })
 
 
-    # Visualize output
-    output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
-                                     options = list(pageLength = 8, scrollX=TRUE),
-                                  selection = "none")
+  # Visualize output
+  output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
+                                options = list(pageLength = 8, scrollX=TRUE),
+                                selection = "none")
 
-    output$DataOutputSummary <- renderPrint(summary(DataOutput()))
+  output$DataOutputSummary <- renderPrint(summary(DataOutput()))
 
 
   output$dbFile <- downloadHandler(
@@ -1072,7 +1084,7 @@ observe( {
     }
   )
 
-# Help stuff
+  # Help stuff
   output$AppGeneralWorkflow <- renderImage(
     list(src = "www/AppGeneralWorkflow.png",
          contentType = "image/png",
