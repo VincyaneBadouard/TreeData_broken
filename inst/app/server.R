@@ -28,14 +28,15 @@ CodeOptions <-  read.csv("data/CodeOptions.csv")
 
 
 
-selector <- function(id, values, items = values){ # --- this is to edit CODES table
+selector <- function(id, values, items = values, titles = ""){ # --- this is to edit CODES table
   options <- HTML(paste0(mapply(
     function(i, item){
       value <- values[i]
+      title = titles[i]
       if(i == 1L){
-        opt <- tags$option(value = value, selected = "selected", item)
+        opt <- tags$option(value = value, title=title, selected = "selected", item)
       }else{
-        opt <- tags$option(value = value, item)
+        opt <- tags$option(value = value, title = title, item)
       }
       as.character(opt)
     }, seq_along(values), items
@@ -516,7 +517,10 @@ server <- function(input, output, session) { # server ####
                           showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
                         })
 
-    if(!is.null(profile$AllCodes)) shinyjs::show("UseProfileCodes")
+    if(!is.null(profile$AllCodes)) {
+      if(!profile$AllCodes[1,1] %in% "You have not selected columns for codes")
+      shinyjs::show("UseProfileCodes")
+    }
 
 
     MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
@@ -702,7 +706,7 @@ server <- function(input, output, session) { # server ####
   observe({FormatedColumnOptions(names(DataFormated()))})
 
   observeEvent(input$LaunchFormating , {
-    shinyjs::show("GoToCorrect")
+    shinyjs::show("GoToCodes")
   }, ignoreInit = T)
 
   observeEvent(input$LaunchFormating , {
@@ -723,11 +727,13 @@ server <- function(input, output, session) { # server ####
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
   ## codes ####
+  observeEvent(input$GoToCodes, {
+    updateTabItems(session, "tabs", "Codes")
+  }, ignoreInit = TRUE)
 
-
-  AllCodes <- reactiveVal(data.frame(Column = "You have not selected columns for codes yet",
-                                     Value = "You have not selected columns for codes yet",
-                                     Definition = "You have not selected columns for codes yet"))
+  AllCodes <- reactiveVal(data.frame(Column = "You have not selected columns for codes",
+                                     Value = "You have not selected columns for codes",
+                                     Definition = "You have not selected columns for codes"))
 
 
 
@@ -757,8 +763,8 @@ server <- function(input, output, session) { # server ####
     dat <- AllCodes()
     # AllCodes(dat)
     for(i in 1L:nrow(dat)){
-      dat$Definition_selector[i] <-
-        selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition))
+      dat$DefinitionSelector[i] <-
+        selector(id = paste0("slct", i), values = c("[select or enter a definition]", CodeOptions$Definition), titles = c("", CodeOptions$Source))
     }
 
     AllCodes(dat)
@@ -797,59 +803,6 @@ server <- function(input, output, session) { # server ####
     AllCodes()[, c(1:3)]
   })
 
-
-  # AllCodes <- reactiveVal()
-  #
-  # observe({
-  #   req(input$TreeCodes)
-  #   dat <- rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "column" )
-  #   dat$Definition = ""
-  #   AllCodes(dat)
-  #   dat <- cbind(dat, "DefinitionSelector" =  selector(id = paste0("slct",nrow(AllCodes())), values = c("Def 1", "Def 2")))
-  #
-  #   output[["CodeTable"]] <- renderDT({
-  #     datatable(
-  #       data = dat,
-  #       selection = "none",
-  #       escape = FALSE,
-  #       rownames = FALSE,
-  #       options = list(
-  #         initComplete = JS(js) #,
-  #         # preDrawCallback = JS(
-  #         #   "function() { Shiny.unbindAll(this.api().table().node()); }"
-  #         # ),
-  #         # drawCallback = JS(
-  #         #   "function() { Shiny.bindAll(this.api().table().node()); }"
-  #         # )
-  #       )
-  #     )
-  #   }, server = TRUE)
-  #
-  # })
-  #
-  #
-  #
-  #
-  # # output$CodeTable <- renderDT(AllCodes())
-  #
-  # # edit a column
-  # # observeEvent(input$CodeTable_cell_edit, {
-  # #   req(input$CodeTable_cell_edit)
-  # #   dToEdit <- AllCodes()
-  # #   dToEdit[input$CodeTable_cell_edit$row,input$CodeTable_cell_edit$col+1] <- input$CodeTable_cell_edit$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
-  # #   AllCodes(dToEdit)
-  # # })
-  #
-  # observeEvent(input[["CodeTable_cell_selection"]], {
-  #   info <- input[["CodeTable_cell_selection"]]
-  #   dat <- editData(dat, info, rownames = FALSE)
-  #
-  #   AllCodes(dat)
-  #   # AllCodes(editData(AllCodes(), info, rownames = FALSE))
-  # })
-  #
-  # output$NewCodeTable <- renderDT(AllCodes(), rownames = FALSE, selection  = "none",  escape = FALSE)
-
   # Correct ####
 
   observeEvent(input$GoToCorrect, {
@@ -857,7 +810,11 @@ server <- function(input, output, session) { # server ####
   }, ignoreInit = TRUE)
 
 
-  observeEvent(input$GoToDownload | input$SkipCorrections , {
+  observeEvent(input$GoToOutput, {
+    updateTabItems(session, "tabs", "OutputFormat")
+
+  })
+  observeEvent(input$GoToDownload, {
     updateTabItems(session, "tabs", "Save")
 
 
@@ -891,10 +848,14 @@ server <- function(input, output, session) { # server ####
   #decide what DataDone is going to be
 
   observeEvent(input$SkipCorrections,
-               {  DataDone(DataFormated())
+               {
+                 DataDone(DataFormated())
+                 updateTabItems(session, "tabs", "OutputFormat")
+
                })
+
   observeEvent(input$ApplyCorrections,{
-    shinyjs::show("GoToDownload")
+    shinyjs::show("GoToOutput")
     DataDone(DataCorrected())
   })
 
@@ -972,16 +933,26 @@ server <- function(input, output, session) { # server ####
 
     DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
 
+    if(!is.null(profileOutput$AllCodes) & !AllCodes()[1,1] %in% "You have not selected columns for codes") {
+      shinyjs::show("CodeTranslationsDiv")
+      output$uiCodeTranslations <- renderUI(DTOutput("CodeTranslationTable"))
+      output$CodeTranslationTable <- renderDT(profileOutput$AllCodes)
+    }
+
     profileOutput(profileOutput)
 
   })
 
   observeEvent(input$DontUseProfileOuput, {
     shinyjs::hide("DontUseProfileOuput")
-    # shinyjs::hide("UseProfileOuput")
 
     DataOutput(DataDone())
   })
+
+  observeEvent(input$DontUseProfileOuput | input$UseProfileOutput, {
+    shinyjs::show("GoToDownload")
+
+  }, ignoreInit = T)
 
 
   # Visualize output

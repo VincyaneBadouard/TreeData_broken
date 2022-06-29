@@ -53,6 +53,7 @@ ForestGeoProfile <-
     SubPlotArea = "none",
     SiteMan = "",
     IsLiveMan = c("alive", "broken below"),
+    TreeCodes = "codes",
     Authority = "SpeciesID",
     Lat = "none",
     Genus = "Genus",
@@ -87,7 +88,20 @@ ForestGeoProfile <-
     ValueName2 = "om",
     Variablecolumns4 = c("Species",
                          "SpeciesID"),
-    ValueName1 = ""
+    ValueName1 = "",
+
+    AllCodes = structure(list(Column = c("codes", "codes", "codes", "codes",
+                                         "codes", "codes", "codes", "codes", "codes", "codes", "codes",
+                                         "codes", "codes", "codes", "codes"), Value = c("B", "M", "A",
+                                                                                        "I", "P", "L", "Q", "X", "C", "Y", "R", "DS", "DC", "DT", "DN"
+                                         ), Definition = c("large buttress, requiring ladder to measure",
+                                                           "multiple stems", "POM at alternative height, not breast height",
+                                                           "stem irregular where measured", "any problem requiring further attention",
+                                                           "stem leaning", "stem broken above breast height", "stem broken below breast height",
+                                                           "POM has changed since prior census", "prostrate stem", "resprout (main stem broken but resprouted since last census)",
+                                                           "dead, stem standing", "dead, stem fallen", "dead, only tag found",
+                                                           "presumed dead, no tag nor stem")), class = "data.frame", row.names = c(NA,
+                                                                                                                                   -15L))
   )
 usethis::use_data(ForestGeoProfile, overwrite = TRUE)
 

@@ -508,8 +508,8 @@ body <- dashboardBody(
                          solidHeader = TRUE,
                          downloadButton(outputId = "dbProfile", label = "Save profile")),
                      hidden( actionBttn(
-                       inputId = "GoToCorrect",
-                       label = "Go To Correct",
+                       inputId = "GoToCodes",
+                       label = "Go To Codes",
                        style = "material-flat",
                        color = "success"
                      ))),
@@ -531,6 +531,12 @@ tabItem("Codes",
 
         h4("Please, fill-out the", code("Definition"), "by selecting a pre-written denfinition or manually writting yours."),
         hidden(actionBttn(inputId = "UseProfileCodes" , label = "Use your profile")),
+        actionBttn(
+          inputId = "GoToCorrect",
+          label = "Go To Correct",
+          style = "material-flat",
+          color = "success"
+        ),
 
         # uiOutput("uiCodes"),
         br(),
@@ -570,8 +576,8 @@ tabItem("Codes",
               color = "warning"
             ),
             hidden(actionBttn(
-              inputId = "GoToDownload",
-              label = "Go To Download",
+              inputId = "GoToOutput",
+              label = "Go To Output format",
               style = "material-flat",
               color = "success"
             )),
@@ -608,10 +614,19 @@ tabItem("Codes",
                            inputId = "DontUseProfileOuput",
                            label = "Don't use profile",
                            style = "pill",
-                           color = "success")
+                           color = "success"),
+                         hidden(actionBttn(
+                           inputId = "GoToDownload",
+                           label = "Go To Download",
+                           style = "material-flat",
+                           color = "success"
+                         ))
 
             )
             ),
+            fluidRow(hidden(div(id = "CodeTranslationsDiv", box(width = 12,
+              h3("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes wiht the same difinition, but your need to double check and fill out the rest of the codes"),
+              uiOutput("uiCodeTranslations"))))),
             fluidRow(
 
               column(width = 12,
@@ -620,7 +635,6 @@ tabItem("Codes",
                      h4("View of your final table:"),
                      withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
               ))
-
     ), # end of "OutputFormat" panel
 tabItem(tabName = "Save",
         fluidRow(
