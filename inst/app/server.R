@@ -948,12 +948,17 @@ server <- function(input, output, session) { # server ####
       CodeTranslationTable <- matrix(AllCodesOutput$Value, ncol = nrow(AllCodesOutput),
              nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
+
       for (i in seq_len(nrow(CodeTranslationTable))) {
-        CodeTranslationTable[i, ] = sprintf(
+        for(j in seq_len(ncol(CodeTranslationTable))) {
+       if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
+          '<input type="radio" name="%s" value="%s" checked="checked"/>',
+          AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
           '<input type="radio" name="%s" value="%s"/>',
-          AllCodesInput$Value[i], CodeTranslationTable[i, ]
-        )
+          AllCodesInput$Value[i], CodeTranslationTable[i,j])
+        }
       }
+
       output$CodeTranslationTable <- renderDT(
         CodeTranslationTable, escape = FALSE, selection = 'none', server = FALSE,
         options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE),
