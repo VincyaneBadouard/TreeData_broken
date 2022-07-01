@@ -9,13 +9,16 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Trouver des packages de : détéction de special characters, pour réccupérer la famille à partir du scientific name, et de update selon phylogenetic classification
+Trouver des packages de : 
++ détéction de **special characters**,
++ pour **réccupérer la famille** à partir du scientific name,
++ et de **update** selon phylogenetic classification
 
 Return: ... and fill the 'Comment' column
 
 Details:
 - No special characters (typography) (*TNRS package*)  
-- Check invariant botanical informations per IdTree (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
+- Check **invariant botanical informations per IdTree** (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
 - No family name in the genus and species columns (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?) (sort(unique(data[grep("aceae", data$genus), genus]))))  
 - Family & Scientific names match (*BIOMASS::getTaxonomy*)
 - Scientific & vernacular names match
@@ -73,6 +76,16 @@ Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), r
 Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4))]
 
 # Create errors
+
+## Missing value in  Family, ScientificName/Genus, species, VernName
+Data[IdTree %in% "d" & Year %in% 2000, ("Family") := NA_character_]
+Data[IdTree %in% "b" & Year %in% 2000, ("Genus") := NA_character_]
+Data[IdTree %in% "b", ("Family") := NA_character_]
+Data[IdTree %in% "c" & Year %in% 2000, ("Species") := NA_character_]
+Data[IdTree %in% "d" & Year %in% 2000, ("VernName") := NA_character_]
+
+
+
 ## Special characters
 Data[IdTree %in% "a" & Year %in% 2003, ("VernName") := "Angélique"] # good answer: "angelique"
 Data[IdTree %in% "a", ("Family") := "Fabacé"] # good answer: "Fabaceae"
@@ -99,6 +112,25 @@ Data[, ScientificName := paste(Genus, Species)]
 # Ask to the user
 
 # Check args
+
+# Missing value
+Family, ScientificName/Genus, species, VernName
+```{r}
+Vars <- c("Family", "ScientificName", "Genus", "Species", "VernName")
+
+  for (v in 1:length(Vars)) {
+
+    if(Vars[v] %in% names(Data)){ # If the column exists
+
+      Data <- GenerateComment(Data,
+                              condition = is.na(Data[,get(Vars[v])]),
+                              comment = paste0("Missing value in ", Vars[v]))
+    }
+  }
+
+  # Data[Comment != ""] # to check 
+```
+
 
 # Special characters (Typographie)
 TNRS package é, è or œ
@@ -211,16 +243,40 @@ unique(Data[IdTree %in% duplicated_ID,
 # No family name in the genus and species columns
 (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
 ```{r}
-sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
-sort(unique(Data[grep("aceae", Data$Genus), Genus]))
-sort(unique(Data[grep("aceae", Data$Species), Species]))
+Data[, FamilyCor := Family]
+Data[, GenusCor := Genus]
+Data[, SpeciesCor := Species]
+
+Data[grep("aceae", Data$Genus), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Genus, FamilyCor), GenusCor = NA_character_)]
+Data[grep("aceae", Data$Species), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Species, FamilyCor), SpeciesCor = NA_character_)]
+# sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
 
 
 ```
 
 
 # Family & Scientific names match
+Recovering the Family name by Genus
 (*BIOMASS::getTaxonomy*)
+```{r}
+FamilyData <- 
+  setDT( # as data.table
+    BIOMASS::getTaxonomy(unique(Data$Genus), findOrder = FALSE)
+  )
+
+FamilyData <- setnames(FamilyData, "family", "FamilyCor") # rename columns
+
+
+Data <- merge(Data, FamilyData, by.x = "Genus", by.y = "inputGenus", sort = FALSE)
+
+# Generate a comment if the family name is incorrect
+Data <- GenerateComment(Data,
+                            condition = Data[,Family] != Data[,FamilyCor],
+                            comment = "The 'Family' name is incorrect")
+
+# Comment je gère ces différentes colonnes ? ARRETEE ICI
+```
+
 
 # Scientific & vernacular names match
 

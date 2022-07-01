@@ -34,7 +34,7 @@ utils::globalVariables(c("Circ", "Diameter", "Site", "IdTree", "IdStem",
 
                          "LifeStatusCor", "PlotSubNum", "SitYearID", "Comment",
                          "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth", "Cresc",
-                         "HOMcor"
+                         "HOMCor"
 ))
 
 ## usethis namespace: end

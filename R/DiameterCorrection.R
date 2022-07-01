@@ -269,7 +269,7 @@ DiameterCorrection <- function(
 
     # Data[, POMcor := DefaultPOM] # Corrected diameter is at default POM
 
-    Data[, HOMcor := DefaultHOM] # Corrected diameter is at default HOM
+    Data[, HOMCor := DefaultHOM] # Corrected diameter is at default HOM
 
   }
 
