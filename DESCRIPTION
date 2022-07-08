@@ -33,10 +33,6 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.4), 
     bslib, 
-    DT, 
-    shinydashboard,
-    shinyjs,
-    shinyWidgets,
     shinycssloaders,
     shinytest,
     lubridate
@@ -51,5 +47,9 @@ Imports:
     data.tree (>= 1.0.0),
     stringdist (>= 0.9.8),
     stats (>= 3.6.1),
-    utils (>=  3.6.1)
+    utils (>=  3.6.1),
+    DT, 
+    shinydashboard,
+    shinyjs,
+    shinyWidgets
 BugReports: https://github.com/VincyaneBadouard/TreeData/issues

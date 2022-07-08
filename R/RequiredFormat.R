@@ -168,7 +168,7 @@ RequiredFormat <- function(
 
       }
 
-      # send waring if some dates translated as NA
+      # send warning if some dates translated as NA
       if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
 
     }
@@ -188,7 +188,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else waring("You did not provide Date or Year")
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else warning("You did not provide Date or Year")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
