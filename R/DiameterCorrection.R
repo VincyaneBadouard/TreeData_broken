@@ -175,8 +175,7 @@ DiameterCorrection <- function(
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # TrustMeasSet
-  if(length(TrustMeasSet) != 1 |
-     !any(TrustMeasSet == "first" || TrustMeasSet == "last"))
+  if(!any(TrustMeasSet %in% "first" || TrustMeasSet %in% "last"))
     stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
 
   # WhatToCorrect
