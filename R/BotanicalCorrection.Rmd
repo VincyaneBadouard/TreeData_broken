@@ -24,7 +24,7 @@ Details:
 - Scientific & vernacular names match
 - Update the scientific botanical names with the current phylogenetic classification
 
-+ **add the correction source!**
++ **add the correction source!** : 'BotanicalCorrectionSource' column
 
 Tests:
 - No special characters
@@ -93,7 +93,7 @@ Data[IdTree %in% "a", ("Family") := "Fabacé"] # good answer: "Fabaceae"
 Data[IdTree %in% "c" & Year %in% 2003, ("Genus") := "Licanï_a"] # good answer: "Licania"
 
 ## Variant botanical informations per IdTree
-Data[IdTree %in% "d" & Year %in% 2002, ("Species") := "grandiflora"] # good answer: "falcata"
+Data[IdTree %in% "d" & Year %in% 2002, ("Species") := "grandi!flora"] # good answer: "falcata"
 
 ## Family name in the genus/species columns
 Data[IdTree %in% "b", ("Species") := "Lecythidaceae"] # good answer: "sagotiana"
@@ -127,26 +127,39 @@ Family, ScientificName/Genus, species, VernName
 ```{r}
 Vars <- c("Family", "ScientificName", "Genus", "Species", "VernName")
 
-  for (v in 1:length(Vars)) {
-
-    if(Vars[v] %in% names(Data)){ # If the column exists
-
-      Data <- GenerateComment(Data,
-                              condition = is.na(Data[,get(Vars[v])]),
-                              comment = paste0("Missing value in ", Vars[v]))
-    }
+for (v in 1:length(Vars)) {
+  
+  if(Vars[v] %in% names(Data)){ # If the column exists
+    
+    Data <- GenerateComment(Data,
+                            condition = is.na(Data[,get(Vars[v])]),
+                            comment = paste0("Missing value in ", Vars[v]))
   }
+}
 
-  # Data[Comment != ""] # to check 
+# Data[Comment != ""] # to check 
 ```
 
 
 # Special characters
 Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
 ```{r}
-Data$ScientificNameCor <- gsub("[[:punct:]]", "", Data$ScientificName)
+x <- "a"
+x <- "!"
+grepl('[[:punct:]]', x) # TRUE if there are any special character
 
-# Comment : "Special characters in the 'ScientificName'"
+Data[, GenusCor := gsub("[[:punct:]]", "", Data$GenusCor)]
+Data[, SpeciesCor := gsub("[[:punct:]]", "", Data$SpeciesCor)]
+
+# Comment :
+
+Data <- GenerateComment(Data,
+                        condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character
+                        comment = "Special characters in the 'Genus'")
+
+Data <- GenerateComment(Data,
+                        condition = grepl('[[:punct:]]', Data$Species), # TRUE if there are any special character
+                        comment = "Special characters in the 'Species'")
 
 ```
 
@@ -213,25 +226,26 @@ Autre fonction : https://github.com/EnquistLab/RTNRS/blob/master/R/TNRS_base.R
 un shiny : https://github.com/APonce73/ShinyR-Taxonomic-correction (marche pas)
 
 ```{r}
+Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
+
 ## with Scientific name (25 var)
-RsltSfc <- Taxonstand::TPL(unique(Data$ScientificName), corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+TPLCor <- Taxonstand::TPL(unique(Data$ScientificNameCor), corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+# with Genus and species marche pas bien pcq décale genre et sp quand on unique())
 
-## with Genus and species (23 var)
-RsltGS <- Taxonstand::TPL(genus = unique(Data$Genus), species = unique(Data$Species), infra = FALSE, corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+setDT(TPLCor) # df to dt
+
+# Take only corrected names. Columns: New.Genus, New.Species, Family, Typo
+TPLCor <- TPLCor[New.Genus != Genus | New.Species != Species,]
+TPLCor <- TPLCor[, list(Taxonomic.status, Typo, Family, Taxon, New.Genus, New.Species)]
+TPLCor <- setnames(TPLCor, "Family", "New.Family") # rename columns
+TPLCor[, BotanicalCorrectionSource := "The Plant List"] # create the Source
 
 
-setDT(RsltSfc) # df to dt
-setDT(RsltGS) # df to dt
+# Join the corrected Genus and Species, by original 'ScientificNameCor'
+Data <- merge(Data, TPLCor, by.x = "ScientificNameCor", by.y = "Taxon", all.x = TRUE) #  by.x = "ScientificNameCor", by.y = "Taxon", sort = FALSE
 
-RsltSfc[, c("Hybrid.marker", "New.Hybrid.marker", # No hybrid
-            "Abbrev", "Infraspecific.rank", "Infraspecific", "New.Infraspecific.rank", "New.Infraspecific", "Higher.level", # No infrasp
-            "Date") := NULL]
 
-# Take only Taxonomic.status == "Accepted" | "Synonym"
-
-# Method : The Plant List
-
-# Comment:
+# Comment: AREETE LA
 ## if "Synonym" : 'ScientificName' is a synonym of the accepted botanical name
 ## if Typo == TRUE : Orthographic error in the 'ScientificName'
 ```
@@ -293,12 +307,12 @@ FamilyData <-
 FamilyData <- setnames(FamilyData, "family", "FamilyCor") # rename columns
 
 
-Data <- merge(Data, FamilyData, by.x = "Genus", by.y = "inputGenus", sort = FALSE)
+Data <- merge(Data, FamilyData, by.x = "Genus", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
 
 # Generate a comment if the family name is incorrect
 Data <- GenerateComment(Data,
-                            condition = Data[,Family] != Data[,FamilyCor],
-                            comment = "The 'Family' name is incorrect")
+                        condition = Data[,Family] != Data[,FamilyCor],
+                        comment = "The 'Family' name is incorrect")
 
 # Comment je gère ces différentes colonnes ? ARRETEE ICI
 ```
