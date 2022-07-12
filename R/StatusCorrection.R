@@ -1,11 +1,11 @@
-#' StatusCorrection
+#' Status Correction
 #'
 #' @description Detect errors or detect errors and correct the tree life status
 #'   evolution over the censuses.
 #'   Inspired by the code of Nino Page package (ForestData::correct_alive() and
 #'   .correct_alive_tree())
 #'
-#' @param Data (data.frame or data.table)
+#' @param Data Dataset (data.frame or data.table)
 #'   The *LifeStatus* column must be coded as:
 #'     - TRUE = alive,
 #'     - FALSE = dead,

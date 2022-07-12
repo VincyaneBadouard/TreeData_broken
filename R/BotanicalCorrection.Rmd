@@ -54,7 +54,8 @@ setDT(TestData) # data.frame to data.table
 ```
 
 # Create data with different type of botanical error
-- No special characters
+- No special characters (!"#$%&’()*+,-./:;<=>?@[]^_`{|}~)
+- No orthographical error
 - Invariant botanical informations per IdTree
 - No family name in the genus and species columns 
 - Family & Scientific names match
@@ -113,6 +114,14 @@ Data[, ScientificName := paste(Genus, Species)]
 
 # Check args
 
+# Corrected columns initialisation
+```{r}
+Data[, FamilyCor := Family]
+Data[, GenusCor := Genus]
+Data[, SpeciesCor := Species]
+```
+
+
 # Missing value
 Family, ScientificName/Genus, species, VernName
 ```{r}
@@ -132,7 +141,16 @@ Vars <- c("Family", "ScientificName", "Genus", "Species", "VernName")
 ```
 
 
-# Special characters (Typographie)
+# Special characters
+Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
+```{r}
+Data$ScientificNameCor <- gsub("[[:punct:]]", "", Data$ScientificName)
+
+# Comment : "Special characters in the 'ScientificName'"
+
+```
+
+# Orthographical error
 TNRS package é, è or œ
 Reurn: A data.frame with the following components:
 
@@ -190,11 +208,17 @@ Logical. If TRUE, the input taxon is at infraspecific level and does not occur i
 
 $Date	(*to delete*)
 Current date according to Sys.Date
-```{r}
-# The Plant List
-RsltSfc <- Taxonstand::TPL(Data$ScientificName, diffchar = 2, ) # diffchar: maximum difference of characters nbr between input and output
 
-RsltGS <- Taxonstand::TPL(genus = Data$Genus, species = Data$Species, infra = FALSE, diffchar = 2, ) # diffchar: maximum difference of characters nbr between input and output
+Autre fonction : https://github.com/EnquistLab/RTNRS/blob/master/R/TNRS_base.R
+un shiny : https://github.com/APonce73/ShinyR-Taxonomic-correction (marche pas)
+
+```{r}
+## with Scientific name (25 var)
+RsltSfc <- Taxonstand::TPL(unique(Data$ScientificName), corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+
+## with Genus and species (23 var)
+RsltGS <- Taxonstand::TPL(genus = unique(Data$Genus), species = unique(Data$Species), infra = FALSE, corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+
 
 setDT(RsltSfc) # df to dt
 setDT(RsltGS) # df to dt
@@ -203,8 +227,13 @@ RsltSfc[, c("Hybrid.marker", "New.Hybrid.marker", # No hybrid
             "Abbrev", "Infraspecific.rank", "Infraspecific", "New.Infraspecific.rank", "New.Infraspecific", "Higher.level", # No infrasp
             "Date") := NULL]
 
-# Autre fonction : https://github.com/EnquistLab/RTNRS/blob/master/R/TNRS_base.R
-# un shiny : https://github.com/APonce73/ShinyR-Taxonomic-correction
+# Take only Taxonomic.status == "Accepted" | "Synonym"
+
+# Method : The Plant List
+
+# Comment:
+## if "Synonym" : 'ScientificName' is a synonym of the accepted botanical name
+## if Typo == TRUE : Orthographic error in the 'ScientificName'
 ```
 
 
@@ -243,9 +272,6 @@ unique(Data[IdTree %in% duplicated_ID,
 # No family name in the genus and species columns
 (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
 ```{r}
-Data[, FamilyCor := Family]
-Data[, GenusCor := Genus]
-Data[, SpeciesCor := Species]
 
 Data[grep("aceae", Data$Genus), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Genus, FamilyCor), GenusCor = NA_character_)]
 Data[grep("aceae", Data$Species), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Species, FamilyCor), SpeciesCor = NA_character_)]

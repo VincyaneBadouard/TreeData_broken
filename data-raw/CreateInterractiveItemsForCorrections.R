@@ -4,7 +4,9 @@ db <- tools::Rd_db("TreeData")
 
 
 # extract the arguments and their descriptions from the funcions we are interested in
-Fct_args <- lapply(db, tools:::.Rd_get_metadata, "arguments")[c("ErrorsDetection.Rd", "StatusCorrection.Rd")]
+Fct_args <- lapply(db, tools:::.Rd_get_metadata, "arguments")[c("ErrorsDetection.Rd",
+                                                                "StatusCorrection.Rd",
+                                                                "DiameterCorrection.Rd")]
 
 Fct_args <- lapply(Fct_args, function(x) eval(parse(text = paste("list(", gsub('\\"', "'", gsub(")list", "), list", gsub("(\n)", "", x ))), ")"))))
 

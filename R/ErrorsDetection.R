@@ -1,9 +1,10 @@
-#' ErrorsDetection
+#' Errors Detection
 #'
-#' @param Data (data.frame or data.table)
+#' @param Data Dataset (data.frame or data.table)
 #'
-#' @param ByStem TRUE if your inventory contains the stem level, FALSE if not,
-#'   and in this case the correction is done by tree.
+#' @param ByStem must be equal to TRUE if your inventory contains the stem
+#'   level, equal to FALSE if not, and in this case the correction is done by
+#'   tree (logical)
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric) (Default = 2 censuses)
@@ -14,8 +15,8 @@
 #' @param MinDBH Minimum diameter of trees inventoried according to your
 #'   protocol (in cm) (numeric, 1 value) (Default = 10 cm)
 #'
-#' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
-#'   considered abnormal (numeric, 1 value) (Default = 5 cm)
+#' @param PositiveGrowthThreshold in cm/year: a tree
+#'   widening by more than this value is considered abnormal (numeric, 1 value)
 #'
 #' @details Detect errors
 #'   - Remove **duplicated rows**

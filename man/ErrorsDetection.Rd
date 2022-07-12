@@ -2,7 +2,7 @@
 % Please edit documentation in R/ErrorsDetection.R
 \name{ErrorsDetection}
 \alias{ErrorsDetection}
-\title{ErrorsDetection}
+\title{Errors Detection}
 \usage{
 ErrorsDetection(
   Data,
@@ -14,10 +14,11 @@ ErrorsDetection(
 )
 }
 \arguments{
-\item{Data}{(data.frame or data.table)}
+\item{Data}{Dataset (data.frame or data.table)}
 
-\item{ByStem}{TRUE if your inventory contains the stem level, FALSE if not,
-and in this case the correction is done by tree.}
+\item{ByStem}{must be equal to TRUE if your inventory contains the stem
+level, equal to FALSE if not, and in this case the correction is done by
+tree (logical)}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric) (Default = 2 censuses)}
@@ -28,15 +29,15 @@ tree (logical) (Default = FALSE)}
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
 protocol (in cm) (numeric, 1 value) (Default = 10 cm)}
 
-\item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
-considered abnormal (numeric, 1 value) (Default = 5 cm)}
+\item{PositiveGrowthThreshold}{in cm/year: a tree
+widening by more than this value is considered abnormal (numeric, 1 value)}
 }
 \value{
 The input dataset (data.table) with a new \emph{Comment} column with error
 type informations.
 }
 \description{
-ErrorsDetection
+Errors Detection
 }
 \details{
 Detect errors

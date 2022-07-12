@@ -28,7 +28,7 @@ DiameterCorrection(
 )
 }
 \arguments{
-\item{Data}{(data.frame or data.table)
+\item{Data}{Dataset (data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
 \item 'IdTree' (character)
@@ -41,23 +41,26 @@ The dataset must contain the columns:
 \item \strong{'POM'(Point Of Measurement) (factor)} if you want to correct from the
 \strong{"POM change}
 If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
-dataset must contain the columns:
+dataset must also contain the columns:
 \item 'Genus' (character)
 \item 'Family' (character)
 }}
 
-\item{ByStem}{TRUE if your inventory contains the stem level, FALSE if not,
-and in this case the correction is done by tree.}
+\item{ByStem}{must be equal to TRUE if your inventory contains the stem
+level, equal to FALSE if not, and in this case the correction is done by
+tree (logical)}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}
 
-\item{MinDBH}{Minimum census DBH of your protocol in cm (numeric, 1 value)}
+\item{MinDBH}{Minimum census DBH (Diameter at the default HOM) of your
+protocol in cm (numeric, 1 value)}
 
-\item{MaxDBH}{Maximum possible DBH of your stand in cm (numeric, 1 value)}
+\item{MaxDBH}{Maximum possible DBH (Diameter at the default HOM) of your
+stand in cm (numeric, 1 value)}
 
 \item{PositiveGrowthThreshold}{in cm/year: a tree
-widening by more than x cm/year is considered abnormal (numeric, 1 value)}
+widening by more than this value is considered abnormal (numeric, 1 value)}
 
 \item{NegativeGrowthThreshold}{in cm/census: the possible
 positive measurement error (+n) cannot be corrected until the growth
@@ -69,23 +72,25 @@ appears abnormal, but a negative measurement error can be allowed until -n
 the 'ScientificName' column (characters vector)}
 
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
-widens by more than x cm/year is considered abnormal (numeric, 1 value)}
+widens by more than this value is considered abnormal (numeric, 1 value)}
 
 \item{TrustMeasSet}{Trust measurements set: the "first" or the "last" set
-(character, 1 value)}
+(character, 1 value) (not implemented yet)}
 
-\item{WhatToCorrect}{c("POM change", "punctual", "shift") (character)
+\item{WhatToCorrect}{Possible values: "POM change", "punctual", "shift"
+(character)
 \itemize{
-\item "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-the Diameter values from it.
+\item "POM change": detect POM change in the column 'POM' and correct the
+Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
-\item "shift": detect if there is a shift of several Diameter values and links them
-to the trust measurements set (\emph{TrustMeasSet} argument).
+\item "shift": detect if there is a shift of several Diameter values and
+links them to the trust measurements set
+(\emph{TrustMeasSet} argument).
 }}
 
-\item{CorrectionType}{c("taper", "linear", "quadratic", "individual",
-"phylogenetic hierarchical") (character).
+\item{CorrectionType}{Possible values: "taper", "linear", "quadratic",
+"individual", "phylogenetic hierarchical") (character).
 \itemize{
 \item "taper": correct for biases associated with nonstandard and changing
 measurement heights, from a taper model (\emph{TaperParameter} &

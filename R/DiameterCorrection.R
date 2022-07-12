@@ -1,6 +1,6 @@
 #' Diameter correction
 #'
-#' @param Data (data.frame or data.table)
+#' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
 #'   - 'IdTree' (character)
 #'   - 'IdStem' (character) if *ByStem* argument = TRUE
@@ -12,21 +12,24 @@
 #'   - **'POM'(Point Of Measurement) (factor)** if you want to correct from the
 #'       **"POM change**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
-#'   dataset must contain the columns:
+#'   dataset must also contain the columns:
 #'   - 'Genus' (character)
 #'   - 'Family' (character)
 #'
-#' @param ByStem TRUE if your inventory contains the stem level, FALSE if not,
-#'   and in this case the correction is done by tree.
+#' @param ByStem must be equal to TRUE if your inventory contains the stem
+#'   level, equal to FALSE if not, and in this case the correction is done by
+#'   tree (logical)
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
 #'
-#' @param MinDBH Minimum census DBH of your protocol in cm (numeric, 1 value)
-#' @param MaxDBH Maximum possible DBH of your stand in cm (numeric, 1 value)
+#' @param MinDBH Minimum census DBH (Diameter at the default HOM) of your
+#'   protocol in cm (numeric, 1 value)
+#' @param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
+#'   stand in cm (numeric, 1 value)
 #'
 #' @param PositiveGrowthThreshold in cm/year: a tree
-#'   widening by more than x cm/year is considered abnormal (numeric, 1 value)
+#'   widening by more than this value is considered abnormal (numeric, 1 value)
 #'
 #' @param NegativeGrowthThreshold in cm/census: the possible
 #'   positive measurement error (+n) cannot be corrected until the growth
@@ -38,21 +41,23 @@
 #'   the 'ScientificName' column (characters vector)
 #'
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
-#'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
+#'   widens by more than this value is considered abnormal (numeric, 1 value)
 #'
 #' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
-#'   (character, 1 value)
+#'   (character, 1 value) (not implemented yet)
 #'
-#' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
-#'   - "POM change": detect POM change in the column 'POM' or 'HOM' and correct
-#'                   the Diameter values from it.
+#' @param WhatToCorrect Possible values: "POM change", "punctual", "shift"
+#'   (character)
+#'   - "POM change": detect POM change in the column 'POM' and correct the
+#'                   Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
-#'   - "shift": detect if there is a shift of several Diameter values and links them
-#'              to the trust measurements set (*TrustMeasSet* argument).
+#'   - "shift": detect if there is a shift of several Diameter values and
+#'              links them to the trust measurements set
+#'              (*TrustMeasSet* argument).
 #'
-#' @param CorrectionType c("taper", "linear", "quadratic", "individual",
-#'   "phylogenetic hierarchical") (character).
+#' @param CorrectionType Possible values: "taper", "linear", "quadratic",
+#'   "individual", "phylogenetic hierarchical") (character).
 #'   - "taper": correct for biases associated with nonstandard and changing
 #'              measurement heights, from a taper model (*TaperParameter* &
 #'              *TaperFormula* arguments).
@@ -319,12 +324,13 @@ DiameterCorrection <- function(
 #' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
 #'   (character, 1 value)
 #' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
-#'   - "POM change": detect POM change in the column 'POM' or 'HOM' and correct
+#'   - "POM change": detect POM change in the column 'POM' and correct
 #'                   the Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
-#'   - "shift": detect if there is a shift of several Diameter values and links them
-#'              to the trust measurements set (*TrustMeasSet* argument).
+#'   - "shift": detect if there is a shift of several 'Diameter' values and
+#'              links them to the trust measurements set
+#'              (*TrustMeasSet* argument).
 #'
 #' @param CorrectionType c("taper", "linear", "quadratic", "individual",
 #'   "phylogenetic hierarchical") (character).

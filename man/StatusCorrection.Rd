@@ -2,7 +2,7 @@
 % Please edit documentation in R/StatusCorrection.R
 \name{StatusCorrection}
 \alias{StatusCorrection}
-\title{StatusCorrection}
+\title{Status Correction}
 \usage{
 StatusCorrection(
   Data,
@@ -15,7 +15,7 @@ StatusCorrection(
 )
 }
 \arguments{
-\item{Data}{(data.frame or data.table)
+\item{Data}{Dataset (data.frame or data.table)
 The \emph{LifeStatus} column must be coded as:
 - TRUE = alive,
 - FALSE = dead,

@@ -71,12 +71,13 @@ widens by more than x cm/year is considered abnormal (numeric, 1 value)}
 
 \item{WhatToCorrect}{c("POM change", "punctual", "shift") (character)
 \itemize{
-\item "POM change": detect POM change in the column 'POM' or 'HOM' and correct
+\item "POM change": detect POM change in the column 'POM' and correct
 the Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
-\item "shift": detect if there is a shift of several Diameter values and links them
-to the trust measurements set (\emph{TrustMeasSet} argument).
+\item "shift": detect if there is a shift of several 'Diameter' values and
+links them to the trust measurements set
+(\emph{TrustMeasSet} argument).
 }}
 
 \item{CorrectionType}{c("taper", "linear", "quadratic", "individual",
