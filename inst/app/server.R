@@ -708,6 +708,9 @@ server <- function(input, output, session) { # server ####
 
   FormatedColumnOptions <- reactiveVal()
   observe({FormatedColumnOptions(names(DataFormated()))})
+  FormatedScientificNameOptions <- reactiveVal()
+  observe({FormatedScientificNameOptions(sort(unique(DataFormated()$ScientificName)))})
+
 
   observeEvent(input$LaunchFormating , {
     shinyjs::show("GoToCodes")
@@ -717,7 +720,7 @@ server <- function(input, output, session) { # server ####
 
     lapply(which(xCorr$argument %in% "choices"), function(i) {
 
-      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], "= get(xCorr$argValue[i])()", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
+      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], ifelse(xCorr$ReactiveArgValue[i], "= get(xCorr$argValue[i])()", "= eval(str2lang(xCorr$argValue[i]))"), ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
     })
 
   })
@@ -743,7 +746,7 @@ server <- function(input, output, session) { # server ####
 
   observe({
     req(input$TreeCodes)
-    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(Value = unique(unlist(strsplit(x, "[[:punct:]]"))))), idcol = "Column" ), Definition = ""))
+    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(Value = unique(unlist(strsplit(as.character(x), "[[:punct:]]"))))), idcol = "Column" ), Definition = ""))
 
   })
 
@@ -901,6 +904,7 @@ server <- function(input, output, session) { # server ####
 
   DataOutput <- reactiveVal(NULL)
   profileOutput <- reactiveVal(NULL)
+  CodeTranslationFinal <- reactiveValues(dt = NULL, output = NULL)
 
   observe( {
     if(input$predefinedProfileOutput != "No" )
@@ -940,10 +944,23 @@ server <- function(input, output, session) { # server ####
 
     if(!is.null(profileOutput$AllCodes) & !AllCodes()[1,1] %in% "You have not selected columns for codes") {
       shinyjs::show("CodeTranslationsDiv")
-      output$uiCodeTranslations <- renderUI(DTOutput("CodeTranslationTable"))
+      output$uiCodeTranslations <-  renderUI({
+        div(DTOutput("CodeTranslationTable"),
+            DTOutput("CodeTranslationFinal")
+        # actionBttn(
+        #   inputId = "btnProcess",
+        #   label = "Process",
+        #   style = "float",
+        #   size = "sm",
+        #   color = "success"
+        # )
+        )
+        })
 
       AllCodesInput <- AllCodes()
       AllCodesOutput <- profileOutput$AllCodes
+
+      AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
       CodeTranslationTable <- matrix(AllCodesOutput$Value, ncol = nrow(AllCodesOutput),
              nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
@@ -959,9 +976,20 @@ server <- function(input, output, session) { # server ####
         }
       }
 
+      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead></table>"))
+
+
+
       output$CodeTranslationTable <- renderDT(
-        CodeTranslationTable, escape = FALSE, selection = 'none', server = FALSE,
-        options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE),
+        datatable(
+          data = cbind(AllCodesInput$Column, CodeTranslationTable),
+          selection = 'none',
+          escape = FALSE,
+          extensions = 'RowGroup',
+          options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
+                         rowGroup = list(dataSrc=c(1)),
+                         columnDefs = list(list(visible=FALSE, targets=c(1)))),
+       container = sketch,
         callback = JS("table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
           $this.attr('id', this.data()[0]);
@@ -969,14 +997,48 @@ server <- function(input, output, session) { # server ####
         });
         Shiny.unbindAll(table.table().node());
         Shiny.bindAll(table.table().node());")
-      )
+        ),
+       server = FALSE)
+
+      # output$CodeTranslationTable <- renderHtmlTableWidget(
+      #   htmlTableWidget(
+      #       addHtmlTableStyle( CodeTranslationTable,
+      #                          css.rgroup = "text-align:left; font-weight:900",
+      #                          css.cgroup = "text-align:left; font-weight:900",
+      #                          css.header	= "text-align:center; font-weight:400"
+      #       ),
+      #       rgroup = unique(AllCodesInput$Column),
+      #       n.rgroup = c(table(AllCodesInput$Column)[unique(AllCodesInput$Column)]),
+      #       cgroup = unique(AllCodesOutput$Column),
+      #       n.cgroup =table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)],
+      #     number_of_entries = nrow(CodeTranslationTable) + length(unique(AllCodesInput$Column)))
+      #   )
+
 
       # output$CodeTranslationTable <- renderDT(profileOutput$AllCodes)
     }
 
     profileOutput(profileOutput)
+    # CodeTranslationTable(CodeTranslationTable)
+    CodeTranslationFinal$dt <- data.frame(input = rownames(CodeTranslationTable))
 
   })
+
+
+
+  # CodeTranslationFinal <- reactiveVal(data.frame(input = rownames(CodeTranslationTable), output = colnames(CodeTranslationTable)))
+
+  observe({
+    dt <- CodeTranslationFinal$dt
+    dt$output <- sapply(CodeTranslationFinal$dt$input, function(x) input[[x]])
+    CodeTranslationFinal$output <- dt
+  })
+
+  output$CodeTranslationFinal <- renderDT({
+    req(CodeTranslationFinal$output)
+    datatable(CodeTranslationFinal$output)
+  }, options = list( paging = FALSE))
+
 
   observeEvent(input$DontUseProfileOuput, {
     shinyjs::hide("DontUseProfileOuput")

@@ -11,6 +11,7 @@ library(stringdist)
 library(data.table)
 library(TreeData)
 library(shinycssloaders)
+library(htmlTable)
 
 # read in csv file that has all we want to ask about the headers
 x <- read.csv("data/interactive_items.csv")
@@ -556,7 +557,7 @@ tabItem("Codes",
                 radioButtons(inputId = f, label = paste("Apply", f, "?"), choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
                 hidden(div(id = paste0(f, "Yes"),
 
-                lapply(which(xCorr$Function %in%f), function(i) {
+                lapply(which(xCorr$Function %in% f), function(i) {
                   eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = ifelse(xCorr$helpText[i] %in% '', xCorr$Label[i], paste0(xCorr$Label[i], ' (', xCorr$helpText[i], ')')),", xCorr$argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                 })
               )
