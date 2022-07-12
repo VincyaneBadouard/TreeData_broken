@@ -14,7 +14,7 @@ DiameterCorrection(
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  TrustMeasSet = "first",
+  TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("taper", "quadratic", "linear", "individual",
     "phylogenetic hierarchical"),
@@ -31,19 +31,19 @@ DiameterCorrection(
 \item{Data}{Dataset (data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdTree' (character)
-\item 'IdStem' (character) if \emph{ByStem} argument = TRUE
-\item 'ScientificName' (character)
-\item 'Diameter' (numeric)
-\item 'Year' (numeric)
-\item \strong{'HOM'(Height Of Measurement) (numeric)} if you want to apply the
+\item \code{IdTree} (character)
+\item \code{IdStem} (character) if \emph{ByStem} argument = TRUE
+\item \code{ScientificName} (character)
+\item \code{Diameter} (numeric)
+\item \code{Year} (numeric)
+\item \strong{\code{HOM} (Height Of Measurement) (numeric)} if you want to apply the
 \strong{"taper" correction}
-\item \strong{'POM'(Point Of Measurement) (factor)} if you want to correct from the
-\strong{"POM change}
+\item \strong{\code{POM} (Point Of Measurement) (factor)} if you want to correct from the
+\strong{"POM change"}
 If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
 dataset must also contain the columns:
-\item 'Genus' (character)
-\item 'Family' (character)
+\item \code{Genus} (character)
+\item \code{Family} (character)
 }}
 
 \item{ByStem}{must be equal to TRUE if your inventory contains the stem
@@ -69,7 +69,7 @@ appears abnormal, but a negative measurement error can be allowed until -n
 "compensated". (numeric, 1 value)}
 
 \item{Pioneers}{Scientific names of the pioneer species of the site, as in
-the 'ScientificName' column (characters vector)}
+the \code{ScientificName} column (characters vector)}
 
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
@@ -80,7 +80,7 @@ widens by more than this value is considered abnormal (numeric, 1 value)}
 \item{WhatToCorrect}{Possible values: "POM change", "punctual", "shift"
 (character)
 \itemize{
-\item "POM change": detect POM change in the column 'POM' and correct the
+\item "POM change": detect POM change in the column \code{POM} and correct the
 Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
@@ -95,7 +95,7 @@ links them to the trust measurements set
 \item "taper": correct for biases associated with nonstandard and changing
 measurement heights, from a taper model (\emph{TaperParameter} &
 \emph{TaperFormula} arguments).
-Correction possible only if the 'HOM' (Height Of Measurement)
+Correction possible only if the \code{HOM} (Height Of Measurement)
 column is available.
 \item "linear": interpolation by linear regression of the individual annual
 growth over time.
@@ -117,7 +117,7 @@ cm) (numeric, 1 value)}
 \item{MinIndividualNbr}{Minimum number of individuals to take into account in
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)}
 
-\item{Digits}{Number of decimal places to be used in the 'DBHCor' column
+\item{Digits}{Number of decimal places to be used in the \code{DBHCor} column
 (Default: 1L) (integer)}
 
 \item{TaperParameter}{Taper parameter (unitless) formula (function)

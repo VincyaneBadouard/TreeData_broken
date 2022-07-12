@@ -2,19 +2,19 @@
 #'
 #' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdTree' (character)
-#'   - 'IdStem' (character) if *ByStem* argument = TRUE
-#'   - 'ScientificName' (character)
-#'   - 'Diameter' (numeric)
-#'   - 'Year' (numeric)
-#'   - **'HOM'(Height Of Measurement) (numeric)** if you want to apply the
+#'   - `IdTree` (character)
+#'   - `IdStem` (character) if *ByStem* argument = TRUE
+#'   - `ScientificName` (character)
+#'   - `Diameter` (numeric)
+#'   - `Year` (numeric)
+#'   - **`HOM` (Height Of Measurement) (numeric)** if you want to apply the
 #'       **"taper" correction**
-#'   - **'POM'(Point Of Measurement) (factor)** if you want to correct from the
-#'       **"POM change**
+#'   - **`POM` (Point Of Measurement) (factor)** if you want to correct from the
+#'       **"POM change"**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must also contain the columns:
-#'   - 'Genus' (character)
-#'   - 'Family' (character)
+#'   - `Genus` (character)
+#'   - `Family` (character)
 #'
 #' @param ByStem must be equal to TRUE if your inventory contains the stem
 #'   level, equal to FALSE if not, and in this case the correction is done by
@@ -38,7 +38,7 @@
 #'   "compensated". (numeric, 1 value)
 #'
 #' @param Pioneers Scientific names of the pioneer species of the site, as in
-#'   the 'ScientificName' column (characters vector)
+#'   the `ScientificName` column (characters vector)
 #'
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
@@ -48,7 +48,7 @@
 #'
 #' @param WhatToCorrect Possible values: "POM change", "punctual", "shift"
 #'   (character)
-#'   - "POM change": detect POM change in the column 'POM' and correct the
+#'   - "POM change": detect POM change in the column `POM` and correct the
 #'                   Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
@@ -61,7 +61,7 @@
 #'   - "taper": correct for biases associated with nonstandard and changing
 #'              measurement heights, from a taper model (*TaperParameter* &
 #'              *TaperFormula* arguments).
-#'              Correction possible only if the 'HOM' (Height Of Measurement)
+#'              Correction possible only if the `HOM` (Height Of Measurement)
 #'              column is available.
 #'   - "linear": interpolation by linear regression of the individual annual
 #'               growth over time.
@@ -81,7 +81,7 @@
 #' @param MinIndividualNbr Minimum number of individuals to take into account in
 #'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
 #'
-#' @param Digits Number of decimal places to be used in the 'DBHCor' column
+#' @param Digits Number of decimal places to be used in the `DBHCor` column
 #'   (Default: 1L) (integer)
 #'
 #' @param TaperParameter Taper parameter (unitless) formula (function)
@@ -136,7 +136,7 @@ DiameterCorrection <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  TrustMeasSet = "first",
+  TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
