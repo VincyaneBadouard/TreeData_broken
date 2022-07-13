@@ -42,7 +42,7 @@ test_that("DiameterCorrection", {
                regexp = "'arg' must be NULL or a character vector")
 
   expect_error(DiameterCorrection(TestData, TrustMeasSet = "T"),
-               regexp = 'should be one of "first", "last"')
+               regexp = "arg' should be one of “first”, “last”")
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
                regexp = "The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
@@ -51,7 +51,7 @@ test_that("DiameterCorrection", {
                regexp = "The 'CorrectionType' argument value must be among
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
-  expect_error(DiameterCorrection(TestData, Digits = 1.2),
+  expect_warning(DiameterCorrection(TestData, Digits = 1.2, CorrectionType = c( "linear", "individual", "phylogenetic hierarchical")),
                regexp = "The 'Digits' argument must be an integer")
 
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
