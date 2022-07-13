@@ -522,7 +522,7 @@ server <- function(input, output, session) { # server ####
                         })
 
     if(!is.null(profile$AllCodes)) {
-      if(!profile$AllCodes[1,1] %in% "You have not selected columns for codes")
+      if(!profile$AllCodes[1,1] %in% "You have not selected columns for codes" & !all(profile$AllCode$Definition == ""))
       shinyjs::show("UseProfileCodes")
     }
 
