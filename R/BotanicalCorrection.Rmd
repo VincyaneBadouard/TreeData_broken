@@ -17,9 +17,10 @@ Trouver des packages de :
 Return: ... and fill the 'Comment' column
 
 Details:
-- No special characters (typography) (*TNRS package*)  
-- Check **invariant botanical informations per IdTree** (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
+- No special characters (typography) (*TNRS package*)
 - No family name in the genus and species columns (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?) (sort(unique(data[grep("aceae", data$genus), genus]))))  
+- Correct spelling of botanical names (*Taxonstand::TPL*)
+- Check **invariant botanical informations per IdTree** (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
 - Family & Scientific names match (*BIOMASS::getTaxonomy*)
 - Scientific & vernacular names match
 - Update the scientific botanical names with the current phylogenetic classification
@@ -144,14 +145,16 @@ for (v in 1:length(Vars)) {
 # Special characters
 Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
 ```{r}
-x <- "a"
-x <- "!"
-grepl('[[:punct:]]', x) # TRUE if there are any special character
 
+Data[, FamilyCor := gsub("[[:punct:]]", "", Data$FamilyCor)]
 Data[, GenusCor := gsub("[[:punct:]]", "", Data$GenusCor)]
 Data[, SpeciesCor := gsub("[[:punct:]]", "", Data$SpeciesCor)]
 
 # Comment :
+
+Data <- GenerateComment(Data,
+                        condition = grepl('[[:punct:]]', Data$Family), # TRUE if there are any special character
+                        comment = "Special characters in the 'Family'")
 
 Data <- GenerateComment(Data,
                         condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character
@@ -162,6 +165,23 @@ Data <- GenerateComment(Data,
                         comment = "Special characters in the 'Species'")
 
 ```
+
+# No family name in the genus and species columns
+(detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
+```{r}
+
+Data[grep("aceae", Data$Genus), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Genus, FamilyCor), GenusCor = NA_character_)]
+Data[grep("aceae", Data$Species), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Species, FamilyCor), SpeciesCor = NA_character_)]
+# sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
+
+# Comment : 
+Data <- GenerateComment(Data,
+                        condition = grepl("aceae", Data$Genus) | grepl("aceae", Data$Species),
+                        comment = "Names ending in 'aceae' cannot be genus or species names")
+
+
+```
+
 
 # Orthographical error
 TNRS package é, è or œ
@@ -244,15 +264,30 @@ TPLCor[, BotanicalCorrectionSource := "The Plant List"] # create the Source
 # Join the corrected Genus and Species, by original 'ScientificNameCor'
 Data <- merge(Data, TPLCor, by.x = "ScientificNameCor", by.y = "Taxon", all.x = TRUE) #  by.x = "ScientificNameCor", by.y = "Taxon", sort = FALSE
 
+# Update correction columns
+Data[, GenusCor := ifelse(!is.na(New.Genus), New.Genus, GenusCor)]
+Data[, SpeciesCor := ifelse(!is.na(New.Species), New.Species, SpeciesCor)]
+
 
 # Comment: AREETE LA
-## if "Synonym" : 'ScientificName' is a synonym of the accepted botanical name
-## if Typo == TRUE : Orthographic error in the 'ScientificName'
+## if "Synonym" : 
+Data <- GenerateComment(Data,
+                        condition = Data$Taxonomic.status == "Synonym",
+                        comment = "'ScientificName' is a synonym of the accepted botanical name")
+## if Typo == TRUE : 
+Data <- GenerateComment(Data,
+                        condition = Data$Typo == TRUE,
+                        comment = "Spelling error in the 'ScientificName'")
+
+# Remove columns that have become useless
+Data[, c("Taxonomic.status", "Typo", "New.Genus", "New.Species") := NULL]
+
+# Expand Family info (A FAIRE, je sais pas encore comment)
 ```
 
 
 
-# Check invariant botanical informations per IdTree
+# Check invariant botanical informations per IdTree ARETE LA !
 "Family", "ScientificName", VernName"
 ```{r}
 duplicated_ID <- CorresIDs <- vector("character")
@@ -283,36 +318,27 @@ unique(Data[IdTree %in% duplicated_ID,
 
 ```
 
-# No family name in the genus and species columns
-(detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
-```{r}
-
-Data[grep("aceae", Data$Genus), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Genus, FamilyCor), GenusCor = NA_character_)]
-Data[grep("aceae", Data$Species), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Species, FamilyCor), SpeciesCor = NA_character_)]
-# sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
-
-
-```
-
 
 # Family & Scientific names match
 Recovering the Family name by Genus
-(*BIOMASS::getTaxonomy*)
+(*BIOMASS::getTaxonomy*) with APG III family
 ```{r}
 FamilyData <- 
   setDT( # as data.table
-    BIOMASS::getTaxonomy(unique(Data$Genus), findOrder = FALSE)
+    BIOMASS::getTaxonomy(unique(Data$GenusCor), findOrder = FALSE)
   )
 
 FamilyData <- setnames(FamilyData, "family", "FamilyCor") # rename columns
 
 
-Data <- merge(Data, FamilyData, by.x = "Genus", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
+Data <- merge(Data, FamilyData, by.x = "GenusCor", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
 
 # Generate a comment if the family name is incorrect
 Data <- GenerateComment(Data,
                         condition = Data[,Family] != Data[,FamilyCor],
                         comment = "The 'Family' name is incorrect")
+
+Data[Family != FamilyCor, FamilyCorSource := "APG III family"] # create the Source
 
 # Comment je gère ces différentes colonnes ? ARRETEE ICI
 ```
@@ -321,4 +347,13 @@ Data <- GenerateComment(Data,
 # Scientific & vernacular names match
 
 # Update the scientific botanical names with the current phylogenetic classification
+
+# Reformer ScientificNameCor
+Si "NA NA" -> NA_character_
+```{r}
+Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
+
+Data[, ScientificNameCor := ifelse(ScientificNameCor == "NA NA", NA_character_, ScientificNameCor)]
+
+```
 
