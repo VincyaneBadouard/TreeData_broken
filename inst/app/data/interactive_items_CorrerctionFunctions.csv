@@ -1,73 +1,314 @@
-"Label","helpText","Function","ItemID","Default","ItemType","Multiple","Options","argument","argument2","argValue","ReactiveArgValue"
-"ByStem","must be equal to TRUE if your inventory contains the stem
-level, equal to FALSE if not, and in this case the correction is done by
-tree (logical)","ErrorsDetection","ErrorsDetectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"DeathConfirmation","Number of times (censuses) needed for an unseen tree
-to be considered dead (numeric) (Default = 2 censuses)","ErrorsDetection","ErrorsDetectionDeathConfirmation","2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"UseSize","Use the size presence as a witness of the living status of the
-tree (logical) (Default = FALSE)","ErrorsDetection","ErrorsDetectionUseSize","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"MinDBH","Minimum diameter of trees inventoried according to your
-protocol (in cm) (numeric, 1 value) (Default = 10 cm)","ErrorsDetection","ErrorsDetectionMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"PositiveGrowthThreshold","in cm/year: a tree
-widening by more than this value is considered abnormal (numeric, 1 value)","ErrorsDetection","ErrorsDetectionPositiveGrowthThreshold","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"InvariantColumns","Vector with the names of the columns that are
-supposed to have always the same value for each measurement of the same
-tree (character)","StatusCorrection","StatusCorrectionInvariantColumns","c(""Site"", ""Genus"", ""Species"", ""Family"", ""ScientificName"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","FormatedColumnOptions",TRUE
-"DeathConfirmation","Number of times (censuses) needed for an unseen tree
-to be considered dead (numeric)  (Default = 2 censuses)","StatusCorrection","StatusCorrectionDeathConfirmation","2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"UseSize","Use the size presence as a witness of the living status of the
-tree (logical) (Default = FALSE)","StatusCorrection","StatusCorrectionUseSize","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"DetectOnly","TRUE: Only detect errors, FALSE: detect and correct errors
-(logical)","StatusCorrection","StatusCorrectionDetectOnly","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"RemoveRBeforeAlive","Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)","StatusCorrection","StatusCorrectionRemoveRBeforeAlive","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"RemoveRAfterDeath","After correction do you want to delete the rows
-concerning the tree after its death? (logical)","StatusCorrection","StatusCorrectionRemoveRAfterDeath","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"ByStem","must be equal to TRUE if your inventory contains the stem
-level, equal to FALSE if not, and in this case the correction is done by
-tree (logical)","DiameterCorrection","DiameterCorrectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"DefaultHOM","Default Height Of Measurement in meter (Default: 1.3 m)
-(numeric, 1 value)","DiameterCorrection","DiameterCorrectionDefaultHOM","1.3","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"MinDBH","Minimum census DBH (Diameter at the default HOM) of your
-protocol in cm (numeric, 1 value)","DiameterCorrection","DiameterCorrectionMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"MaxDBH","Maximum possible DBH (Diameter at the default HOM) of your
-stand in cm (numeric, 1 value)","DiameterCorrection","DiameterCorrectionMaxDBH","500","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"PositiveGrowthThreshold","in cm/year: a tree
-widening by more than this value is considered abnormal (numeric, 1 value)","DiameterCorrection","DiameterCorrectionPositiveGrowthThreshold","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"NegativeGrowthThreshold","in cm/census: the possible
-positive measurement error (+n) cannot be corrected until the growth
-appears abnormal, but a negative measurement error can be allowed until -n
-(a tree does not decrease). Thus the positive measurement error (+n) is
-'compensated'. (numeric, 1 value)","DiameterCorrection","DiameterCorrectionNegativeGrowthThreshold","-2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"Pioneers","Scientific names of the pioneer species of the site, as in
-the list(""ScientificName"") column (characters vector)","DiameterCorrection","DiameterCorrectionPioneers","NULL","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","FormatedScientificNameOptions",TRUE
-"PioneersGrowthThreshold","in cm/year: a tree of a pioneer species that
-widens by more than this value is considered abnormal (numeric, 1 value)","DiameterCorrection","DiameterCorrectionPioneersGrowthThreshold","7.5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"TrustMeasSet","Trust measurements set: the 'first' or the 'last' set
-(character, 1 value) (not implemented yet)","DiameterCorrection","DiameterCorrectionTrustMeasSet","c(""first"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""first"", ""last"")",FALSE
-"WhatToCorrect","Possible values: 'POM change', 'punctual', 'shift'
-(character)
-list(""\n"", list(), "" 'POM change': detect POM change in the column "", list(""POM""), "" and correct the\n"", ""Diameter values from it.\n"", list(), "" 'punctual': detect if the error is punctual and correct it by\n"", ""interpolation.\n"", list(), "" 'shift': detect if there is a shift of several Diameter values and\n"", ""links them to the trust measurements set\n"", ""("", list(""TrustMeasSet""), "" argument).\n"")","DiameterCorrection","DiameterCorrectionWhatToCorrect","c(""POM change"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""POM change"", ""punctual"", ""shift"")",FALSE
-"CorrectionType","Possible values: 'taper', 'linear', 'quadratic',
-'individual', 'phylogenetic hierarchical') (character).
-list(""\n"", list(), "" 'taper': correct for biases associated with nonstandard and changing\n"", ""measurement heights, from a taper model ("", list(""TaperParameter""), "" &\n"", list(""TaperFormula""), "" arguments).\n"", ""Correction possible only if the "", list(""HOM""), "" (Height Of Measurement)\n"", ""column is available.\n"", list(), "" 'linear': interpolation by linear regression of the individual annual\n"", ""growth over time.\n"", list(), "" 'quadratic': interpolation by quadratic regression  of the individual\n"", 
-    ""annual growth over time.\n"", list(), "" 'individual': replace abnormal growth by interpolation from the\n"", ""individual values.\n"", list(), "" 'phylogenetic hierarchical': replace abnormal growth with the average\n"", ""growth of other trees in the dataset, at the specific, genus, family\n"", ""or stand level, within a DBH range of x cm ("", list(""DBHRange""), "" argument).\n"", ""If the number of these trees < n ("", list(""MinIndividualNbr""), "" argument)\n"", ""at the specific level, we switch to the genus level etc.\n"")","DiameterCorrection","DiameterCorrectionCorrectionType","c(""taper"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""taper"", ""quadratic"", ""linear"", ""individual"", ""phylogenetic hierarchical"")",FALSE
-"DBHRange","DBH range in cm to take into account to select other trees in
-the dataset to apply 'phylogenetic hierarchical' correction (Default: 10
-cm) (numeric, 1 value)","DiameterCorrection","DiameterCorrectionDBHRange","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"MinIndividualNbr","Minimum number of individuals to take into account in
-'phylogenetic hierarchical' correction (Default: 5) (numeric, 1 value)","DiameterCorrection","DiameterCorrectionMinIndividualNbr","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"Digits","Number of decimal places to be used in the list(""DBHCor"") column
-(Default: 1L) (integer)","DiameterCorrection","DiameterCorrectionDigits","1","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"TaperParameter","Taper parameter (unitless) formula (function)
-Default: list(""TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)"")
-of Cushman et al.2021.
-With:
-list(""\n"", list(), "" "", list(""DAB""), "": Diameter Above Buttress (in cm)\n"", list(), "" "", list(""HOM""), "": Height Of Measurement (in m)\n"")","DiameterCorrection","DiameterCorrectionTaperParameter","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")",FALSE
-"TaperFormula","Taper formula (function)
-Default: list(""DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))"")
-of Cushman et al.2021.
-With:
-list(""\n"", list(), "" "", list(""DAB""), "": Diameter Above Buttress (in cm)\n"", list(), "" "", list(""HOM""), "": Height Of Measurement (in m)\n"", list(), "" "", list(""DefaultHOM""), "":  Default Height Of Measurement (in m)\n"", list(), "" "", list(""TaperParameter""), "": Taper parameter (unitless)\n"")","DiameterCorrection","DiameterCorrectionTaperFormula","list(""Default Function"" = ""function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")",FALSE
-"DetectOnly","TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)","DiameterCorrection","DiameterCorrectionDetectOnly","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"Function","Label","ItemID","Default","ItemType","Multiple","Options","argument","argument2","argValue","ReactiveArgValue"
+"ErrorsDetection","<tr valign=""top"">
+<td><code>ByStem</code></td>
+<td>
+<p>must be equal to TRUE if your inventory contains the stem
+level, equal to FALSE if not, and in this case the correction is done by
+tree (logical)</p>
+</td>
+</tr>
+","ErrorsDetectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"ErrorsDetection","<tr valign=""top"">
+<td><code>DeathConfirmation</code></td>
+<td>
+<p>Number of times (censuses) needed for an unseen tree
+to be considered dead (numeric) (Default = 2 censuses)</p>
+</td>
+</tr>
+","ErrorsDetectionDeathConfirmation","2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"ErrorsDetection","<tr valign=""top"">
+<td><code>UseSize</code></td>
+<td>
+<p>Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)</p>
+</td>
+</tr>
+","ErrorsDetectionUseSize","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"ErrorsDetection","<tr valign=""top"">
+<td><code>MinDBH</code></td>
+<td>
+<p>Minimum diameter of trees inventoried according to your
+protocol (in cm) (numeric, 1 value) (Default = 10 cm)</p>
+</td>
+</tr>
+","ErrorsDetectionMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"ErrorsDetection","<tr valign=""top"">
+<td><code>PositiveGrowthThreshold</code></td>
+<td>
+<p>in cm/year: a tree
+widening by more than this value is considered abnormal (numeric, 1 value)</p>
+</td>
+</tr>","ErrorsDetectionPositiveGrowthThreshold","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>InvariantColumns</code></td>
+<td>
+<p>Vector with the names of the columns that are
+supposed to have always the same value for each measurement of the same
+tree (character)</p>
+</td>
+</tr>
+","StatusCorrectionInvariantColumns","c(""Site"", ""Genus"", ""Species"", ""Family"", ""ScientificName"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","FormatedColumnOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>DeathConfirmation</code></td>
+<td>
+<p>Number of times (censuses) needed for an unseen tree
+to be considered dead (numeric)  (Default = 2 censuses)</p>
+</td>
+</tr>
+","StatusCorrectionDeathConfirmation","2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>UseSize</code></td>
+<td>
+<p>Use the size presence as a witness of the living status of the
+tree (logical) (Default = FALSE)</p>
+</td>
+</tr>
+","StatusCorrectionUseSize","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>DetectOnly</code></td>
+<td>
+<p>TRUE: Only detect errors, FALSE: detect and correct errors
+(logical)</p>
+</td>
+</tr>
+","StatusCorrectionDetectOnly","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>RemoveRBeforeAlive</code></td>
+<td>
+<p>Do you want to delete the rows about the tree
+before it was seen alive for the 1st time? (logical)</p>
+</td>
+</tr>
+","StatusCorrectionRemoveRBeforeAlive","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>RemoveRAfterDeath</code></td>
+<td>
+<p>After correction do you want to delete the rows
+concerning the tree after its death? (logical)</p>
+</td>
+</tr>","StatusCorrectionRemoveRAfterDeath","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>ByStem</code></td>
+<td>
+<p>must be equal to TRUE if your inventory contains the stem
+level, equal to FALSE if not, and in this case the correction is done by
+tree (logical)</p>
+</td>
+</tr>
+","DiameterCorrectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>DefaultHOM</code></td>
+<td>
+<p>Default Height Of Measurement in meter (Default: 1.3 m)
+(numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionDefaultHOM","1.3","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>MinDBH</code></td>
+<td>
+<p>Minimum census DBH (Diameter at the default HOM) of your
+protocol in cm (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>MaxDBH</code></td>
+<td>
+<p>Maximum possible DBH (Diameter at the default HOM) of your
+stand in cm (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionMaxDBH","500","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>PositiveGrowthThreshold</code></td>
+<td>
+<p>in cm/year: a tree
+widening by more than this value is considered abnormal (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionPositiveGrowthThreshold","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>NegativeGrowthThreshold</code></td>
+<td>
+<p>in cm/census: the possible
+positive measurement error (+n) cannot be corrected until the growth
+appears abnormal, but a negative measurement error can be allowed until -n
+(a tree does not decrease). Thus the positive measurement error (+n) is
+""compensated"". (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionNegativeGrowthThreshold","-2","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>Pioneers</code></td>
+<td>
+<p>Scientific names of the pioneer species of the site, as in
+the <code>ScientificName</code> column (characters vector)</p>
+</td>
+</tr>
+","DiameterCorrectionPioneers","NULL","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","FormatedScientificNameOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>PioneersGrowthThreshold</code></td>
+<td>
+<p>in cm/year: a tree of a pioneer species that
+widens by more than this value is considered abnormal (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionPioneersGrowthThreshold","7.5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>TrustMeasSet</code></td>
+<td>
+<p>Trust measurements set: the ""first"" or the ""last"" set
+(character, 1 value) (not implemented yet)</p>
+</td>
+</tr>
+","DiameterCorrectionTrustMeasSet","c(""first"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""first"", ""last"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>WhatToCorrect</code></td>
+<td>
+<p>Possible values: ""POM change"", ""punctual"", ""shift""
+(character)
+</p>
+
+<ul>
+<li>
+<p> ""POM change"": detect POM change in the column <code>POM</code> and correct the
+Diameter values from it.
+</p>
+</li>
+<li>
+<p> ""punctual"": detect if the error is punctual and correct it by
+interpolation.
+</p>
+</li>
+<li>
+<p> ""shift"": detect if there is a shift of several Diameter values and
+links them to the trust measurements set
+(<em>TrustMeasSet</em> argument).
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","DiameterCorrectionWhatToCorrect","c(""POM change"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""POM change"", ""punctual"", ""shift"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>CorrectionType</code></td>
+<td>
+<p>Possible values: ""taper"", ""linear"", ""quadratic"",
+""individual"", ""phylogenetic hierarchical"") (character).
+</p>
+
+<ul>
+<li>
+<p> ""taper"": correct for biases associated with nonstandard and changing
+measurement heights, from a taper model (<em>TaperParameter</em> &amp;
+<em>TaperFormula</em> arguments).
+Correction possible only if the <code>HOM</code> (Height Of Measurement)
+column is available.
+</p>
+</li>
+<li>
+<p> ""linear"": interpolation by linear regression of the individual annual
+growth over time.
+</p>
+</li>
+<li>
+<p> ""quadratic"": interpolation by quadratic regression  of the individual
+annual growth over time.
+</p>
+</li>
+<li>
+<p> ""individual"": replace abnormal growth by interpolation from the
+individual values.
+</p>
+</li>
+<li>
+<p> ""phylogenetic hierarchical"": replace abnormal growth with the average
+growth of other trees in the dataset, at the specific, genus, family
+or stand level, within a DBH range of x cm (<em>DBHRange</em> argument).
+If the number of these trees &lt; n (<em>MinIndividualNbr</em> argument)
+at the specific level, we switch to the genus level etc.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","DiameterCorrectionCorrectionType","c(""taper"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""taper"", ""quadratic"", ""linear"", ""individual"", ""phylogenetic hierarchical"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>DBHRange</code></td>
+<td>
+<p>DBH range in cm to take into account to select other trees in
+the dataset to apply ""phylogenetic hierarchical"" correction (Default: 10
+cm) (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionDBHRange","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>MinIndividualNbr</code></td>
+<td>
+<p>Minimum number of individuals to take into account in
+""phylogenetic hierarchical"" correction (Default: 5) (numeric, 1 value)</p>
+</td>
+</tr>
+","DiameterCorrectionMinIndividualNbr","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>Digits</code></td>
+<td>
+<p>Number of decimal places to be used in the <code>DBHCor</code> column
+(Default: 1L) (integer)</p>
+</td>
+</tr>
+","DiameterCorrectionDigits","1","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>TaperParameter</code></td>
+<td>
+<p>Taper parameter (unitless) formula (function)
+Default: <em>TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)</em>
+of Cushman et al.2021.
+With:
+</p>
+
+<ul>
+<li> <p><em>DAB</em>: Diameter Above Buttress (in cm)
+</p>
+</li>
+<li> <p><em>HOM</em>: Height Of Measurement (in m)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","DiameterCorrectionTaperParameter","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>TaperFormula</code></td>
+<td>
+<p>Taper formula (function)
+Default: <em>DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))</em>
+of Cushman et al.2021.
+With:
+</p>
+
+<ul>
+<li> <p><em>DAB</em>: Diameter Above Buttress (in cm)
+</p>
+</li>
+<li> <p><em>HOM</em>: Height Of Measurement (in m)
+</p>
+</li>
+<li> <p><em>DefaultHOM</em>:  Default Height Of Measurement (in m)
+</p>
+</li>
+<li> <p><em>TaperParameter</em>: Taper parameter (unitless)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","DiameterCorrectionTaperFormula","list(""Default Function"" = ""function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>DetectOnly</code></td>
+<td>
+<p>TRUE: Only detect errors, FALSE: detect and correct errors
+(Default: FALSE) (logical)</p>
+</td>
+</tr>","DiameterCorrectionDetectOnly","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
