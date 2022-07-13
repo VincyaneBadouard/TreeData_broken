@@ -39,7 +39,9 @@ test_that("DiameterCorrection", {
                regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
   expect_error(DiameterCorrection(TestData, TrustMeasSet = T),
-               regexp = "The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
+               regexp = "'arg' must be NULL or a character vector")
+  expect_error(DiameterCorrection(TestData, TrustMeasSet = "T"),
+               regexp = "'arg' should be one of “first”, “last”")
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
                regexp = "The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
