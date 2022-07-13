@@ -6,10 +6,22 @@ test_that("RequiredFormat", {
   Data <- ParacouSubset
   input <- ParacouProfile
 
-  expect_warning(DataFormated <- RequiredFormat(Data, input ), "MinDBH was calculated")
+  expect_warning(expect_warning(expect_warning(
+    DataFormated <- RequiredFormat(Data, input ),
+    "MinDBH was calculated"),
+    "You did not provide a Census ID column"),
+    "You are missing stemIDs"
+  )
+
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
+
+  # make sure no IdStem is NA
+  expect_false(any(is.na(DataFormated$IdStem)))
+
+  # make sure all IdStem has _auto
+  expect_true(all(grepl("_auto", DataFormated$IdStem)))
 
   # make sure Diameter or Circ units were converted correctly
   if(!input$Diameter %in% "none")   expect_equal(DataFormated$Diameter, Data[,input$Diameter] * switch(input$DiameterUnitMan , mm = 0.1, cm = 1, dm = 10, m = 100))
@@ -29,7 +41,10 @@ test_that("RequiredFormat", {
 
 
   # cAREFULL, EDITING DATA OR INPUT AFTER THIS LINE #
- input$MinDBHMan = 1 # adding this so we don't get warnings
+  input$MinDBHMan = 1 # adding this so we don't get warnings
+  input$IdStem = input$IdTree # adding this so we don't get warnings
+  input$IdCensus = input$Year # adding this so we don't get warnings
+
   # expect error is size units are not correct
   input$DiameterUnitMan = input$CircUnitMan = "centimeter"
 
@@ -57,6 +72,8 @@ test_that("RequiredFormat", {
   expect_error(expect_warning(RequiredFormat(Data, input ))) # don't expect the warning anymore
 
   # expect IdTree to be filled with "auto" if is NA
+  input$IdStem <- "IdStem"
+  Data$IdStem <- Data$idTree
   Data[, input$IdTree][sample(10)] <- NA
 
   expect_warning(expect_true(all(grepl("_auto", RequiredFormat(Data, input )$IdTree[is.na(Data[, input$IdTree])]))), "You are missing treeIDs")
@@ -93,6 +110,7 @@ test_that("RequiredFormat", {
   input$PlotMan <- ParacouProfile$PlotMan
   input$SubPlot <- ParacouProfile$SubPlot
   input$SubPlotMan <- ParacouProfile$SubPlotMan
+  Data$idTree <- ParacouSubset$idTree
 
 
 
@@ -285,7 +303,7 @@ input$SubPlotAreaUnitMan <- "ha"
   input$DateFormatMan = input$DateFormat
   input$DateFormat = NULL
 
-  DataFormated <- RequiredFormat(Data, input )
+  expect_warning(DataFormated <- RequiredFormat(Data, input), "we are using your tree field tag to construct the tree ID. And since some of your  tree field tag are NAs, we will automatically")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))

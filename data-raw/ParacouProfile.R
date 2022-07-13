@@ -74,14 +74,13 @@ if (!interactive()) {
                            "Yutm"),
       Variablecolumns3 = c("Lat", "Lon"),
       VernName = "VernName",
-      Xplot = "Xfield",
+      Xplot = "none",
       Xsubplot = "none",
-      Xutm = "Xutm",
       Xutm = "Xutm",
       Year = "CensusYear",
       YearMan = -999,
       Yfield = "Yfield",
-      Yplot = "Yfield",
+      Yplot = "none",
       Ysubplot = "none",
       Yutm = "Yutm"
     )

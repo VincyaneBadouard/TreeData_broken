@@ -73,14 +73,13 @@ A named list
 \item{Variablecolumns2}{Some value entered via interaction with the Shiny app}
 \item{Variablecolumns3}{Some value entered via interaction with the Shiny app}
 \item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
-\item{Xplot}{Value or column name in data set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
+\item{Xplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in plot}
 \item{Xsubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in SUBplot}
-\item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
 \item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
 \item{Year}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Year of measurement}
 \item{YearMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your year of measurement?}
 \item{Yfield}{Some value entered via interaction with the Shiny app}
-\item{Yplot}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
+\item{Yplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in plot}
 \item{Ysubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in SUBplot}
 \item{Yutm}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
 ...

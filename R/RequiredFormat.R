@@ -78,6 +78,7 @@ RequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
+
   idx <- match(gsub("[[:punct:]]| ", "", colnames(Data)), gsub("[[:punct:]]| ", "", input[x$ItemID]))
 
   colnames(Data) <- names(input[x$ItemID])[idx]
@@ -85,8 +86,17 @@ RequiredFormat <- function(
   ## delete columns we don't want
   Data[which(is.na(idx))] <- NULL
 
+
   ## add columns missing
   Data[, setdiff(gsub("[[:punct:]]| ", "", x$ItemID[x$RequiredColumn]), gsub("[[:punct:]]| ", "", colnames(Data)))] <- NA
+
+  ## deal with case where one column represents more than one thing
+  DoubleFctColumn <- input[names(input) %in% x$ItemID[x$RequiredColumn] & !input %in% "none" & input %in% input[duplicated(input)]]
+
+  for(j in names(DoubleFctColumn)) {
+    if(all(is.na(Data[, j]))) Data[, j] <- Data[, names(DoubleFctColumn[DoubleFctColumn %in% DoubleFctColumn[[j]] & !names(DoubleFctColumn) %in% j])]
+  }
+
 
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environemnt
@@ -194,7 +204,16 @@ RequiredFormat <- function(
 
   }
 
- ## Site, Plote, subplot
+  ## IdCensus
+
+  if(input$IdCensus %in% "none") {
+
+    warning("You did not provide a Census ID column. We will use year as census ID")
+
+    Data$IdCensus <- as.character(Data$Year)
+  }
+
+ ## Site, Plot, subplot
   if (input$Site %in% "none") {
     if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will consider you have only one site called 'SiteA'")
 
@@ -224,50 +243,63 @@ RequiredFormat <- function(
     if(input$IdTree %in% "none") Data$IdTree <- NA
 
     if (input$TreeFieldNum %in% "none") {
-      if(input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, nore Census ID, so we are considering that each row without a tree ID refers to one unique tree.")
-        Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto") ]
-      }
-      if(!input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a census ID refers to one unique tree. This is assuming the order of your trees is consistent accross censuses.")
 
+        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
         Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  , by = .(IdCensus)]
-      }
+
     }
 
     # if we have TreeFieldNum, we use it
 
     if (!input$TreeFieldNum %in% "none") {
-      if(input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column Census ID. But you did specify a column for tree tag, so we are considering that each row without a tree ID within a Site, plot and subplot refers to one unique tree, and we are using your tree field number to construct the tree ID.")
-        Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_")]
+
+        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
+
+      if(any(is.na(Data$TreeFieldNum))) {
+        Data[is.na(TreeFieldNum), TreeFieldNum := paste0(seq(1, .N), "_auto") , by = .(Site, Plot, SubPlot, IdCensus)]
       }
 
-      if(!input$IdCensus %in% "none") {
-        warning("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specify a column for tree tag and census ID, so we are considering that each row within a Site, plot, subplot and census ID refers to one unique tree, and we are using your tree field number to construct the tree ID.")
-        Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
-      }
+      Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
+
+      Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
+
     }
 
 
   }
 
-  # if (!input$IdTree %in% "none" & any(is.na(Data$IdTree))) {
-  #
-  #   # if there is an IdTree but some IDs are NA --> fill those with unique values  - This patch is to handle ForestPlot data, where they have stem level information, so each stem gets a stemID, and IdTree is the stem group ID. if a stem is alone, its stem group ID is NA, so there are some NA's in IdTree.
-  #  if(input$IdCensus %in% "none") {
-  #    warning("You have some IdTree that are missing and you did not specify a column for Census ID, so we are considering that each row, with a missing IdTree refers to one unique tree.")
-  #
-  #    Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  ]
-  #    }
-  #  if(!input$IdCensus %in% "none") {
-  #    warning("You have some IdTree that are missing so we are considering that each row within a census ID refers to one unique tree. This is assuming the order of your trees is consistent accross censuses.")
-  #
-  #    Data[is.na(IdTree), IdTree := paste0(seq(1, .N), "_auto") , by = .(IdCensus)]
-  #  }
-  #
-  #
-  # }
+  ## IdStem (unique along IdCensus) ####
+
+  if (input$IdStem %in% "none" | any(is.na(Data$IdStem))) {
+
+    # if we also don't have StemFieldNum, we are just considering that each row within a plot and subplot  and tree is one stem
+    if(input$IdStem %in% "none") Data$IdStem <- NA
+
+    if (input$StemFieldNum %in% "none") {
+
+        warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
+        Data[is.na(IdStem), IdStem := paste0(.(IdTree), "_", seq(1, .N), "_auto"), by = .(IdCensus, IdTree)]
+
+    }
+
+    # if we have TreeFieldNum, we use it
+
+    if (!input$StemFieldNum %in% "none") {
+
+        warning("You are missing stemIDs (either you are missing some tree IDs or you  did not specify a column for stem IDs). But you did specify a column for stem tags, so we are considering that each stem field number within a tree refers to a unique stem and are using your stem field number to construct the stem ID.", ifelse(any(is.na(Data$StemFieldNum)), "And since some of your stem field tags are NAs, we will automatically generating those assuming assuming that the order of each stem within a tree is consistent across censuse.", ""))
+
+      if(any(is.na(Data$StemFieldNum))) {
+        Data[is.na(StemFieldNum), StemFieldNum := paste0(seq(1, .N), "_auto") , by = .(IdCensus, IdTree)]
+      }
+
+        Data[is.na(IdStem), IdStem := paste(IdTree, StemFieldNum, "auto", sep = "_"), by = .(IdCensus)]
+
+    }
+
+
+  }
+
+
   ## Genus, Species, ScientificNameSepMan ####
 
   ### Genus and species if we have ScientificName and ScientificNameSepMan
