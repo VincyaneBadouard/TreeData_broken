@@ -90,7 +90,7 @@ links them to the trust measurements set
 }}
 
 \item{CorrectionType}{Possible values: "taper", "linear", "quadratic",
-"individual", "phylogenetic hierarchical") (character).
+"individual", "phylogenetic hierarchical" (character).
 \itemize{
 \item "taper": correct for biases associated with nonstandard and changing
 measurement heights, from a taper model (\emph{TaperParameter} &

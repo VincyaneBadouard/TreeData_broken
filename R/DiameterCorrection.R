@@ -57,7 +57,7 @@
 #'              (*TrustMeasSet* argument).
 #'
 #' @param CorrectionType Possible values: "taper", "linear", "quadratic",
-#'   "individual", "phylogenetic hierarchical") (character).
+#'   "individual", "phylogenetic hierarchical" (character).
 #'   - "taper": correct for biases associated with nonstandard and changing
 #'              measurement heights, from a taper model (*TaperParameter* &
 #'              *TaperFormula* arguments).
@@ -176,7 +176,6 @@ DiameterCorrection <- function(
 
   # TrustMeasSet
   TrustMeasSet <- match.arg(TrustMeasSet)
-  if(!TrustMeasSet %in% c("first", "last")) stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
 
   # WhatToCorrect
   if(!any(WhatToCorrect %in% "POM change" | WhatToCorrect %in% "punctual"| WhatToCorrect %in% "shift"))
