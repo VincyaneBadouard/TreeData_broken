@@ -175,8 +175,8 @@ DiameterCorrection <- function(
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # TrustMeasSet
-  if(!any(TrustMeasSet %in% "first" || TrustMeasSet %in% "last"))
-    stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
+  TrustMeasSet <- match.arg(TrustMeasSet)
+  if(!TrustMeasSet %in% c("first", "last")) stop("The 'TrustMeasSet' argument value must be equal to 'first' or 'last'")
 
   # WhatToCorrect
   if(!any(WhatToCorrect %in% "POM change" | WhatToCorrect %in% "punctual"| WhatToCorrect %in% "shift"))
