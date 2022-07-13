@@ -873,7 +873,16 @@ server <- function(input, output, session) { # server ####
       unique(xCorr$Function),
       FUN = function(f){
         if(input[[f]] %in% "Yes") {
-          cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(xCorr$Label[xCorr$Function %in% f], "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
+          # cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]), "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
+          cl <- paste0(f, "(", paste("Data = Rslt,", gsub("list\\(", "", paste(deparse(set_names(reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]], gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]))), collapse = ""))))
+          cl <- gsub('"FALSE"', "FALSE", cl)
+          cl <- gsub('"TRUE"', "TRUE", cl)
+          cl <- gsub('\"function', "function", cl)
+          cl <- gsub(')\"', ")", cl)
+          cl <- gsub(' (\\d*)L', " \\1", cl)
+
+          cl <- str2lang(str2lang(deparse(cl)))
+
           Rslt <<- eval(cl)
 
 

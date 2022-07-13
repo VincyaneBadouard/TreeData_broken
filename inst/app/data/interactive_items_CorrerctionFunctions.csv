@@ -195,7 +195,7 @@ links them to the trust measurements set
 <td><code>CorrectionType</code></td>
 <td>
 <p>Possible values: ""taper"", ""linear"", ""quadratic"",
-""individual"", ""phylogenetic hierarchical"") (character).
+""individual"", ""phylogenetic hierarchical"" (character).
 </p>
 
 <ul>
