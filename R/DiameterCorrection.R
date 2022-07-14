@@ -188,7 +188,7 @@ DiameterCorrection <- function(
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
   # Digits
-  if(!inherits(Digits, "integer"))  {
+  if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
      warning(paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
     Digits <- as.integer(Digits)
   }
