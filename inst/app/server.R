@@ -975,6 +975,8 @@ server <- function(input, output, session) { # server ####
       shinyjs::show("CodeTranslationsDiv")
       output$uiCodeTranslations <-  renderUI({
         div(DTOutput("CodeTranslationTable"),
+            br(),
+            br(),
             DTOutput("CodeTranslationFinal"),
             actionBttn(
               inputId = "ApplyCodeTranslation",
@@ -1072,8 +1074,8 @@ server <- function(input, output, session) { # server ####
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
-    datatable(CodeTranslationFinal$output)
-  }, options = list( paging = FALSE))
+    datatable(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], options = list( paging = FALSE, scrollX=TRUE))
+  })
 
 
   observeEvent(input$DontUseProfileOuput, {
