@@ -541,7 +541,8 @@ tabItem("Codes",
 
         # uiOutput("uiCodes"),
         br(),
-        DTOutput("CodeTable", height =  "600px")
+        box(width = NULL,
+            DTOutput("CodeTable", height =  "600px"))
         # tags$hr(),
         # h2("Edited table:"),
         # tableOutput("NewCodeTable")

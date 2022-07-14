@@ -798,13 +798,15 @@ server <- function(input, output, session) { # server ####
 
   output[["CodeTable"]] <- renderDT({
     datatable(
-      data = AllCodes(),
+      data =
+        AllCodes(),
       selection = "none",
       escape = FALSE,
       rownames = FALSE,
       container = FotterWithHeader(AllCodes()),
       options = list(
         paging = F,
+        searching = F,
         initComplete = JS(js),
         preDrawCallback = JS(
           "function() { Shiny.unbindAll(this.api().table().node()); }"
