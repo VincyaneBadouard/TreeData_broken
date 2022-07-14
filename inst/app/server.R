@@ -975,14 +975,14 @@ server <- function(input, output, session) { # server ####
       shinyjs::show("CodeTranslationsDiv")
       output$uiCodeTranslations <-  renderUI({
         div(DTOutput("CodeTranslationTable"),
-            DTOutput("CodeTranslationFinal")
-        # actionBttn(
-        #   inputId = "btnProcess",
-        #   label = "Process",
-        #   style = "float",
-        #   size = "sm",
-        #   color = "success"
-        # )
+            DTOutput("CodeTranslationFinal"),
+            actionBttn(
+              inputId = "ApplyCodeTranslation",
+              label = "Apply Code Translation",
+              style = "float",
+              size = "sm",
+              color = "success"
+            )
         )
         })
 
@@ -1014,10 +1014,11 @@ server <- function(input, output, session) { # server ####
           data = cbind(AllCodesInput$Column, CodeTranslationTable),
           selection = 'none',
           escape = FALSE,
-          extensions = 'RowGroup',
+          extensions = c('RowGroup', 'FixedColumns'),
           options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
                          rowGroup = list(dataSrc=c(1)),
-                         columnDefs = list(list(visible=FALSE, targets=c(1)))),
+                         columnDefs = list(list(visible=FALSE, targets=c(1))),
+                         fixedColumns = list(leftColumns = 1)),
        container = sketch,
         callback = JS("table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
@@ -1049,7 +1050,9 @@ server <- function(input, output, session) { # server ####
 
     profileOutput(profileOutput)
     # CodeTranslationTable(CodeTranslationTable)
-    CodeTranslationFinal$dt <- data.frame(input = rownames(CodeTranslationTable))
+    CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
+                                          InputValue = AllCodesInput$Value,
+                                          InputDefinition = AllCodesInput$Definition)
 
   })
 
@@ -1058,9 +1061,12 @@ server <- function(input, output, session) { # server ####
   # CodeTranslationFinal <- reactiveVal(data.frame(input = rownames(CodeTranslationTable), output = colnames(CodeTranslationTable)))
 
   observe({
-    req(CodeTranslationFinal$dt$input)
+    req(CodeTranslationFinal$dt$InputValue)
     dt <- CodeTranslationFinal$dt
-    dt$output <- sapply(CodeTranslationFinal$dt$input, function(x) input[[x]])
+    dt$OutputValue <- sapply(dt$InputValue, function(x) input[[x]])
+    dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, profileOutput()$AllCodes$Value)]
+    dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, profileOutput()$AllCodes$Value)]
+
     CodeTranslationFinal$output <- dt
   })
 
