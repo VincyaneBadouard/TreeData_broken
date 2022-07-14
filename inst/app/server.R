@@ -11,6 +11,14 @@ firstUpper <- function(x) {
   x
 }
 
+# my function to repeat headers at bottom
+FotterWithHeader <- function(x) {
+  paste0("<table>",
+         tableHeader(x),
+         tableFooter(x),"</table>"
+  )
+}
+
 # read in csv file that has all we want to show in app
 xall <- read.csv("data/interactive_items.csv")
 x <- xall[xall$Activate, ]
@@ -171,9 +179,13 @@ server <- function(input, output, session) { # server ####
   })
 
   observe({
-    req(Data)
+    req(Data()[[1]])
+
+    cnames = lapply(Data(), colnames)
+
     lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]] , rownames = FALSE,
                                                               options = list(pageLength = 8, scrollX=TRUE),
+                                                              container = FotterWithHeader(Data()[[i]]),
                                                               selection = "none")
     )
   })
@@ -212,6 +224,7 @@ server <- function(input, output, session) { # server ####
 
     output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
                                      options = list(pageLength = 8, scrollX=TRUE),
+                                     container = FotterWithHeader(StackedTables()),
                                      selection = "none")
 
     output$StackedTablesSummary <- renderPrint(summary(StackedTables()))
@@ -366,6 +379,7 @@ server <- function(input, output, session) { # server ####
 
     output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE),
+                                    container = FotterWithHeader(MergedTables()),
                                     selection = "none")
 
 
@@ -461,6 +475,7 @@ server <- function(input, output, session) { # server ####
 
     output$TidyTable <- renderDT(TidyTable(), rownames = FALSE,
                                  options = list(pageLength = 8, scrollX=TRUE),
+                                 container = FotterWithHeader(TidyTable()),
                                  selection = "none")
 
     output$TidyTableSummary <- renderPrint(summary(TidyTable()))
@@ -729,6 +744,7 @@ server <- function(input, output, session) { # server ####
   # Visualize output
   output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
                                    options = list(pageLength = 8, scrollX=TRUE),
+                                   container = FotterWithHeader(DataFormated()),
                                    selection = "none")
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
@@ -786,6 +802,7 @@ server <- function(input, output, session) { # server ####
       selection = "none",
       escape = FALSE,
       rownames = FALSE,
+      container = FotterWithHeader(AllCodes()),
       options = list(
         paging = F,
         initComplete = JS(js),
@@ -903,6 +920,7 @@ server <- function(input, output, session) { # server ####
 
   output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE),
+                                    container = FotterWithHeader(DataCorrected()),
                                     selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
@@ -985,7 +1003,7 @@ server <- function(input, output, session) { # server ####
         }
       }
 
-      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead></table>"))
+      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>"))
 
 
 
@@ -1045,7 +1063,7 @@ server <- function(input, output, session) { # server ####
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
-    datatable(CodeTranslationFinal$output)
+    datatable(CodeTranslationFinal$output, container = FotterWithHeader(CodeTranslationFinal$output),)
   }, options = list( paging = FALSE))
 
 
@@ -1064,6 +1082,7 @@ server <- function(input, output, session) { # server ####
   # Visualize output
   output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
                                 options = list(pageLength = 8, scrollX=TRUE),
+                                container = FotterWithHeader(DataOutput()),
                                 selection = "none")
 
   output$DataOutputSummary <- renderPrint(summary(DataOutput()))
