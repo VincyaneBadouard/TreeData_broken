@@ -1058,6 +1058,7 @@ server <- function(input, output, session) { # server ####
   # CodeTranslationFinal <- reactiveVal(data.frame(input = rownames(CodeTranslationTable), output = colnames(CodeTranslationTable)))
 
   observe({
+    req(CodeTranslationFinal$dt$input)
     dt <- CodeTranslationFinal$dt
     dt$output <- sapply(CodeTranslationFinal$dt$input, function(x) input[[x]])
     CodeTranslationFinal$output <- dt
@@ -1065,7 +1066,7 @@ server <- function(input, output, session) { # server ####
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
-    datatable(CodeTranslationFinal$output, container = FotterWithHeader(CodeTranslationFinal$output),)
+    datatable(CodeTranslationFinal$output)
   }, options = list( paging = FALSE))
 
 
