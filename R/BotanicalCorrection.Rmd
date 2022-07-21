@@ -13,17 +13,19 @@ Trouver des packages de :
 + détéction de **special characters**,
 + pour **réccupérer la famille** à partir du scientific name,
 + et de **update** selon phylogenetic classification
+(*TNRS package*)
 
 Return: ... and fill the 'Comment' column
 
 Details:
-- No special characters (typography) (*TNRS package*)
+- No special characters (typography) 
 - No family name in the genus and species columns (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?) (sort(unique(data[grep("aceae", data$genus), genus]))))  
 - Correct spelling of botanical names (*Taxonstand::TPL*)
-- Check **invariant botanical informations per IdTree** (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
 - Family & Scientific names match (*BIOMASS::getTaxonomy*)
-- Scientific & vernacular names match
+- Scientific & vernacular names match (Bad idea?)
 - Update the scientific botanical names with the current phylogenetic classification
+- Check **invariant botanical informations per IdTree** (1 IdTree = 1 family, 1 scientific and 1 vernacular name)  
+
 
 + **add the correction source!** : 'BotanicalCorrectionSource' column
 
@@ -77,6 +79,10 @@ Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4),
 Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4))]
 Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4))]
 
+# Scientific-vernacular names match table (data.frame) : ScientificVernaTable
+ScientificVernaTable <- copy(Data)
+ScientificVernaTable <- unique(ScientificVernaTable[, list(Genus, Species, VernName)])
+
 # Create errors
 
 ## Missing value in  Family, ScientificName/Genus, species, VernName
@@ -84,12 +90,13 @@ Data[IdTree %in% "d" & Year %in% 2000, ("Family") := NA_character_]
 Data[IdTree %in% "b" & Year %in% 2000, ("Genus") := NA_character_]
 Data[IdTree %in% "b", ("Family") := NA_character_]
 Data[IdTree %in% "c" & Year %in% 2000, ("Species") := NA_character_]
+Data[IdTree %in% "a" & Year %in% 2000, ("VernName") := NA_character_]
 Data[IdTree %in% "d" & Year %in% 2000, ("VernName") := NA_character_]
 
 
 
+
 ## Special characters
-Data[IdTree %in% "a" & Year %in% 2003, ("VernName") := "Angélique"] # good answer: "angelique"
 Data[IdTree %in% "a", ("Family") := "Fabacé"] # good answer: "Fabaceae"
 Data[IdTree %in% "c" & Year %in% 2003, ("Genus") := "Licanï_a"] # good answer: "Licania"
 
@@ -103,7 +110,7 @@ Data[IdTree %in% "b", ("Species") := "Lecythidaceae"] # good answer: "sagotiana"
 Data[IdTree %in% "c", ("Family") := "Lecythidaceae"] # good answer: "Chrysobalanaceae"
 
 ## Scientific & vernacular names unmatch
-Data[IdTree %in% "d" & Year %in% 2003, ("VernName") := "leaf"]  # good answer: "wapa"
+Data[IdTree %in% "d" & Year %in% 2001, ("VernName") := "leaf"]  # good answer: "wapa"
 
 ## Old scientific name (A trouver)
 
@@ -117,7 +124,7 @@ Data[, ScientificName := paste(Genus, Species)]
 
 # Corrected columns initialisation
 ```{r}
-Data[, FamilyCor := Family]
+# Data[, FamilyCor := Family]
 Data[, GenusCor := Genus]
 Data[, SpeciesCor := Species]
 ```
@@ -146,15 +153,15 @@ for (v in 1:length(Vars)) {
 Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
 ```{r}
 
-Data[, FamilyCor := gsub("[[:punct:]]", "", Data$FamilyCor)]
+# Data[, FamilyCor := gsub("[[:punct:]]", "", Data$FamilyCor)]
 Data[, GenusCor := gsub("[[:punct:]]", "", Data$GenusCor)]
 Data[, SpeciesCor := gsub("[[:punct:]]", "", Data$SpeciesCor)]
 
 # Comment :
 
-Data <- GenerateComment(Data,
-                        condition = grepl('[[:punct:]]', Data$Family), # TRUE if there are any special character
-                        comment = "Special characters in the 'Family'")
+# Data <- GenerateComment(Data,
+#                         condition = grepl('[[:punct:]]', Data$Family), # TRUE if there are any special character
+#                         comment = "Special characters in the 'Family'")
 
 Data <- GenerateComment(Data,
                         condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character
@@ -169,9 +176,10 @@ Data <- GenerateComment(Data,
 # No family name in the genus and species columns
 (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
 ```{r}
+Data[, GenspFamily := NA_character_]
 
-Data[grep("aceae", Data$Genus), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Genus, FamilyCor), GenusCor = NA_character_)]
-Data[grep("aceae", Data$Species), `:=`(FamilyCor = ifelse(is.na(FamilyCor), Species, FamilyCor), SpeciesCor = NA_character_)]
+Data[grep("aceae", Data$Genus), `:=`(GenspFamily = ifelse(is.na(Family), Genus, GenspFamily), GenusCor = NA_character_)]
+Data[grep("aceae", Data$Species), `:=`(GenspFamily = ifelse(is.na(Family), Species, GenspFamily), SpeciesCor = NA_character_)]
 # sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
 
 # Comment : 
@@ -254,10 +262,9 @@ TPLCor <- Taxonstand::TPL(unique(Data$ScientificNameCor), corr = TRUE, diffchar 
 
 setDT(TPLCor) # df to dt
 
-# Take only corrected names. Columns: New.Genus, New.Species, Family, Typo
+# Take only corrected names. Columns: New.Genus, New.Species, Typo. Not Family because it is outdated.
 TPLCor <- TPLCor[New.Genus != Genus | New.Species != Species,]
-TPLCor <- TPLCor[, list(Taxonomic.status, Typo, Family, Taxon, New.Genus, New.Species)]
-TPLCor <- setnames(TPLCor, "Family", "New.Family") # rename columns
+TPLCor <- TPLCor[, list(Taxonomic.status, Typo, Taxon, New.Genus, New.Species)]
 TPLCor[, BotanicalCorrectionSource := "The Plant List"] # create the Source
 
 
@@ -282,42 +289,7 @@ Data <- GenerateComment(Data,
 # Remove columns that have become useless
 Data[, c("Taxonomic.status", "Typo", "New.Genus", "New.Species") := NULL]
 
-# Expand Family info (A FAIRE, je sais pas encore comment)
 ```
-
-
-
-# Check invariant botanical informations per IdTree ARETE LA !
-"Family", "ScientificName", VernName"
-```{r}
-duplicated_ID <- CorresIDs <- vector("character")
-
-# For each site
-for (s in unique(na.omit(Data$Site))) {
-  
-  BotaIDCombination <- na.omit(unique(
-    Data[Data$Site == s, .(IdTree, Family, ScientificName, VernName)]
-  ))
-  
-  CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
-  
-  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
-    
-    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
-    
-    Data <- GenerateComment(Data,
-                            condition =
-                              Data[,Site] == s
-                            & Data[,IdTree] %in% duplicated_ID,
-                            comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
-  }
-} # end site loop
-
-unique(Data[IdTree %in% duplicated_ID,
-            .(IdTree = sort(IdTree), Family, ScientificName, VernName, Comment)]) # to check 
-
-```
-
 
 # Family & Scientific names match
 Recovering the Family name by Genus
@@ -338,15 +310,84 @@ Data <- GenerateComment(Data,
                         condition = Data[,Family] != Data[,FamilyCor],
                         comment = "The 'Family' name is incorrect")
 
-Data[Family != FamilyCor, FamilyCorSource := "APG III family"] # create the Source
+Data[Family != FamilyCor | (is.na(Family) & !is.na(FamilyCor)), FamilyCorSource := "APG III family"] # create the Source
 
-# Comment je gère ces différentes colonnes ? ARRETEE ICI
+# If no Family corr with APG because no genus, previously with -aceae, take this name put in GenspFamily
+Data[is.na(FamilyCor) & !is.na(GenspFamily), `:=`(FamilyCor = GenspFamily,
+                                                  FamilyCorSource = "Found in the 'Genus' or 'Species' column")]
+
+Data[, GenspFamily := NULL]
+
 ```
 
 
-# Scientific & vernacular names match
+# Scientific & vernacular names match (Bad idea?)
+```{r}
+# ScientificVernaTable <- setnames(ScientificVernaTable, "VernName", "VernNameCor") # rename columns
+# 
+# 
+# Data <- merge(Data, ScientificVernaTable, by.x = c("GenusCor", "SpeciesCor"), by.y = c("Genus", "Species"),  all.x = TRUE)
+# Data[!is.na(VernNameCor), VernNameCorSource := "ScientificVernaTable"] # create the Source
+# 
+# # Generate a comment if the family name is incorrect
+# Data <- GenerateComment(Data,
+#                         condition = Data[,VernName] != Data[,VernNameCor],
+#                         comment = "The 'VernName' name is incorrect")
+# 
+# # Quand encore NA dans VernNameCor, et soit pas de genre, soit pas d'espèce, mettre VernName ?
+# Data[is.na(VernNameCor) & (is.na(GenusCor) | is.na(SpeciesCor)), VernNameCor := VernName]
 
-# Update the scientific botanical names with the current phylogenetic classification
+
+```
+
+
+# Update the scientific botanical names with the current phylogenetic classification (WorldFlora package)
+
+# Per IdTree, the same Family, Genus, Species, Vernacular name
+```{r}
+Data[, VernNameCor := VernName]
+
+BotaCols <- c("FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor")
+
+# Give the unique value (if it is unique) of the IdTree
+for(j in BotaCols){
+Data[,  (j) := ifelse(is.na(get(j)) & length(na.omit(unique(get(j)))) == 1, na.omit(unique(get(j))), get(j)), keyby = IdTree]
+}
+
+```
+
+
+# Check invariant botanical informations per IdTree
+"FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor"
+```{r}
+duplicated_ID <- CorresIDs <- vector("character")
+
+# For each site
+for (s in unique(na.omit(Data$Site))) {
+  
+  BotaIDCombination <- na.omit(unique(
+    Data[Data$Site == s, .(IdTree, FamilyCor, GenusCor, SpeciesCor, VernNameCor)]
+  ))
+  
+  CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+  
+  if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+    
+    duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+    
+    Data <- GenerateComment(Data,
+                            condition =
+                              Data[,Site] == s
+                            & Data[,IdTree] %in% duplicated_ID,
+                            comment = "Different botanical informations (Family, ScientificName or VernName) for a same IdTree")
+  }
+} # end site loop
+
+unique(Data[IdTree %in% duplicated_ID,
+            .(IdTree = sort(IdTree), FamilyCor, GenusCor, SpeciesCor, VernNameCor)]) # to check 
+
+```
+
 
 # Reformer ScientificNameCor
 Si "NA NA" -> NA_character_

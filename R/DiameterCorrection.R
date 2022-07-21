@@ -104,8 +104,9 @@
 #'   (Default: FALSE) (logical)
 #'
 #' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns: - *DBHCor*: corrected trees diameter at
-#'   default HOM - *DiameterCorrectionMeth* =
+#'   *DetectOnly* = FALSE, add columns:
+#'   - *DBHCor*: corrected trees diameter at default HOM
+#'   - *DiameterCorrectionMeth* =
 #'   "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
 #'
 #' @export
