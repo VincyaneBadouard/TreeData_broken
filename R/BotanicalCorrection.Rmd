@@ -122,7 +122,7 @@ Data[, ScientificName := paste(Genus, Species)]
 
 # Check args
 
-# Corrected columns initialisation
+# Corrected columns initialisation (pas nécessaire si j'utilise WorldFlora)
 ```{r}
 # Data[, FamilyCor := Family]
 Data[, GenusCor := Genus]
@@ -149,7 +149,7 @@ for (v in 1:length(Vars)) {
 ```
 
 
-# Special characters
+# Special characters (pas nécessaire si j'utilise WorldFlora)
 Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
 ```{r}
 
@@ -173,7 +173,7 @@ Data <- GenerateComment(Data,
 
 ```
 
-# No family name in the genus and species columns
+# No family name in the genus and species columns (pas nécessaire si j'utilise WorldFlora)
 (detection of the suffix "aceae" in the genus and species columns (it is specific to the family name) -> Comment (+transfer to the Family column?)
 ```{r}
 Data[, GenspFamily := NA_character_]
@@ -342,6 +342,39 @@ Data[, GenspFamily := NULL]
 
 
 # Update the scientific botanical names with the current phylogenetic classification (WorldFlora package)
+Télécharger la dernière version de la base de donnée : http://www.worldfloraonline.org/downloadData.
+
+```{r}
+# library(readr)
+# WFO_Backbone <- read_delim("C:/Users/Utilisateur/Downloads/WFO_Backbone/classification.txt",
+#     delim = "\t", escape_double = FALSE, 
+#     trim_ws = TRUE)
+# setDT(WFO_Backbone)
+# WFO_Backbone[is.na(WFO_Backbone), ] <- ""  
+# usethis::use_data(WFO_Backbone, overwrite = TRUE)
+
+# data(WFO_Backbone)
+# 
+# ScientificNames <- unique(Data[, list(ScientificName)])
+# setnames(ScientificNames, "ScientificName", "spec.name")
+# 
+# WFmatch <- WorldFlora::WFO.match(spec.data = ScientificNames, WFO.data = WFO_Backbone) # (très long)
+# 
+# WFmatch <- WFmatch[, list(taxonomicStatus, spec.name, scientificName, family)]
+# 
+# 
+# WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
+# WFmatch[, BotanicalCorrectionSource := "World Flora Online"] # create the Source
+# 
+# 
+# # Join the corrected Genus and Species, by original 'ScientificNameCor'
+# Data <- merge(Data, WFmatch, by.x = "ScientificName", by.y = "spec.name", all.x = TRUE)
+# 
+# setnames(Data, c("scientificName", "family"), c("ScientificNameCor", "FamilyCor"))
+
+
+```
+
 
 # Per IdTree, the same Family, Genus, Species, Vernacular name
 ```{r}
