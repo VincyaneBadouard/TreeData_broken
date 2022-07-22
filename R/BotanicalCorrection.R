@@ -9,6 +9,16 @@
 #'   - `VernName` (character)
 #'   - `ScientificName` (character)
 #'
+#'
+#'@param Source (character) To correct and standardise, you can choose between:
+#'  - "TPL": *The Plant List* (http://www.theplantlist.org/) (faster but based
+#'           on the 2013 taxonomy)
+#'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
+#'           but based on the 2022 taxonomy)
+#'
+#' @param WFOData A static copy of the World Flora Online (WFO) Taxonomic
+#'   Backbone data (from http://www.worldfloraonline.org/downloadData.)
+#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
@@ -24,6 +34,17 @@
 #'   - `VernNameCor` (character): completed if information available at `IdTree`
 #'       level.
 #'
+#'@details
+#' - No special characters (typography)
+#' - No family name in the Genus and Species columns (the suffix "aceae" is
+#'     specific to the family name.
+#' - Correct spelling of botanical names (*Taxonstand or WorldFlora*)
+#' - Family & Scientific names match (*BIOMASS::getTaxonomy or WorldFlora*)
+#' - Update the scientific botanical names with the current phylogenetic
+#'     classification
+#' - Check **invariant botanical informations per IdTree** (1 IdTree = 1 family,
+#'     1 scientific and 1 vernacular name)
+#'
 #'@importFrom Taxonstand TPL
 #'@importFrom BIOMASS getTaxonomy
 #'
@@ -33,7 +54,7 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' Rslt <- BotanicalCorrection(TestData)
+#' Rslt <- BotanicalCorrection(TestData, Source = "TPL")
 #'
 #' ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
 #'                 list(ScientificName, ScientificNameCor,
@@ -53,6 +74,8 @@
 #'
 BotanicalCorrection <- function(
   Data,
+  Source,
+  WFOData,
   DetectOnly = FALSE
 ){
 
@@ -60,6 +83,9 @@ BotanicalCorrection <- function(
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
+
+  # Source
+  Source <- match.arg(Source, choices = c("TPL", "WFO"))
 
   # DetectOnly (logical)
   if(!inherits(DetectOnly, "logical"))
@@ -70,10 +96,6 @@ BotanicalCorrection <- function(
 
   setDT(Data) # data.frame to data.table
 
-
-  # Corrected columns initialisation --------------------------------------------------------------------------------------
-  Data[, GenusCor := Genus]
-  Data[, SpeciesCor := Species]
 
   # Missing value ---------------------------------------------------------------------------------------------------------
   # Family, ScientificName/Genus, species, VernName
@@ -91,6 +113,13 @@ BotanicalCorrection <- function(
   }
 
   # Data[Comment != ""] # to check
+
+  if(Source == "TPL"){
+
+  # Corrected columns initialisation --------------------------------------------------------------------------------------
+  Data[, GenusCor := Genus]
+  Data[, SpeciesCor := Species]
+
 
   # Special characters: remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~ ----------------------------------------------------------
 
@@ -124,7 +153,9 @@ BotanicalCorrection <- function(
   Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
 
   ## with Scientific name (25 var)
-  TPLCor <- Taxonstand::TPL(unique(Data$ScientificNameCor), corr = TRUE, diffchar = 20, max.distance = 1) # diffchar: maximum difference of characters nbr between input and output
+  TPLCor <- suppressWarnings(Taxonstand::TPL(unique(Data$ScientificNameCor),
+                                             corr = TRUE, diffchar = 20, max.distance = 1)
+  ) # diffchar: maximum difference of characters nbr between input and output
   # with Genus and species marche pas bien pcq décale genre et sp quand on unique())
 
   setDT(TPLCor) # df to dt
@@ -224,8 +255,8 @@ BotanicalCorrection <- function(
     }
   } # end site loop
 
-  unique(Data[IdTree %in% duplicated_ID,
-              .(IdTree = sort(IdTree), FamilyCor, GenusCor, SpeciesCor, VernNameCor)]) # to check
+  # unique(Data[IdTree %in% duplicated_ID,
+  #             .(IdTree = sort(IdTree), FamilyCor, GenusCor, SpeciesCor, VernNameCor)]) # to check
 
 
   # Reformer ScientificNameCor ------------------------------------------------------------------------------------------
@@ -235,6 +266,51 @@ BotanicalCorrection <- function(
 
   Data[, ScientificNameCor := ifelse(ScientificNameCor == "NA NA", NA_character_, ScientificNameCor)]
 
+  } # end if "TPL"
+
+  if(Source == "WFO"){
+
+    # WFO database
+    data(WFO_Backbone) # if WFO data in the our package
+    # WFO_Backbone[is.na(WFO_Backbone), ] <- "" # if provided by the user
+
+    ScientificNames <- unique(Data[, list(ScientificName)]) # create data to use WorldFlora package (df, 1 col with scfic names)
+    setnames(ScientificNames, "ScientificName", "spec.name")
+
+    WFmatch <- WorldFlora::WFO.match(spec.data = ScientificNames, # data to correct
+                                     WFO.data = WFO_Backbone, # WFO data
+                                     Fuzzy.force = FALSE,
+                                     Fuzzy.shortest = TRUE,
+                                     verbose = FALSE)
+
+    WFmatch <- WFmatch[, list(taxonomicStatus, spec.name, scientificName, family)] # columns of interest
+
+
+    WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
+    WFmatch[, BotanicalCorrectionSource := "World Flora Online"] # create the correction source
+    WFmatch[, taxonomicStatus := NULL] # remove the column
+
+
+
+    # Join the corrected Genus and Species, by original 'ScientificNameCor'
+    Data <- merge(Data, WFmatch, by.x = "ScientificName", by.y = "spec.name", all.x = TRUE)
+
+    setnames(Data, c("scientificName", "family"), c("ScientificNameCor", "FamilyCor")) # rename columns
+
+    # Family name in Genus or Species column:
+    Data[grep("aceae", Data$Genus), FamilyCor := ifelse(is.na(FamilyCor), Genus, FamilyCor)]
+    Data[grep("aceae", Data$Species), FamilyCor := ifelse(is.na(FamilyCor), Species, FamilyCor)]
+    # sort(unique(Data[grep("aceae", Data$ScientificName), ScientificName]))
+
+    # Comment :
+    Data <- GenerateComment(Data,
+                            condition = grepl("aceae", Data$Genus) | grepl("aceae", Data$Species),
+                            comment = "Names ending in 'aceae' cannot be genus or species names")
+
+    # Create GenusCor and SpeciesCor
+    Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)]
+
+  }
 
   return(Data)
 

@@ -4,7 +4,7 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, DetectOnly = FALSE)
+BotanicalCorrection(Data, Source, WFOData, DetectOnly = FALSE)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -17,6 +17,17 @@ The dataset must contain the columns:
 \item \code{VernName} (character)
 \item \code{ScientificName} (character)
 }}
+
+\item{Source}{(character) To correct and standardise, you can choose between:
+\itemize{
+\item "TPL": \emph{The Plant List} (http://www.theplantlist.org/) (faster but based
+on the 2013 taxonomy)
+\item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
+but based on the 2022 taxonomy)
+}}
+
+\item{WFOData}{A static copy of the World Flora Online (WFO) Taxonomic
+Backbone data (from http://www.worldfloraonline.org/downloadData.)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}
@@ -39,11 +50,24 @@ level.
 \description{
 Botanical Correction
 }
+\details{
+\itemize{
+\item No special characters (typography)
+\item No family name in the Genus and Species columns (the suffix "aceae" is
+specific to the family name.
+\item Correct spelling of botanical names (\emph{Taxonstand or WorldFlora})
+\item Family & Scientific names match (\emph{BIOMASS::getTaxonomy or WorldFlora})
+\item Update the scientific botanical names with the current phylogenetic
+classification
+\item Check \strong{invariant botanical informations per IdTree} (1 IdTree = 1 family,
+1 scientific and 1 vernacular name)
+}
+}
 \examples{
 library(data.table)
 data(TestData)
 
-Rslt <- BotanicalCorrection(TestData)
+Rslt <- BotanicalCorrection(TestData, Source = "TPL")
 
 ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
                 list(ScientificName, ScientificNameCor,
