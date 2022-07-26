@@ -993,17 +993,17 @@ server <- function(input, output, session) { # server ####
 
       AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
-      CodeTranslationTable <- matrix(AllCodesOutput$Value, ncol = nrow(AllCodesOutput),
+      CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_"), ncol = nrow(AllCodesOutput),
              nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
 
       for (i in seq_len(nrow(CodeTranslationTable))) {
         for(j in seq_len(ncol(CodeTranslationTable))) {
        if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-          '<input type="radio" name="%s" value="%s" checked="checked"/>',
-          AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
-          '<input type="radio" name="%s" value="%s"/>',
-          AllCodesInput$Value[i], CodeTranslationTable[i,j])
+          '<input type="radio" name="%s_%s" value="%s" checked="checked"/>',
+          AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
+            '<input type="radio" name="%s_%s" value="%s"/>',
+            AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
         }
       }
 
@@ -1024,7 +1024,7 @@ server <- function(input, output, session) { # server ####
        container = sketch,
         callback = JS("table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
-          $this.attr('id', this.data()[0]);
+          $this.attr('id', this.data()[1]+'_'+this.data()[0]);
           $this.addClass('shiny-input-radiogroup');
         });
         Shiny.unbindAll(table.table().node());
@@ -1064,11 +1064,11 @@ server <- function(input, output, session) { # server ####
 
   observe({
     req(CodeTranslationFinal$dt$InputValue)
+    # req(input$codes_MAIN)
     dt <- CodeTranslationFinal$dt
-    dt$OutputValue <- sapply(dt$InputValue, function(x) input[[x]])
-    dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, profileOutput()$AllCodes$Value)]
-    dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, profileOutput()$AllCodes$Value)]
-
+    dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_"), function(x) input[[x]])
+    dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
+    dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
     CodeTranslationFinal$output <- dt
   })
 
