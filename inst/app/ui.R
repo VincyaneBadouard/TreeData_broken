@@ -34,8 +34,35 @@ CodeDefinitions <- HTML(paste0('<select class="form-control" multiple="multiple"
                                paste0('<option>',c("First definition", "second definition"), '</option>', collapse = ""),
                                '</select>'))
 
+
+languages <- c("en" = "English", "es" = "Spanish")
+
+flags <- c(
+  "https://cdn.rawgit.com/lipis/flag-icon-css/master/flags/4x3/us.svg",
+  "https://cdn.rawgit.com/lipis/flag-icon-css/master/flags/4x3/es.svg"
+
+)
+
+
 # header with title
-header <- dashboardHeader(title = "Data harmonisation")
+header <- dashboardHeader(title = "Data harmonisation"
+                          # ,
+                          # tags$li(class = "dropdown",
+                          #
+                          #         pickerInput ("languages", NULL, width = "auto",
+                          #                     choices = languages,
+                          #
+                          #                     choicesOpt = list(content =
+                          #                                         mapply(languages, flags, FUN = function(country, flagUrl) {
+                          #                                           HTML(paste(
+                          #                                             tags$img(src=flagUrl, width=20, height=15),
+                          #                                             country
+                          #                                           ))
+                          #                                         }, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+                          #
+                          #                     ))
+                          # )
+                          )
 
 # sidebar contains menu items
 sidebar <- dashboardSidebar(
