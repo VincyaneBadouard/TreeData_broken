@@ -13,32 +13,35 @@
 
 ## usethis namespace: start
 ### quiets concerns of R CMD check "no visible binding for global variables"
-utils::globalVariables(c("Circ", "Diameter", "MinDBH",
-                         "Site", "IdTree", "IdStem", "StemFieldNum",
-                         "POM", "HOM", "Plot",
-                         "SubPlot", "TreeFieldNum", "TreeHeight",
+utils::globalVariables(c("Site", "Plot", "SubPlot", "PlotArea", "SubPlotArea",
+                         "Xutm", "Yutm", "Xplot", "Yplot", "Xsubplot", "Ysubplot", "PlotSubNum",
+
                          "CensusYear", "Date", "CensusDate", "Month", "Day", "IdCensus",
-                         "LifeStatus", "PlotArea", "Year", "Time",
-                         "SubPlotArea", "CommercialSp",
+                         "Year", "Time", "DateOriginal", "CensusDateOriginal", "SitYearID",
+
+                         "IdTree", "IdStem", "StemFieldNum", "TreeFieldNum", "NewIdTree",
+
+                         "Circ", "Diameter", "MinDBH", "TreeHeight",
+                         "POM", "HOM",
+
+
                          "Family", "VernName",  "Genus", "Species", "ScientificName",
 
-                         "Xutm", "Yutm", "Xplot", "Yplot", "Xsubplot", "Ysubplot",
 
-                         "DateOriginal", "CensusDateOriginal",
-                         "LifeStatusOriginal", "CommercialSpOriginal",
+                         "LifeStatus", "CommercialSp", "LifeStatusOriginal", "CommercialSpOriginal",
 
-                         "NewIdTree",
+
 
                          "BD", "BCirc", "BPOM", "BHOM",
 
                          ".", ".N", ".SD", "..ColumnsToReturn",
 
-                         "LifeStatusCor", "PlotSubNum", "SitYearID", "Comment",
+                         "LifeStatusCor", "Comment",
                          "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth", "Cresc",
                          "HOMCor",
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",
-                         "New.Genus", "New.Species", "Taxonomic.status", "Typo",
-                         "Taxon", "GenspFamily",
+                         "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
+                         "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",
                          "BotanicalCorrectionSource", "FamilyCorSource"
 ))
 

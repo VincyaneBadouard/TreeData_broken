@@ -4,7 +4,7 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, Source, WFOData, DetectOnly = FALSE)
+BotanicalCorrection(Data, Source, WFOData = NULL, DetectOnly = FALSE)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -26,8 +26,10 @@ on the 2013 taxonomy)
 but based on the 2022 taxonomy)
 }}
 
-\item{WFOData}{A static copy of the World Flora Online (WFO) Taxonomic
-Backbone data (from http://www.worldfloraonline.org/downloadData.)}
+\item{WFOData}{To be filled in if the argument \code{Source} = "WFO". Data set
+with the static copy of the \emph{World Flora Online} (WFO) Taxonomic Backbone
+data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
+data.table)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}
@@ -84,5 +86,24 @@ FamCor <- unique(Rslt[FamilyCor != Family,
                 Species, SpeciesCor,
                 BotanicalCorrectionSource, Comment)
                 ])
+\dontrun{
+RsltWFO <- BotanicalCorrection(TestData, Source = "WFO", WFOData = WFO_Backbone)
+
+ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
+                list(ScientificName, ScientificNameCor,
+                Family, FamilyCor,
+                Genus, GenusCor,
+                Species, SpeciesCor,
+                BotanicalCorrectionSource, Comment)
+                ])
+
+FamCor <- unique(RsltWFO[FamilyCor != Family,
+                list(ScientificName, ScientificNameCor,
+                Family, FamilyCor,
+                Genus, GenusCor,
+                Species, SpeciesCor,
+                BotanicalCorrectionSource, Comment)
+                ])
+}
 
 }

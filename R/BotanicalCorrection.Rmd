@@ -63,14 +63,14 @@ library(Taxonstand)
 # Chrysobalanaceae Licania alba (koko) "c"
 # Fabaceae Eperua falcata (wapa) "d"
 Data <- data.table(Site = "Nowhere",
-                   IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4)), # 4 ind
-                   Year = rep(c(2000:2003), 4) # 4 years each
+                   IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4), rep("e", 1), rep("f", 1), rep("g", 1)), # 7 ind
+                   Year = c(rep(c(2000:2003), 4), rep(2000, 3)) # 4 years each
 )
 Data <- Data[order(IdTree, Year)]
-Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4))]
-Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("Eperua", 4))]
-Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4))]
-Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4))]
+Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4), rep("Sapindaceae", 1), rep("Clusiaceae", 1), rep("Burseraceae", 1))]
+Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("Eperua", 4), rep("Indet.Sapindaceae", 1), rep("Tovomita", 1), rep("Protium", 1))]
+Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4), rep("Indet.", 1), rep("sp.5-CAY", 1), rep("opacum_subsp.rabelianum", 1))]
+Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4), rep(NA, 3))]
 
 # Scientific-vernacular names match table (data.frame) : ScientificVernaTable
 ScientificVernaTable <- copy(Data)
@@ -141,14 +141,61 @@ for (v in 1:length(Vars)) {
 # Data[Comment != ""] # to check 
 ```
 
+# Genus column with Family name
+```{r}
+# de aceae à un special character en lecture à l'envers
+Data[, c("GenusCor", "GenspFamily") := tstrsplit(Genus, "[[:punct:]]", fixed = TRUE)]
+
+sub.pattern = c(" sp[.]", " spp[.]", " pl[.]",
+                "Indet[.]", " indet[.]", " ind[.]", " gen[.]", " g[.]", " fam[.]",
+                " nov[.]", " prox[.]", " cf[.]", " aff[.]", " s[.]s[.]",
+                " s[.]l[.]", " p[.]p[.]", " p[.] p[.]", "[?]", " inc[.]",
+                " stet[.]", "Ca[.]", "nom[.] cons[.]", "nom[.] dub[.]",
+                " nom[.] err[.]", " nom[.] illeg[.]", " nom[.] inval[.]",
+                " nom[.] nov[.]", " nom[.] nud[.]", " nom[.] obl[.]",
+                " nom[.] prot[.]", " nom[.] rej[.]", " nom[.] supp[.]",
+                " sensu auct[.]")
+i=2
+for (i in 1:length(sub.pattern)) {
+  Data[, ScientificName := gsub(pattern = sub.pattern[i],
+                                replacement = "", x = Data[, ScientificName])]
+}
+
+
+for (i in 1:nrow(Data)) {
+  species.string <- Data[i, ScientificName]
+  if (grepl("[[:digit:]]", species.string) ==
+      TRUE) {
+    Data[i, "Number.detected"] <- as.logical(1)
+    species.terms <- unlist(strsplit(species.string,
+                                     split = " "))
+    species.new.string <- species.terms[1]
+    while (grepl("^[[:digit:]]", substr(species.new.string,
+                                        start = nchar(species.new.string), stop = nchar(species.new.string))) ==
+           TRUE) {
+      species.new.string <- substr(species.new.string,
+                                   start = 1, stop = nchar(species.new.string) -
+                                     1)
+    }
+    Data[i, ScientificName] <- species.new.string
+  }
+}
+```
+
+# SubSpecies column if necessary
+```{r}
+SubSpeciesSep = "_subsp."
+Data[, c("SpeciesCor", "SubSpeciesCor") := tstrsplit(SpeciesCor, SubSpeciesSep, fixed = TRUE)]
+```
 
 # Special characters (pas nécessaire si j'utilise WorldFlora)
-Remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
+Remove : !#$%&’+,:;<=>?@^`
+Allowed : "()*-./[]_{|}~
 ```{r}
 
 # Data[, FamilyCor := gsub("[[:punct:]]", "", Data$FamilyCor)]
-Data[, GenusCor := gsub("[[:punct:]]", "", Data$GenusCor)]
-Data[, SpeciesCor := gsub("[[:punct:]]", "", Data$SpeciesCor)]
+Data[, GenusCor := gsub("[!#$%&’+,:;<=>?@^`]", "", Data$GenusCor)]
+Data[, SpeciesCor := gsub("[!#$%&’+,:;<=>?@^`]", "", Data$SpeciesCor)]
 
 # Comment :
 
@@ -157,11 +204,11 @@ Data[, SpeciesCor := gsub("[[:punct:]]", "", Data$SpeciesCor)]
 #                         comment = "Special characters in the 'Family'")
 
 Data <- GenerateComment(Data,
-                        condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character
+                        condition = grepl('[!#$%&’+,:;<=>?@^`]', Data$Genus), # TRUE if there are any special character
                         comment = "Special characters in the 'Genus'")
 
 Data <- GenerateComment(Data,
-                        condition = grepl('[[:punct:]]', Data$Species), # TRUE if there are any special character
+                        condition = grepl('[!#$%&’+,:;<=>?@^`]', Data$Species), # TRUE if there are any special character
                         comment = "Special characters in the 'Species'")
 
 ```
@@ -396,7 +443,7 @@ BotaCols <- c("FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor")
 
 # Give the unique value (if it is unique) of the IdTree
 for(j in BotaCols){
-Data[,  (j) := ifelse(is.na(get(j)) & length(na.omit(unique(get(j)))) == 1, na.omit(unique(get(j))), get(j)), keyby = IdTree]
+  Data[,  (j) := ifelse(is.na(get(j)) & length(na.omit(unique(get(j)))) == 1, na.omit(unique(get(j))), get(j)), keyby = IdTree]
 }
 
 ```
@@ -440,6 +487,22 @@ Si "NA NA" -> NA_character_
 Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
 
 Data[, ScientificNameCor := ifelse(ScientificNameCor == "NA NA", NA_character_, ScientificNameCor)]
+
+```
+
+# Cas particuliers
+```{r}
+data("TestData")
+
+Data <- TestData
+
+Data <- Data[grepl("Indet", Data$ScientificName) |
+               grepl("[0-9]", Data$ScientificName) |
+               grepl("subsp[.]", Data$ScientificName), ] 
+
+# Data[grepl("Indet", Data$ScientificName, ignore.case = TRUE), ] 
+# Data[grepl("sp[.]", Data$ScientificName), ]
+# Data[grepl("subsp[.]", Data$ScientificName), ]
 
 ```
 
