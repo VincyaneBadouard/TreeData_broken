@@ -1069,12 +1069,61 @@ server <- function(input, output, session) { # server ####
     dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_"), function(x) input[[x]])
     dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
     dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
+    dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x)) strsplit(x,"_")[[1]][[2]] else NULL)# remove the column part in the value
     CodeTranslationFinal$output <- dt
   })
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
     datatable(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], options = list( paging = FALSE, scrollX=TRUE))
+  })
+
+
+  observeEvent(input$ApplyCodeTranslation, {
+    DataDone <- DataDone()
+
+    idx <- which(names(DataDone) %in% paste0("Original_", input$TreeCodes))
+
+    CodesInput <- DataDone[,..idx]
+    # names(CodesInput) <- gsub("Original_", "", names(CodesInput))
+
+    for(j in names(CodesInput)) {
+
+      CodeTranslation <- CodeTranslationFinal$output[CodeTranslationFinal$output$InputColumn %in% gsub("Original_", "", j), ]
+      CodeTranslation <- CodeTranslation[!is.na(CodeTranslation$OutputColumn),]
+
+      CodesInput[,OriginalTranslated := CodesInput[,..j]]
+
+      for(i in seq_len(nrow(CodeTranslation))) {
+
+        CodesInput[,OriginalTranslated:=gsub(paste0("\\<", CodeTranslation$InputValue[i], "\\>"), paste(CodeTranslation$OutputColumn[i], CodeTranslation$OutputValue[i], sep = "_"), OriginalTranslated)]
+
+      }
+
+      CodesInput[,paste0(j, "_Translated") := OriginalTranslated]
+      CodesInput[, OriginalTranslated:=NULL]
+
+    }
+
+    CodesInput[, Translation:=do.call(paste, c(.SD, sep = ";")), .SDcols=-seq_along(idx)]
+    CodesInput[, grep("_Translated", colnames(CodesInput)):=NULL]
+
+    CodesInput[, Translation:=gsub("\\<[A-Z]*\\>[[:punct:]]", "", Translation)] # remove codes that don't have an equivalence
+    CodesInput[, Translation:=gsub("\\b(\\w+)\\b\\s*\\W\\s*(?=.*\\1)", "", Translation, perl = T)] # remove duplicated -  this deals with n-1 relationship (if different input refer to the same output code )
+
+    OutCols <- unique(na.omit(CodeTranslationFinal$output$OutputColumn))
+
+    for(j in OutCols) {
+      CodesInput[,Final:=gsub(paste0(j, "_|\\<(\\w*?_\\w*?)\\>"), "", Translation)]
+
+      colnames(CodesInput) <- gsub("Final", j, colnames(CodesInput))
+      CodesInput[,Final := NULL]
+    }
+
+
+
+
+    DataOutput(cbind(DataDone, CodesInput[, ..OutCols]))
   })
 
 
@@ -1121,6 +1170,7 @@ server <- function(input, output, session) { # server ####
         Profile[[input.i]] <-  input[[input.i]]
       }
       Profile[["AllCodes"]] <- AllCodes()
+      Profile[["CodeTranslationFinal"]] <- CodeTranslationFinal$output
       saveRDS( Profile, file = file)
     }
   )

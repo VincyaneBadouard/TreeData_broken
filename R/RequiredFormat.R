@@ -67,7 +67,10 @@ RequiredFormat <- function(
       warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
       x <- read.csv("inst/app/data/interactive_items.csv")
     }
+
+    # keep only what is "active" (the rest is not in used)
     x <- x[x$Activate,]
+
   }
 
   CharacVar <- x$ItemID[x$DataType %in% "character"]
@@ -78,13 +81,28 @@ RequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
+  ## deal with TreeCodes separately
+  ## repeat cases where multiple columns match one item (only checked for Treecodes, need to check what happens for other columns)
+  multiplecolumns <- names(which(sapply(input[x$ItemID], length)>1))
+  if(any(!multiplecolumns %in% "TreeCodes")) stop ("You've selected multiple columns for something other than 'TreeCodes', please contact us at herrmannv@si.edu")
+
+  if(all(multiplecolumns %in%  "TreeCodes")) {
+  Treecodes <- input[multiplecolumns][[1]]
+  names(Treecodes) <- rep(multiplecolumns, length(Treecodes))
+  input[multiplecolumns] <- NULL
+  }
+
+
 
   idx <- match(gsub("[[:punct:]]| ", "", colnames(Data)), gsub("[[:punct:]]| ", "", input[x$ItemID]))
 
-  colnames(Data) <- names(input[x$ItemID])[idx]
+  NewColNames <- names(input[x$ItemID])[idx]
+  NewColNames[ colnames(Data) %in% Treecodes] <- paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])
 
-  ## delete columns we don't want
-  Data[which(is.na(idx))] <- NULL
+  colnames(Data) <- NewColNames
+
+  ## delete columns we don't want (except the ones related to Treecodes)
+  Data[which(is.na(colnames(Data)))] <- NULL
 
 
   ## add columns missing
@@ -595,7 +613,7 @@ RequiredFormat <- function(
     }
   }
   # return output ####
-  ColumnsToReturn <- intersect(c(x$ItemID, paste0(x$ItemID, "Original")), colnames(Data))
+  ColumnsToReturn <- intersect(c(x$ItemID, grep("Original", colnames(Data), value = T)), colnames(Data))
   return(Data[, ..ColumnsToReturn])
 
 }
