@@ -22,7 +22,7 @@ Plot info,pickerInput,choices,none,SubPlotArea,SubPlotArea,SubPlot area,none,non
 second column,pickerInput,choices,none,ha,SubPlotAreaUnitMan,What is the unit for subplot area?,,none,none,SubPlotArea,AreaUnitOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 second column,numericInput,value,-999,,SubPlotAreaMan,What is your subplot area in hectare?,,PlotArea,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot info,pickerInput,choices,none,MinDBH,MinDBH,Minimum DBH, minimum diameter of trees included in your inventory,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,cm,The minimum diameter of trees included in the inventory
-second column,pickerInput,choices,none,cm,MinDBHUnitMan,What is your unit for the column indicating the minimum DBH?,,none,none,MinDBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
+second column,pickerInput,choices,none,cm,MinDBHUnitMan,"What is your unit for the column indicating the minimum DBH? If not provided, it will be calculated looking at your Diameter column",,none,none,MinDBH,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 second column,numericInput,value,-999,,MinDBHMan,What is the minimum diameter of trees included in your inventory?,in cm,MinDBH,none,none,OtherNumericOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
 Plot measurements,pickerInput,choices,none,SpeciesAbundance,SpeciesAbundance,Species abundance,"Total number of individuals for a species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,-,"Total number of individuals for a species, per sampling unit"
 Plot measurements,pickerInput,choices,none,SpeciesBasalArea,SpeciesBasalArea,Species Basal area,"Total cross-sectional area of all stems of the species, per sampling unit",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,numeric,sqr cm per sqr meter,"Total cross-sectional area of all stems of the species, per sampling unit"
@@ -102,4 +102,5 @@ NA,,,,,DateOriginal,,,,,,,,,FALSE,,-,-,"Date as it was given in the input table,
 NA,,,,,DiameterOriginal,,,,,,,,,FALSE,,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
 NA,,,,,CircOriginal,,,,,,,,,FALSE,,-,-,"Circ as it was given in the input table, without any correction or transformation"
 NA,,,,,CommercialSpOriginal,,,,,,,,,FALSE,,-,-,"IsCommercial as it was given in the input table, without any correction or transformation"
+NA,,,,,XXXOrginal,,,,,,,,,FALSE,,-,-,"Column coming straight from the original data, the name of it is [colomn name in the input data]Original"
 NA,,,,,Comment,,,,,,,,,FALSE,,-,-,information about error
