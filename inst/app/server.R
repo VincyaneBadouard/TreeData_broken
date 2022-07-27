@@ -893,7 +893,7 @@ server <- function(input, output, session) { # server ####
       FUN = function(f){
         if(input[[f]] %in% "Yes") {
           # cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]), "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
-          cl <- paste0(f, "(", paste("Data = Rslt,", gsub("list\\(", "", paste(deparse(set_names(reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]], gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]))), collapse = ""))))
+          cl <- paste0(f, "(", paste("Data = Rslt,", gsub("list\\(", "", paste(deparse(setNames(reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]], gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]))), collapse = ""))))
           cl <- gsub('"FALSE"', "FALSE", cl)
           cl <- gsub('"TRUE"', "TRUE", cl)
           cl <- gsub('\"function', "function", cl)
@@ -1080,11 +1080,11 @@ server <- function(input, output, session) { # server ####
 
 
   observeEvent(input$ApplyCodeTranslation, {
-    DataDone <- DataDone()
+    DataOutput <- DataOutput()
 
-    idx <- which(names(DataDone) %in% paste0("Original_", input$TreeCodes))
+    idx <- which(names(DataOutput) %in% paste0("Original_", input$TreeCodes))
 
-    CodesInput <- DataDone[,..idx]
+    CodesInput <- DataOutput[,..idx]
     # names(CodesInput) <- gsub("Original_", "", names(CodesInput))
 
     for(j in names(CodesInput)) {
@@ -1120,10 +1120,7 @@ server <- function(input, output, session) { # server ####
       CodesInput[,Final := NULL]
     }
 
-
-
-
-    DataOutput(cbind(DataDone, CodesInput[, ..OutCols]))
+    DataOutput(cbind(DataOutput, CodesInput[, ..OutCols]))
   })
 
 
