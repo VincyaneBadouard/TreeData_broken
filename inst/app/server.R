@@ -1,6 +1,10 @@
 
 # Fichier pour gérer les interactions de l'application Shiny
 
+# install and load libraries
+# devtools::install_github("VincyaneBadouard/TreeData")
+library(TreeData)
+
 
 # increase size limit to 10MB
 options(shiny.maxRequestSize=25*1024^2)
@@ -19,7 +23,9 @@ FotterWithHeader <- function(x) {
   )
 }
 
-# read in csv file that has all we want to show in app
+# read in csv files that has all we want to show in app
+
+## in the Headers and Units tab
 xall <- read.csv("data/interactive_items.csv")
 x <- xall[xall$Activate, ]
 x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
@@ -29,12 +35,14 @@ x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_no
 x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
 x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
 
+## in the Correction tab
 xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
-
+## in the Codes tab (tree code pre-defined options)
 CodeOptions <-  read.csv("data/CodeOptions.csv")
 
 
+# create a couple functions that allows to edit the tree codes table in the Codes tab
 selector <- function(id, CodeOptions){ # --- this is to edit CODES table
   CodeOptionSplit <- split(CodeOptions, CodeOptions$OptionGroup)
 
@@ -85,16 +93,13 @@ js <- c( # --- this is to edit CODES table
 )
 
 
-
-# for(i in unique(x$UI)) assign(paste0("x", i), x[x$UI %in% i,])
-
-# install TreeData package
-# devtools::install_github("VincyaneBadouard/TreeData")
-library(TreeData)
-
+# start server code here
 
 server <- function(input, output, session) { # server ####
 
+  # upload tab ####
+
+  # show as meany upload widgets as asked for
   output$uiUploadTables <- renderUI({
 
     lapply(1:input$nTable, function(i) {
@@ -127,6 +132,7 @@ server <- function(input, output, session) { # server ####
 
   })
 
+  # View tables that are uploaded
   output$uiViewTables <- renderUI({
     req(input$file1)
     do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
@@ -138,10 +144,9 @@ server <- function(input, output, session) { # server ####
 
 
   })
-  # read file(s) ####
 
 
-
+  ## read file(s)
 
   # give a red text if not a csv file
   observe({
@@ -153,6 +158,8 @@ server <- function(input, output, session) { # server ####
     })
 
   })
+
+  # fill in Data, as a list, with one drawer per uploaded table, named as provided by user
 
   Data <- reactiveVal()
   observe({
@@ -191,15 +198,7 @@ server <- function(input, output, session) { # server ####
   })
 
 
-  # render data table
-  # output$tabData <- renderDT({
-  #   if (!is.null(input$file1$name))
-  #     Data()
-  # }, rownames = FALSE,
-  # options = list(pageLength = 8, scrollX=TRUE),
-  # selection = "none")
-
-
+  # move on to next tab
   observeEvent(input$submitTables, {
 
     if(input$nTable == 1 & length(Data()) == 1) {
@@ -213,7 +212,7 @@ server <- function(input, output, session) { # server ####
 
   })
 
-  # stack tables ####
+  # stack tab ####
 
   StackedTables <- eventReactive(input$Stack, {
     do.call(rbind, Data()[input$TablesToStack])
@@ -243,14 +242,11 @@ server <- function(input, output, session) { # server ####
 
   })
 
+  # move on to next tab
   observe({
     if(is.null(input$TablesToStack))   shinyjs::show("SkipStack")
     if(!is.null(input$TablesToStack))   shinyjs::hide("SkipStack")
   })
-
-
-  # merge tables ####
-  n_tables_after_stack <- reactiveVal()
 
   observeEvent(input$GoToMerge | input$SkipStack, {
 
@@ -286,11 +282,13 @@ server <- function(input, output, session) { # server ####
 
   }, ignoreInit = T)
 
+  # merge tab ####
+  n_tables_after_stack <- reactiveVal()
+
   observeEvent("addMerge", {
 
 
   }, ignoreInit = T)
-
 
   MergedTables <- reactiveVal()
 
@@ -313,9 +311,6 @@ server <- function(input, output, session) { # server ####
 
 
   }, ignoreInit = T)
-
-
-
 
   observeEvent(input$Merge, {
 
@@ -390,10 +385,13 @@ server <- function(input, output, session) { # server ####
 
   }, ignoreInit = T)
 
+  # move on to next tab
 
-  # tidy tables ####
   observeEvent(input$GoToTidy | input$SkipMerge, {
     updateTabItems(session, "tabs", "Tidying")}, ignoreInit = T)
+
+
+  # tidy tab ####
 
   OneTable <- eventReactive(input$submitTables | input$GoToTidy | input$SkipMerge, {
 
@@ -464,12 +462,6 @@ server <- function(input, output, session) { # server ####
     TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName, variable.factor = FALSE)) #,  value.name = names(Variablecolumns[TickedMelt])
   }, ignoreInit = TRUE)
 
-  observeEvent(input$SkipTidy, {
-    TidyTable(OneTable())
-  }, ignoreInit = TRUE)
-
-
-
   observeEvent(input$Tidy, {
     shinyjs::show("GoToHeaders")
 
@@ -481,107 +473,21 @@ server <- function(input, output, session) { # server ####
     output$TidyTableSummary <- renderPrint(summary(TidyTable()))
   })
 
+  # move on to next tab
+  observeEvent(input$SkipTidy, {
+    TidyTable(OneTable())
+  }, ignoreInit = TRUE)
 
   observeEvent(input$GoToHeaders | input$SkipTidy, {
     updateTabItems(session, "tabs", "Headers")
 
   }, ignoreInit = T)
 
-  observe({
-    if(!input$Date %in% "none")
-      shinyjs::show("AttentionDates")
-    output$sampleDates <- renderText(head(as.character(TidyTable()[[input$Date]])))
-  })
+
+  # Headers tab ####
 
 
-
-  ### other stuff ####
-  gimme_value <- reactiveVal(0)
-
-  observe( {
-    if(input$predefinedProfile != "No" )
-      shinyjs::show("UseProfile")
-    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
-    gimme_value(0)
-  })
-
-  observeEvent(input$profile, {
-    shinyjs::show("UseProfile")
-    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
-    gimme_value(0)
-  })
-
-
-  UserProfile <- reactiveVal()
-
-  observeEvent(input$UseProfile, {
-
-    if(input$predefinedProfile == "No") {
-      file <- input$profile$datapath
-      ext <- tools::file_ext(file)
-    } else {
-      file <- paste0("data/", input$predefinedProfile, "Profile.rds")
-      ext <- tools::file_ext(file)
-    }
-
-    need(ext != "rds", "This is not a .rds file! Please upload a .rds file.")
-    # if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
-
-
-    profile <- tryCatch({ readRDS(file)},
-                        # warning = function(warn){
-                        #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-                        # },
-                        error = function(err){
-                          showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
-                        })
-
-    if(!is.null(profile$AllCodes)) {
-      if(!profile$AllCodes[1,1] %in% "You have not selected columns for codes" & !all(profile$AllCode$Definition == ""))
-      shinyjs::show("UseProfileCodes")
-    }
-
-
-    MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
-    MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
-
-    if(length(MissingItemIDProfile) > 0 & gimme_value() == 1) {
-      showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
-    }
-
-    ValidItemID <- names(profile)[sapply(profile, function(p) all(p %in% c(names(TidyTable()), "none"))) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
-
-    InValidItemID <- setdiff(names(profile), ValidItemID)
-    InValidItemID <- InValidItemID[InValidItemID %in% x$ItemID]
-
-    if(length(InValidItemID) > 0 & gimme_value() == 1) {
-      showNotification(paste("The profile you selected does not seem to correspond to your data. The items that do not match your data are:", paste0(InValidItemID, " (in ", x$Group[match(InValidItemID, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand (or make sure you picked the right profile). Also, please double check that the info in the second column is filled out properly."), type = 'err', duration = NULL)
-    }
-    #
-    # for(i in which(x$ItemID %in% names(profile) & reactiveValuesToList(input)[x$ItemID] %in% names(TidyTable()))) {
-
-    for(i in which(x$ItemID %in% ValidItemID)) {    # used to be for(i in which(x$ItemID %in% names(profile)))
-      eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
-
-      # eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
-      # updateTextInput(session, "Site", value = profile$Site)
-    }
-
-    if(gimme_value() == 1) {
-      updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
-    }
-
-    if(gimme_value() == 0) {
-      updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
-      gimme_value(gimme_value() + 1)
-    }
-
-    UserProfile(profile)
-  })
-
-
-
-  # create options to choose from:
+  # create options to choose from
 
   ColumnOptions <- eventReactive(TidyTable(), { c("none", colnames(TidyTable())) })
 
@@ -606,7 +512,7 @@ server <- function(input, output, session) { # server ####
 
   LogicalOptions <- reactive(c(TRUE, FALSE))
 
-  # enter column names for each element of the RequiredFormat function
+  # update each element base on the options created above
   observe({
 
     lapply(1:nrow(x1), function(i) {
@@ -616,7 +522,6 @@ server <- function(input, output, session) { # server ####
     })
 
   })
-
 
   observe({
 
@@ -701,9 +606,97 @@ server <- function(input, output, session) { # server ####
 
   })
 
+  ## handle upload and use of profile (updating what is selected)
+
+  gimme_value <- reactiveVal(0)
+
+  observe( {
+    if(input$predefinedProfile != "No" )
+      shinyjs::show("UseProfile")
+    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+    gimme_value(0)
+  })
+
+  observeEvent(input$profile, {
+    shinyjs::show("UseProfile")
+    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+    gimme_value(0)
+  })
+
+  UserProfile <- reactiveVal()
+
+  observeEvent(input$UseProfile, {
+
+    if(input$predefinedProfile == "No") {
+      file <- input$profile$datapath
+      ext <- tools::file_ext(file)
+    } else {
+      file <- paste0("data/", input$predefinedProfile, "Profile.rds")
+      ext <- tools::file_ext(file)
+    }
+
+    need(ext != "rds", "This is not a .rds file! Please upload a .rds file.")
+    # if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
 
 
-  # format data using the input
+    profile <- tryCatch({ readRDS(file)},
+                        # warning = function(warn){
+                        #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+                        # },
+                        error = function(err){
+                          showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                        })
+
+    if(!is.null(profile$AllCodes)) {
+      if(!profile$AllCodes[1,1] %in% "You have not selected columns for codes" & !all(profile$AllCode$Definition == ""))
+        shinyjs::show("UseProfileCodes")
+    }
+
+
+    MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
+    MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
+
+    if(length(MissingItemIDProfile) > 0 & gimme_value() == 1) {
+      showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
+    }
+
+    ValidItemID <- names(profile)[sapply(profile, function(p) all(p %in% c(names(TidyTable()), "none"))) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
+
+    InValidItemID <- setdiff(names(profile), ValidItemID)
+    InValidItemID <- InValidItemID[InValidItemID %in% x$ItemID]
+
+    if(length(InValidItemID) > 0 & gimme_value() == 1) {
+      showNotification(paste("The profile you selected does not seem to correspond to your data. The items that do not match your data are:", paste0(InValidItemID, " (in ", x$Group[match(InValidItemID, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand (or make sure you picked the right profile). Also, please double check that the info in the second column is filled out properly."), type = 'err', duration = NULL)
+    }
+    #
+    # for(i in which(x$ItemID %in% names(profile) & reactiveValuesToList(input)[x$ItemID] %in% names(TidyTable()))) {
+
+    for(i in which(x$ItemID %in% ValidItemID)) {    # used to be for(i in which(x$ItemID %in% names(profile)))
+      eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
+
+      # eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
+      # updateTextInput(session, "Site", value = profile$Site)
+    }
+
+    if(gimme_value() == 1) {
+      updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
+    }
+
+    if(gimme_value() == 0) {
+      updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
+      gimme_value(gimme_value() + 1)
+    }
+
+    UserProfile(profile)
+  })
+
+  observe({
+    if(!input$Date %in% "none")
+      shinyjs::show("AttentionDates")
+    output$sampleDates <- renderText(head(as.character(TidyTable()[[input$Date]])))
+  })
+
+  # format data
 
   DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
@@ -727,19 +720,6 @@ server <- function(input, output, session) { # server ####
   observe({FormatedScientificNameOptions(sort(unique(DataFormated()$ScientificName)))})
 
 
-  observeEvent(input$LaunchFormating , {
-    shinyjs::show("GoToCodes")
-  }, ignoreInit = T)
-
-  observeEvent(input$LaunchFormating , {
-
-    lapply(which(xCorr$argument %in% "choices"), function(i) {
-
-      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], ifelse(xCorr$ReactiveArgValue[i], "= get(xCorr$argValue[i])()", "= eval(str2lang(xCorr$argValue[i]))"), ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
-    })
-
-  })
-
 
   # Visualize output
   output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
@@ -749,10 +729,30 @@ server <- function(input, output, session) { # server ####
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
-  ## codes ####
+
+ # update stuff in the Corrections tab, based on the formated data
+  observeEvent(input$LaunchFormating , {
+
+    lapply(which(xCorr$argument %in% "choices"), function(i) {
+
+      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], ifelse(xCorr$ReactiveArgValue[i], "= get(xCorr$argValue[i])()", "= eval(str2lang(xCorr$argValue[i]))"), ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
+    })
+
+  })
+
+  # move on to next tab
+  observeEvent(input$LaunchFormating , {
+    shinyjs::show("GoToCodes")
+  }, ignoreInit = T)
+
   observeEvent(input$GoToCodes, {
     updateTabItems(session, "tabs", "Codes")
   }, ignoreInit = TRUE)
+
+
+
+  # codes tab ####
+
 
   AllCodes <- reactiveVal(data.frame(Column = "You have not selected columns for codes",
                                      Value = "You have not selected columns for codes",
@@ -830,26 +830,16 @@ server <- function(input, output, session) { # server ####
     AllCodes()[, c(1:3)]
   })
 
-  # Correct ####
 
+  # move on to next tab
   observeEvent(input$GoToCorrect, {
     updateTabItems(session, "tabs", "Correct")
   }, ignoreInit = TRUE)
 
 
-  observeEvent(input$GoToOutput, {
-    updateTabItems(session, "tabs", "OutputFormat")
 
-  })
-  observeEvent(input$GoToDownload, {
-    updateTabItems(session, "tabs", "Save")
+  # Correction tab ####
 
-
-  }, ignoreInit = T)
-
-
-
-  # apply corrections
 
   # show corrections arguments or not
 
@@ -869,23 +859,7 @@ server <- function(input, output, session) { # server ####
     }
   })
 
-  # place holder to put either corrected data or non corrected data
-  DataDone <- reactiveVal()
-
-  #decide what DataDone is going to be
-
-  observeEvent(input$SkipCorrections,
-               {
-                 DataDone(DataFormated())
-                 updateTabItems(session, "tabs", "OutputFormat")
-
-               })
-
-  observeEvent(input$ApplyCorrections,{
-    shinyjs::show("GoToOutput")
-    DataDone(DataCorrected())
-  })
-
+  # apply corrections
   DataCorrected <- eventReactive(input$ApplyCorrections, {
     Rslt <- DataFormated()
     lapply(
@@ -928,8 +902,38 @@ server <- function(input, output, session) { # server ####
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
 
 
+  # place holder to put either corrected data or non corrected data
+  DataDone <- reactiveVal()
 
-  # save final data table
+  #decide what DataDone is going to be
+
+  observeEvent(input$SkipCorrections,
+               {
+                 DataDone(DataFormated())
+                 updateTabItems(session, "tabs", "OutputFormat")
+
+               })
+
+  observeEvent(input$ApplyCorrections,{
+    shinyjs::show("GoToOutput")
+    DataDone(DataCorrected())
+  })
+
+
+  # move on to next tab
+  observeEvent(input$GoToOutput, {
+    updateTabItems(session, "tabs", "OutputFormat")
+
+  })
+  observeEvent(input$GoToDownload, {
+    updateTabItems(session, "tabs", "Save")
+
+
+  }, ignoreInit = T)
+
+
+
+  # output tab ####
 
   DataOutput <- reactiveVal(NULL)
   profileOutput <- reactiveVal(NULL)
@@ -971,6 +975,8 @@ server <- function(input, output, session) { # server ####
 
     DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
 
+
+    # show and work on Codes translation if necessary
     if(!is.null(profileOutput$AllCodes) & !AllCodes()[1,1] %in% "You have not selected columns for codes") {
       shinyjs::show("CodeTranslationsDiv")
       output$uiCodeTranslations <-  renderUI({
@@ -1059,9 +1065,6 @@ server <- function(input, output, session) { # server ####
   })
 
 
-
-  # CodeTranslationFinal <- reactiveVal(data.frame(input = rownames(CodeTranslationTable), output = colnames(CodeTranslationTable)))
-
   observe({
     req(CodeTranslationFinal$dt$InputValue)
     # req(input$codes_MAIN)
@@ -1145,6 +1148,11 @@ server <- function(input, output, session) { # server ####
   output$DataOutputSummary <- renderPrint(summary(DataOutput()))
 
 
+
+
+  # download tab ####
+
+  # Save output data .csv
   output$dbFile <- downloadHandler(
     filename = function() {
       paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
@@ -1154,7 +1162,7 @@ server <- function(input, output, session) { # server ####
     }
   )
 
-  # save profile Rdata file
+  # Save profile .Rdata
 
   output$dbProfile <- downloadHandler(
     filename = function() {
@@ -1172,7 +1180,7 @@ server <- function(input, output, session) { # server ####
     }
   )
 
-  # save code needed to produce the table
+  # Save script .R
 
   output$dbCode <- downloadHandler(
     filename = function() {
@@ -1198,7 +1206,7 @@ server <- function(input, output, session) { # server ####
     }
   )
 
-  # Save metadata
+  # Save metadata .csv
 
   output$dbMetadata <- downloadHandler(
     filename = function() {
@@ -1238,7 +1246,7 @@ server <- function(input, output, session) { # server ####
     }
   )
 
-  # Help stuff
+  # Help tab ####
   output$AppGeneralWorkflow <- renderImage(
     list(src = "www/AppGeneralWorkflow.png",
          contentType = "image/png",
