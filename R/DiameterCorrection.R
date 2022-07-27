@@ -212,6 +212,44 @@ DiameterCorrection <- function(
 
   Data <- unique(Data)   # if there are duplicate rows, delete them
 
+
+  if(ByStem == TRUE){
+    ID <- "IdStem"
+  }else if (ByStem == FALSE) {
+    ID <- "IdTree"
+  }
+
+
+  # Check no duplicated IdTree/IdStem in a census ----------------------------------------------------------------------------
+
+  # Create "SitYearID" = "Site/Year/ID"
+  Data[, SitYearID := paste(Site, Year, get(ID), sep = "/")]
+
+  duplicated_ids <- ids <- vector("character")
+
+  # if any duplicates in this col
+  if(anyDuplicated(Data$SitYearID) != 0){
+    # For each site
+    for (s in unique(na.omit(Data$Site))) {
+      # For each census
+      for (y in unique(na.omit(Data$Year))) {
+
+        ids <- Data[Data$Site == s & Data$Year == y, get(ID)] # all the IDs for each Site and Year combination
+
+        # if there are several IdTree/IdStem per Site and Year combination
+        if(anyDuplicated(ids) != 0){
+          duplicated_ids <- unique(ids[duplicated(ids)])
+
+          stop("Duplicated '", ID, "' in the census ", y, ": ", paste0(duplicated_ids, collapse = "/"), "")
+
+        }
+      } # end year loop
+    } # end site loop
+  }
+
+  Data[, SitYearID := NULL]
+
+
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
   if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
 
