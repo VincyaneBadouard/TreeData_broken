@@ -591,7 +591,6 @@ tabItem("Codes",
               )
               ))
             }),
-            # radioButtons(inputId = "taper", label = "Apply taper corrections? (NOT IMPLEMENTED YET", choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
             hidden(actionBttn(
               inputId = "ApplyCorrections",
               label = "Apply Corrections",
@@ -654,8 +653,16 @@ tabItem("Codes",
             )
             ),
             fluidRow(hidden(div(id = "CodeTranslationsDiv", box(width = 12,
-              h4("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes with the same difinition, but you need to double check and fill out the rest of the codes"),
-              strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
+              h4("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes with the same difinitions, but you need to double check and fill out the rest of the codes"),
+              h3("Help"),
+              p(strong("Row names:"), "These are the your codes. They may come from multiple columns, indicated in the grey rows"),
+              p(strong("Column names:"), "These are the codes in the output profile you selected. They may come from multiple columns, given at the top of the table."),
+              p("What to do:"),
+              tags$li("Hover over the codes in the column names to see the defintions of the profile you selected."),
+              tags$li("For each of your codes, select the radio button in the column that corresponds most to your defintion. We already selected the buttons for codes that match defintions perfectly."),
+              tags$li("If there is no match, leave blank."),
+              tags$li("When you are done, double check your selection in the next table. When you are satisfied, click on the 'Apply Code Translation' button."),
+              # strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
               uiOutput("uiCodeTranslations"))))),
             fluidRow(
 

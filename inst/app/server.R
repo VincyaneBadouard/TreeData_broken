@@ -1013,7 +1013,7 @@ server <- function(input, output, session) { # server ####
         }
       }
 
-      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>"))
+      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
 
 
 
@@ -1035,7 +1035,7 @@ server <- function(input, output, session) { # server ####
         });
         Shiny.unbindAll(table.table().node());
         Shiny.bindAll(table.table().node());")
-        ),
+        ), # this is generating the radio buttons in the body of the table
        server = FALSE)
 
       # output$CodeTranslationTable <- renderHtmlTableWidget(
@@ -1078,7 +1078,26 @@ server <- function(input, output, session) { # server ####
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
-    datatable(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], options = list( paging = FALSE, scrollX=TRUE))
+    datatable(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")],
+              options = list( paging = FALSE, scrollX=TRUE),
+              container = htmltools::withTags(table(
+                # class = 'display',
+                thead(
+                  tr(
+                    th('Input', colspan = 2),
+                    th('Output', colspan = 2),
+                    th('defintions', colspan = 2)
+                  ),
+                  tr(
+                    th("Column"),
+                    th("Value"),
+                    th("Column"),
+                    th("Value"),
+                    th("Input"),
+                    th("Output")
+                  )
+                )
+              )), rownames = F)
   })
 
 
