@@ -6,7 +6,7 @@
 \usage{
 ErrorsDetection(
   Data,
-  ByStem = FALSE,
+  ByStem = TRUE,
   DeathConfirmation = 2,
   UseSize = FALSE,
   MinDBH = 10,

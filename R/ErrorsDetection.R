@@ -56,7 +56,7 @@
 ErrorsDetection <- function(
   Data,
 
-  ByStem = FALSE,
+  ByStem = TRUE,
 
   # Life status error detection
   DeathConfirmation = 2,

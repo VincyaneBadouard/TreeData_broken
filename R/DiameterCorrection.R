@@ -23,8 +23,6 @@
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
 #'
-#' @param MinDBH Minimum census DBH (Diameter at the default HOM) of your
-#'   protocol in cm (numeric, 1 value)
 #' @param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
 #'   stand in cm (numeric, 1 value)
 #'
@@ -109,6 +107,7 @@
 #'   - *DiameterCorrectionMeth* =
 #'   "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
 #'
+#'@importFrom utils capture.output
 #' @export
 #'
 #' @examples
@@ -126,10 +125,9 @@
 DiameterCorrection <- function(
   Data,
 
-  ByStem = FALSE,
+  ByStem = TRUE,
 
   DefaultHOM = 1.3,
-  MinDBH = 10,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
@@ -162,7 +160,7 @@ DiameterCorrection <- function(
     stop("The 'Diameter' (Diameter at Breast Height) column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
-  if(!all(unlist(lapply(list(DefaultHOM, MinDBH, MaxDBH,
+  if(!all(unlist(lapply(list(DefaultHOM, MaxDBH,
                              PositiveGrowthThreshold, NegativeGrowthThreshold, PioneersGrowthThreshold,
                              DBHRange, MinIndividualNbr),
                         length)) %in% 1) |
@@ -190,7 +188,7 @@ DiameterCorrection <- function(
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
-     warning(paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
+    warning(paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
     Digits <- as.integer(Digits)
   }
 
@@ -221,33 +219,19 @@ DiameterCorrection <- function(
 
 
   # Check no duplicated IdTree/IdStem in a census ----------------------------------------------------------------------------
+  DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
 
-  # Create "SitYearID" = "Site/Year/ID"
-  Data[, SitYearID := paste(Site, Year, get(ID), sep = "/")]
+  setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""))
 
-  duplicated_ids <- ids <- vector("character")
+  if(nrow(DuplicatedID) > 0){
 
-  # if any duplicates in this col
-  if(anyDuplicated(Data$SitYearID) != 0){
-    # For each site
-    for (s in unique(na.omit(Data$Site))) {
-      # For each census
-      for (y in unique(na.omit(Data$Year))) {
+    b <- capture.output(DuplicatedID)
+    c <- paste(b, "\n", sep = "")
+    cat("Your data set is:\n", c, "\n")
 
-        ids <- Data[Data$Site == s & Data$Year == y, get(ID)] # all the IDs for each Site and Year combination
+    stop("Duplicated ", ID, "(s) in a census:\n", c, "\n")
 
-        # if there are several IdTree/IdStem per Site and Year combination
-        if(anyDuplicated(ids) != 0){
-          duplicated_ids <- unique(ids[duplicated(ids)])
-
-          stop("Duplicated '", ID, "' in the census ", y, ": ", paste0(duplicated_ids, collapse = "/"), "")
-
-        }
-      } # end year loop
-    } # end site loop
   }
-
-  Data[, SitYearID := NULL]
 
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
@@ -275,6 +259,17 @@ DiameterCorrection <- function(
   # Dataset with the rows without IDS ----------------------------------------------------------------------------------
   DataIDNa <-  Data[is.na(get(ID))]
 
+
+  # Taper correction ------------------------------------------------------------------------------------------------------
+  # if("taper" %in% CorrectionType) {
+  #   Data <- TaperCorrection(Data,
+  #                           DefaultHOM = DefaultHOM,
+  #                           TaperParameter = TaperParameter, TaperFormula = TaperFormula,
+  #                           DetectOnly = DetectOnly)
+  # }
+
+
+
   # Apply for all the trees -----------------------------------------------------------------------------------------------
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
@@ -282,7 +277,6 @@ DiameterCorrection <- function(
     Data = Data,
 
     DefaultHOM = DefaultHOM,
-    MinDBH = MinDBH,
     MaxDBH = MaxDBH,
     PositiveGrowthThreshold = PositiveGrowthThreshold,
     NegativeGrowthThreshold = NegativeGrowthThreshold,
@@ -298,8 +292,6 @@ DiameterCorrection <- function(
     MinIndividualNbr = MinIndividualNbr,
     Digits = Digits,
 
-    TaperParameter = TaperParameter,
-    TaperFormula = TaperFormula,
     DetectOnly = DetectOnly
   )
   )) # do.call apply the 'rbind' to the lapply result
@@ -342,7 +334,6 @@ DiameterCorrection <- function(
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
 #'
-#' @param MinDBH Minimum census DBH of your protocol in cm (numeric, 1 value)
 #' @param MaxDBH Maximum possible DBH of your stand in cm (numeric, 1 value)
 #'
 #' @param PositiveGrowthThreshold in cm/year: a tree
@@ -371,13 +362,8 @@ DiameterCorrection <- function(
 #'              links them to the trust measurements set
 #'              (*TrustMeasSet* argument).
 #'
-#' @param CorrectionType c("taper", "linear", "quadratic", "individual",
-#'   "phylogenetic hierarchical") (character).
-#'   - "taper": correct for biases associated with nonstandard and changing
-#'              measurement heights, from a taper model (*TaperParameter* &
-#'              *TaperFormula* arguments).
-#'              Correction possible only if the 'HOM' (Height Of Measurement)
-#'              column is available.
+#' @param CorrectionType c("linear", "quadratic", "individual", "phylogenetic
+#'   hierarchical") (character).
 #'   - "linear": interpolation by linear regression of the individual annual
 #'               growth over time.
 #'   - "quadratic": interpolation by quadratic regression  of the individual
@@ -399,29 +385,13 @@ DiameterCorrection <- function(
 #' @param Digits Number of decimal places to be used in the 'DBHCor' column
 #'   (Default: 1L) (integer)
 #'
-#' @param TaperParameter Taper parameter (unitless) formula (function)
-#' Default: *TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)*
-#' of Cushman et al.2021.
-#' With:
-#'   - *DAB*: Diameter Above Buttress (in cm)
-#'   - *HOM*: Height Of Measurement (in m)
-#'
-#' @param TaperFormula Taper formula (function)
-#' Default: *DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))*
-#' of Cushman et al.2021.
-#' With:
-#'   - *DAB*: Diameter Above Buttress (in cm)
-#'   - *HOM*: Height Of Measurement (in m)
-#'   - *DefaultHOM*:  Default Height Of Measurement (in m)
-#'   - *TaperParameter*: Taper parameter (unitless)
-#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *DBHCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "taper"/"linear"/"quadratic"/"individual"
+#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"individual"
 #'   /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
 #'   realignment")
 #'
@@ -451,7 +421,6 @@ DiameterCorrectionByTree <- function(
   Data,
 
   DefaultHOM = 1.3,
-  MinDBH = 10,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
@@ -461,15 +430,11 @@ DiameterCorrectionByTree <- function(
 
   TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
   Digits = 1L,
-
-  TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
-
 
   DetectOnly = FALSE
 ){
@@ -513,17 +478,6 @@ DiameterCorrectionByTree <- function(
 
     # DBH > MaxDBH -> DBH = NA
     DBHCor[DBHCor > MaxDBH] <- NA
-
-    # Taper correction ------------------------------------------------------------------------------------------------------
-    if("taper" %in% CorrectionType) {
-      DataTree <- TaperCorrection(DataTree,
-                                  DefaultHOM = DefaultHOM,
-                                  TaperParameter = TaperParameter, TaperFormula = TaperFormula,
-                                  DetectOnly = DetectOnly)
-
-      DBHCor <- DataTree[, DBHCor]
-    }
-
 
     # Correction with POM ---------------------------------------------------------------------------------------------------
     if("POM change" %in% WhatToCorrect){

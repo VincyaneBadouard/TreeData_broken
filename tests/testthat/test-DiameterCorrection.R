@@ -25,7 +25,6 @@ test_that("DiameterCorrection", {
                regexp = "column does't exist in the dataset")
 
   expect_error(DiameterCorrection(TestData, DefaultHOM = "a",
-                                  MinDBH = TRUE,
                                   MaxDBH = c(1,2),
                                   PositiveGrowthThreshold = c("a", "b"),
                                   NegativeGrowthThreshold = "-2",

@@ -8,7 +8,6 @@ DiameterCorrectionByTree(
   DataTree,
   Data,
   DefaultHOM = 1.3,
-  MinDBH = 10,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
@@ -16,14 +15,10 @@ DiameterCorrectionByTree(
   PioneersGrowthThreshold = 7.5,
   TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("taper", "quadratic", "linear", "individual",
-    "phylogenetic hierarchical"),
+  CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
   Digits = 1L,
-  TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter * (HOM
-    - DefaultHOM))),
   DetectOnly = FALSE
 )
 }
@@ -46,8 +41,6 @@ The dataset must contain the columns:
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}
-
-\item{MinDBH}{Minimum census DBH of your protocol in cm (numeric, 1 value)}
 
 \item{MaxDBH}{Maximum possible DBH of your stand in cm (numeric, 1 value)}
 
@@ -80,14 +73,9 @@ links them to the trust measurements set
 (\emph{TrustMeasSet} argument).
 }}
 
-\item{CorrectionType}{c("taper", "linear", "quadratic", "individual",
-"phylogenetic hierarchical") (character).
+\item{CorrectionType}{c("linear", "quadratic", "individual", "phylogenetic
+hierarchical") (character).
 \itemize{
-\item "taper": correct for biases associated with nonstandard and changing
-measurement heights, from a taper model (\emph{TaperParameter} &
-\emph{TaperFormula} arguments).
-Correction possible only if the 'HOM' (Height Of Measurement)
-column is available.
 \item "linear": interpolation by linear regression of the individual annual
 growth over time.
 \item "quadratic": interpolation by quadratic regression  of the individual
@@ -111,26 +99,6 @@ cm) (numeric, 1 value)}
 \item{Digits}{Number of decimal places to be used in the 'DBHCor' column
 (Default: 1L) (integer)}
 
-\item{TaperParameter}{Taper parameter (unitless) formula (function)
-Default: \emph{TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)}
-of Cushman et al.2021.
-With:
-\itemize{
-\item \emph{DAB}: Diameter Above Buttress (in cm)
-\item \emph{HOM}: Height Of Measurement (in m)
-}}
-
-\item{TaperFormula}{Taper formula (function)
-Default: \emph{DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))}
-of Cushman et al.2021.
-With:
-\itemize{
-\item \emph{DAB}: Diameter Above Buttress (in cm)
-\item \emph{HOM}: Height Of Measurement (in m)
-\item \emph{DefaultHOM}:  Default Height Of Measurement (in m)
-\item \emph{TaperParameter}: Taper parameter (unitless)
-}}
-
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}
 }
@@ -139,7 +107,7 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
 \item \emph{DBHCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "taper"/"linear"/"quadratic"/"individual"
+\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"individual"
 /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
 realignment")
 }

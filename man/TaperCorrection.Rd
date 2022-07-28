@@ -5,7 +5,7 @@
 \title{TaperCorrection}
 \usage{
 TaperCorrection(
-  DataTree,
+  Data,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter) DAB/(2 * exp(-TaperParameter * (HOM
@@ -14,12 +14,11 @@ TaperCorrection(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
-measurements (data.frame or data.table).
+\item{Data}{Dataset (data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'Diameter'
-\item \strong{'HOM'(Height Of Measurement) (numeric)}
+\item \code{Diameter} (numeric)
+\item \strong{\code{HOM} (Height Of Measurement) (numeric)}
 }}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
@@ -60,12 +59,11 @@ TaperCorrection
 \examples{
 library(data.table)
 
-DataTree <- data.table(IdTree = "c",
-      Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
-      Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+Data <- data.table(
+      Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2),
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
-Rslt <- TaperCorrection(DataTree)
+Rslt <- TaperCorrection(Data)
 
 }

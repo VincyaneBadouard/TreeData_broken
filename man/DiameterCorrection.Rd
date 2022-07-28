@@ -6,9 +6,8 @@
 \usage{
 DiameterCorrection(
   Data,
-  ByStem = FALSE,
+  ByStem = TRUE,
   DefaultHOM = 1.3,
-  MinDBH = 10,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
@@ -52,9 +51,6 @@ tree (logical)}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}
-
-\item{MinDBH}{Minimum census DBH (Diameter at the default HOM) of your
-protocol in cm (numeric, 1 value)}
 
 \item{MaxDBH}{Maximum possible DBH (Diameter at the default HOM) of your
 stand in cm (numeric, 1 value)}
