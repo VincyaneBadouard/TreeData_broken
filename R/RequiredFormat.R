@@ -81,23 +81,29 @@ RequiredFormat <- function(
 
   setDF(Data) # just for this step then we can put back in data.table
 
+  idx <- match(gsub("[[:punct:]]| ", "", colnames(Data)), gsub("[[:punct:]]| ", "", input[x$ItemID]))
+  NewColNames <- names(input[x$ItemID])[idx]
+
   ## deal with TreeCodes separately
   ## repeat cases where multiple columns match one item (only checked for Treecodes, need to check what happens for other columns)
   multiplecolumns <- names(which(sapply(input[x$ItemID], length)>1))
   if(any(!multiplecolumns %in% "TreeCodes")) stop ("You've selected multiple columns for something other than 'TreeCodes', please contact us at herrmannv@si.edu")
 
-  if(all(multiplecolumns %in%  "TreeCodes")) {
+  if(length(multiplecolumns) > 0 & all(multiplecolumns %in%  "TreeCodes")) {
   Treecodes <- input[multiplecolumns][[1]]
   names(Treecodes) <- rep(multiplecolumns, length(Treecodes))
   input[multiplecolumns] <- NULL
+
+  NewColNames[ colnames(Data) %in% Treecodes] <- paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])
+
+  } else {
+    if(!input$TreeCodes %in% "none") {
+      NewColNames[ colnames(Data) %in% input$TreeCodes] <- paste0("Original_",input$TreeCodes)
+    }
   }
 
 
-
-  idx <- match(gsub("[[:punct:]]| ", "", colnames(Data)), gsub("[[:punct:]]| ", "", input[x$ItemID]))
-
-  NewColNames <- names(input[x$ItemID])[idx]
-  NewColNames[ colnames(Data) %in% Treecodes] <- paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])
+  # change columns
 
   colnames(Data) <- NewColNames
 
