@@ -496,8 +496,13 @@ server <- function(input, output, session) { # server ####
                                })
 
   AreaUnitOptions <- eventReactive(input$PlotArea,
-                                   {c("none", "m2", "ha", "km2")
+                                   {c("none", "cm2", "m2", "ha", "km2")
                                    })
+
+  AreaByAreaUnitOptions <- reactiveVal(c("cm2/ha"))
+  VolumeByAreaUnitOptions<- reactiveVal(c("cm3/ha"))
+
+
 
 
   LifeStatusOptions <- eventReactive(input$LifeStatus, {
