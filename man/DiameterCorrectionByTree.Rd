@@ -30,13 +30,13 @@ measurements (data.frame or data.table).}
 hierarchical" correction (\emph{CorrectionType} argument) is chosen.
 The dataset must contain the columns:
 \itemize{
-\item 'IdTree' (character)
-\item 'IdStem' (character) if \emph{ByStem} argument = TRUE
-\item 'ScientificName' (character)
-\item 'Genus' (character)
-\item 'Family' (character)
-\item 'Diameter' (numeric)
-\item 'Year' (numeric)
+\item \code{IdTree} (character)
+\item \code{IdStem} (character) if \emph{ByStem} argument = TRUE
+\item \code{ScientificName} (character)
+\item \code{Genus} (character)
+\item \code{Family} (character)
+\item \code{Diameter} (numeric)
+\item \code{Year} (numeric)
 }}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
@@ -114,6 +114,11 @@ realignment")
 }
 \description{
 DiameterCorrectionByTree
+}
+\details{
+When there is only 1 \code{Diameter} value for a tree/stem, \code{DBHCor}
+takes the original \code{Diameter} value. If this value is 0 or > MaxDBH,
+\code{DBHCor} takes NA.
 }
 \examples{
 library(data.table)

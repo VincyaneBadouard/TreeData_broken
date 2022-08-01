@@ -53,9 +53,9 @@ IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 \item Check of the \emph{unique association of the idTree with plot, subplot and
 TreeFieldNum} (at the site scale)
 \item Check \strong{duplicated idTree/IdStem} in a census (at the site scale)
-\item Check for trees \strong{outside the subplot}
+\item Check for trees \strong{outside the subplot} (not implemented yet)
 \item Check \strong{invariant coordinates per IdTree/IdStem}
-\item Check \strong{fix Plot and SubPlot number}
+\item Check \strong{fix Plot and SubPlot number} (not implemented yet)
 \item Check botanical identification (\emph{BotanicalCorrection})
 \item Check the life status evolution of the trees (\emph{StatusCorrection})
 \item Check diameter evolution of the trees (\emph{DiameterCorrection})

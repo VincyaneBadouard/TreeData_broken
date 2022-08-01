@@ -30,9 +30,9 @@
 #'   - Check of the *unique association of the idTree with plot, subplot and
 #'      TreeFieldNum* (at the site scale)
 #'   - Check **duplicated idTree/IdStem** in a census (at the site scale)
-#'   - Check for trees **outside the subplot**
+#'   - Check for trees **outside the subplot** (not implemented yet)
 #'   - Check **invariant coordinates per IdTree/IdStem**
-#'   - Check **fix Plot and SubPlot number**
+#'   - Check **fix Plot and SubPlot number** (not implemented yet)
 #'
 #'   - Check botanical identification (*BotanicalCorrection*)
 #'   - Check the life status evolution of the trees (*StatusCorrection*)

@@ -107,7 +107,12 @@
 #'   - *DiameterCorrectionMeth* =
 #'   "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
 #'
-#'@importFrom utils capture.output
+#' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
+#'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
+#'   `DBHCor` takes NA.
+#'
+#' @importFrom utils capture.output
+#'
 #' @export
 #'
 #' @examples
@@ -323,13 +328,13 @@ DiameterCorrection <- function(
 #' @param Data Complete dataset (data.table) used if the "phylogenetic
 #'   hierarchical" correction (*CorrectionType* argument) is chosen.
 #'   The dataset must contain the columns:
-#'   - 'IdTree' (character)
-#'   - 'IdStem' (character) if *ByStem* argument = TRUE
-#'   - 'ScientificName' (character)
-#'   - 'Genus' (character)
-#'   - 'Family' (character)
-#'   - 'Diameter' (numeric)
-#'   - 'Year' (numeric)
+#'   - `IdTree` (character)
+#'   - `IdStem` (character) if *ByStem* argument = TRUE
+#'   - `ScientificName` (character)
+#'   - `Genus` (character)
+#'   - `Family` (character)
+#'   - `Diameter` (numeric)
+#'   - `Year` (numeric)
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
@@ -395,7 +400,11 @@ DiameterCorrection <- function(
 #'   /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
 #'   realignment")
 #'
-#'@importFrom stats na.omit
+#' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
+#'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
+#'   `DBHCor` takes NA.
+#'
+#' @importFrom stats na.omit
 #'
 #' @export
 #'
@@ -789,8 +798,12 @@ DiameterCorrectionByTree <- function(
 
       DataTree[, DBHCor := round(DBHCor, digits = Digits)] }
 
-  }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 dbh value
-    DataTree[, DBHCor := NA]
+  }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
+    DataTree[, DBHCor := Diameter] # keep original Diameter
+
+    # DBH = 0 or > MaxDBH is impossible
+    DataTree[DBHCor == 0 | DBHCor > MaxDBH, DBHCor := NA]
+
   }
 
   return(DataTree)

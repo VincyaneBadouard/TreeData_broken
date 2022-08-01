@@ -42,7 +42,38 @@ test_that("DiameterCorrectionByTree", {
                                                       "individual", "phylogenetic hierarchical"))
 
   expect_true(Rslt$Diameter == OnlyOne$Diameter) # same Diameter value
-  expect_true(is.na(Rslt$DBHCor)) # no possible correction
+  expect_true(Rslt$DBHCor == OnlyOne$Diameter) # Keep the original Diameter value
+
+  # Only one but too big
+  OnlyOne <- data.table(IdTree = "c",
+                        ScientificName = "A",
+                        Year = 2000,
+                        Diameter = 900,
+                        POM = 0,
+                        HOM = 1.3)
+
+  Rslt <- DiameterCorrectionByTree(OnlyOne,
+                                   OnlyOne,
+                                   WhatToCorrect = c("POM change", "punctual", "shift"),
+                                   CorrectionType = c("quadratic", "linear",
+                                                      "individual", "phylogenetic hierarchical"))
+  expect_true(is.na(Rslt$DBHCor)) # impossible value
+
+
+  # Only one but = 0 (impossible)
+  OnlyOne <- data.table(IdTree = "c",
+                        ScientificName = "A",
+                        Year = 0,
+                        Diameter = 900,
+                        POM = 0,
+                        HOM = 1.3)
+
+  Rslt <- DiameterCorrectionByTree(OnlyOne,
+                                   OnlyOne,
+                                   WhatToCorrect = c("POM change", "punctual", "shift"),
+                                   CorrectionType = c("quadratic", "linear",
+                                                      "individual", "phylogenetic hierarchical"))
+  expect_true(is.na(Rslt$DBHCor)) # impossible value
 
 
   # Taper correction ---------------------------------------------------------------------------------------------------

@@ -151,6 +151,11 @@ Fill the \emph{Comment} column with error type informations. If
 \description{
 Diameter correction
 }
+\details{
+When there is only 1 \code{Diameter} value for a tree/stem, \code{DBHCor}
+takes the original \code{Diameter} value. If this value is 0 or > MaxDBH,
+\code{DBHCor} takes NA.
+}
 \examples{
 library(data.table)
 data(TestData)
