@@ -39,7 +39,7 @@ A named list
 \item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
 \item{MinDBH}{Value or column name in data set @ParacouSubset (none) corresponding to Minimum DBH}
 \item{MinDBHMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is the minimum diameter of trees included in your inventory?}
-\item{MinDBHUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your unit for the column indicating the minimum DBH?}
+\item{MinDBHUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your unit for the column indicating the minimum DBH? If not provided, it will be calculated looking at your Diameter column}
 \item{Plot}{Value or column name in data set @ParacouSubset (Plot) corresponding to Plot name}
 \item{PlotArea}{Value or column name in data set @ParacouSubset (PlotArea) corresponding to Plot area}
 \item{PlotAreaMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your plot area in hectare?}
@@ -62,6 +62,7 @@ A named list
 \item{TickedMelt2}{Some value entered via interaction with the Shiny app}
 \item{TickedMelt3}{Some value entered via interaction with the Shiny app}
 \item{Tidy}{Some value entered via interaction with the Shiny app}
+\item{TreeCodes}{Value or column name in data set @ParacouSubset (none) corresponding to Select all the columns that give information about your tree, and/or your methods of measurements}
 \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree tag}
 \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
 \item{TreeHeightUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your tree height unit?}
