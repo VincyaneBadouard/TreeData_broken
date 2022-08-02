@@ -22,12 +22,12 @@ Data[modif, Diameter := 0]
 
 #### Missing coordinates ####
 modif <- Data[, .I[sample(.N, nError)]] # .I = seq_len(nrow(Data)), .N = nrows in the group -> sample 2 rows number in Data
-Data[modif, Xutm := NA]
-Data[modif, Yutm := NA]
+Data[modif, XTreeUTM := NA]
+Data[modif, YTreeUTM := NA]
 # Data[modif] # to check
 
 #### Other missing values ####
-Vars <- c("PlotArea", "Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
+Vars <- c("PlotArea", "Plot", "Subplot", "Year", "TreeFieldNum", "IdTree",
           "Diameter", "LifeStatus", "POM", "Family", "Genus", "Species",
           "VernName", "ScientificName", "CommercialSp")
 
@@ -70,7 +70,7 @@ Last_census[IdTree == 101410] # alive
 modif <- Data[, .I[sample(.N, nError)]] # 1 row to change
 duplicatedFieldNum <- Data[!(row.names(Data)) %in% modif & # all rows != modif
                              Plot == Data[modif, Plot] & # same plot as modif
-                             SubPlot == Data[modif, SubPlot], # same subplot as modif
+                             Subplot == Data[modif, Subplot], # same subplot as modif
                            sample(TreeFieldNum,1)] # 1 TreeFieldNum to duplicate
 
 Data[modif, TreeFieldNum := duplicatedFieldNum] # on the row to modif, we duplicate the TreeFieldNum

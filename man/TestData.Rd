@@ -10,21 +10,21 @@ A tibble with 4855 rows and 32 variables:
 \item{Site}{Site name (character)}
 \item{Plot}{Plot number (character)}
 \item{PlotArea}{Plot area, in hectare (numeric)}
-\item{SubPlot}{Subplot number (character)}
-\item{SubSubPlot}{Dummy sub-sub-plots created for the package (character)}
+\item{Subplot}{Subplot number (character)}
+\item{SubSubplot}{Dummy sub-sub-plots created for the package (character)}
 \item{TreeFieldNum}{Tree unique identifiers within the subplot (matching
 the tag number in the field) (character)}
 \item{IdTree}{Unique tree identifier from the database (character)}
 \item{Protocole}{Protocole name (character)}
-\item{Xplot}{Euclidean position of the tree relative to
+\item{XTreePlot}{Euclidean position of the tree relative to
 the Southwestern corner of the subplot, in m (numeric)}
-\item{Yplot}{Euclidean position of the tree relative to
+\item{YTreePlot}{Euclidean position of the tree relative to
 the Southwestern corner of the subplot, in m (numeric)}
-\item{Xutm}{Coordinate X for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
-\item{Yutm}{Coordinate Y for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
+\item{XTreeUTM}{Coordinate X for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
+\item{YTreeUTM}{Coordinate Y for the tree in UTM 22 N (EPSG: 32 622) (numeric)}
 \item{UTMZone}{UTM Zone (integer)}
-\item{Lat}{Tree latitude (WGS 84, EPSG : 4326) (numeric)}
-\item{Lon}{Tree longitude (WGS 84, EPSG : 4326) (numeric)}
+\item{TreeLat}{Tree latitude (WGS 84, EPSG : 4326) (numeric)}
+\item{TreeLon}{Tree longitude (WGS 84, EPSG : 4326) (numeric)}
 \item{Family}{Botanical family (character)}
 \item{Genus}{Botanical genus (character)}
 \item{Species}{Botanical species (character)}
