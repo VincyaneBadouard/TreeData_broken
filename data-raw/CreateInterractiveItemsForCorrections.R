@@ -8,13 +8,14 @@ Fct_args <- NULL
 
 for(rd in c("ErrorsDetection.Rd",
             "StatusCorrection.Rd",
+            "TaperCorrection.Rd",
             "DiameterCorrection.Rd")) {
 
   tools::Rd2HTML(db[[rd]], outfile)
 
-  Label <- as.character(html_nodes(read_html(outfile ), "tr")[-1])
+  Label <- as.character(rvest::html_nodes(xml2::read_html(outfile ), "tr")[-1])
 
-  Fct_args <- rbind(Fct_args, data.frame( Function = gsub("\\.Rd", "", rd),  Label = as.character(html_nodes(read_html(outfile ), "tr")[-1])
+  Fct_args <- rbind(Fct_args, data.frame( Function = gsub("\\.Rd", "", rd),  Label = as.character(rvest::html_nodes(xml2::read_html(outfile ), "tr")[-1])
   ))
 
 }
@@ -53,8 +54,7 @@ df_moreInfo <-
              argValue = c("OtherOptions", "OtherOptions", "LogicalOptions", "TBD", "OtherOptions", "TBD", "OtherOptions", "Function")) # TBD because some need to be column names, others need to be list of options given by default.
 
 
-Fct_args <- cbind(Fct_args, df_moreInfo[match(sapply(Fct_args$Default, function(x) paste(class(eval(x)), class(x))), df_moreInfo$class), -1], ReactiveArgValue
-                  = T) # by default is a reactive in the app, but when list of option defined in the function, it will be changed to FALSE
+Fct_args <- cbind(Fct_args, df_moreInfo[match(sapply(Fct_args$Default, function(x) paste(class(eval(x)), class(x))), df_moreInfo$class), -1], ReactiveArgValue = T) # by default is a reactive in the app, but when list of option defined in the function, it will be changed to FALSE
 
 ## get the list of columns
 x <- read.csv("inst/app/data/interactive_items.csv")
