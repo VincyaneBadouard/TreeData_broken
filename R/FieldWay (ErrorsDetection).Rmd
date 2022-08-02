@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Objective: Detect errors
 - Check *duplicate rows*
-- Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
+- Check *missing value* in X-YTreeUTM/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
 IdTree/DBH/MeasCode/Family/Genus/Species/VernName
 - Check *missing value* (NA/0) in the measurement variables  
 
@@ -66,7 +66,7 @@ If the column exists, but have NA values
 # Check size : DBH, POM(?)
 Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
           "DBH", "POM", "TreeHeight", "StemHeight", "MeasCode",
-          "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
+          "XTreeUTM", "YTreeUTM", "Family", "Genus", "Species", "VernName")
 
 for (v in 1:length(Vars)) {
   
@@ -221,10 +221,10 @@ duplicated_ID <- CorresIDs <- vector("character")
 for (s in unique(na.omit(Data$Site))) {
   
   CoordIDCombination <- na.omit(unique(
-    Data[Data$Site == s, .(IdTree, Xutm, Yutm)]
+    Data[Data$Site == s, .(IdTree, XTreeUTM, YTreeUTM)]
   ))
   
-  CorresIDs <- CoordIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+  CorresIDs <- CoordIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
   
   if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
     
@@ -234,12 +234,12 @@ for (s in unique(na.omit(Data$Site))) {
                             condition =
                               Data[,Site] == s
                             & Data[,IdTree] %in% duplicated_ID,
-                            comment = "Different coordinates (Xutm, Yutm) for a same IdTree")
+                            comment = "Different coordinates (XTreeUTM, YTreeUTM) for a same IdTree")
   }
 } # end site loop
 
 unique(Data[IdTree %in% duplicated_ID,
-            .(IdTree = sort(IdTree), Xutm, Yutm, Comment)]) # to check 
+            .(IdTree = sort(IdTree), XTreeUTM, YTreeUTM, Comment)]) # to check 
 ```
 
 ## Check fix Plot and SubPlot number 
