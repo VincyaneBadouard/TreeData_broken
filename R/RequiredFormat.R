@@ -86,7 +86,7 @@ RequiredFormat <- function(
 
   ## deal with TreeCodes separately
   ## repeat cases where multiple columns match one item (only checked for Treecodes, need to check what happens for other columns)
-  multiplecolumns <- names(which(sapply(input[x$ItemID], length)>1))
+  multiplecolumns <- names(which(sapply(input[x$ItemID[!x$Group %in% "second column"]], length)>1))
   if(any(!multiplecolumns %in% "TreeCodes")) stop ("You've selected multiple columns for something other than 'TreeCodes', please contact us at herrmannv@si.edu")
 
   if(length(multiplecolumns) > 0 & all(multiplecolumns %in%  "TreeCodes")) {
@@ -123,7 +123,7 @@ RequiredFormat <- function(
 
 
   setDT(Data)
-  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environemnt
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
   # coerce to data types ####
   ### as.character
@@ -252,11 +252,11 @@ RequiredFormat <- function(
     Data[, Plot :=  PlotMan]
   }
 
-  if (input$SubPlot %in% "none"){
-    if(input$SubPlotMan %in% "")  warning("You did not specify a subplot column or name, we will consider you have only one subplot called 'SubPlotA'")
+  if (input$Subplot %in% "none"){
+    if(input$SubplotMan %in% "")  warning("You did not specify a subplot column or name, we will consider you have only one subplot called 'SubplotA'")
 
-    SubPlotMan <- ifelse(input$SubPlotMan %in% "", "SubPlotA", input$SubPlotMan)
-    Data[, SubPlot := SubPlotMan]
+    SubplotMan <- ifelse(input$SubplotMan %in% "", "SubplotA", input$SubplotMan)
+    Data[, Subplot := SubplotMan]
   }
 
   ## IdTree (unique along IdCensus) ####
@@ -280,12 +280,12 @@ RequiredFormat <- function(
         warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
 
       if(any(is.na(Data$TreeFieldNum))) {
-        Data[is.na(TreeFieldNum), TreeFieldNum := paste0(seq(1, .N), "_auto") , by = .(Site, Plot, SubPlot, IdCensus)]
+        Data[is.na(TreeFieldNum), TreeFieldNum := paste0(seq(1, .N), "_auto") , by = .(Site, Plot, Subplot, IdCensus)]
       }
 
-      Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
+      Data[is.na(IdTree), IdTree := paste(Site, Plot, Subplot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
 
-      Data[is.na(IdTree), IdTree := paste(Site, Plot, SubPlot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
+      Data[is.na(IdTree), IdTree := paste(Site, Plot, Subplot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
 
     }
 
@@ -337,8 +337,15 @@ RequiredFormat <- function(
   ## Diameter if we have circumference ####
   if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") stop("You do not have tree size (Diameter, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
 
-  if(input$Diameter %in% "none" & !input$Circ %in% "none") Data[, Diameter := round(Circ/pi, 2)]
-  if(input$BD %in% "none" & !input$BCirc %in% "none") Data[, BD := round(BCirc/pi, 2)]
+  if(input$Diameter %in% "none" & !input$Circ %in% "none") {
+    Data[, Diameter := round(Circ/pi, 2)]
+    input$DiameterUnitMan <- input$CircUnitMan
+  }
+  if(input$BD %in% "none" & !input$BCirc %in% "none") {
+    Data[, BD := round(BCirc/pi, 2)]
+    input$BDUnitMan <- input$BCircUnitMan
+
+  }
 
 
   ## MinDBH if we don't have it
@@ -357,267 +364,324 @@ RequiredFormat <- function(
   }
 
 
-  # Units changing ####
-
-  unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
-
-  AreaUnitOptions <- c("m2", "ha", "km2")
-
-  ### Diameter, MinDBH and BD in cm ####
-  # if((!input$Diameter %in% "none" & !input$DiameterUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
-
-  if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
-
-    SizeUnit <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
-
-    if(!SizeUnit %in% unitOptions) stop(paste("Your tree size units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if(SizeUnit %in% unitOptions) {
-
-    if (SizeUnit == "mm") Data[, Diameter := Diameter/10] # mm -> cm
-
-    if (SizeUnit == "dm") Data[, Diameter := Diameter*10] # dm -> cm
-
-    if (SizeUnit == "m") Data[, Diameter := Diameter*100] # m -> cm
-    }
-
-    # (re)calculate Circ
-    Data[, Circ := round(Diameter*pi, 2)]
-  }
-
-  if(!input$BD %in% "none" | !input$BCirc %in% "none") {
-
-    BSizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
-
-    if(!BSizeUnit %in% unitOptions) stop(paste("Your basal size units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if(BSizeUnit %in% unitOptions) {
-      if (BSizeUnit == "mm") Data[, BD := BD/10] # mm -> cm
-
-      if (BSizeUnit == "dm") Data[, BD := BD*10] # dm -> cm
-
-      if (BSizeUnit == "m") Data[, BD := BD*100] # m -> cm
-    }
-
-    Data[, BCirc := round(BD*pi, 2)]
-  }
-
-  if(!input$MinDBH %in% "none") {
-
-    SizeUnit <- input$MinDBHUnitMan
-
-    if(!SizeUnit %in% unitOptions) stop(paste("Your minimum DBH size units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if(SizeUnit %in% unitOptions) {
-
-      if (SizeUnit == "mm") Data[, MinDBH := MinDBH/10] # mm -> cm
-
-      if (SizeUnit == "dm") Data[, MinDBH := MinDBH*10] # dm -> cm
-
-      if (SizeUnit == "m") Data[, MinDBH := MinDBH*100] # m -> cm
-    }
-
-  }
-
-  ### HOM and BHOM in m ####
-  # if(!input$HOM %in% "none" & !input$HOMUnit %in% "none") stop("We have not coded the case where HOM units are not constant across your data yet - Please contact us or unify your units first.")
-
-  if(!input$HOM %in% "none") {
-
-    # if(input$HOMUnitMan %in% "none") stop("we need HOM units")
-
-    HOMUnit <- input$HOMUnitMan
-
-    if(!HOMUnit %in% unitOptions) stop(paste("Your HOM units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if (HOMUnit %in% unitOptions) {
-
-      if (HOMUnit == "mm") Data[, HOM := HOM/1000] # mm -> m
-
-      if (HOMUnit == "cm") Data[, HOM := HOM/100] # cm -> m
-
-
-      if (HOMUnit == "dm") Data[, HOM := HOM/10] # dm -> m
-    }
-  }
-
-  if(!input$BHOM %in% "none") {
-
-    # if(input$BHOMUnitMan %in% "none") stop("we need basal HOm units")
-
-
-    BHOMUnit <- input$BHOMUnitMan
-
-    if(!BHOMUnit %in% unitOptions) stop(paste("Your basal HOM units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if (BHOMUnit %in% unitOptions) {
-
-      if (BHOMUnit == "mm") Data[, BHOM := BHOM/1000] # mm -> m
-
-      if (BHOMUnit == "cm") Data[, BHOM := BHOM/100] # cm -> m
-
-      if (BHOMUnit == "dm") Data[, BHOM := BHOM/10] # dm -> m
-    }
-  }
-
-
-  ### TreeHeight in m ####
-  # if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
-
-
-  if(!input$TreeHeight %in% "none") {
-
-    # if(input$TreeHeightUnitMan %in% "none") stop("we need tree height units")
-
-    TreeHeightUnit <- input$TreeHeightUnitMan
-
-    if(!TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if (TreeHeightUnit %in% unitOptions) {
-
-      if (TreeHeightUnit == "mm") Data[, TreeHeight := TreeHeight/1000] # mm -> m
-
-      if (TreeHeightUnit == "cm") Data[, TreeHeight := TreeHeight/100] # cm -> m
-
-      if (TreeHeightUnit == "dm") Data[, TreeHeight := TreeHeight/10] # dm -> m
-    }
-  }
-
-
-
-
-  ### PlotArea in ha ####
-
-  if(!input$PlotArea %in% "none") {
-
-    # if(input$PlotAreaUnitMan %in% "none") stop("we need Plot Area units")
-
-    PlotAreaUnit <- input$PlotAreaUnitMan
-
-    if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your plot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
-
-    if (PlotAreaUnit %in% AreaUnitOptions) {
-
-      if (PlotAreaUnit == "m2") Data[, PlotArea := PlotArea/10000] # m2 -> ha
-
-      if (PlotAreaUnit == "km2") Data[, PlotArea := PlotArea*100] # km2 -> ha
-    }
-  }
-
-  # if area is entered manually, it is supposed to be in ha already
+  # PlotArea (if area is entered manually, it is supposed to be in ha already)
   if(input$PlotArea %in% "none") {
-    if(!input$PlotAreaMan %in% -999) Data[, PlotArea := input$PlotAreaMan]
+    if(!input$PlotAreaMan %in% -999) {
+      Data[, PlotArea := input$PlotAreaMan]
+      input$PlotAreaUnitMan <- "ha"
+    }
 
     if(input$PlotAreaMan %in% -999) warning("You did not specify a plot area")
   }
 
-  ### SubPlotArea in ha ####
+  # SubplotArea (if area is entered manually, it is supposed to be in ha already)
+  if(input$SubplotArea %in% "none") {
 
-  if(!input$SubPlotArea %in% "none") {
-
-    SubPlotAreaUnitMan <- input$SubPlotAreaUnitMan
-
-    if(!SubPlotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your subplot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
-
-    if (SubPlotAreaUnitMan %in% AreaUnitOptions){
-
-      if (SubPlotAreaUnitMan == "m2") Data[, SubPlotArea := SubPlotArea/10000] # m2 -> ha
-      if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea*100] # km2 -> ha
+    if(!input$SubplotAreaMan %in% -999) {
+      Data[, SubplotArea := input$SubplotAreaMan]
+      input$SubplotAreaUnitMan <- "ha"
     }
-  }
 
-  # if area is entered manually, it is supposed to be in ha already
-  if(input$SubPlotArea %in% "none") {
-
-    if(!input$SubPlotAreaMan %in% -999) Data[, SubPlotArea := input$SubPlotAreaMan]
-
-    if(input$SubPlotAreaMan %in% -999) warning("You did not specify a subplot area")
+    if(input$SubplotAreaMan %in% -999) warning("You did not specify a subplot area")
 
   }
 
-  ### XY coordinates in m ####
+  # convert units to standards ####
+
+  units::remove_unit(c("ha", "ind"), c("hectare", "individual"))
+
+  units::install_unit("ha", "10000 m2", "hectare")
+  units::install_unit("ind", name =  "individual")
 
 
-  if(!input$Xutm %in% "none") {
+  StandardUnitTable <- do.call(rbind, lapply(grep("UnitMan", x$ItemID, value = T), function(i) {
 
-    utmUnitMan <- input$utmUnitMan
+    ItemID <-  sub("UnitMan", "", i)
 
-    if(!utmUnitMan %in% unitOptions) stop(paste("Your utm units are not one of:", paste(unitOptions, collapse = ", ")))
+    if(is.na(x$Unit[match(ItemID, x$ItemID)])) ItemID <- paste0(c("X", "Y"), ItemID)
 
-    if (utmUnitMan %in% unitOptions) {
 
-      if (utmUnitMan == "mm") {
-        Data[, Xutm := Xutm/1000] # mm -> m
-        Data[, Yutm := Yutm/1000] # mm -> m
-      }
+    data.frame(ItemID = ItemID,
+               UnitMan = i,
+               StandardUnit = x$Unit[match(ItemID, x$ItemID)]
+    )
 
-      if (utmUnitMan == "cm") {
-        Data[, Xutm := Xutm/100] # cm -> m
-        Data[, Yutm := Yutm/100] # cm -> m
+  }))
 
-        }
+  StandardUnitTable <- StandardUnitTable[!input[StandardUnitTable$ItemID] %in% "none", ] # keep only the ones we need
 
-      if (utmUnitMan == "dm") {
-        Data[, Xutm := Xutm/10] # dm -> m
-        Data[, Yutm := Yutm/10] # dm -> m
-        }
+  if(any(is.na(StandardUnitTable$StandardUnit))) stop("Some Stanadrd unit have not been defined, contact HerrmannV@si.edu")
 
-    }
+  setDF(Data)
+  idx <- which(StandardUnitTable$ItemID %in% NewColNames)
+
+  # if(any(input[StandardUnitTable$UnitMan[idx]] %in% "none")) stop(paste0("You did not specify units for ", gsub("UnitMan", "", StandardUnitTable$UnitMan[idx][input[StandardUnitTable$UnitMan[idx]]%in%"none"]), "."))
+  #
+  # idx <- idx[!input[StandardUnitTable$UnitMan[idx]] %in% "none"]
+
+  for(i in idx) {
+    # setting units
+    units(Data[, StandardUnitTable$ItemID[i]]) <- input[[StandardUnitTable$UnitMan[i]]]
+    # converting units
+    units(Data[, StandardUnitTable$ItemID[i]]) <- StandardUnitTable$StandardUnit[i]
+    # remove units class
+    units(Data[, StandardUnitTable$ItemID[i]]) <- NULL
+
+
   }
 
-  if(!input$Xplot %in% "none") {
+  setDT(Data)
+  Data <- copy(Data)
+  # # Units changing ####
+  #
+  # unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
+  #
+  # AreaUnitOptions <- c("m2", "ha", "km2")
 
-    plotUnitMan <- input$plotUnitMan
+  # ### Diameter, MinDBH and BD in cm ####
+  # # if((!input$Diameter %in% "none" & !input$DiameterUnit %in% "none") | (!input$Circ %in% "none" & !input$CircUnit %in% "none")) stop("We have not coded the case where size units are not constant across your data yet - Please contact us or unify your units first.")
+  #
+  # if(!input$Diameter %in% "none" | !input$Circ %in% "none") {
+  #
+  #   SizeUnit <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
+  #
+  #   if(!SizeUnit %in% unitOptions) stop(paste("Your tree size units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if(SizeUnit %in% unitOptions) {
+  #
+  #   if (SizeUnit == "mm") Data[, Diameter := Diameter/10] # mm -> cm
+  #
+  #   if (SizeUnit == "dm") Data[, Diameter := Diameter*10] # dm -> cm
+  #
+  #   if (SizeUnit == "m") Data[, Diameter := Diameter*100] # m -> cm
+  #   }
+  #
+  #   # (re)calculate Circ
+  #   Data[, Circ := round(Diameter*pi, 2)]
+  # }
+  #
+  # if(!input$BD %in% "none" | !input$BCirc %in% "none") {
+  #
+  #   BSizeUnit <- grep("[^none]", c(input$BDUnitMan, input$BCircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit (not a big deal since we only care about Diameter and we already converted it from Circ if that was the only size we had)
+  #
+  #   if(!BSizeUnit %in% unitOptions) stop(paste("Your basal size units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if(BSizeUnit %in% unitOptions) {
+  #     if (BSizeUnit == "mm") Data[, BD := BD/10] # mm -> cm
+  #
+  #     if (BSizeUnit == "dm") Data[, BD := BD*10] # dm -> cm
+  #
+  #     if (BSizeUnit == "m") Data[, BD := BD*100] # m -> cm
+  #   }
+  #
+  #   Data[, BCirc := round(BD*pi, 2)]
+  # }
+  #
+  # if(!input$MinDBH %in% "none") {
+  #
+  #   SizeUnit <- input$MinDBHUnitMan
+  #
+  #   if(!SizeUnit %in% unitOptions) stop(paste("Your minimum DBH size units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if(SizeUnit %in% unitOptions) {
+  #
+  #     if (SizeUnit == "mm") Data[, MinDBH := MinDBH/10] # mm -> cm
+  #
+  #     if (SizeUnit == "dm") Data[, MinDBH := MinDBH*10] # dm -> cm
+  #
+  #     if (SizeUnit == "m") Data[, MinDBH := MinDBH*100] # m -> cm
+  #   }
+  #
+  # }
+  #
+  # ### HOM and BHOM in m ####
+  # # if(!input$HOM %in% "none" & !input$HOMUnit %in% "none") stop("We have not coded the case where HOM units are not constant across your data yet - Please contact us or unify your units first.")
+  #
+  # if(!input$HOM %in% "none") {
+  #
+  #   # if(input$HOMUnitMan %in% "none") stop("we need HOM units")
+  #
+  #   HOMUnit <- input$HOMUnitMan
+  #
+  #   if(!HOMUnit %in% unitOptions) stop(paste("Your HOM units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (HOMUnit %in% unitOptions) {
+  #
+  #     if (HOMUnit == "mm") Data[, HOM := HOM/1000] # mm -> m
+  #
+  #     if (HOMUnit == "cm") Data[, HOM := HOM/100] # cm -> m
+  #
+  #
+  #     if (HOMUnit == "dm") Data[, HOM := HOM/10] # dm -> m
+  #   }
+  # }
+  #
+  # if(!input$BHOM %in% "none") {
+  #
+  #   # if(input$BHOMUnitMan %in% "none") stop("we need basal HOm units")
+  #
+  #
+  #   BHOMUnit <- input$BHOMUnitMan
+  #
+  #   if(!BHOMUnit %in% unitOptions) stop(paste("Your basal HOM units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (BHOMUnit %in% unitOptions) {
+  #
+  #     if (BHOMUnit == "mm") Data[, BHOM := BHOM/1000] # mm -> m
+  #
+  #     if (BHOMUnit == "cm") Data[, BHOM := BHOM/100] # cm -> m
+  #
+  #     if (BHOMUnit == "dm") Data[, BHOM := BHOM/10] # dm -> m
+  #   }
+  # }
+  #
+  #
+  # ### TreeHeight in m ####
+  # # if(!input$TreeHeight %in% "none" & !input$TreeHeightUnit %in% "none") stop("We have not coded the case where height units are not constant across your data yet - Please contact us or unify your units first.")
+  #
+  #
+  # if(!input$TreeHeight %in% "none") {
+  #
+  #   # if(input$TreeHeightUnitMan %in% "none") stop("we need tree height units")
+  #
+  #   TreeHeightUnit <- input$TreeHeightUnitMan
+  #
+  #   if(!TreeHeightUnit %in% unitOptions) stop(paste("Your height units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (TreeHeightUnit %in% unitOptions) {
+  #
+  #     if (TreeHeightUnit == "mm") Data[, TreeHeight := TreeHeight/1000] # mm -> m
+  #
+  #     if (TreeHeightUnit == "cm") Data[, TreeHeight := TreeHeight/100] # cm -> m
+  #
+  #     if (TreeHeightUnit == "dm") Data[, TreeHeight := TreeHeight/10] # dm -> m
+  #   }
+  # }
+  #
+  #
+  #
+  #
+  ### PlotArea in ha ####
 
-    if(!plotUnitMan %in% unitOptions) stop(paste("Your plot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
+  # if(!input$PlotArea %in% "none") {
+  #
+  #   # if(input$PlotAreaUnitMan %in% "none") stop("we need Plot Area units")
+  #
+  #   PlotAreaUnit <- input$PlotAreaUnitMan
+  #
+  #   if(!PlotAreaUnit %in% AreaUnitOptions) stop(paste("Your plot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+  #
+  #   if (PlotAreaUnit %in% AreaUnitOptions) {
+  #
+  #     if (PlotAreaUnit == "m2") Data[, PlotArea := PlotArea/10000] # m2 -> ha
+  #
+  #     if (PlotAreaUnit == "km2") Data[, PlotArea := PlotArea*100] # km2 -> ha
+  #   }
+  # }
 
-    if (plotUnitMan %in% unitOptions) {
 
-      if (plotUnitMan == "mm") {
-        Data[, Xplot := Xplot/1000] # mm -> m
-        Data[, Yplot := Yplot/1000] # mm -> m
-      }
 
-      if (plotUnitMan == "cm") {
-        Data[, Xplot := Xplot/100] # cm -> m
-        Data[, Yplot := Yplot/100] # cm -> m
+  # ### SubplotArea in ha ####
+  #
+  # if(!input$SubplotArea %in% "none") {
+  #
+  #   SubplotAreaUnitMan <- input$SubplotAreaUnitMan
+  #
+  #   if(!SubplotAreaUnitMan %in% AreaUnitOptions) stop(paste("Your subplot area units are not one of:", paste(AreaUnitOptions, collapse = ", ")))
+  #
+  #   if (SubplotAreaUnitMan %in% AreaUnitOptions){
+  #
+  #     if (SubplotAreaUnitMan == "m2") Data[, SubplotArea := SubplotArea/10000] # m2 -> ha
+  #     if (SubplotAreaUnitMan == "km2") Data[, SubplotArea := SubplotArea*100] # km2 -> ha
+  #   }
+  # }
+  #
 
-      }
+  #
+  # ### XY coordinates in m ####
+  #
+  #
+  # if(!input$XTreeUTM %in% "none") {
+  #
+  #   TreeUTMUnitMan <- input$TreeUTMUnitMan
+  #
+  #   if(!TreeUTMUnitMan %in% unitOptions) stop(paste("Your utm units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (TreeUTMUnitMan %in% unitOptions) {
+  #
+  #     if (TreeUTMUnitMan == "mm") {
+  #       Data[, XTreeUTM := XTreeUTM/1000] # mm -> m
+  #       Data[, YTreeUTM := YTreeUTM/1000] # mm -> m
+  #     }
+  #
+  #     if (TreeUTMUnitMan == "cm") {
+  #       Data[, XTreeUTM := XTreeUTM/100] # cm -> m
+  #       Data[, YTreeUTM := YTreeUTM/100] # cm -> m
+  #
+  #       }
+  #
+  #     if (TreeUTMUnitMan == "dm") {
+  #       Data[, XTreeUTM := XTreeUTM/10] # dm -> m
+  #       Data[, YTreeUTM := YTreeUTM/10] # dm -> m
+  #       }
+  #
+  #   }
+  # }
+  #
+  # if(!input$XTreePlot %in% "none") {
+  #
+  #   TreePlotUnitMan <- input$TreePlotUnitMan
+  #
+  #   if(!TreePlotUnitMan %in% unitOptions) stop(paste("Your plot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (TreePlotUnitMan %in% unitOptions) {
+  #
+  #     if (TreePlotUnitMan == "mm") {
+  #       Data[, XTreePlot := XTreePlot/1000] # mm -> m
+  #       Data[, YTreePlot := YTreePlot/1000] # mm -> m
+  #     }
+  #
+  #     if (TreePlotUnitMan == "cm") {
+  #       Data[, XTreePlot := XTreePlot/100] # cm -> m
+  #       Data[, YTreePlot := YTreePlot/100] # cm -> m
+  #
+  #     }
+  #
+  #     if (TreePlotUnitMan == "dm") {
+  #       Data[, XTreePlot := XTreePlot/10] # dm -> m
+  #       Data[, YTreePlot := YTreePlot/10] # dm -> m
+  #     }
+  #
+  #   }
+  # }
+  #
+  # if(!input$XTreeSubplot %in% "none") {
+  #
+  #   TreeSubplotUnitMan <- input$TreeSubplotUnitMan
+  #
+  #   if(!TreeSubplotUnitMan %in% unitOptions) stop(paste("Your subplot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
+  #
+  #   if (TreeSubplotUnitMan %in% unitOptions) {
+  #
+  #     if (TreeSubplotUnitMan == "mm") {
+  #       Data[, XTreeSubplot := XTreeSubplot/1000] # mm -> m
+  #       Data[, YTreeSubplot := YTreeSubplot/1000] # mm -> m
+  #     }
+  #
+  #     if (TreeSubplotUnitMan == "cm") {
+  #       Data[, XTreeSubplot := XTreeSubplot/100] # cm -> m
+  #       Data[, YTreeSubplot := YTreeSubplot/100] # cm -> m
+  #
+  #     }
+  #
+  #     if (TreeSubplotUnitMan == "dm") {
+  #       Data[, XTreeSubplot := XTreeSubplott/10] # dm -> m
+  #       Data[, YTreeSubplot := YTreeSubplot/10] # dm -> m
+  #     }
+  #
+  #   }
+  # }
 
-      if (plotUnitMan == "dm") {
-        Data[, Xplot := Xplot/10] # dm -> m
-        Data[, Yplot := Yplot/10] # dm -> m
-      }
-
-    }
-  }
-
-  if(!input$Xsubplot %in% "none") {
-
-    subplotUnitMan <- input$subplotUnitMan
-
-    if(!subplotUnitMan %in% unitOptions) stop(paste("Your subplot coordinates units are not one of:", paste(unitOptions, collapse = ", ")))
-
-    if (subplotUnitMan %in% unitOptions) {
-
-      if (subplotUnitMan == "mm") {
-        Data[, Xsubplot := Xsubplot/1000] # mm -> m
-        Data[, Ysubplot := Ysubplot/1000] # mm -> m
-      }
-
-      if (subplotUnitMan == "cm") {
-        Data[, Xsubplot := Xsubplot/100] # cm -> m
-        Data[, Ysubplot := Ysubplot/100] # cm -> m
-
-      }
-
-      if (subplotUnitMan == "dm") {
-        Data[, Xsubplot := Xsubplot/10] # dm -> m
-        Data[, Ysubplot := Ysubplot/10] # dm -> m
-      }
-
-    }
-  }
   # return output ####
   ColumnsToReturn <- intersect(c(x$ItemID, grep("Original", colnames(Data), value = T)), colnames(Data))
   return(Data[, ..ColumnsToReturn])

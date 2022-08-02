@@ -46,9 +46,9 @@ test_that("RequiredFormat", {
   input$IdCensus = input$Year # adding this so we don't get warnings
 
   # expect error is size units are not correct
-  input$DiameterUnitMan = input$CircUnitMan = "centimeter"
+  # input$DiameterUnitMan = input$CircUnitMan = "centimeter"
 
-  expect_error(RequiredFormat(Data, input ), "Your tree size units are not one of: mm, cm, dm, m")
+  # expect_error(RequiredFormat(Data, input ), "Your tree size units are not one of: mm, cm, dm, m")
 
   input$DiameterUnitMan <- ParacouProfile$DiameterUnitMan
   input$CircUnitMan <- ParacouProfile$CircUnitMan
@@ -87,19 +87,19 @@ test_that("RequiredFormat", {
   expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
     grepl(x["Site"] , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
-      grepl(x["SubPlot"] , x["IdTree"]))}))), "You are missing treeIDs")
+      grepl(x["Subplot"] , x["IdTree"]))}))), "You are missing treeIDs")
 
   input$Site <- "none"
   input$SiteMan = ""
   input$Plot <- "none"
   input$PlotMan = "BB"
-  input$SubPlot <- "none"
-  input$SubPlotMan = ""
+  input$Subplot <- "none"
+  input$SubplotMan = ""
 
   expect_warning(expect_warning(expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
     grepl("SiteA" , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
-      grepl("SubPlotA" , x["IdTree"]))}))), "SiteA"), "SubPlotA"), "You are missing treeIDs")
+      grepl("SubplotA" , x["IdTree"]))}))), "SiteA"), "SubplotA"), "You are missing treeIDs")
 
   # RequiredFormat(Data, input )$IdTree
 
@@ -108,8 +108,8 @@ test_that("RequiredFormat", {
   input$SiteMan <- ParacouProfile$SiteMan
   input$Plot <- ParacouProfile$Plot
   input$PlotMan <- ParacouProfile$PlotMan
-  input$SubPlot <- ParacouProfile$SubPlot
-  input$SubPlotMan <- ParacouProfile$SubPlotMan
+  input$Subplot <- ParacouProfile$Subplot
+  input$SubplotMan <- ParacouProfile$SubplotMan
   Data$idTree <- ParacouSubset$idTree
 
 
@@ -129,76 +129,196 @@ test_that("RequiredFormat", {
  Data$TreeHeight = 20
  input$TreeHeight = "TreeHeight"
  input$TreeHeightUnitMan = "m"
- Data$Xsubplot <- Data$Xfield
- Data$Ysubplot <- Data$yfield
- input$Xsubplot = "Xsubplot"
- input$Ysubplot = "Ysubplot"
- input$subplotUnitMan = "cm"
+ Data$XSubplot <- Data$Xfield
+ Data$YSubplot <- Data$Yfield
+ input$XTreeSubplot = "XSubplot"
+ input$YTreeSubplot = "YSubplot"
+ input$TreeSubplotUnitMan = "cm"
+
+
+ appdir <- system.file(package = "TreeData", "app")
+ x <- read.csv(paste0(appdir, "/data/interactive_items.csv"))
+ x <- x[x$Activate, ]
+ StandardUnitTable <- do.call(rbind, lapply(grep("UnitMan", x$ItemID, value = T), function(i) {
+
+   ItemID <-  sub("UnitMan", "", i)
+
+   if(i %in%  c("TreeUTMUnitMan","TreePlotUnitMan", "TreeSubplotUnitMan")) ItemID <- paste0(c("X", "Y"), ItemID)
+
+
+   data.frame(ItemID = ItemID,
+              UnitMan = i,
+              StandardUnit = x$Unit[match(ItemID, x$ItemID)]
+   )
+
+ }))
+
+
+ # simple unit conversions
 
   for(i in c("mm", "cm", "dm", "m", "none")){
 
+    for (u in c("cm", "m")) {
+        for(j in StandardUnitTable$ItemID[StandardUnitTable$StandardUnit %in%  u]) {
 
-    if(!input$Diameter %in% "none") {
-      input$DiameterUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$Diameter, Data[,input$Diameter] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100))
-      input$DiameterUnitMan = "cm" # so that does not through an error anymore
+          if(u %in% "cm") cf <- switch(i, mm = 0.1, cm = 1, dm = 10, m = 100)
+          if(u %in% "m")  cf <- switch(i , mm = 0.001, cm = .01, dm = .10, m = 1)
+
+      if(!input[[j]] %in% "none") {
+        UnitItemID <- paste0(j, "UnitMan")
+
+        if(grepl("^X|^Y", UnitItemID)) UnitItemID <- gsub("^X|^Y", "", UnitItemID)
+
+        oi <-  input[[UnitItemID]]
+        input[[UnitItemID]]= i
+
+        if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits.") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+
+        input[[UnitItemID]] = oi # so that does not through an error anymore
+
+      }
+
     }
-
-    if(!input$Circ %in% "none") {
-      input$CircUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "size units") else expect_equal(RequiredFormat(Data, input )$Circ, Data[,input$Circ] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-      input$CircUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$HOM %in% "none") {
-      input$HOMUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "HOM units") else expect_equal(RequiredFormat(Data, input )$HOM, Data[,input$HOM] * switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$HOMUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$BD %in% "none") {
-      input$BDUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal size") else expect_equal(RequiredFormat(Data, input )$BD, Data[,input$BD] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-      input$BDUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$BCirc %in% "none")  {
-      input$BCircUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal size") else expect_equal(RequiredFormat(Data, input )$BCirc, Data[,input$BCirc] * switch(i, mm = 0.1, cm = 1, dm = 10, m = 100), tolerance = 0.1)
-      input$BCircUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$BHOM %in% "none") {
-      input$BHOMUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "basal HOM units") else expect_equal(RequiredFormat(Data, input )$BHOM, Data[,input$BHOM] * switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$BHOMUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$TreeHeight %in% "none")  {
-      input$TreeHeightUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "height units") else expect_equal(RequiredFormat(Data, input )$TreeHeight, Data[,input$TreeHeight] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$TreeHeightUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$Xutm %in% "none")  {
-      input$utmUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "utm units") else expect_equal(RequiredFormat(Data, input )$Xutm, Data[,input$Xutm] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$utmUnitMan = "cm" # so that does not through an error anymore
-    }
-
-    if(!input$Xplot %in% "none") {
-      input$plotUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "\\<plot coordinates units") else expect_equal(RequiredFormat(Data, input )$Xplot, Data[,input$Xplot] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$plotUnitMan = ParacouProfile$plotUnitMan
-    }
-
-    if(!input$Xsubplot %in% "none"){
-      input$subplotUnitMan = i
-      if(i %in% "none") expect_error(RequiredFormat(Data, input ), "subplot coordinates units") else expect_equal(RequiredFormat(Data, input )$Xsubplot, Data[,input$Xsubplot] *  switch(i , mm = 0.001, cm = .01, dm = .10, m = 1))
-      input$subplotUnitMan = "cm" # so that does not through an error anymore
     }
 
   }
+
+ # raised unit conversions
+
+ for(i in c("mm2", "cm2", "m2", "ha", "km2", "none")){
+
+   for (u in c("cm2", "ha")) {
+
+     for(j in StandardUnitTable$ItemID[StandardUnitTable$StandardUnit %in%  u]) {
+
+
+       if(u %in% "cm2") cf = switch(i , mm2 = 0.01, cm2 = 1, m2 = 10000,ha = 100000000, km2 = 100000000)
+       if(u %in% "ha") cf = switch(i , mm2 = 1/10000000000, cm2 = 1/100000000 , m2 = 1/10000, ha = 1, km2 = 100)
+
+       if(!input[[j]] %in% "none") {
+
+         oi <-  input[[paste0(j, "UnitMan")]]
+         input[[paste0(j, "UnitMan")]]= i
+
+         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
+
+       }
+
+     }
+   }
+
+ }
+
+ # simple Quotient unit conversions
+ for(i in c("individual/mm2", "individual/cm2", "individual/m2", "individual/ha", "individual/km2", "none")){
+
+   for (u in c("individual/ha")) {
+
+     for(j in StandardUnitTable$ItemID[StandardUnitTable$StandardUnit %in%  u]) {
+
+
+       if(u %in% "individual/ha") cf = switch(i ,
+                                               "individual/mm2" = 1/10000000000,
+                                               "individual/cm2" = 1/100000000 ,
+                                               "individual/m2" = 1/10000,
+                                               "individual/ha" = 1,
+                                               "individual/km2" = 100)
+
+
+       if(!input[[j]] %in% "none") {
+
+         oi <-  input[[paste0(j, "UnitMan")]]
+         input[[paste0(j, "UnitMan")]]= i
+
+         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
+
+       }
+
+     }
+   }
+
+ }
+
+ # raised2 Quotient unit conversions
+ for(i in c("mm2/m2", "cm2/m2", "m2/m2",
+            "mm2/ha", "cm2/ha", "m2/ha",
+            "mm2/km2", "cm2/km2", "m2/km2",
+            "none"
+            )){
+
+   for (u in c("cm2/ha")) {
+
+     for(j in StandardUnitTable$ItemID[StandardUnitTable$StandardUnit %in%  u]) {
+
+
+       if(u %in% "cm2/ha") cf = switch(i ,
+                                      "mm2/m2" = 0.01/10000,
+                                      "cm2/m2" = 1/10000 ,
+                                      "m2/m2" = 100/10000,
+                                      "mm2/ha" = 0.01/1,
+                                      "cm2/ha" = 1/1 ,
+                                      "m2/ha" = 100/1,
+                                      "mm2/km2" = 0.01/100,
+                                      "cm2/km2" = 1/100 ,
+                                      "m2/km2" = 100/100)
+
+
+       if(!input[[j]] %in% "none") {
+
+         oi <-  input[[paste0(j, "UnitMan")]]
+         input[[paste0(j, "UnitMan")]]= i
+
+         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
+
+       }
+
+     }
+   }
+
+ }
+
+ # raised3 Quotient unit conversions
+ for(i in c("mm3/m2", "cm3/m2", "m3/m2",
+            "mm3/ha", "cm3/ha", "m3/ha",
+            "mm3/km2", "cm3/km2", "m3/km2",
+            "none"
+ )){
+
+   for (u in c("cm3/ha")) {
+
+     for(j in StandardUnitTable$ItemID[StandardUnitTable$StandardUnit %in%  u]) {
+
+
+       if(u %in% "cm3/ha")  cf = switch(i ,
+                                        "mm3/m2" = 0.001/10000,
+                                        "cm3/m2" = 1/10000 ,
+                                        "m3/m2" = 1000000/10000,
+                                        "mm3/ha" = 0.001/1,
+                                        "cm3/ha" = 1/1 ,
+                                        "m3/ha" = 1000000/1,
+                                        "mm3/km2" = 0.001/100,
+                                        "cm3/km2" = 1/100 ,
+                                        "m3/km2" = 1000000/100)
+
+       if(!input[[j]] %in% "none") {
+
+         oi <-  input[[paste0(j, "UnitMan")]]
+         input[[paste0(j, "UnitMan")]]= i
+
+         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
+
+       }
+
+     }
+   }
+
+ }
+
+
 
  # put parameters back to what they were
  # input$HOM = ParacouProfile$HOM
@@ -212,40 +332,17 @@ test_that("RequiredFormat", {
  # input$BDUnitMan = ParacouProfile$BDUnitMan
  # input$BCircUnitMan = ParacouProfile$BCircUnitMan
  # input$TreeHeightUnitMan = ParacouProfile$TreeHeightUnitMan
- # input$utmUnitMan = ParacouProfile$utmUnitMan
- # input$plotUnitMan = ParacouProfile$plotUnitMan
- # input$subplotUnitMan = ParacouProfile$subplotUnitMan
+ # input$TreeUTMUnitMan = ParacouProfile$TreeUTMUnitMan
+ # input$TreePlotUnitMan = ParacouProfile$TreePlotUnitMan
+ # input$TreeSubplotUnitMan = ParacouProfile$TreeSubplotUnitMan
 
 
 
- # make sure AREA gets converted correctly or throw error if units not selected
-Data$SubPlotArea <- Data$PlotArea
-input$SubPlotArea <- "SubPlotArea"
-input$SubPlotAreaUnitMan <- "ha"
-
-
-
- for(i in c("m2", "ha", "km2", "none")){
-
-     if(!input$PlotArea %in% "none")   {
-       input$PlotAreaUnitMan = i
-       if(i %in% "none") expect_error(RequiredFormat(Data, input ), "\\<plot area units") else expect_equal(RequiredFormat(Data, input )$PlotArea, Data[,input$PlotArea] * switch(i , m2 = 0.0001, ha = 1, km2 = 100))
-       input$PlotAreaUnitMan = "ha"
-     }
-
-     if(!input$SubPlotArea %in% "none")  {
-       input$SubPlotAreaUnitMan = i
-       if(i %in% "none") expect_error(RequiredFormat(Data, input ), "subplot area units") else expect_equal(RequiredFormat(Data, input )$SubPlotArea, Data[,input$SubPlotArea] *  switch(i , m2 = 0.0001, ha = 1, km2 = 100))
-       input$SubPlotAreaUnitMan = "ha"
-     }
-
-
- }
 
  # put parameters back to what they were
- # input$SubPlotArea = ParacouProfile$SubPlotArea
+ # input$SubplotArea = ParacouProfile$SubplotArea
  # input$PlotAreaUnitMan = ParacouProfile$PlotAreaUnitMan
- # input$SubPlotAreaMan = ParacouProfile$SubPlotAreaMan
+ # input$SubplotAreaMan = ParacouProfile$SubplotAreaMan
 
 
   # expect year to be filled
@@ -297,13 +394,14 @@ input$SubPlotAreaUnitMan <- "ha"
   Data <- merge( data.table::fread(paste0(appdir, "/tests/shinytest/ForestPlots_test2_trees_small.csv")),
                  data.table::fread(paste0(appdir, "/tests/shinytest/ForestPlots_test2_plots_small.csv")), by.x= "PlotID", by.y = "Plot ID", suffixes = c("", ".y"))
   input <- readRDS(paste0(appdir, "/tests/shinytest/ForestPlots_test2_trees_small_Profile.rds"))
+  input$TreeCodes <- "none"
   input$MinDBH = "none"
   input$MinDBHMan =1
   input$MinDBHUnitMan = "none"
   input$DateFormatMan = input$DateFormat
   input$DateFormat = NULL
 
-  expect_warning(DataFormated <- RequiredFormat(Data, input), "we are using your tree field tag to construct the tree ID. And since some of your  tree field tag are NAs, we will automatically")
+  expect_warning(DataFormated <- RequiredFormat(Data, input), "You are missing treeID")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
