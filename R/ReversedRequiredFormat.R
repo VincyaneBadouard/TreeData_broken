@@ -206,15 +206,15 @@ ReversedRequiredFormat <- function(
     if (PlotAreaUnit == "km2") Data[, PlotArea := PlotArea/100] # ha -> km2
   }
 
-  ### SubPlotArea in ha ####
+  ### SubplotArea in ha ####
 
-  if(!input$SubPlotArea %in% "none" & !input$SubPlotAreaUnitMan %in% "none") {
+  if(!input$SubplotArea %in% "none" & !input$SubplotAreaUnitMan %in% "none") {
 
-    SubPlotAreaUnitMan <- input$SubPlotAreaUnitMan
+    SubplotAreaUnitMan <- input$SubplotAreaUnitMan
 
-    if (SubPlotAreaUnitMan == "m2") Data[, SubPlotArea := SubPlotArea*10000] # ha -> m2
+    if (SubplotAreaUnitMan == "m2") Data[, SubplotArea := SubplotArea*10000] # ha -> m2
 
-    if (SubPlotAreaUnitMan == "km2") Data[, SubPlotArea := SubPlotArea/100] # ha -> km2
+    if (SubplotAreaUnitMan == "km2") Data[, SubplotArea := SubplotArea/100] # ha -> km2
 
   }
 
@@ -222,72 +222,72 @@ ReversedRequiredFormat <- function(
   ### XY coordinates in m ####
 
 
-  if(!input$Xutm %in% "none" & !input$utmUnitMan %in% "none") {
+  if(!input$XTreeUTM %in% "none" & !input$TreeUTMUnitMan %in% "none") {
 
-    utmUnitMan <- input$utmUnitMan
+    TreeUTMUnitMan <- input$TreeUTMUnitMan
 
-      if (utmUnitMan == "mm") {
-        Data[, Xutm := Xutm*1000] # m -> mm
-        Data[, Yutm := Yutm*1000] # m -> mm
+      if (TreeUTMUnitMan == "mm") {
+        Data[, XTreeUTM := XTreeUTM*1000] # m -> mm
+        Data[, YTreeUTM := YTreeUTM*1000] # m -> mm
       }
 
-      if (utmUnitMan == "cm") {
-        Data[, Xutm := Xutm*100] # m -> cm
-        Data[, Yutm := Yutm*100] # m -> cm
-
-      }
-
-      if (utmUnitMan == "dm") {
-        Data[, Xutm := Xutm*10] # m -> dm
-        Data[, Yutm := Yutm*10] # m -> dm
-      }
-
-
-  }
-
-  if(!input$Xplot %in% "none" & !input$plotUnitMan %in% "none") {
-
-    plotUnitMan <- input$plotUnitMan
-
-
-      if (plotUnitMan == "mm") {
-        Data[, Xplot := Xplot*1000] # m -> mm
-        Data[, Yplot := Yplot*1000] # m -> mm
-      }
-
-      if (plotUnitMan == "cm") {
-        Data[, Xplot := Xplot*100] # m -> cm
-        Data[, Yplot := Yplot*100] # m -> cm
+      if (TreeUTMUnitMan == "cm") {
+        Data[, XTreeUTM := XTreeUTM*100] # m -> cm
+        Data[, YTreeUTM := YTreeUTM*100] # m -> cm
 
       }
 
-      if (plotUnitMan == "dm") {
-        Data[, Xplot := Xplot*10] # m -> dm
-        Data[, Yplot := Yplot*10] # m -> dm
+      if (TreeUTMUnitMan == "dm") {
+        Data[, XTreeUTM := XTreeUTM*10] # m -> dm
+        Data[, YTreeUTM := YTreeUTM*10] # m -> dm
       }
 
 
   }
 
-  if(!input$Xsubplot %in% "none" & !input$subplotUnitMan %in% "none") {
+  if(!input$XTreePlot %in% "none" & !input$TreePlotUnitMan %in% "none") {
 
-    subplotUnitMan <- input$subplotUnitMan
+    TreePlotUnitMan <- input$TreePlotUnitMan
 
 
-      if (subplotUnitMan == "mm") {
-        Data[, Xsubplot := Xsubplot*1000] # m -> mm
-        Data[, Ysubplot := Ysubplot*1000] # m -> mm
+      if (TreePlotUnitMan == "mm") {
+        Data[, XTreePlot := XTreePlot*1000] # m -> mm
+        Data[, YTreePlot := YTreePlot*1000] # m -> mm
       }
 
-      if (subplotUnitMan == "cm") {
-        Data[, Xsubplot := Xsubplot*100] # m -> cm
-        Data[, Ysubplot := Ysubplot*100] # m -> cm
+      if (TreePlotUnitMan == "cm") {
+        Data[, XTreePlot := XTreePlot*100] # m -> cm
+        Data[, YTreePlot := YTreePlot*100] # m -> cm
 
       }
 
-      if (subplotUnitMan == "dm") {
-        Data[, Xsubplot := Xsubplot*10] # m -> dm
-        Data[, Ysubplot := Ysubplot*10] # m -> dm
+      if (TreePlotUnitMan == "dm") {
+        Data[, XTreePlot := XTreePlot*10] # m -> dm
+        Data[, YTreePlot := YTreePlot*10] # m -> dm
+      }
+
+
+  }
+
+  if(!input$XTreeSubplot %in% "none" & !input$TreeSubplotUnitMan %in% "none") {
+
+    TreeSubplotUnitMan <- input$TreeSubplotUnitMan
+
+
+      if (TreeSubplotUnitMan == "mm") {
+        Data[, XTreeSubplot := XTreeSubplot*1000] # m -> mm
+        Data[, YTreeSubplot := YTreeSubplot*1000] # m -> mm
+      }
+
+      if (TreeSubplotUnitMan == "cm") {
+        Data[, XTreeSubplot := XTreeSubplot*100] # m -> cm
+        Data[, YTreeSubplot := YTreeSubplot*100] # m -> cm
+
+      }
+
+      if (TreeSubplotUnitMan == "dm") {
+        Data[, XTreeSubplot := XTreeSubplot*10] # m -> dm
+        Data[, YTreeSubplot := YTreeSubplot*10] # m -> dm
       }
 
 
