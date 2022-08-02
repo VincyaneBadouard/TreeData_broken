@@ -270,7 +270,7 @@ BotanicalCorrection <- function(
         Data[Data$Site == s, .(IdTree, FamilyCor, GenusCor, SpeciesCor, VernNameCor)]
       ))
 
-      CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+      CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
 
       if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 

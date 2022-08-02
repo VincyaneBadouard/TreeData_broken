@@ -21,7 +21,7 @@
 #' @details Detect errors
 #'   - Remove **duplicated rows**
 #'   - Check **missing value** in
-#'      X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
+#'      X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/
 #'      IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 #'   - Check **missing value** (NA/0) in the measurement variables: "Diameter",
 #'      "HOM", "TreeHeight", "StemHeight"
@@ -32,7 +32,7 @@
 #'   - Check **duplicated idTree/IdStem** in a census (at the site scale)
 #'   - Check for trees **outside the subplot** (not implemented yet)
 #'   - Check **invariant coordinates per IdTree/IdStem**
-#'   - Check **fix Plot and SubPlot number** (not implemented yet)
+#'   - Check **fix Plot and Subplot number** (not implemented yet)
 #'
 #'   - Check botanical identification (*BotanicalCorrection*)
 #'   - Check the life status evolution of the trees (*StatusCorrection*)
@@ -108,9 +108,9 @@ ErrorsDetection <- function(
 
   # Check bota : Family/Genus/Species/ScientificName/VernName
   # Check size : Diameter, POM(?)
-  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree", "IdStem",
+  Vars <- c("Plot", "Subplot", "Year", "TreeFieldNum", "IdTree", "IdStem",
             "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
-            "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
+            "XTreeUTM", "YTreeUTM", "Family", "Genus", "Species", "VernName")
 
   for (v in 1:length(Vars)) {
 
@@ -143,8 +143,8 @@ ErrorsDetection <- function(
 
   #### Check duplicated TreeFieldNum in plot-subplot association ####
 
-  # Create "PlotSubNum" = "Site/Year/Plot/SubPlot/TreeFieldNum"
-  Data[, PlotSubNum := paste(Site, Year, Plot, SubPlot, TreeFieldNum, sep = "/")]
+  # Create "PlotSubNum" = "Site/Year/Plot/Subplot/TreeFieldNum"
+  Data[, PlotSubNum := paste(Site, Year, Plot, Subplot, TreeFieldNum, sep = "/")]
 
   # y = 2017
   # p=1
@@ -159,22 +159,22 @@ ErrorsDetection <- function(
       for (y in unique(na.omit(Data$Year))) {
         # For each plot
         for (p in unique(na.omit(Data$Plot))) {
-          # For each SubPlot in this plot
-          for (c in unique(na.omit(Data[Data$Plot==p, SubPlot]))) {
+          # For each Subplot in this plot
+          for (c in unique(na.omit(Data[Data$Plot==p, Subplot]))) {
 
             num <- Data[Data$Site == s & Data$Year == y
-                        & Data$Plot == p & Data$SubPlot == c]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
+                        & Data$Plot == p & Data$Subplot == c]$TreeFieldNum # all the TreeFieldNum for each Plot-Subplot combination
 
-            # if there are several TreeFieldNum per Plot-SubPlot combination
+            # if there are several TreeFieldNum per Plot-Subplot combination
             if(anyDuplicated(num) != 0){
               duplicated_num <- unique(num[duplicated(num)])
 
               Data <- GenerateComment(Data,
                                       condition =
                                         Data[,Site] == s & Data[,Year] == y
-                                      & Data[,Plot] == p & Data[,SubPlot] == c
+                                      & Data[,Plot] == p & Data[,Subplot] == c
                                       & Data[,TreeFieldNum] %in% duplicated_num,
-                                      comment = "Duplicate TreeFieldNum in the same Plot and SubPlot")
+                                      comment = "Duplicate TreeFieldNum in the same Plot and Subplot")
 
               num <- vector("character")
 
@@ -186,10 +186,10 @@ ErrorsDetection <- function(
   }
 
   Data[, PlotSubNum := NULL]
-  # Data[TreeFieldNum == duplicated_num,.(Year = sort(Year), Plot, SubPlot, TreeFieldNum, Comment)] # to check (1 duplicate)
+  # Data[TreeFieldNum == duplicated_num,.(Year = sort(Year), Plot, Subplot, TreeFieldNum, Comment)] # to check (1 duplicate)
 
 
-  #### Check of the unique association of the idTree with Plot-SubPlot-TreeFieldNum, at the site scale ####
+  #### Check of the unique association of the idTree with Plot-Subplot-TreeFieldNum, at the site scale ####
 
   duplicated_ID <- CorresIDs <- vector("character")
 
@@ -197,7 +197,7 @@ ErrorsDetection <- function(
   for (s in unique(na.omit(Data$Site))) {
 
     correspondances <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum)]
+      Data[Data$Site == s, .(IdTree, Plot, Subplot, TreeFieldNum)]
     ))
 
     CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
@@ -210,12 +210,12 @@ ErrorsDetection <- function(
                               condition =
                                 Data[,Site] == s
                               & Data[,IdTree] %in% duplicated_ID,
-                              comment = "Non-unique association of the IdTree with Plot, SubPlot and TreeFieldNum")
+                              comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
     }
   } # end site loop
 
   # unique(Data[IdTree %in% duplicated_ID,
-  #             .(IdTree = sort(IdTree), Plot, SubPlot, TreeFieldNum, Comment)]) # to check
+  #             .(IdTree = sort(IdTree), Plot, Subplot, TreeFieldNum, Comment)]) # to check
 
 
   #### Check duplicated IdTree/IdStem in a census ####
@@ -256,7 +256,7 @@ ErrorsDetection <- function(
 
   Data[, SitYearID := NULL]
 
-  # Data[IdTree == duplicated_ids,.(Year = sort(Year), Plot, SubPlot, TreeFieldNum, IdTree, Comment)] # to check
+  # Data[IdTree == duplicated_ids,.(Year = sort(Year), Plot, Subplot, TreeFieldNum, IdTree, Comment)] # to check
 
 
   ## Check for trees outside the subplot (A FAIRE)
@@ -272,10 +272,10 @@ ErrorsDetection <- function(
   for (s in unique(na.omit(Data$Site))) {
 
     CoordIDCombination <- na.omit(unique(
-      Data[Data$Site == s, c(ID, "Xutm", "Yutm"), with = FALSE]
+      Data[Data$Site == s, c(ID, "XTreeUTM", "YTreeUTM"), with = FALSE]
     ))
 
-    CorresIDs <- CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+    CorresIDs <- CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
 
     if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 
@@ -285,15 +285,15 @@ ErrorsDetection <- function(
                               condition =
                                 Data[,Site] == s
                               & Data[,get(ID)] %in% duplicated_ID,
-                              comment = paste0("Different coordinates (Xutm, Yutm) for a same '", ID,"'"))
+                              comment = paste0("Different coordinates (XTreeUTM, YTreeUTM) for a same '", ID,"'"))
     }
   } # end site loop
 
   # unique(Data[IdTree %in% duplicated_ID,
-  #             .(IdTree = sort(IdTree), Xutm, Yutm, Comment)]) # to check
+  #             .(IdTree = sort(IdTree), XTreeUTM, YTreeUTM, Comment)]) # to check
 
 
-  #### Check fix Plot and SubPlot number (A FAIRE, Eliot a) ####
+  #### Check fix Plot and Subplot number (A FAIRE, Eliot a) ####
   # alerte quand le nombre de sous-parcelles/parcelles varie selon les années
 
   #### Internals ####
@@ -315,7 +315,7 @@ ErrorsDetection <- function(
       Data[Data$Site == s, c(ID, "Family", "ScientificName", "VernName"), with = FALSE]
     ))
 
-    CorresIDs <- BotaIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+    CorresIDs <- BotaIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
 
     if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 

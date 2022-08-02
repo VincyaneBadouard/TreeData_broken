@@ -427,7 +427,7 @@ StatusCorrectionByTree <- function(
                            LifeStatus = NA,                    # not seen
                            LifeStatusCor = NA,               # no corrected status for now
                            Plot = unique(DataTree$Plot),  # the unique plot in DataTree
-                           SubPlot = unique(DataTree$SubPlot),  # the unique subplot in DataTree
+                           Subplot = unique(DataTree$Subplot),  # the unique subplot in DataTree
                            stringsAsFactors =  FALSE)      # do not convert characters into factors
 
       if(length(InvariantColumns) > 0){ # if there are invariant columns

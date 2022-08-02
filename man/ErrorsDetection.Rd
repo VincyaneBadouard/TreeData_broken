@@ -44,7 +44,7 @@ Detect errors
 \itemize{
 \item Remove \strong{duplicated rows}
 \item Check \strong{missing value} in
-X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/
+X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/
 IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 \item Check \strong{missing value} (NA/0) in the measurement variables: "Diameter",
 "HOM", "TreeHeight", "StemHeight"
@@ -55,7 +55,7 @@ TreeFieldNum} (at the site scale)
 \item Check \strong{duplicated idTree/IdStem} in a census (at the site scale)
 \item Check for trees \strong{outside the subplot} (not implemented yet)
 \item Check \strong{invariant coordinates per IdTree/IdStem}
-\item Check \strong{fix Plot and SubPlot number} (not implemented yet)
+\item Check \strong{fix Plot and Subplot number} (not implemented yet)
 \item Check botanical identification (\emph{BotanicalCorrection})
 \item Check the life status evolution of the trees (\emph{StatusCorrection})
 \item Check diameter evolution of the trees (\emph{DiameterCorrection})
