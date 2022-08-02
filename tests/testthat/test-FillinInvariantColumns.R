@@ -4,7 +4,7 @@ test_that("FillinInvariantColumns", {
   library(data.table)
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
-                         SubPlot = "3",
+                         Subplot = "3",
                          IdTree = "a", # 1 ind
                          Year = seq(2012,2028, by=2) # 9 census
   )
@@ -12,7 +12,7 @@ test_that("FillinInvariantColumns", {
   NewRow <- data.table(IdTree = "a",
                        Year = 2013)
 
-  InvariantColumns = c("Site", "Plot", "SubPlot")
+  InvariantColumns = c("Site", "Plot", "Subplot")
   NewRow[,(InvariantColumns) := NA] # empty the invariant columns for the added rows
 
   # Create test data
@@ -22,7 +22,7 @@ test_that("FillinInvariantColumns", {
   VarPlot <- copy(TestData)
   VarPlot[Year == 2014, ("Plot") := "2"] # variant data
   NoVal <- copy(TestData)
-  NoVal[, ("SubPlot") := NA] # no value
+  NoVal[, ("Subplot") := NA] # no value
 
 
   # Check the function argument

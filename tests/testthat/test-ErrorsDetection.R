@@ -31,10 +31,10 @@ test_that("ErrorsDetection", {
   ## Remove *duplicated rows*
   expect_true(anyDuplicated(TestData)!= 0 & anyDuplicated(Rslt) == 0)
 
-  ## Check *missing value* in (X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
-  Vars <- c("Plot", "SubPlot", "Year", "TreeFieldNum", "IdTree",
+  ## Check *missing value* in (X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
+  Vars <- c("Plot", "Subplot", "Year", "TreeFieldNum", "IdTree",
             "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
-            "Xutm", "Yutm", "Family", "Genus", "Species", "VernName")
+            "XTreeUTM", "YTreeUTM", "Family", "Genus", "Species", "VernName")
   # v =1
   for (v in 1:length(Vars)) {
 
@@ -69,18 +69,18 @@ test_that("ErrorsDetection", {
     for (y in unique(na.omit(Rslt$Year))) {
       # For each plot
       for (p in unique(na.omit(Rslt$Plot))) {
-        # For each SubPlot in this plot
-        for (c in unique(na.omit(Rslt[Rslt$Plot==p, SubPlot]))) {
+        # For each Subplot in this plot
+        for (c in unique(na.omit(Rslt[Rslt$Plot==p, Subplot]))) {
 
           num <- Rslt[Rslt$Site == s & Rslt$Year == y
-                      & Rslt$Plot == p & Rslt$SubPlot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-SubPlot combination
+                      & Rslt$Plot == p & Rslt$Subplot == c,]$TreeFieldNum # all the TreeFieldNum for each Plot-Subplot combination
 
-          # if there are several TreeFieldNum per Plot-SubPlot combination
+          # if there are several TreeFieldNum per Plot-Subplot combination
           if(anyDuplicated(num) != 0){
             duplicated_num <- unique(num[duplicated(num)])
 
             DuplFieldNbr <- (Rslt[,Site] == s & Rslt[,Year] == y
-                             & Rslt[,Plot] == p & Rslt[,SubPlot] == c
+                             & Rslt[,Plot] == p & Rslt[,Subplot] == c
                              & Rslt[,TreeFieldNum] %in% duplicated_num)
 
             expect_true(all(Rslt$Comment[DuplFieldNbr] != "")) # Rslt[DuplFieldNbr]
@@ -101,7 +101,7 @@ test_that("ErrorsDetection", {
   for (s in unique(na.omit(Rslt$Site))) {
 
     correspondances <- na.omit(unique(
-      Rslt[Rslt$Site == s, .(IdTree, Plot, SubPlot, TreeFieldNum, Xutm, Yutm)]
+      Rslt[Rslt$Site == s, .(IdTree, Plot, Subplot, TreeFieldNum, XTreeUTM, YTreeUTM)]
     ))
 
     CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
@@ -144,7 +144,7 @@ test_that("ErrorsDetection", {
 
   ## Check for trees *outside the subplot* A FAIRE
 
-  ## Check *fix Plot and SubPlot number* A FAIRE
+  ## Check *fix Plot and Subplot number* A FAIRE
 
   # Internals
   ## Check botanical identification (BotanicalCorrection)
@@ -158,14 +158,14 @@ test_that("ErrorsDetection", {
 })
 
 # Remove *duplicated rows*
-# Check *missing value* in X-Yutm/PlotArea/Plot/SubPlot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
+# Check *missing value* in X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName
 # Check *missing value* (NA/0) in the measurement variables
 # Check *duplicated TreeFieldNum* in plot-subplot association in a census (at the site scale)
 # Check of the *unique association of the idTree with plot, subplot, TreeFieldNum and coordinates* (at the site scale)
 # Check *duplicated idTree* in a census (at the site scale)
 # Check for trees *outside the subplot*
 # Check *invariant coordinates per IdTree*
-# Check *fix Plot and SubPlot number*
+# Check *fix Plot and Subplot number*
 
 # Check botanical identification (BotanicalCorrection)
 # Check the life status evolution of the trees (StatusCorrection)
