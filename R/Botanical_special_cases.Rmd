@@ -1,0 +1,125 @@
+---
+title: "Botanical_special_cases"
+author: "Vincyane Badouard"
+date: "02/08/2022"
+output: html_document
+---
+
+# Packages 
+```{r}
+library(TreeData)
+library(data.table)
+```
+
+# Create data with different type of botanical error
+```{r}
+# Fabaceae Dicorynia guianensis (angelique) "a"
+# Lecythidaceae Eschweilera sagotiana (maho noir) "b"
+# Chrysobalanaceae Licania alba (koko) "c"
+# Fabaceae Eperua falcata (wapa) "d"
+Data <- data.table(Site = "Nowhere",
+                   IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4), rep("e", 1), rep("f", 1), rep("g", 1)), # 7 ind
+                   Year = c(rep(c(2000:2003), 4), rep(2000, 3)) # 4 years each
+)
+Data <- Data[order(IdTree, Year)]
+Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4), rep("Sapindaceae", 1), rep("Clusiaceae", 1), rep("Burseraceae", 1))]
+Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("Eperua", 4), rep("Indet.Sapindaceae", 1), rep("Tovomita", 1), rep("Protium", 1))]
+Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4), rep("Indet.", 1), rep("sp.5-CAY", 1), rep("opacum_subsp.rabelianum", 1))]
+Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4), rep(NA, 3))]
+
+# Create errors
+
+## Missing value in  Family, ScientificName/Genus, species, VernName
+Data[IdTree %in% "d" & Year %in% 2000, ("Family") := NA_character_]
+Data[IdTree %in% "b" & Year %in% 2000, ("Genus") := NA_character_]
+Data[IdTree %in% "b", ("Family") := NA_character_]
+Data[IdTree %in% "c" & Year %in% 2000, ("Species") := NA_character_]
+Data[IdTree %in% "a" & Year %in% 2000, ("VernName") := NA_character_]
+Data[IdTree %in% "d" & Year %in% 2000, ("VernName") := NA_character_]
+
+
+
+
+## Special characters
+Data[IdTree %in% "a", ("Family") := "Fabacé"] # good answer: "Fabaceae"
+Data[IdTree %in% "c" & Year %in% 2003, ("Genus") := "Licanï_a"] # good answer: "Licania"
+
+## Variant botanical informations per IdTree
+Data[IdTree %in% "d" & Year %in% 2002, ("Species") := "grandi!flora"] # good answer: "falcata"
+
+## Family name in the genus/species columns
+Data[IdTree %in% "b", ("Species") := "Lecythidaceae"] # good answer: "sagotiana"
+
+## Family & Scientific names unmatch
+Data[IdTree %in% "c", ("Family") := "Lecythidaceae"] # good answer: "Chrysobalanaceae"
+
+## Scientific & vernacular names unmatch
+Data[IdTree %in% "d" & Year %in% 2001, ("VernName") := "leaf"]  # good answer: "wapa"
+
+## Old scientific name (A trouver)
+
+Data[, ScientificName := paste(Genus, Species)]
+
+```
+
+# TPL
+```{r}
+RsltTPL <- BotanicalCorrection(Data, Source = "TPL")
+
+ScfcCorTPL <- unique(RsltTPL[ScientificNameCor != ScientificName,
+                             list(IdTree,
+                                  Genus, GenusCor,
+                                  Species, SpeciesCor,
+                                  Family, FamilyCor, FamilyCorSource,
+                                  BotanicalCorrectionSource, Comment)
+])
+
+ScfcCorTPL
+
+# Indet.Sapindaceae
+# sp.5-CAY
+# opacum_subsp.rabelianum -> separer à l'espace et l'underscore pour créeer SubSpecies
+# strsplit("Indet.Sapindaceae", '[[:punct:]]') # cut at punctuation
+# strsplit("IndetSapindaceae", "(?<=.)(?=[[:upper:]])", perl = T) # cut at Uppercase
+# strsplit("opacum subsp.rabelianum", '[[:blank:]]') # cut at space
+# strsplit("opacum_subsp.rabelianum", '\\[[:blank:]] |\\_') # \\ devant une des possibilités. Le manque d'espace après le barre du "ou" (|) est important, le résultat n'est pas le même sinon
+# 
+# 
+# 
+# # detecter que si un espace dans genus ou species c'est probablment un scientificname
+# 
+# # A faire avant les corrections
+# # For Genus: split at punctuation then at uppercase, and Create GenspFamily if family name in it
+# 
+# RsltTPL[, c("GenusCor", "GenspFamily") := tstrsplit(Genus, '[[:punct:]]')]
+# RsltTPL[, c("GenusCor", "GenspFamily") := tstrsplit(Genus, "(?<=.)(?=[[:upper:]])", perl = T)]
+# # et réccupérer GenspFamily si ça finit par aceae
+# 
+# # For species: split at space or underscore, and create SubSpecies
+# RsltTPL[, c("SpeciesCor", "SubSpecies") := tstrsplit(Species, '\\[[:blank:]] |\\_')] # \\ devant une des possibilités. Le manque d'espace après le barre du "ou" (|) est important, le résultat n'est pas le même sinon
+
+
+```
+
+# WFO
+```{r}
+load("D:/VSC TmFO/Data/WFO_Backbone.rda")
+
+# RsltWFO <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFO_Backbone)
+save(RsltWFO, file = "RsltWFO.rda")
+
+
+ScfcCorWFO <- unique(RsltWFO[, list(IdTree,
+                                    Genus, GenusCor,
+                                    Species, SpeciesCor,
+                                    ScientificName, ScientificNameCor,
+                                    Family, FamilyCor, FamilyCorSource,
+                                    BotanicalCorrectionSource)
+])
+ScfcCorWFO
+
+# Indet.Sapindaceae
+# opacum_subsp.rabelianum
+# sp.5-CAY
+```
+
