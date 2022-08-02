@@ -70,7 +70,7 @@ A named list
 \item{MinDBHUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your unit for the column indicating the minimum DBH? If not provided, it will be calculated looking at your Diameter column}
 \item{XTreePlot}{Value or column name in data set @ForestGeoSubset (gx) corresponding to Tree X euclidean position in plot}
 \item{XTreeSubplot}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree X euclidean position in SUBplot}
-\item{TreeplotUnitMan}{Some value entered via interaction with the Shiny app}
+\item{TreePlotUnitMan}{Value or column name in data set @ForestGeoSubset (m) corresponding to Tree XY plot coordinates units}
 \item{TreeSubplotUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree XY subplot coordinates units}
 \item{Diameter}{Value or column name in data set @ForestGeoSubset (dbh) corresponding to DBH}
 \item{HOMUnitMan}{Value or column name in data set @ForestGeoSubset (m) corresponding to What is your HOM unit?}

@@ -64,7 +64,7 @@ ForestGeoProfile <-
     MinDBHUnitMan = "none",
     XTreePlot = "gx",
     XTreeSubplot = "none",
-    TreeplotUnitMan = "m",
+    TreePlotUnitMan = "m",
     TreeSubplotUnitMan = "none",
     Diameter = "dbh",
     HOMUnitMan = "m",
