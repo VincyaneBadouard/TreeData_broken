@@ -29,10 +29,10 @@
 #'   \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
 #'   \item{IsCommercialMan}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
 #'   \item{IsLive}{Some value entered via interaction with the Shiny app}
-#'   \item{Lat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
+#'   \item{TreeLat}{Value or column name in data set @ParacouSubset (Lat) corresponding to Tree latitude}
 #'   \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
 #'   \item{LifeStatus}{Value or column name in data set @ParacouSubset (CodeAlive) corresponding to Life status}
-#'   \item{Lon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
+#'   \item{TreeLon}{Value or column name in data set @ParacouSubset (Lon) corresponding to Tree longitude}
 #'   \item{MinDBH}{Value or column name in data set @ParacouSubset (none) corresponding to Minimum DBH}
 #'   \item{MinDBHMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is the minimum diameter of trees included in your inventory?}
 #'   \item{MinDBHUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your unit for the column indicating the minimum DBH? If not provided, it will be calculated looking at your Diameter column}
@@ -41,19 +41,19 @@
 #'   \item{PlotAreaMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your plot area in hectare?}
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What is the unit for plot area?}
 #'   \item{PlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your plot name ?}
-#'   \item{plotUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to Tree XY plot coordinates units}
+#'   \item{TreePlotUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to Tree XY plot coordinates units}
 #'   \item{POM}{Value or column name in data set @ParacouSubset (MeasCode) corresponding to POM}
 #'   \item{ScientificName}{Value or column name in data set @ParacouSubset (none) corresponding to Scientific name}
 #'   \item{ScientificNameSepMan}{Value or column name in data set @ParacouSubset () corresponding to Character separating Genus and Species in Scientific name}
 #'   \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
 #'   \item{SiteMan}{Value or column name in data set @ParacouSubset () corresponding to What is your site name ?}
 #'   \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
-#'   \item{SubPlot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to SubPlot name}
-#'   \item{SubPlotArea}{Value or column name in data set @ParacouSubset (none) corresponding to SubPlot area}
-#'   \item{SubPlotAreaMan}{Value or column name in data set @ParacouSubset (1) corresponding to What is your subplot area in hectare?}
-#'   \item{SubPlotAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is the unit for subplot area?}
-#'   \item{SubPlotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your subplot name ?}
-#'   \item{subplotUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to Tree XY subplot coordinates units}
+#'   \item{Subplot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to Subplot name}
+#'   \item{SubplotArea}{Value or column name in data set @ParacouSubset (none) corresponding to Subplot area}
+#'   \item{SubplotAreaMan}{Value or column name in data set @ParacouSubset (1) corresponding to What is your Subplot area in hectare?}
+#'   \item{SubplotAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is the unit for Subplot area?}
+#'   \item{SubplotMan}{Value or column name in data set @ParacouSubset () corresponding to What is your Subplot name ?}
+#'   \item{TreeSubplotUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to Tree XY subplot coordinates units}
 #'   \item{TickedMelt1}{Some value entered via interaction with the Shiny app}
 #'   \item{TickedMelt2}{Some value entered via interaction with the Shiny app}
 #'   \item{TickedMelt3}{Some value entered via interaction with the Shiny app}
@@ -62,7 +62,7 @@
 #'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree tag}
 #'   \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
 #'   \item{TreeHeightUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your tree height unit?}
-#'   \item{utmUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to Tree UTM units}
+#'   \item{TreeUTMUnitMan}{Value or column name in data set @ParacouSubset (m) corresponding to Tree UTM units}
 #'   \item{ValueName1}{Some value entered via interaction with the Shiny app}
 #'   \item{ValueName2}{Some value entered via interaction with the Shiny app}
 #'   \item{ValueName3}{Some value entered via interaction with the Shiny app}
@@ -70,15 +70,14 @@
 #'   \item{Variablecolumns2}{Some value entered via interaction with the Shiny app}
 #'   \item{Variablecolumns3}{Some value entered via interaction with the Shiny app}
 #'   \item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
-#'   \item{Xplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in plot}
-#'   \item{Xsubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in SUBplot}
-#'   \item{Xutm}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
+#'   \item{XTreePlot}{Value or column name in data set @ParacouSubset (Xfield) corresponding to Tree X euclidean position in plot}
+#'   \item{XTreeSubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in SUBplot}
+#'   \item{XTreeUTM}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
 #'   \item{Year}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Year of measurement}
 #'   \item{YearMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your year of measurement?}
-#'   \item{Yfield}{Some value entered via interaction with the Shiny app}
-#'   \item{Yplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in plot}
-#'   \item{Ysubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in SUBplot}
-#'   \item{Yutm}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
+#'   \item{YTreePlot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in plot}
+#'   \item{YTreeSubplot}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in SUBplot}
+#'   \item{YTreeutm}{Some value entered via interaction with the Shiny app}
 #'   ...
 #' }
 
