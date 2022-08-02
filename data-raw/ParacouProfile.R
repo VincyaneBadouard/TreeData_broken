@@ -51,6 +51,14 @@ if (!interactive()) {
       Site = "Forest",
       SiteMan = "",
       Species = "Species",
+      SpeciesDensity = "none",
+      SpeciesDensityunitMan = "none",
+      SpeciesBasalAreaDensity = "none",
+      SpeciesBasalAreaDensityUnitMan = "none",
+      SpeciesTotalBasalArea = "none",
+      SpeciesTotalBasalAreaUnitMan = "none",
+      SpeciesVolume = "none",
+      SpeciesVolumeUnitMan = "none",
       Subplot = "SubPlot",
       SubplotArea = "none",
       SubplotAreaMan = 1,
@@ -80,9 +88,9 @@ if (!interactive()) {
       XTreeUTM = "Xutm",
       Year = "CensusYear",
       YearMan = -999,
-      YTreePlot = "none",
-      YTreeSubplot = "Yfield",
-      YTreeutm = "Yutm"
+      YTreePlot = "Yfield",
+      YTreeSubplot = "none",
+      YTreeUTM = "Yutm"
     )
 
 }

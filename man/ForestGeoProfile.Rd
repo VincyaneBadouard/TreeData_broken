@@ -76,6 +76,14 @@ A named list
 \item{HOMUnitMan}{Value or column name in data set @ForestGeoSubset (m) corresponding to What is your HOM unit?}
 \item{Variety}{Value or column name in data set @ForestGeoSubset (none) corresponding to Variety name}
 \item{Voucher}{Value or column name in data set @ForestGeoSubset (none) corresponding to Voucher code}
+\item{SpeciesDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species density}
+\item{SpeciesDensityunitMan}{Some value entered via interaction with the Shiny app}
+\item{SpeciesBasalAreaDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species basal area density}
+\item{SpeciesBasalAreaDensityUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your species basal area unit?}
+\item{SpeciesTotalBasalArea}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species total basal area}
+\item{SpeciesTotalBasalAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is yourindividual basal area unit?}
+\item{SpeciesVolume}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species volume}
+\item{SpeciesVolumeUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your species volume unit?}
 \item{Tidy}{Some value entered via interaction with the Shiny app}
 \item{ClearValueName}{Some value entered via interaction with the Shiny app}
 \item{TickedMelt3}{Some value entered via interaction with the Shiny app}

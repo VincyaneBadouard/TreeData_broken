@@ -52,6 +52,14 @@ A named list
 \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
 \item{SiteMan}{Value or column name in data set @ParacouSubset () corresponding to What is your site name ?}
 \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
+\item{SpeciesDensity}{Value or column name in data set @ParacouSubset (none) corresponding to Species density}
+\item{SpeciesDensityunitMan}{Some value entered via interaction with the Shiny app}
+\item{SpeciesBasalAreaDensity}{Value or column name in data set @ParacouSubset (none) corresponding to Species basal area density}
+\item{SpeciesBasalAreaDensityUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your species basal area unit?}
+\item{SpeciesTotalBasalArea}{Value or column name in data set @ParacouSubset (none) corresponding to Species total basal area}
+\item{SpeciesTotalBasalAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is yourindividual basal area unit?}
+\item{SpeciesVolume}{Value or column name in data set @ParacouSubset (none) corresponding to Species volume}
+\item{SpeciesVolumeUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your species volume unit?}
 \item{Subplot}{Value or column name in data set @ParacouSubset (SubPlot) corresponding to Subplot name}
 \item{SubplotArea}{Value or column name in data set @ParacouSubset (none) corresponding to Subplot area}
 \item{SubplotAreaMan}{Value or column name in data set @ParacouSubset (1) corresponding to What is your Subplot area in hectare?}
@@ -79,9 +87,9 @@ A named list
 \item{XTreeUTM}{Value or column name in data set @ParacouSubset (Xutm) corresponding to Tree X UTM coordinate}
 \item{Year}{Value or column name in data set @ParacouSubset (CensusYear) corresponding to Year of measurement}
 \item{YearMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your year of measurement?}
-\item{YTreePlot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in plot}
-\item{YTreeSubplot}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in SUBplot}
-\item{YTreeutm}{Some value entered via interaction with the Shiny app}
+\item{YTreePlot}{Value or column name in data set @ParacouSubset (Yfield) corresponding to Tree Y euclidean position in plot}
+\item{YTreeSubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y euclidean position in SUBplot}
+\item{YTreeUTM}{Value or column name in data set @ParacouSubset (Yutm) corresponding to Tree Y UTM coordinate}
 ...
 }
 }
