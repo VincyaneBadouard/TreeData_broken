@@ -96,7 +96,6 @@ js <- c( # --- this is to edit CODES table
 # start server code here
 
 server <- function(input, output, session) { # server ####
-
   # upload tab ####
 
   # show as meany upload widgets as asked for
@@ -499,8 +498,14 @@ server <- function(input, output, session) { # server ####
                                    {c("none", "cm2", "m2", "ha", "km2")
                                    })
 
-  AreaByAreaUnitOptions <- reactiveVal(c("cm2/ha"))
-  VolumeByAreaUnitOptions<- reactiveVal(c("cm3/ha"))
+  AreaByAreaUnitOptions <- reactiveVal(c("none",
+                                         "mm2/m2", "cm2/m2", "m2/m2",
+                                         "mm2/ha", "cm2/ha", "m2/ha",
+                                         "mm2/km2", "cm2/km2", "m2/km2"))
+  VolumeByAreaUnitOptions<- reactiveVal(c("none",
+                                          "mm3/m2", "cm3/m2", "m3/m2",
+                                          "mm3/ha", "cm3/ha", "m3/ha",
+                                          "mm3/km2", "cm3/km2", "m3/km2"))
 
 
 
@@ -735,7 +740,7 @@ server <- function(input, output, session) { # server ####
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
 
 
- # update stuff in the Corrections tab, based on the formated data
+  # update stuff in the Corrections tab, based on the formated data
   observeEvent(input$LaunchFormating , {
 
     lapply(which(xCorr$argument %in% "choices"), function(i) {
@@ -997,7 +1002,7 @@ server <- function(input, output, session) { # server ####
               color = "success"
             )
         )
-        })
+      })
 
       AllCodesInput <- AllCodes()
       AllCodesOutput <- profileOutput$AllCodes
@@ -1005,16 +1010,16 @@ server <- function(input, output, session) { # server ####
       AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
       CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_"), ncol = nrow(AllCodesOutput),
-             nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
+                                     nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
 
       for (i in seq_len(nrow(CodeTranslationTable))) {
         for(j in seq_len(ncol(CodeTranslationTable))) {
-       if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-          '<input type="radio" name="%s_%s" value="%s" checked="checked"/>',
-          AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
-            '<input type="radio" name="%s_%s" value="%s"/>',
-            AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
+          if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
+            '<input type="radio" name="%s_%s" value="%s" checked="checked"/>',
+            AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
+              '<input type="radio" name="%s_%s" value="%s"/>',
+              AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
         }
       }
 
@@ -1032,8 +1037,8 @@ server <- function(input, output, session) { # server ####
                          rowGroup = list(dataSrc=c(1)),
                          columnDefs = list(list(visible=FALSE, targets=c(1))),
                          fixedColumns = list(leftColumns = 1)),
-       container = sketch,
-        callback = JS("table.rows().every(function(i, tab, row) {
+          container = sketch,
+          callback = JS("table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
           $this.attr('id', this.data()[1]+'_'+this.data()[0]);
           $this.addClass('shiny-input-radiogroup');
@@ -1041,7 +1046,7 @@ server <- function(input, output, session) { # server ####
         Shiny.unbindAll(table.table().node());
         Shiny.bindAll(table.table().node());")
         ), # this is generating the radio buttons in the body of the table
-       server = FALSE)
+        server = FALSE)
 
       # output$CodeTranslationTable <- renderHtmlTableWidget(
       #   htmlTableWidget(
