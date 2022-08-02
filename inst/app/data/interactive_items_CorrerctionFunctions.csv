@@ -7,7 +7,7 @@ level, equal to FALSE if not, and in this case the correction is done by
 tree (logical)</p>
 </td>
 </tr>
-","ErrorsDetectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+","ErrorsDetectionByStem","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "ErrorsDetection","<tr valign=""top"">
 <td><code>DeathConfirmation</code></td>
 <td>
@@ -87,6 +87,67 @@ before it was seen alive for the 1st time? (logical)</p>
 concerning the tree after its death? (logical)</p>
 </td>
 </tr>","StatusCorrectionRemoveRAfterDeath","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"TaperCorrection","<tr valign=""top"">
+<td><code>DefaultHOM</code></td>
+<td>
+<p>Default Height Of Measurement in meter (Default: 1.3 m)
+(numeric, 1 value)</p>
+</td>
+</tr>
+","TaperCorrectionDefaultHOM","1.3","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+"TaperCorrection","<tr valign=""top"">
+<td><code>TaperParameter</code></td>
+<td>
+<p>Taper parameter (unitless) formula (function)
+Default: <em>TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)</em>
+of Cushman et al.2021.
+With:
+</p>
+
+<ul>
+<li> <p><em>DAB</em>: Diameter Above Buttress (in cm)
+</p>
+</li>
+<li> <p><em>HOM</em>: Height Of Measurement (in m)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","TaperCorrectionTaperParameter","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM)"")",FALSE
+"TaperCorrection","<tr valign=""top"">
+<td><code>TaperFormula</code></td>
+<td>
+<p>Taper formula (function)
+Default: <em>DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))</em>
+of Cushman et al.2021.
+With:
+</p>
+
+<ul>
+<li> <p><em>DAB</em>: Diameter Above Buttress (in cm)
+</p>
+</li>
+<li> <p><em>HOM</em>: Height Of Measurement (in m)
+</p>
+</li>
+<li> <p><em>DefaultHOM</em>:  Default Height Of Measurement (in m)
+</p>
+</li>
+<li> <p><em>TaperParameter</em>: Taper parameter (unitless)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","TaperCorrectionTaperFormula","list(""Default Function"" = ""function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","list(""Default Function"" = ""function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(2 * exp(-TaperParameter *     (HOM - DefaultHOM)))"")",FALSE
+"TaperCorrection","<tr valign=""top"">
+<td><code>DetectOnly</code></td>
+<td>
+<p>TRUE: Only detect errors, FALSE: detect and correct errors
+(Default: FALSE) (logical)</p>
+</td>
+</tr>","TaperCorrectionDetectOnly","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>ByStem</code></td>
 <td>
@@ -95,7 +156,7 @@ level, equal to FALSE if not, and in this case the correction is done by
 tree (logical)</p>
 </td>
 </tr>
-","DiameterCorrectionByStem","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+","DiameterCorrectionByStem","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>DefaultHOM</code></td>
 <td>
@@ -104,14 +165,6 @@ tree (logical)</p>
 </td>
 </tr>
 ","DiameterCorrectionDefaultHOM","1.3","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"DiameterCorrection","<tr valign=""top"">
-<td><code>MinDBH</code></td>
-<td>
-<p>Minimum census DBH (Diameter at the default HOM) of your
-protocol in cm (numeric, 1 value)</p>
-</td>
-</tr>
-","DiameterCorrectionMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>MaxDBH</code></td>
 <td>
