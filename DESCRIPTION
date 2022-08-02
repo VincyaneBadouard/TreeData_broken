@@ -40,6 +40,7 @@ Depends:
 Config/testthat/edition: 3
 Imports: 
     kableExtra,
+    units,
     htmlTable,
     data.table (>= 1.14.2),
     shiny (>= 1.6.0),
