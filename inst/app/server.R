@@ -833,6 +833,9 @@ server <- function(input, output, session) { # server ####
     dToEdit <- AllCodes()
     dToEdit[info$row,info$col-1] <- info$value # have to add the +1 because for some reason the indexing starts at 0 (probably because of the rbindlist function)
     AllCodes(dToEdit)
+
+    shinyjs::show("dbProfile1")
+
   })
 
 
@@ -1193,7 +1196,7 @@ server <- function(input, output, session) { # server ####
 
   # Save profile .Rdata
 
-  output$dbProfile <- downloadHandler(
+  output$dbProfile <- output$dbProfile1 <- output$dbProfile2 <-downloadHandler(
     filename = function() {
       paste(gsub(".csv", "", input$file1$name), '_Profile.rds', sep = '')
     },
