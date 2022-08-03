@@ -155,17 +155,20 @@ Diameter correction
 When there is only 1 \code{Diameter} value for a tree/stem, \code{DBHCor}
 takes the original \code{Diameter} value. If this value is 0 or > MaxDBH,
 \code{DBHCor} takes NA.
+Diameters not linked to an IdTree/IdStem or to a Census Year are not
+processed.
 }
 \examples{
 library(data.table)
 data(TestData)
 
 # Remove other errors types (non-unique idTree, missing Year)
-TestData <- TestData[!IdTree \%in\% c("100898", "101686")]
+# TestData <- TestData[!IdTree \%in\% c("100898", "101686")]
 
 Rslt <- DiameterCorrection(
  TestData,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("quadratic", "phylogenetic hierarchical"))
+    CorrectionType = c("quadratic", "phylogenetic hierarchical"),
+    MinIndividualNbr = 1)
 
 }

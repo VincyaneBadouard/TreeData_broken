@@ -6,7 +6,7 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
 
@@ -31,7 +31,7 @@ test_that("DiameterCorrectionByTree", {
                         ScientificName = "A",
                         Year = 2000,
                         Diameter = 12,
-                        POM = 0,
+                        POM = as.factor(0),
                         HOM = 1.3)
 
 
@@ -49,7 +49,7 @@ test_that("DiameterCorrectionByTree", {
                         ScientificName = "A",
                         Year = 2000,
                         Diameter = 900,
-                        POM = 0,
+                        POM = as.factor(0),
                         HOM = 1.3)
 
   Rslt <- DiameterCorrectionByTree(OnlyOne,
@@ -65,7 +65,7 @@ test_that("DiameterCorrectionByTree", {
                         ScientificName = "A",
                         Year = 0,
                         Diameter = 900,
-                        POM = 0,
+                        POM = as.factor(0),
                         HOM = 1.3)
 
   Rslt <- DiameterCorrectionByTree(OnlyOne,
@@ -81,7 +81,7 @@ test_that("DiameterCorrectionByTree", {
   #                        ScientificName = "A",
   #                        Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
   #                        Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-  #                        POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+  #                        POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
   #                        HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
   #
   # Rslt <- suppressWarnings(DiameterCorrectionByTree(DataTree,
@@ -104,7 +104,7 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = seq(2000,2008, by = 2), # 5 censuses
                          Diameter = c(13, 14, 15, 30, 17), # 0.5 cm/year. The 4th value is abnormal
-                         POM = c(0, 0, 1, 1, 2),
+                         POM = as.factor(c(0, 0, 1, 1, 2)),
                          HOM = c(1.3, 1.3, 1.5, 1.5, 2))
 
   Rslt <- DiameterCorrectionByTree(DataTree,
@@ -123,7 +123,7 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = seq(2000,2008, by = 2), # 5 censuses
                          Diameter = c(13, 14, 15, NA, 17), # 0.5 cm/year
-                         POM = c(0, 0, 1, 1, 2),
+                         POM = as.factor(c(0, 0, 1, 1, 2)),
                          HOM = c(1.3, 1.3, 1.5, 1.5, 2))
 
   Rslt <- DiameterCorrectionByTree(DataTree,
@@ -142,7 +142,7 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)))
   ## individual correction ---------------------------------------------------------------------------------------------
 
   Rslt <- DiameterCorrectionByTree(DataTree,
@@ -150,7 +150,7 @@ test_that("DiameterCorrectionByTree", {
                                    WhatToCorrect = "POM change",
                                    CorrectionType = c("individual", "linear"))
 
-  expect_true(all(Rslt[POM != 0, DBHCor] != DataTree[POM != 0, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
   expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "linear")) # the 1st value is correct by linear regression
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
@@ -161,14 +161,14 @@ test_that("DiameterCorrectionByTree", {
   DataTree <- TestData[IdTree %in% "100628"]
   DataTree <- DataTree[order(Year)] # order de dt
   DataTree$Diameter <- c(13, 14, 15, 12, 13)
-  DataTree$POM = c(0, 0, 0, 1, 1)
+  DataTree$POM = as.factor(c(0, 0, 0, 1, 1))
 
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    TestData,
                                    WhatToCorrect = "POM change",
                                    CorrectionType = c("phylogenetic hierarchical", "linear"))
 
-  expect_true(all(Rslt[POM != 0, DBHCor] != DataTree[POM != 0, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(Rslt[4, Comment] == "POM change") # detect the POM change
   expect_true(Rslt[4, DiameterCorrectionMeth] %in% c("species","genus","family","stand")) # the 1st value is correct by linear regression
   expect_true(Rslt[5, DiameterCorrectionMeth] == "shift realignment") # the other value of the shift are just realigned
@@ -179,14 +179,14 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)))
 
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "shift",
                                    CorrectionType = c("individual", "linear"))
 
-  expect_true(all(Rslt[POM != 0, DBHCor] != DataTree[POM != 0, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "Abnormal diameter value (shift error)")) # detect the POM change
   expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "linear")) # the 1st value is correct by linear regression
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
@@ -235,7 +235,7 @@ test_that("DiameterCorrectionByTree", {
   #                        ScientificName = "A",
   #                        Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
   #                        Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-  #                        POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+  #                        POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
   #                        HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
   #
   # Rslt <- suppressWarnings(DiameterCorrectionByTree(DataTree,
@@ -258,7 +258,7 @@ test_that("DiameterCorrectionByTree", {
   #                        ScientificName = "A",
   #                        Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
   #                        Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-  #                        POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+  #                        POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
   #                        HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
   #
   # Rslt <- DiameterCorrectionByTree(DataTree,
@@ -277,14 +277,14 @@ test_that("DiameterCorrectionByTree", {
                          ScientificName = "A",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2))
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)))
 
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = c("POM change", "punctual"),
                                    CorrectionType = c("individual", "quadratic"))
 
-  expect_true(all(Rslt[POM != 0, DBHCor] != DataTree[POM != 0, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
+  expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
   expect_true(all(Rslt[3, Comment] == "Abnormal diameter value (punctual error)")) # detect the punctual error
   expect_true(all(Rslt[c(3,5,8), DiameterCorrectionMeth] == "quadratic")) # the 1st value is correct by linear regression
@@ -302,7 +302,7 @@ test_that("DiameterCorrectionByTree", {
                          Family = "Sapotaceae",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
 
@@ -325,7 +325,7 @@ test_that("DiameterCorrectionByTree", {
                          Family = "Sapotaceae",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13, 14, 24, 16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-                         POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
+                         POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)),
                          HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
 

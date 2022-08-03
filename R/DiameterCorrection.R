@@ -110,6 +110,8 @@
 #' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
 #'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
 #'   `DBHCor` takes NA.
+#'   Diameters not linked to an IdTree/IdStem or to a Census Year are not
+#'   processed.
 #'
 #' @importFrom utils capture.output
 #'
@@ -120,12 +122,13 @@
 #' data(TestData)
 #'
 #' # Remove other errors types (non-unique idTree, missing Year)
-#' TestData <- TestData[!IdTree %in% c("100898", "101686")]
+#' # TestData <- TestData[!IdTree %in% c("100898", "101686")]
 #'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("quadratic", "phylogenetic hierarchical"))
+#'     CorrectionType = c("quadratic", "phylogenetic hierarchical"),
+#'     MinIndividualNbr = 1)
 #'
 DiameterCorrection <- function(
   Data,
@@ -232,7 +235,7 @@ DiameterCorrection <- function(
 
     b <- capture.output(DuplicatedID)
     c <- paste(b, "\n", sep = "")
-    cat("Your data set is:\n", c, "\n")
+    # cat("Your data set is:\n", c, "\n")
 
     stop("Duplicated ", ID, "(s) in a census:\n", c, "\n")
 
@@ -263,7 +266,8 @@ DiameterCorrection <- function(
 
   # Dataset with the rows without IDS ----------------------------------------------------------------------------------
   DataIDNa <-  Data[is.na(get(ID))]
-
+  # Dataset with the rows without Year ----------------------------------------------------------------------------------
+  DataYearNa <-  Data[is.na(Year)]
 
   # Taper correction ------------------------------------------------------------------------------------------------------
   # if("taper" %in% CorrectionType) {
@@ -278,7 +282,7 @@ DiameterCorrection <- function(
   # Apply for all the trees -----------------------------------------------------------------------------------------------
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
-    DataTree = Data[get(ID) %in% i], # per ID, all censuses
+    DataTree = Data[get(ID) %in% i & !is.na(Year)], # per ID, all censuses
     Data = Data,
 
     DefaultHOM = DefaultHOM,
@@ -301,10 +305,8 @@ DiameterCorrection <- function(
   )
   )) # do.call apply the 'rbind' to the lapply result
 
-  # Re-put the the rows without ID ------------------------------------------------------------------------------------
-  Data <- rbindlist(list(Data, DataIDNa), use.names = TRUE, fill = TRUE)
-
-
+  # Re-put the the rows without ID or Year --------------------------------------------------------------------------------
+  Data <- rbindlist(list(Data, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
 
   if(DetectOnly %in% FALSE){
 
@@ -416,8 +418,7 @@ DiameterCorrection <- function(
 #'       ScientificName = "A",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
 #'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-#'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-#'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+#'       POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)))
 #'
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
@@ -493,7 +494,22 @@ DiameterCorrectionByTree <- function(
       ## POM change detection -----------------------------------------------------------------------------------------------
       if(any(!is.na(DataTree$POM))) { # POM exists?
 
-        raised = which(diff(c(NA, DataTree$POM)) == 1) # POM change detection (1ere val = NA because it's the default POM) (1 = changement de POM)
+        # Check the POM value over the time
+        # If POM decreases comment it
+        DataTree <- GenerateComment(DataTree,
+                                    condition = as.numeric(rownames(DataTree)) %in%
+                                      (which(diff(as.numeric(DataTree$POM)) < 0) +1),
+                                    comment = "POM decrease")
+
+        # POM change detection
+        POMChange <- NA  # 1st val = NA because it's the default POM
+        for( n in (2:(length(DataTree$POM))) ){
+          POMChange <- c(POMChange, DataTree$POM[n-1] != DataTree$POM[n]) # (TRUE = POM change)
+        }
+
+        raised = which(POMChange) # which are TRUE
+
+
         if(length(raised) != 0){ # if there are POM changes
 
           DataTree <- GenerateComment(DataTree,

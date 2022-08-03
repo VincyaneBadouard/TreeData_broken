@@ -3,12 +3,12 @@ test_that("PhylogeneticHierarchicalCorrection", {
   # Import data ---------------------------------------------------------------------------------------------------------------------
   library(data.table)
   data(TestData)
-  DataTree <- TestData[IdTree %in% "100658"]
+  DataTree <- TestData[IdStem %in% "100621_1_auto"]
 
-  DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008, 2010)
-  DataTree$Diameter <- c(13, 14, 15, 12, 13, 14)
-  cresc <- c(0.5, 0.5, NA, 0.5, 0.5)
-  cresc_abs <- c(1, 1, NA, 1, 1)
+  DataTree$Year <-  c(2000, 2002, 2004, 2006, 2008)
+  DataTree$Diameter <- c(13, 14, 11, 12, 13)
+  cresc <- c(0.5, NA, 0.5, 0.5)
+  cresc_abs <- c(1, NA, 1, 1)
   cresc_abn <- 3
 
   NoSctficDataTree <- DataTree[, !c("ScientificName")]

@@ -74,6 +74,8 @@ test_that("BotanicalCorrection", {
                regexp = "The 'DetectOnly' argument must be a logical")
 
   # Check the function work -----------------------------------------------------------------------------------------------
+  options(warn = 2) # trace warning
+  options(warn = 0) # when debug is over
 
   ## Detect Only: no correction, only comments (A FAIRE)----------------------------------------------------------------------------
   Rslt <- BotanicalCorrection(Data, Source = "TPL", DetectOnly = TRUE)

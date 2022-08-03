@@ -7,7 +7,7 @@
 #' @param DataTree A dataset corresponding to a single tree/stem's (1
 #'   IdTree/IdStem) measurements (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdTree' (character)
+#'   - 'IdStem' (character)
 #'   - 'ScientificName' (character)
 #'   - 'Genus' (character)
 #'   - 'Family' (character)
@@ -16,7 +16,7 @@
 #'
 #' @param Data Complete dataset (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdTree' (character)
+#'   - 'IdStem' (character)
 #'   - 'ScientificName' (character)
 #'   - 'Genus' (character)
 #'   - 'Family' (character)
@@ -139,34 +139,45 @@ PhylogeneticHierarchicalCorrection <- function(
 
         # Find colleagues ---------------------------------------------------------------------------------------------------------
         ## Species level
-        Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
-                             ScientificName == unique(DataTree$ScientificName) &
+        Colleagues <- Data[ScientificName == unique(DataTree$ScientificName) &
                              (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
-        if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "species"
+        Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+
+
+        if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "species"
 
         }else{
           ## Genus level
-          Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
-                               Genus == unique(DataTree$Genus) &
+          Colleagues <- Data[Genus == unique(DataTree$Genus) &
                                (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
-          if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "genus"
+          Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+
+          if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "genus"
 
           }else{
             ## Family level
-            Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
-                                 Family == unique(DataTree$Family) &
+            Colleagues <- Data[Family == unique(DataTree$Family) &
                                  (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 
-            if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "family"
+            Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+
+            if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "family"
 
             }else{
               ## Stand level
-              Colleagues <- Data[IdTree != unique(DataTree$IdTree) & # colleagues, not the tree to correct
-                                   Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
+              Colleagues <- Data[Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
 
-              if(length(unique(Colleagues[, IdTree])) >= MinIndividualNbr){ Method <- "stand"
+              Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+
+
+              if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "stand"
+
+              }else if(nrow(Colleagues) == 0){
+                stop("There are no individuals of the same species (",unique(DataTree$ScientificName),")
+                     and diameter category(",EstDBH - DBHRange/2,";",EstDBH + DBHRange/2,")
+                     as the estimated diameter(",EstDBH,") of the stem",unique(DataTree$IdStem),"")
 
               }else{stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
                        You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument)")}

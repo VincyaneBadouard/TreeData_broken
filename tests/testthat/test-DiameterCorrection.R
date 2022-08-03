@@ -13,7 +13,7 @@ test_that("DiameterCorrection", {
   HOMData <- copy(TestData[IdTree == "100658"])
   HOMData[, HOM := 1.3] # data with HOM
   POMData <- copy(TestData[IdTree == "100658"])
-  POMData[, POM := 1] # data with HOM
+  POMData[, POM := as.factor(1)] # data with POM
 
 
   # Check the function argument -----------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ test_that("DiameterCorrection", {
                regexp = "'arg' must be NULL or a character vector")
 
   expect_error(DiameterCorrection(TestData, TrustMeasSet = "T"),
-               regexp = 'should be one of "first", "last"')
+               regexp = 'should be one of')
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
                regexp = "The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
@@ -50,8 +50,8 @@ test_that("DiameterCorrection", {
                regexp = "The 'CorrectionType' argument value must be among
          'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
-  expect_warning(DiameterCorrection(TestData, Digits = 1.2, CorrectionType = c( "linear", "individual", "phylogenetic hierarchical")),
-               regexp = "The 'Digits' argument must be an integer")
+  expect_warning(DiameterCorrection(TestData, Digits = 1.2),
+                 regexp = "The 'Digits' argument must be an integer")
 
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
@@ -76,8 +76,13 @@ test_that("DiameterCorrection", {
   expect_true(!"DBHCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
 
   ## Correction --------------------------------------------------------------------------------------------------------------------
+  # options(warn = 2) # trace warning
+  # options(warn = 0) # when debug is over
+
   Rslt <- DiameterCorrection(
     TestData,
+    ByStem = TRUE,
+
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
 
@@ -89,7 +94,7 @@ test_that("DiameterCorrection", {
     CorrectionType = c("quadratic", "linear", "phylogenetic hierarchical"),
 
     DBHRange = 10,
-    MinIndividualNbr = 5,
+    MinIndividualNbr = 1,
     Digits = 2L,
 
     TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),

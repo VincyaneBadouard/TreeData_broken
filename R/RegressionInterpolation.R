@@ -74,7 +74,11 @@ RegressionInterpolation <- function(
 
   Y[miss] <- sapply(miss, function(i) { # i = each value de miss
 
-    if("quadratic" %in% CorrectionType & length(which(!is.na(Y))) > 2){
+    if(length(which(!is.na(Y))) < 2){
+
+      yi <- Y[!is.na(Y)]
+
+  }else if("quadratic" %in% CorrectionType & length(which(!is.na(Y))) > 2){
 
       # Degree 2 polynomial regression (= quadratic)
       reg <- lm(Y ~ poly(X, degree = 2, raw = TRUE))$coef # 'degree' must be less than number of unique points

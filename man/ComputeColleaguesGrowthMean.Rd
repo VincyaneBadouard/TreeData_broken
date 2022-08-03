@@ -21,12 +21,12 @@ the same genus, the same family or the same stand, depending on what the
 inventory proposes and the minimum selection criteria of the user
 ('\emph{MinIndividualNbr}' argument of \emph{PhylogeneticHierarchicalCorrection()}).
 (data.table)
-The dataset must contain the column: 'IdTree' (character)}
+The dataset must contain the column: 'IdStem' (character)}
 
 \item{Data}{(data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdTree' (character)
+\item 'IdStem' (character)
 \item 'Diameter' (numeric)
 \item 'Year' (numeric)
 }}
@@ -59,7 +59,6 @@ EstDBH <- 17 # Estimated DBH (cm)
 DBHRange = 10 # DBH range (cm)
 # Find colleagues
 Colleagues <- TestData[
-IdTree != "100658" & # colleagues, not the tree to correct
 ScientificName == "Licania membranacea" & # same species as the tree to be corrected
 (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 

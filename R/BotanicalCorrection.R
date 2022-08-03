@@ -239,7 +239,7 @@ BotanicalCorrection <- function(
 
 
     Data <- merge(Data, FamilyData, by.x = "GenusCor", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
-	
+
     # Generate a comment if the family name is incorrect
     Data <- GenerateComment(Data,
                             condition = Data[,Family] != Data[,FamilyCor],
@@ -279,7 +279,7 @@ BotanicalCorrection <- function(
         Data[Data$Site == s, .(IdTree, FamilyCor, GenusCor, SpeciesCor, VernNameCor)]
       ))
 
-      CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
+      CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree)
 
       if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 
@@ -394,7 +394,7 @@ BotanicalCorrection <- function(
       Data[Data$Site == s, .(IdTree, FamilyCor, GenusCor, SpeciesCor, VernNameCor)]
     ))
 
-    CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-Yutm) combination
+    CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree)
 
     if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 

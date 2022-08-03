@@ -23,7 +23,7 @@ PhylogeneticHierarchicalCorrection(
 IdTree/IdStem) measurements (data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdTree' (character)
+\item 'IdStem' (character)
 \item 'ScientificName' (character)
 \item 'Genus' (character)
 \item 'Family' (character)
@@ -34,7 +34,7 @@ The dataset must contain the columns:
 \item{Data}{Complete dataset (data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdTree' (character)
+\item 'IdStem' (character)
 \item 'ScientificName' (character)
 \item 'Genus' (character)
 \item 'Family' (character)

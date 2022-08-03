@@ -9,11 +9,11 @@
 #'   inventory proposes and the minimum selection criteria of the user
 #'   ('*MinIndividualNbr*' argument of *PhylogeneticHierarchicalCorrection()*).
 #'   (data.table)
-#'   The dataset must contain the column: 'IdTree' (character)
+#'   The dataset must contain the column: 'IdStem' (character)
 #'
 #' @param Data (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdTree' (character)
+#'   - 'IdStem' (character)
 #'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
@@ -43,7 +43,6 @@
 #' DBHRange = 10 # DBH range (cm)
 #' # Find colleagues
 #' Colleagues <- TestData[
-#' IdTree != "100658" & # colleagues, not the tree to correct
 #' ScientificName == "Licania membranacea" & # same species as the tree to be corrected
 #' (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
 #'
@@ -64,14 +63,14 @@ ComputeColleaguesGrowthMean <- function(
   # Work start --------------------------------------------------------------------------------------------------------------
   # Find their cresc at these DBHs and compute the average of these crescs
 
-  # Collect their IdTree ----------------------------------------------------------------------------------------------------
-  ColleaguesId <- unique(Colleagues[, IdTree])
+  # Collect their IdStem ----------------------------------------------------------------------------------------------------
+  ColleaguesId <- unique(Colleagues[, IdStem])
 
   # DBH seq of the Colleagues -----------------------------------------------------------------------------------------------
-  ColleaguesSeq <- Data[IdTree %in% ColleaguesId]
+  ColleaguesSeq <- Data[IdStem %in% ColleaguesId]
 
-  # Order IdTrees and times in ascending order
-  ColleaguesSeq <- ColleaguesSeq[order(IdTree, Year)]
+  # Order IdStems and times in ascending order
+  ColleaguesSeq <- ColleaguesSeq[order(IdStem, Year)]
 
   # Compute cresc for each Colleague ----------------------------------------------------------------------------------------
   # i = "100747"
@@ -79,12 +78,12 @@ ComputeColleaguesGrowthMean <- function(
 
     # i = "100747"
     ColleaguesCresc <- ComputeIncrementation( # matrix (Rows: ind, Col: cresc)
-      Var = ColleaguesSeq[IdTree %in% i, Diameter], # Diameter or DBHCor ?
+      Var = ColleaguesSeq[IdStem %in% i, Diameter], # Diameter or DBHCor ?
       Type = "annual",
-      Time = ColleaguesSeq[IdTree %in% i, Year]
+      Time = ColleaguesSeq[IdStem %in% i, Year]
     )
 
-    ColleaguesSeq[IdTree == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
+    ColleaguesSeq[IdStem == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
   }
 
   # Keep only rows with DBH in DBHRange -------------------------------------------------------------------------------------
@@ -92,8 +91,10 @@ ComputeColleaguesGrowthMean <- function(
 
   # Compute mean(Colleaguescresc) -------------------------------------------------------------------------------------------
   ColleaguesCrescMean <- mean(
-    Colleagues[Cresc < PositiveGrowthThreshold | Cresc > NegativeGrowthThreshold]$Cresc # filter abnormal growth
+    Colleagues[Cresc < PositiveGrowthThreshold | Cresc > NegativeGrowthThreshold, Cresc] # filter abnormal growth
   )
+
+  # length(ColleaguesCrescMean) == 0 # cas où il ne reste plus de colleagues (il faudrait faire tourner cette fct pour tous les niveaux (sp, gen, fam)..très long.
 
   return(ColleaguesCrescMean)
 
