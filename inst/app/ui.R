@@ -45,8 +45,24 @@ flags <- c(
 
 
 # header with title
-header <- dashboardHeader(title = "Data harmonisation"
-                          # ,
+header <- dashboardHeader(title = "Data harmonisation",
+                          tags$li(class = "dropdown",  dropdownMenu(type = "messages",
+                                                                    # from for first line, message 2nd line smaller font
+                                                                    messageItem(
+                                                                      from = "Project in Github",
+                                                                      message = "Documentation, Source, Citation",
+                                                                      icon = icon("github"),
+                                                                      href = "https://github.com/VincyaneBadouard/TreeData"),
+                                                                    messageItem(
+                                                                      from = "Issues",
+                                                                      message = "Report Issues",
+                                                                      icon = icon("exclamation-circle"),
+                                                                      href = "https://github.com/VincyaneBadouard/TreeData/issues"),
+                                                                    badgeStatus = NULL,
+                                                                    icon = icon("info-circle"),
+                                                                    # icon = fontawesome::fa("info-circle"),
+                                                                    headerText = "App Information"
+                          ))
                           # tags$li(class = "dropdown",
                           #
                           #         pickerInput ("languages", NULL, width = "auto",
