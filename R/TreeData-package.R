@@ -13,8 +13,8 @@
 
 ## usethis namespace: start
 ### quiets concerns of R CMD check "no visible binding for global variables"
-utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea",
-                         "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot", "Xsubplot", "Ysubplot", "PlotSubNum",
+utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "PlotSubNum",
+                         "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot", "XTreeSubplot", "YTreeSubplot",
 
                          "CensusYear", "Date", "CensusDate", "Month", "Day", "IdCensus",
                          "Year", "Time", "DateOriginal", "CensusDateOriginal", "SitYearID",
@@ -25,7 +25,7 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea",
                          "POM", "HOM",
 
 
-                         "Family", "VernName",  "Genus", "Species", "ScientificName",
+                         "Family", "VernName", "Genus", "Species", "Subspecies", "ScientificName",
 
 
                          "LifeStatus", "CommercialSp", "LifeStatusOriginal", "CommercialSpOriginal",
