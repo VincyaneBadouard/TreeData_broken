@@ -57,6 +57,7 @@ data(TestData)
 
 EstDBH <- 17 # Estimated DBH (cm)
 DBHRange = 10 # DBH range (cm)
+
 # Find colleagues
 Colleagues <- TestData[
 ScientificName == "Licania membranacea" & # same species as the tree to be corrected

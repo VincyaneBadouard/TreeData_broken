@@ -82,6 +82,7 @@
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
 #'                 Species, SpeciesCor,
+#'                 One.Reason, Old.name, Old.status, New.accepted,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'
@@ -90,6 +91,7 @@
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
 #'                 Species, SpeciesCor,
+#'                 One.Reason, Old.name, Old.status, New.accepted,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'}
@@ -253,19 +255,41 @@ BotanicalCorrection <- function(
       setDT(WFOData) # in data.table
       WFOData[is.na(WFOData), ] <- "" # WFO.match doesn't take NA but ""
 
-      WFmatch <- WorldFlora::WFO.match(spec.data = unique(Data[, ScientificNameCor]), # data to correct
+      # Prepare Data (replace risky characters)
+      Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)]
+      Data[, ScientificNameCor := gsub("Indet", "", ScientificNameCor)]
+      Data[, ScientificNameCor := gsub("indet", "", ScientificNameCor)]
+
+      # "Plants of the World Online" correction (more actual than WFO):
+      Data <- GenerateComment(Data,
+                              condition = Data$ScientificNameCor %in% c("Tetragastris panamensis",
+                                                                        "Protium picramnioides",
+                                                                        "Tetragastris stevensonii"),
+                              comment = "'ScientificName' is a synonym of the accepted botanical name")
+
+      Data[ScientificNameCor %in% c("Tetragastris panamensis",
+                                    "Protium picramnioides",
+                                    "Tetragastris stevensonii"),
+           `:=` (ScientificNameCor = "Protium stevensonii",
+                 FamilyCor = "Burseraceae",
+                 BotanicalCorrectionSource = "Plants of the World Online")]
+
+      WFmatch <- WorldFlora::WFO.match(spec.data = unique(Data[ScientificNameCor!= "Protium stevensonii",
+                                                               ScientificNameCor]), # data to correct
                                        WFO.data = WFOData, # WFO data
                                        Fuzzy.force = FALSE,
                                        Fuzzy.shortest = TRUE,
                                        verbose = FALSE)
+      setDT(WFmatch) # in data.table
 
-      setDT(WFmatch)
+      # Remove multiple matches case (faudrait garder la famille par contre)
+      WFmatch <- WFmatch[!spec.name %in% c(WFmatch[duplicated(WFmatch[, spec.name]), spec.name])]
 
-      WFmatch <- WFmatch[, list(taxonomicStatus, spec.name, scientificName, family)] # columns of interest
+      WFmatch <- WFmatch[, list(taxonomicStatus, Old.status, spec.name, scientificName, family)] # columns of interest
 
 
       WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
-      WFmatch[, BotanicalCorrectionSource := "World Flora Online"] # create the correction source
+      WFmatch[, BotaCorSource := "World Flora Online"] # create the correction source
       WFmatch[, taxonomicStatus := NULL] # remove the column
 
 
@@ -273,9 +297,24 @@ BotanicalCorrection <- function(
       # Join the corrected Genus and Species, by original 'ScientificNameCor'
       Data <- merge(Data, WFmatch, by.x = "ScientificNameCor", by.y = "spec.name", all.x = TRUE)
 
-      Data[, ScientificNameCor := NULL] # remove previous clomum before create the new one
+      Data[, ScientificNameCor := NULL] # remove previous column before create the new one
+
+      # Deal with "Plants of the World Online" correction
+      Data[, FamilyCor := ifelse(is.na(FamilyCor), family, FamilyCor)]
+      Data[, BotanicalCorrectionSource := ifelse(is.na(BotanicalCorrectionSource), BotaCorSource, BotanicalCorrectionSource)]
+
 
       setnames(Data, c("scientificName", "family"), c("ScientificNameCor", "FamilyCor")) # rename columns
+
+      # if "Synonym" :
+      # Data <- GenerateComment(Data,
+      #                         condition = Data$Old.status %in% "SYNONYM",
+      #                         comment = "'ScientificName' is a synonym of the accepted botanical name")
+      # WFmatch[, Old.status := NULL] # remove the column
+
+
+      # No output species name if only genus in input
+      Data[is.na(SpeciesCor), ScientificNameCor := sub(" .*", "", ScientificNameCor) ]
 
       # Create GenusCor and SpeciesCor
       Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)] # fixed = T : match split exactly
@@ -324,6 +363,8 @@ BotanicalCorrection <- function(
 
   # Check invariant botanical informations per IdTree -------------------------------------------------------------------
   # Family, Genus, Species, Subspecies, VernName
+
+  if(!"Subspecies" %in% names(Data)) Data[, Subspecies := NA_character_]
 
   duplicated_ID <- CorresIDs <- vector("character")
 

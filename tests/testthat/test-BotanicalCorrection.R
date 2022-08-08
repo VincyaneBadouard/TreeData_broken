@@ -157,15 +157,12 @@ test_that("BotanicalCorrection", {
     # Subspecies
     expect_true(any(grepl("subsp", Rslt[[r]]$Subspecies)))
 
-
-    # Comment column ? (A FAIRE)
-
     # Source columns ? (A FAIRE)
     # BotanicalCorrectionSource == "The Plant List” or "World Flora Online"
     # FamilyCorSource == "APG III family” if TPL, "World Flora Online”
 
     # No adding rows
-    # expect_true( nrow(Rslt[[r]]) == nrow(Data[[r]]) )
+    expect_true( nrow(Rslt[[r]]) == nrow(Data) )
 
   } # end corrected Rslt loop
 

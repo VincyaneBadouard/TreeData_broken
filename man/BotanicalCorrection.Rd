@@ -94,6 +94,7 @@ ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
                 Family, FamilyCor,
                 Genus, GenusCor,
                 Species, SpeciesCor,
+                One.Reason, Old.name, Old.status, New.accepted,
                 BotanicalCorrectionSource, Comment)
                 ])
 
@@ -102,6 +103,7 @@ FamCor <- unique(RsltWFO[FamilyCor != Family,
                 Family, FamilyCor,
                 Genus, GenusCor,
                 Species, SpeciesCor,
+                One.Reason, Old.name, Old.status, New.accepted,
                 BotanicalCorrectionSource, Comment)
                 ])
 }

@@ -241,6 +241,10 @@ DiameterCorrection <- function(
 
   }
 
+   # Remove duplicated measurements (randomly)
+  # Data <- Data[!duplicated(Data[, list((get(ID), Year)])]
+
+
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
   if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
@@ -266,6 +270,7 @@ DiameterCorrection <- function(
 
   # Dataset with the rows without IDS ----------------------------------------------------------------------------------
   DataIDNa <-  Data[is.na(get(ID))]
+
   # Dataset with the rows without Year ----------------------------------------------------------------------------------
   DataYearNa <-  Data[is.na(Year)]
 

@@ -41,6 +41,7 @@
 #'
 #' EstDBH <- 17 # Estimated DBH (cm)
 #' DBHRange = 10 # DBH range (cm)
+#'
 #' # Find colleagues
 #' Colleagues <- TestData[
 #' ScientificName == "Licania membranacea" & # same species as the tree to be corrected
@@ -68,6 +69,9 @@ ComputeColleaguesGrowthMean <- function(
 
   # DBH seq of the Colleagues -----------------------------------------------------------------------------------------------
   ColleaguesSeq <- Data[IdStem %in% ColleaguesId]
+
+  # Remove duplicated measurements ----------------------------------------------------------------------------------------
+  ColleaguesSeq <- ColleaguesSeq[!duplicated(ColleaguesSeq[, list(IdStem, Year)])]
 
   # Order IdStems and times in ascending order
   ColleaguesSeq <- ColleaguesSeq[order(IdStem, Year)]
