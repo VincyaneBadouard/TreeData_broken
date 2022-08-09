@@ -46,23 +46,34 @@ flags <- c(
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation",
-                          tags$li(class = "dropdown",  dropdownMenu(type = "messages",
-                                                                    # from for first line, message 2nd line smaller font
-                                                                    messageItem(
-                                                                      from = "Project in Github",
-                                                                      message = "Documentation, Source, Citation",
-                                                                      icon = icon("github"),
-                                                                      href = "https://github.com/VincyaneBadouard/TreeData"),
-                                                                    messageItem(
-                                                                      from = "Issues",
-                                                                      message = "Report Issues",
-                                                                      icon = icon("exclamation-circle"),
-                                                                      href = "https://github.com/VincyaneBadouard/TreeData/issues"),
-                                                                    badgeStatus = NULL,
-                                                                    icon = icon("info-circle"),
-                                                                    # icon = fontawesome::fa("info-circle"),
-                                                                    headerText = "App Information"
-                          ))
+                          tags$li(class = "dropdown",
+                                  dropdownMenu(type = "messages",
+                                               # from for first line, message 2nd line smaller font
+                                               messageItem(
+                                                 from = "Project in Github",
+                                                 message = "Documentation, Source, Citation",
+                                                 icon = icon("github"),
+                                                 href = "https://github.com/VincyaneBadouard/TreeData"),
+                                               messageItem(
+                                                 from = "Issues",
+                                                 message = "Report Issues",
+                                                 icon = icon("exclamation-circle"),
+                                                 href = "https://github.com/VincyaneBadouard/TreeData/issues"),
+                                               badgeStatus = NULL,
+                                               icon = icon("info-circle"),
+                                               # icon = fontawesome::fa("info-circle"),
+                                               headerText = "App Information"
+                                  ),
+
+
+                                    div(style="display:inline-block",
+                                        actionBttn(
+                                          inputId = "browser",
+                                          style = "minimal",
+                                          # label = helpText("Troubleshoot in R"),
+                                          icon = icon("r-project"))
+                                    )
+                          )
                           # tags$li(class = "dropdown",
                           #
                           #         pickerInput ("languages", NULL, width = "auto",
@@ -618,7 +629,8 @@ tabItem("Codes",
                 hidden(div(id = paste0(f, "Yes"),
 
                 lapply(which(xCorr$Function %in% f), function(i) {
-                  eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                  # eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                  eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))")), ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))"))), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
                 })
               )
               ))

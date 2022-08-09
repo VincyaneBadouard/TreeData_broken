@@ -96,6 +96,13 @@ js <- c( # --- this is to edit CODES table
 # start server code here
 
 server <- function(input, output, session) { # server ####
+
+  # open browser #
+
+  observeEvent(input$browser,{
+    browser()
+  })
+
   # upload tab ####
 
   # show as meany upload widgets as asked for
