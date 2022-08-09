@@ -261,7 +261,7 @@ RequiredFormat <- function(
 
   ## IdTree (unique along IdCensus) ####
 
-  if (input$IdTree %in% "none" | any(is.na(Data$IdTree))) {
+  if ((input$IdTree %in% "none" | any(is.na(Data$IdTree))) & input$MeasLevel %in% c("Tree", "Stem")) {
 
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if(input$IdTree %in% "none") Data$IdTree <- NA
@@ -294,7 +294,7 @@ RequiredFormat <- function(
 
   ## IdStem (unique along IdCensus) ####
 
-  if (input$IdStem %in% "none" | any(is.na(Data$IdStem))) {
+  if ((input$IdStem %in% "none" | any(is.na(Data$IdStem))) & input$MeasLevel %in% c("Stem")) {
 
     # if we also don't have StemFieldNum, we are just considering that each row within a plot and subplot  and tree is one stem
     if(input$IdStem %in% "none") Data$IdStem <- NA
@@ -326,16 +326,20 @@ RequiredFormat <- function(
 
   ## Genus, Species, ScientificNameSepMan ####
 
-  ### Genus and species if we have ScientificName and ScientificNameSepMan
+  if(! input$MeasLevel %in% c("Plot")) {
+      ### Genus and species if we have ScientificName and ScientificNameSepMan
   if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
 
   ### ScientificName if we have Genus and species
 
   if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" ) Data[, ScientificName := paste(Genus, Species)]
 
+  }
+
 
   ## Diameter if we have circumference ####
-  if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You do not have tree size (Diameter, Circonference, BD or basal circonference) in your data. This is fine if your data is at the species or plot level, but if your data is a the tree level, you may have forgotten to specified what column tree size is store in.")
+  if(input$MeasLevel %in% c("Tree", "Stem")) {
+      if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You did not specify what column represents tree size (Diameter, Circonference, BD or basal circonference) in your data.")
 
   if(input$Diameter %in% "none" & !input$Circ %in% "none") {
     Data[, Diameter := round(Circ/pi, 2)]
@@ -346,6 +350,8 @@ RequiredFormat <- function(
     input$BDUnitMan <- input$BCircUnitMan
 
   }
+  }
+
 
 
   ## MinDBH if we don't have it
@@ -357,9 +363,15 @@ RequiredFormat <- function(
 
     }
     if(input$MinDBHMan %in% -999) {
-    Data[, MinDBH := min(Diameter)]
-    input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
-    warning("MinDBH was calculated.")
+
+      if(input$MeasLevel %in% c("Tree", "Stem")) {
+        Data[, MinDBH := min(Diameter)]
+        input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
+        warning("MinDBH was calculated.")
+      } else {
+        warning("You did not specify a MinDBH.")
+
+      }
     }
   }
 

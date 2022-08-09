@@ -187,10 +187,10 @@ body <- dashboardBody(
                 span("Checklist before you upload")),
               br(),
               br(),
-              column(width = 8,
+              column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton2",
-                       label = "1",
+                       inputId = "inactivebutton2a",
+                       label = "1a",
                        style = "pill",
                        color = "warning"),
                      strong("How many tables do you wish to upload?"),
@@ -199,6 +199,21 @@ body <- dashboardBody(
                                   value = 1,
                                   min = 1,
                                   max = NA
+                     )
+              ),
+              column(width = 6,
+                     actionBttn(
+                       inputId = "inactivebutton2b",
+                       label = "1b",
+                       style = "pill",
+                       color = "warning"),
+                     strong("What is your deepest level of measurements?"),
+                     awesomeRadio(
+                       inputId = "MeasLevel",
+                       label = "",
+                       choices = c("Plot", "Species", "Tree", "Stem"),
+                       # selected = "B",
+                       status = "warning"
                      )
               )),
 
