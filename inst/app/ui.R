@@ -282,10 +282,10 @@ body <- dashboardBody(
               fluidRow(
 
                 column(width = 12,
-                       h4("summary of your stacked tables:"),
-                       verbatimTextOutput("StackedTablesSummary"),
                        h4("View of your stacked tables:"),
-                       DTOutput(outputId = "StackedTables")
+                       DTOutput(outputId = "StackedTables"),
+                       h4("summary of your stacked tables:"),
+                       verbatimTextOutput("StackedTablesSummary")
                 )
                 # ,
                 # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
@@ -376,10 +376,10 @@ body <- dashboardBody(
             fluidRow(
 
               column(width = 12,
-                     h4("summary of your merged tables:"),
-                     verbatimTextOutput("mergedTablesSummary"),
                      h4("View of your stacked tables:"),
-                     DTOutput(outputId = "mergedTables")
+                     DTOutput(outputId = "mergedTables"),
+                     h4("summary of your merged tables:"),
+                     verbatimTextOutput("mergedTablesSummary")
               )
             #   # ,
             #   # actionButton("UpdateTable", label = "Update table!", style = "color: #fff; background-color: #009e60; border-color: #317256;   position: fixed")
@@ -443,10 +443,10 @@ body <- dashboardBody(
             fluidRow(
 
               column(width = 12,
-                     h4("summary of your tidy table:"),
-                     verbatimTextOutput("TidyTableSummary"),
                      h4("View of your tidy table:"),
-                     DTOutput(outputId = "TidyTable")
+                     DTOutput(outputId = "TidyTable"),
+                     h4("summary of your tidy table:"),
+                     verbatimTextOutput("TidyTableSummary")
               ))
 
 
@@ -561,10 +561,10 @@ body <- dashboardBody(
                      fluidRow(
 
                        column(width = 12,
-                              h4("summary of your formatted table:"),
-                              verbatimTextOutput("FormatedTableSummary"),
                               h4("View of your formatted table:"),
-                              DTOutput(outputId = "FormatedTable")
+                              DTOutput(outputId = "FormatedTable"),
+                              h4("summary of your formatted table:"),
+                              verbatimTextOutput("FormatedTableSummary")
                        ))
 
 
@@ -629,10 +629,10 @@ tabItem("Codes",
             fluidRow(
 
               column(width = 12,
-                     h4("summary of your corrected table:"),
-                     withSpinner(verbatimTextOutput("CorrectedTableSummary"), color="#0dc5c1", id = "spinner"),
                      h4("View of your corrected table:"),
-                     withSpinner(DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner")
+                     withSpinner(DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner"),
+                     h4("summary of your corrected table:"),
+                     withSpinner(verbatimTextOutput("CorrectedTableSummary"), color="#0dc5c1", id = "spinner")
               ))
             ),
 
@@ -684,10 +684,10 @@ tabItem("Codes",
             fluidRow(
 
               column(width = 12,
-                     h4("summary of your final table:"),
-                     withSpinner(verbatimTextOutput("DataOutputSummary"),color="#0dc5c1", id = "spinner"),
                      h4("View of your final table:"),
-                     withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner")
+                     withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner"),
+                     h4("summary of your final table:"),
+                     withSpinner(verbatimTextOutput("DataOutputSummary"),color="#0dc5c1", id = "spinner")
               ))
     ), # end of "OutputFormat" panel
 tabItem(tabName = "Save",
