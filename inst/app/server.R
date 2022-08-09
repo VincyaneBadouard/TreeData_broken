@@ -94,21 +94,23 @@ server <- function(input, output, session) { # server ####
 
       column(width = 6,
              # load button for main data file (csv format)
-             box(title = paste("Table", i),
+             box(#title = paste("Table", i),
+                 textInput(inputId = paste0("TableName", i),
+                           # label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
+                           label = NULL,
+                           value = paste0("Table", i)
+                 ),
                  width = NULL,
                  fileInput(inputId = paste0("file", i), "Choose CSV File (max 25MB)", accept = ".csv"),
                  # does the dataframe have a header?
+                 dropdownButton( icon = icon("cog"), size  ="sm",
                  checkboxInput( paste0("header", i), "Header", TRUE),
                  # choose separator
                  selectInput(inputId = paste0("cbSeparator", i),
                              label = "Separator",
                              choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
                              selected = "auto"
-                 ),
-                 textInput(inputId = paste0("TableName", i),
-                           label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
-                           value = paste0("Table", i)
-                 ),
+                 )),
                  span(textOutput(outputId = paste0("CSVWarning", i)), style="color:red")
              )
       )
@@ -750,7 +752,7 @@ server <- function(input, output, session) { # server ####
   }, ignoreInit = T)
 
   observeEvent(input$GoToCodes, {
-    updateTabItems(session, "tabs", "Codes")
+    if(!is.null(input$Treecodes)) updateTabItems(session, "tabs", "Codes") else if(input$MeasLevel %in% c("Tree", "Stem")) updateTabItems(session, "tabs", "Correct") else updateTabItems(session, "tabs", "OutputFormat")
   }, ignoreInit = TRUE)
 
 

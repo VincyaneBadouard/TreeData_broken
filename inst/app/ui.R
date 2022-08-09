@@ -96,7 +96,7 @@ body <- dashboardBody(
             fluidRow(
 
               actionBttn(
-                inputId = "inactivebutton1",
+                inputId = makeUniqueID("inactive"),
                 label = div(
                   strong("If your connexion is slow and/or your data is very large, you may want to run this app locally. For that, open R Studio and type:"),
                   br()),
@@ -122,26 +122,32 @@ body <- dashboardBody(
                   ))),
               br(),
               br(),
-              box(width = 12,
+              box(title = "checklist",
+                  width = 12,
 
-                 dropdownButton(width = NULL,
-
+                 # dropdownButton(width = NULL,
+                 prettyCheckbox(
+                   inputId = makeUniqueID("ChckLst"),
+                   label = "Inputs are prepared as CSV files.",
+                   # value = TRUE,
+                   status = "warning"
+                 ),
                    prettyCheckbox(
-                     inputId = "inactivechck1",
-                     label = "Tables that will need to be stacked have the exact same column, in same order and with same names.",
-                     value = TRUE,
+                     inputId = makeUniqueID("ChckLst"),
+                     label = "Tables that will need to be stacked have the exact same columns, in same order and with same names.",
+                     # value = TRUE,
                      status = "warning"
                    ),
                    prettyCheckbox(
-                     inputId = "inactivechck2",
+                     inputId = makeUniqueID("ChckLst"),
                      label = "The key columns of tables that will be merged have information that is correctly spelled and capitalized.",
-                     value = TRUE,
+                     # value = TRUE,
                      status = "warning"
                    ),
                    prettyCheckbox(
-                     inputId = "inactivechck3",
+                     inputId = makeUniqueID("ChckLst"),
                      label = "...",
-                     value = TRUE,
+                     # value = TRUE,
                      status = "warning"
                    ),
 
@@ -149,14 +155,17 @@ body <- dashboardBody(
                 label  = tags$h2("Checklist before you upload"),
                 icon = icon("cog"),
                 inline =T,
-                tooltip = tooltipOptions(title = "Click to see checklist !")),
-                span("Checklist before you upload")),
+                tooltip = tooltipOptions(title = "Click to see checklist !")
+                # )
+                # ,
+                # span("Checklist before you upload")
+                ),
               br(),
               br(),
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton2a",
-                       label = "1a",
+                       inputId =  makeUniqueID("inactive"),
+                       label = "1",
                        style = "pill",
                        color = "warning"),
                      strong("How many tables do you wish to upload?"),
@@ -169,25 +178,24 @@ body <- dashboardBody(
               ),
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton2b",
-                       label = "1b",
+                       inputId =  makeUniqueID("inactive"),
+                       label = "2",
                        style = "pill",
                        color = "warning"),
                      strong("What is your deepest level of measurements?"),
-                     awesomeRadio(
+                     radioButtons(
                        inputId = "MeasLevel",
                        label = "",
                        choices = c("Plot", "Species", "Tree", "Stem"),
-                       # selected = "B",
-                       status = "warning"
+                       selected  = character(0)
                      )
               )),
 
             fluidRow(
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton3",
-                       label = "2",
+                       inputId =  makeUniqueID("inactive"),
+                       label = "3",
                        style = "pill",
                        color = "warning"),
                      strong("Upload your tables"),
@@ -195,8 +203,8 @@ body <- dashboardBody(
                      uiOutput("uiUploadTables"),
 
                      actionBttn(
-                       inputId = "inactivebutton4",
-                       label = "3",
+                       inputId =  makeUniqueID("inactive"),
+                       label = "4",
                        style = "pill",
                        color = "warning"),
                      actionBttn(
@@ -218,7 +226,7 @@ body <- dashboardBody(
               fluidRow(
                 # column(width = 12,
                        actionBttn(
-                         inputId = "inactivebutton5",
+                         inputId =  makeUniqueID("inactive"),
                          label = " ! ",
                          style = "pill",
                          color = "danger"),
@@ -279,7 +287,7 @@ body <- dashboardBody(
             fluidRow(
               # column(width = 12,
               actionBttn(
-                inputId = "inactivebutton6",
+                inputId =  makeUniqueID("inactive"),
                 label = " ! ",
                 style = "pill",
                 color = "danger"),
@@ -457,7 +465,7 @@ body <- dashboardBody(
               hidden(div( id = "AttentionDates",
                           box(width = 12,
                               actionBttn(
-                                inputId = "inactivebutton7",
+                                inputId =  makeUniqueID("inactive"),
                                 label = "!",
                                 style = "pill",
                                 color = "danger"),
@@ -467,7 +475,7 @@ body <- dashboardBody(
 
               column(width = 6,
                      actionBttn(
-                       inputId = "inactivebutton8",
+                       inputId = makeUniqueID("inactive"),
                        label = "1",
                        style = "pill",
                        color = "warning"),
@@ -514,7 +522,7 @@ body <- dashboardBody(
 
                      div(
                        actionBttn(
-                         inputId = "inactivebutton9",
+                         inputId = makeUniqueID("inactive"),
                          label = "2",
                          style = "pill",
                          color = "warning")
@@ -534,7 +542,7 @@ body <- dashboardBody(
                          downloadButton(outputId = "dbProfile", label = "Save profile")),
                      hidden( actionBttn(
                        inputId = "GoToCodes",
-                       label = "Go To Codes",
+                       label = "Next",
                        style = "material-flat",
                        color = "success"
                      ))),
@@ -552,7 +560,7 @@ body <- dashboardBody(
     )),
 tabItem("Codes",
         h3("This is where we are going to try to understand the tree codes you have..."),
-        strong(style = "color:red", "This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel)"),
+        # strong(style = "color:red", "This is not functional yet, you can skip this step for now... (click on 'Apply Corrections' on the left pannel)"),
 
         h4("Please, fill-out the", code("Definition"), "by selecting a pre-written denfinition or manually writting yours."),
         hidden(actionBttn(inputId = "UseProfileCodes" , label = "Use your profile")),

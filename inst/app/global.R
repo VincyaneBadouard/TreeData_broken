@@ -38,6 +38,10 @@ xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 CodeOptions <-  read.csv("data/CodeOptions.csv")
 
 
+# function to make unitque IDs (mostly for inactive buttons)
+
+makeUniqueID <- NS(character(0))
+
 # languages <- c("en" = "English", "es" = "Spanish")
 #
 # flags <- c(
