@@ -50,6 +50,7 @@
 #'@importFrom Taxonstand TPL
 #'@importFrom BIOMASS getTaxonomy
 #'@importFrom WorldFlora WFO.match
+#'@importFrom stats na.omit
 #'
 #' @export
 #'
@@ -82,7 +83,6 @@
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
 #'                 Species, SpeciesCor,
-#'                 One.Reason, Old.name, Old.status, New.accepted,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'
@@ -91,7 +91,6 @@
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
 #'                 Species, SpeciesCor,
-#'                 One.Reason, Old.name, Old.status, New.accepted,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'}
@@ -282,16 +281,17 @@ BotanicalCorrection <- function(
                                        verbose = FALSE)
       setDT(WFmatch) # in data.table
 
-      # Remove multiple matches case (faudrait garder la famille par contre)
-      WFmatch <- WFmatch[!spec.name %in% c(WFmatch[duplicated(WFmatch[, spec.name]), spec.name])]
-
       WFmatch <- WFmatch[, list(taxonomicStatus, Old.status, spec.name, scientificName, family)] # columns of interest
-
-
       WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
-      WFmatch[, BotaCorSource := "World Flora Online"] # create the correction source
       WFmatch[, taxonomicStatus := NULL] # remove the column
 
+
+      # Remove multiple matches case (faudrait garder la famille par contre)
+      WFmatch[spec.name %in% c(WFmatch[duplicated(WFmatch[, spec.name]), spec.name]), Old.status := ""]
+      WFmatch <- WFmatch[!duplicated(WFmatch[, spec.name])]
+
+      # Create the correction source
+      WFmatch[, BotaCorSource := "World Flora Online"]
 
 
       # Join the corrected Genus and Species, by original 'ScientificNameCor'
@@ -302,19 +302,20 @@ BotanicalCorrection <- function(
       # Deal with "Plants of the World Online" correction
       Data[, FamilyCor := ifelse(is.na(FamilyCor), family, FamilyCor)]
       Data[, BotanicalCorrectionSource := ifelse(is.na(BotanicalCorrectionSource), BotaCorSource, BotanicalCorrectionSource)]
+      Data[, c("family", "BotaCorSource") := NULL]
 
-
-      setnames(Data, c("scientificName", "family"), c("ScientificNameCor", "FamilyCor")) # rename columns
-
-      # if "Synonym" :
-      # Data <- GenerateComment(Data,
-      #                         condition = Data$Old.status %in% "SYNONYM",
-      #                         comment = "'ScientificName' is a synonym of the accepted botanical name")
-      # WFmatch[, Old.status := NULL] # remove the column
-
+      setnames(Data, "scientificName", "ScientificNameCor") # rename columns
 
       # No output species name if only genus in input
       Data[is.na(SpeciesCor), ScientificNameCor := sub(" .*", "", ScientificNameCor) ]
+
+
+      # if "Synonym" :
+      Data <- GenerateComment(Data,
+                              condition = Data$Old.status %in% "SYNONYM",
+                              comment = "'ScientificName' is a synonym of the accepted botanical name")
+      Data[, Old.status := NULL] # remove the column
+
 
       # Create GenusCor and SpeciesCor
       Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)] # fixed = T : match split exactly
@@ -325,12 +326,12 @@ BotanicalCorrection <- function(
 
     # Generate a comment if the family name is incorrect --------------------------------------------------------------------
     Data <- GenerateComment(Data,
-                            condition = Data[,Family] != Data[,FamilyCor],
+                            condition = !Data$Family %in% Data$FamilyCor,
                             comment = "The 'Family' name is incorrect")
 
     if(Source == "TPL") FamCorSource <- "APG III family"
     if(Source == "WFO") FamCorSource <- "World Flora Online"
-    Data[Family != FamilyCor | (is.na(Family) & !is.na(FamilyCor)), FamilyCorSource := FamCorSource] # create the Source
+    Data[!is.na(FamilyCor), FamilyCorSource := FamCorSource] # create the Source
 
     # If no Family corr because no genus, previously with -aceae, take this name put in GenspFamily -------------------------
     Data[is.na(FamilyCor) & !is.na(GenspFamily), `:=`(FamilyCor = GenspFamily,
@@ -350,12 +351,26 @@ BotanicalCorrection <- function(
            , keyby = IdTree]
     }
 
+    # If no correction keep input botanical values: "Family", "Genus", "Species", "ScientificName" ------------------------
+    # (en fait c'est pas une bonne idée)
+    # NotCorVar <- c("Family", "Genus", "Species", "ScientificName")
+    #
+    # for(i in NotCorVar){
+    #   j <- paste0(i, "Cor")
+    #
+    #   Data[is.na(get(j)), c(j, "BotanicalCorrectionSource") := list(get(i), "Taxon not found")]
+    #
+    # }
+    Data[is.na(FamilyCor) & is.na(BotanicalCorrectionSource), BotanicalCorrectionSource := "Taxon not found"]
+
     # Reform ScientificNameCor ------------------------------------------------------------------------------------------
     # If "NA NA" -> NA_character_
 
     Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
 
     Data[, ScientificNameCor := ifelse(ScientificNameCor == "NA NA", NA_character_, ScientificNameCor)]
+
+    Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)] # remove NA after Genus in ScientificNameCor
 
 
   } # end DetectOnly = FALSE
