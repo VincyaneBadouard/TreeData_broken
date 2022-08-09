@@ -97,7 +97,7 @@ RequiredFormat <- function(
   NewColNames[ colnames(Data) %in% Treecodes] <- paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])
 
   } else {
-    if(!input$TreeCodes %in% "none") {
+    if(!is.null(input$TreeCodes)) if(!input$TreeCodes %in% "none") {
       NewColNames[ colnames(Data) %in% input$TreeCodes] <- paste0("Original_",input$TreeCodes)
     }
   }
@@ -335,7 +335,7 @@ RequiredFormat <- function(
 
 
   ## Diameter if we have circumference ####
-  if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") stop("You do not have tree size (Diameter, Circonference, BD or basal circonference) in your data (or you have not specified what column that information is store in. We cannot move forward.")
+  if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You do not have tree size (Diameter, Circonference, BD or basal circonference) in your data. This is fine if your data is at the species or plot level, but if your data is a the tree level, you may have forgotten to specified what column tree size is store in.")
 
   if(input$Diameter %in% "none" & !input$Circ %in% "none") {
     Data[, Diameter := round(Circ/pi, 2)]
