@@ -294,14 +294,14 @@ RequiredFormat <- function(
 
   ## IdStem (unique along IdCensus) ####
 
-  if ((input$IdStem %in% "none" | any(is.na(Data$IdStem))) & input$MeasLevel %in% c("Stem")) {
+  if ((input$IdStem %in% "none" | any(is.na(Data$IdStem))) & input$MeasLevel %in% c("Tree", "Stem")) {
 
     # if we also don't have StemFieldNum, we are just considering that each row within a plot and subplot  and tree is one stem
     if(input$IdStem %in% "none") Data$IdStem <- NA
 
     if (input$StemFieldNum %in% "none") {
 
-        warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
+        if (input$MeasLevel %in% "Stem") warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
         Data[is.na(IdStem), IdStem := paste0(.(IdTree), "_", seq(1, .N), "_auto"), by = .(IdCensus, IdTree)]
 
     }
@@ -310,7 +310,7 @@ RequiredFormat <- function(
 
     if (!input$StemFieldNum %in% "none") {
 
-        warning("You are missing stemIDs (either you are missing some tree IDs or you  did not specify a column for stem IDs). But you did specify a column for stem tags, so we are considering that each stem field number within a tree refers to a unique stem and are using your stem field number to construct the stem ID.", ifelse(any(is.na(Data$StemFieldNum)), "And since some of your stem field tags are NAs, we will automatically generating those assuming assuming that the order of each stem within a tree is consistent across censuse.", ""))
+      if (input$MeasLevel %in% "Stem")  warning("You are missing stemIDs (either you are missing some tree IDs or you  did not specify a column for stem IDs). But you did specify a column for stem tags, so we are considering that each stem field number within a tree refers to a unique stem and are using your stem field number to construct the stem ID.", ifelse(any(is.na(Data$StemFieldNum)), "And since some of your stem field tags are NAs, we will automatically generating those assuming assuming that the order of each stem within a tree is consistent across censuse.", ""))
 
       if(any(is.na(Data$StemFieldNum))) {
         Data[is.na(StemFieldNum), StemFieldNum := paste0(seq(1, .N), "_auto") , by = .(IdCensus, IdTree)]
