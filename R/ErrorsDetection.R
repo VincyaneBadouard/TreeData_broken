@@ -45,6 +45,8 @@
 #' @return The input dataset (data.table) with a new *Comment* column with error
 #'   type informations.
 #'
+#' @importFrom stats na.omit
+#'
 #' @export
 #'
 #' @examples

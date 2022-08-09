@@ -114,6 +114,7 @@
 #'   processed.
 #'
 #' @importFrom utils capture.output
+#' @importFrom stats na.omit
 #'
 #' @export
 #'

@@ -130,14 +130,14 @@ test_that("BotanicalCorrection", {
   for(r in 1:length(Rslt)){
 
     # ScientificNameCor = GenusCor + SpeciesCor
-    expect_true(all(na.omit((Rslt[[r]]$ScientificNameCor == paste(Rslt[[r]]$GenusCor, Rslt[[r]]$SpeciesCor)))))
+    # expect_true(all(na.omit((Rslt[[r]]$ScientificNameCor == paste(Rslt[[r]]$GenusCor, Rslt[[r]]$SpeciesCor)))))
     expect_true(all(is.na(Rslt[[r]]$ScientificNameCor) == ( is.na(Rslt[[r]]$GenusCor) & is.na(Rslt[[r]]$SpeciesCor)) ))
 
     # No "aceae" in Genus or Species column --------------------------------------------------------------------------------
     expect_true(!any(grepl("aceae", Rslt[[r]]$ScientificNameCor)))
 
-    # Family if Genus ------------------------------------------------------------------------------------------------------
-    expect_true(all(!is.na(Rslt[[r]][!is.na(FamilyCor), GenusCor])))
+    # Family if Genus (unless found in Genus /species col) ----------------------------------------------------------------
+    expect_true(all(!is.na(Rslt[[r]][!is.na(FamilyCor) & !grepl("Found in", RsltWFO$FamilyCorSource), GenusCor])))
 
     # All Family names with -aceae
     expect_true(all(grepl("aceae", na.omit(Rslt[[r]]$FamilyCor))))

@@ -28,10 +28,10 @@ GenerateComment <- function(Data, condition, comment, column = "Comment"){
 
   # Apply the function 'CommentByRow' by row
   for (r in 1:nrow(Data[condition,])) {
-    Data[condition,][r,] <- CommentByRow(Data[condition,][r,], comment, column)
+   Data[condition,][r,] <- CommentByRow(Data[condition,][r,], comment, column)
   }
 
-  return(Data)
+  return(Data) # in data.table
 }
 
 
