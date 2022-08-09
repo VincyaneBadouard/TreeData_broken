@@ -495,7 +495,11 @@ server <- function(input, output, session) { # server ####
                                })
 
   AreaUnitOptions <- eventReactive(input$PlotArea,
-                                   {c("none", "cm2", "m2", "ha", "km2")
+                                   {c("none", "mm2","cm2", "m2", "ha", "km2")
+                                   })
+
+  DensityUnitOptions <- eventReactive(input$PlotArea,
+                                   {c("none", "individual/cm2", "individual/m2", "individual/ha", "individual/km2")
                                    })
 
   AreaByAreaUnitOptions <- reactiveVal(c("none",
@@ -527,7 +531,7 @@ server <- function(input, output, session) { # server ####
 
     lapply(1:nrow(x1), function(i) {
 
-      eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$argument[i],"= get(x1$argValue[i])())")))
+      eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$Argument[i],"= get(x1$argValue[i])())")))
 
     })
 
@@ -537,12 +541,12 @@ server <- function(input, output, session) { # server ####
 
     lapply(c(1:nrow(x2)), function(i) {
       if(input[[x2$if_X1_is_none[i]]] %in% "none") {
-        eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$argument[i], "= get(x2$argValue[i])())")))
+        eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "= get(x2$argValue[i])())")))
 
         shinyjs::show( x2$ItemID[i])
 
       } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$argument[i], "='",  x2$default[i], "')")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "='",  x2$default[i], "')")))
 
         shinyjs::hide( x2$ItemID[i])
       }
@@ -553,13 +557,13 @@ server <- function(input, output, session) { # server ####
     lapply(c(1:nrow(x3)), function(i) {
       if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" ) {
 
-        eval(parse(text = paste(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$argument[i], "= get(x3$argValue[i])())")))
+        eval(parse(text = paste(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "= get(x3$argValue[i])())")))
 
         shinyjs::show( x3$ItemID[i])
 
 
       } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$argument[i], "='",  x3$default[i], "')")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "='",  x3$default[i], "')")))
 
         shinyjs::hide( x3$ItemID[i])
       }
@@ -569,12 +573,12 @@ server <- function(input, output, session) { # server ####
 
     lapply(c(1:nrow(x4)), function(i) {
       if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" ) {
-        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "= get(x4$argValue[i])())")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "= get(x4$argValue[i])())")))
 
         shinyjs::show( x4$ItemID[i])
 
       } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$argument[i], "='", x4$Default[i], "')")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "='", x4$Default[i], "')")))
 
         shinyjs::hide( x4$ItemID[i])
 
@@ -584,13 +588,13 @@ server <- function(input, output, session) { # server ####
 
     lapply(c(1:nrow(x5)), function(i) {
       if(input[[x5$if_X1_is_none[i]]] %in% "none" &  input[[x5$if_X2_is_none[i]]] %in% "none") {
-        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$argument[i], "= get(x5$argValue[i])())")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "= get(x5$argValue[i])())")))
 
         shinyjs::show( x5$ItemID[i])
 
       } else {
 
-        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$argument[i], "='", x5$Default[i], "')")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "='", x5$Default[i], "')")))
 
         shinyjs::hide( x5$ItemID[i])
 
@@ -600,13 +604,13 @@ server <- function(input, output, session) { # server ####
 
     if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
       if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
-        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$argument[i], "= get(x6$argValue[i])())")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "= get(x6$argValue[i])())")))
 
         shinyjs::show( x6$ItemID[i])
 
       } else {
 
-        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$argument[i], "='", x6$Default[i], "')")))
+        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "='", x6$Default[i], "')")))
 
         shinyjs::hide( x6$ItemID[i])
 
@@ -665,6 +669,7 @@ server <- function(input, output, session) { # server ####
 
     MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
     MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
+    MissingItemIDProfile <- MissingItemIDProfile[!x$Multiple[match(MissingItemIDProfile, x$ItemID)]] # remove cases where Multiple - TRUE because in those cases, there is no default so it will always be NULL... Bummer because it could be missing for real, but I don't know how else to do it
 
     if(length(MissingItemIDProfile) > 0 & gimme_value() == 1) {
       showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
@@ -682,7 +687,7 @@ server <- function(input, output, session) { # server ####
     # for(i in which(x$ItemID %in% names(profile) & reactiveValuesToList(input)[x$ItemID] %in% names(TidyTable()))) {
 
     for(i in which(x$ItemID %in% ValidItemID)) {    # used to be for(i in which(x$ItemID %in% names(profile)))
-      eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
+      eval(parse(text = paste0(paste0("update", firstUpper(x$ItemType[i])), "(session,inputId = x$ItemID[i],", ifelse(x$Argument[i] %in% "choices", "selected", "value"), "= profile[[x$ItemID[i]]])")))
 
       # eval(parse(text = paste0("updateTextInput(session, '", x$ItemID[i], "', value = profile$", x$ItemID[i], ")")))
       # updateTextInput(session, "Site", value = profile$Site)
@@ -743,9 +748,9 @@ server <- function(input, output, session) { # server ####
   # update stuff in the Corrections tab, based on the formated data
   observeEvent(input$LaunchFormating , {
 
-    lapply(which(xCorr$argument %in% "choices"), function(i) {
+    lapply(which(xCorr$Argument %in% "choices"), function(i) {
 
-      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$argument[i], ifelse(xCorr$ReactiveArgValue[i], "= get(xCorr$argValue[i])()", "= eval(str2lang(xCorr$argValue[i]))"), ifelse(xCorr$argument2[i] != FALSE, paste0(", ", xCorr$argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
+      eval(parse(text = paste0(paste0("update", firstUpper(xCorr$ItemType[i])), "(session,inputId = xCorr$ItemID[i],", xCorr$Argument[i], ifelse(xCorr$ReactiveArgValue[i], "= get(xCorr$argValue[i])()", "= eval(str2lang(xCorr$argValue[i]))"), ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], ifelse(xCorr$Default[i] %in% c("TRUE", "FALSE"), paste0(" = '", xCorr$Default[i], "'"), paste0(" = eval(parse(text = '",xCorr$Default[i], "'))")), ")")))))
     })
 
   })
