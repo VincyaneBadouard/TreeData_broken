@@ -23,24 +23,6 @@ FotterWithHeader <- function(x) {
   )
 }
 
-# read in csv files that has all we want to show in app
-
-## in the Headers and Units tab
-xall <- read.csv("data/interactive_items.csv")
-x <- xall[xall$Activate, ]
-x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
-x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
-x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
-x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
-x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
-x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
-
-## in the Correction tab
-xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
-
-## in the Codes tab (tree code pre-defined options)
-CodeOptions <-  read.csv("data/CodeOptions.csv")
-
 
 # create a couple functions that allows to edit the tree codes table in the Codes tab
 selector <- function(id, CodeOptions){ # --- this is to edit CODES table

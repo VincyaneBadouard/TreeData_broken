@@ -1,48 +1,3 @@
-#list of packages required
-library(shinydashboard)
-library(bslib)
-library(DT)
-library(shiny)
-library(shinyjs)
-library(shinyWidgets)
-library(data.tree)
-library(stringr)
-library(stringdist)
-library(data.table)
-library(TreeData)
-library(shinycssloaders)
-library(htmlTable)
-
-# read in csv file that has all we want to ask about the headers
-x <- read.csv("data/interactive_items.csv")
-x <- x[x$Activate, ]
-x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
-x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
-x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
-x4 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
-x5 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none == "none", ]
-x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_none != "none", ]
-
-if(!all(unlist(sapply(list(x1, x2, x3, x4, x5, x6), "[[", "ItemID")) %in% x$ItemID)) stop ("not all interactive items are implemented in the app")
-
-
-
-xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
-
-
-CodeDefinitions <- HTML(paste0('<select class="form-control" multiple="multiple">',
-                               paste0('<option>',c("First definition", "second definition"), '</option>', collapse = ""),
-                               '</select>'))
-
-
-languages <- c("en" = "English", "es" = "Spanish")
-
-flags <- c(
-  "https://cdn.rawgit.com/lipis/flag-icon-css/master/flags/4x3/us.svg",
-  "https://cdn.rawgit.com/lipis/flag-icon-css/master/flags/4x3/es.svg"
-
-)
-
 
 # header with title
 header <- dashboardHeader(title = "Data harmonisation",
@@ -66,13 +21,14 @@ header <- dashboardHeader(title = "Data harmonisation",
                                   ),
 
 
-                                    div(style="display:inline-block",
-                                        actionBttn(
-                                          inputId = "browser",
-                                          style = "minimal",
-                                          # label = helpText("Troubleshoot in R"),
-                                          icon = icon("r-project"))
-                                    )
+                                    # div(style="display:inline-block",
+                                    #     actionBttn(
+                                    #       inputId = "browser",
+                                    #       style = "minimal",
+                                    #       # label = helpText("Troubleshoot in R"),
+                                    #       icon = icon("r-project"))
+                                    # ),
+                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -121,7 +77,6 @@ body <- dashboardBody(
              left: calc(25%);
              @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
       }
-
 
              .dropdown-menu{z-index:10000 !important;}
              .sw-dropdown-content {z-index: 3000005 !important;}
@@ -779,4 +734,4 @@ tabItem(tabName = "Save",
 )
 
 
-ui <- dashboardPage(header, sidebar, body)
+ui <- dashboardPage(header, sidebar, body, skin = "black")
