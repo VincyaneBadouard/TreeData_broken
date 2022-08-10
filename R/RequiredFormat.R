@@ -696,6 +696,7 @@ RequiredFormat <- function(
 
   # return output ####
   ColumnsToReturn <- intersect(c(x$ItemID, grep("Original", colnames(Data), value = T)), colnames(Data))
+  ColumnsToReturn <- ColumnsToReturn[unlist(Data[, lapply(.SD, function(x) !all(is.na(x))), .SDcols = ColumnsToReturn] )]
   return(Data[, ..ColumnsToReturn])
 
 }

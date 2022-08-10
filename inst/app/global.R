@@ -14,6 +14,8 @@ library(shinycssloaders)
 library(htmlTable)
 library(TreeData)
 
+useSweetAlert()
+
 
 # read in csv file that has all we want to ask about the headers
 x <- read.csv("data/interactive_items.csv")
