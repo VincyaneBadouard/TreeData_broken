@@ -7,14 +7,16 @@
 #'   - `ScientificName` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
-#'   - **`HOM` (Height Of Measurement) (numeric)** if you want to apply the
-#'       **"taper" correction**
 #'   - **`POM` (Point Of Measurement) (factor)** if you want to correct from the
 #'       **"POM change"**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must also contain the columns:
 #'   - `Genus` (character)
 #'   - `Family` (character)
+#'
+#' @param KeepMeas Possible values: "MaxPOM", "MaxDate" (character, 1 value)
+#'   - "MaxPOM":
+#'   - "MaxDate":
 #'
 #' @param ByStem must be equal to TRUE if your inventory contains the stem
 #'   level, equal to FALSE if not, and in this case the correction is done by
@@ -54,13 +56,8 @@
 #'              links them to the trust measurements set
 #'              (*TrustMeasSet* argument).
 #'
-#' @param CorrectionType Possible values: "taper", "linear", "quadratic",
+#' @param CorrectionType Possible values: "linear", "quadratic",
 #'   "individual", "phylogenetic hierarchical" (character).
-#'   - "taper": correct for biases associated with nonstandard and changing
-#'              measurement heights, from a taper model (*TaperParameter* &
-#'              *TaperFormula* arguments).
-#'              Correction possible only if the `HOM` (Height Of Measurement)
-#'              column is available.
 #'   - "linear": interpolation by linear regression of the individual annual
 #'               growth over time.
 #'   - "quadratic": interpolation by quadratic regression  of the individual
@@ -82,22 +79,6 @@
 #' @param Digits Number of decimal places to be used in the `DBHCor` column
 #'   (Default: 1L) (integer)
 #'
-#' @param TaperParameter Taper parameter (unitless) formula (function)
-#' Default: *TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)*
-#' of Cushman et al.2021.
-#' With:
-#'   - *DAB*: Diameter Above Buttress (in cm)
-#'   - *HOM*: Height Of Measurement (in m)
-#'
-#' @param TaperFormula Taper formula (function)
-#' Default: *DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))*
-#' of Cushman et al.2021.
-#' With:
-#'   - *DAB*: Diameter Above Buttress (in cm)
-#'   - *HOM*: Height Of Measurement (in m)
-#'   - *DefaultHOM*:  Default Height Of Measurement (in m)
-#'   - *TaperParameter*: Taper parameter (unitless)
-#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
@@ -105,7 +86,7 @@
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *DBHCor*: corrected trees diameter at default HOM
 #'   - *DiameterCorrectionMeth* =
-#'   "taper"/"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
+#'   "linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
 #'
 #' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
 #'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
@@ -134,6 +115,8 @@
 DiameterCorrection <- function(
   Data,
 
+  KeepMeas = c("MaxPOM", "MaxDate"),
+
   ByStem = TRUE,
 
   DefaultHOM = 1.3,
@@ -146,15 +129,11 @@ DiameterCorrection <- function(
 
   TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("taper", "quadratic", "linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
   Digits = 1L,
-
-  TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
-
 
   DetectOnly = FALSE
 ){
@@ -190,10 +169,10 @@ DiameterCorrection <- function(
     stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
 
   # CorrectionType
-  if(!any(CorrectionType  %in%  "taper" | CorrectionType %in% "quadratic"| CorrectionType %in% "linear"|
+  if(!any(CorrectionType %in% "quadratic"| CorrectionType %in% "linear"|
           CorrectionType %in% "individual"| CorrectionType %in% "phylogenetic hierarchical"))
     stop("The 'CorrectionType' argument value must be among
-         'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
+         'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
@@ -205,9 +184,9 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
-  if(any(!is.na(Data$HOM)) & !any(CorrectionType  %in% "taper")) # HOM exists?
-    message("You have the 'HOM' information in your dataset.
-            We advise you to correct your diameters also with the 'taper' correction ('CorrectionType' argument)")
+  # if(any(!is.na(Data$HOM)) & !any(CorrectionType  %in% "taper")) # HOM exists?
+  #   message("You have the 'HOM' information in your dataset.
+  #           We advise you to correct your diameters also with the 'taper' correction ('CorrectionType' argument)")
 
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
      any(!is.na(Data$POM)) & !any(WhatToCorrect %in% "POM change")) # POM exists?
@@ -242,8 +221,9 @@ DiameterCorrection <- function(
 
   }
 
-   # Remove duplicated measurements (randomly)
-  # Data <- Data[!duplicated(Data[, list((get(ID), Year)])]
+  # KeepMeas = c("MaxPOM", "MaxDate")
+  # Remove duplicated measurements (randomly)
+  # Data <- Data[!duplicated(Data[, list((get(ID), Year)], fromLast = TRUE)] # keep the last measurement
 
 
 

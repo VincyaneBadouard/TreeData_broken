@@ -16,7 +16,7 @@
 #'   - *HOM*: Height Of Measurement (in m)
 #'
 #' @param TaperFormula Taper formula (function)
-#' Default: *DAB / (2 e^(- TaperParameter (HOM - DefaultHOM)))*
+#' Default: *DAB / (e^(- TaperParameter (HOM - DefaultHOM)))*
 #' of Cushman et al.2021.
 #' With:
 #'   - *DAB*: Diameter Above Buttress (in cm)
@@ -49,7 +49,7 @@ TaperCorrection <- function(
   DefaultHOM = 1.3,
 
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
+  TaperFormula = function(DAB, HOM, TaperParameter) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
 
   DetectOnly = FALSE
 ){
