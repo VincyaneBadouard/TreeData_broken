@@ -75,7 +75,7 @@ ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
                 list(ScientificName, ScientificNameCor,
                 Family, FamilyCor, FamilyCorSource,
                 Genus, GenusCor,
-                Species, SpeciesCor,
+                Species, SpeciesCor, Subspecies,
                 BotanicalCorrectionSource, Comment)
                 ])
 
@@ -83,17 +83,20 @@ FamCor <- unique(Rslt[FamilyCor != Family,
                 list(ScientificName, ScientificNameCor,
                 Family, FamilyCor, FamilyCorSource,
                 Genus, GenusCor,
-                Species, SpeciesCor,
+                Species, SpeciesCor, Subspecies,
                 BotanicalCorrectionSource, Comment)
                 ])
 \dontrun{
+WFO_Backbone <- file.choose()
+load(WFO_Backbone)
+
 RsltWFO <- BotanicalCorrection(TestData, Source = "WFO", WFOData = WFO_Backbone)
 
 ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
                 list(ScientificName, ScientificNameCor,
                 Family, FamilyCor,
                 Genus, GenusCor,
-                Species, SpeciesCor,
+                Species, SpeciesCor, Subspecies,
                 BotanicalCorrectionSource, Comment)
                 ])
 
@@ -101,7 +104,7 @@ FamCor <- unique(RsltWFO[FamilyCor != Family,
                 list(ScientificName, ScientificNameCor,
                 Family, FamilyCor,
                 Genus, GenusCor,
-                Species, SpeciesCor,
+                Species, SpeciesCor, Subspecies,
                 BotanicalCorrectionSource, Comment)
                 ])
 }

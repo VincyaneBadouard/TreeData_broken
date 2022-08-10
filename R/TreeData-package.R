@@ -42,6 +42,7 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",
                          "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
                          "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",
+                         "Old.status", "spec.name.ORIG", "BotaCorSource",
                          "BotanicalCorrectionSource", "FamilyCorSource"
 ))
 

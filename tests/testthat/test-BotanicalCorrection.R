@@ -7,7 +7,7 @@ test_that("BotanicalCorrection", {
   # load("D:/VSC TmFO/Data/WFO_Backbone.rda")
   # WFOdataSubset <- WFO_Backbone[scientificName %in% c("Dicorynia guianensis", "Licania alba",
   #                                                     "Eperua falcata", "Eperua grandiflora", "Protium opacum")|
-  #                                 genus %in% c("Eschweilera", "Indothuidium")]
+  #                                 genus %in% c("Eschweilera", "Indothuidium", "Tovomita")]
   #
   # WFOdataSubset[, c("localID", "subfamily", "tribe", "subtribe", "subgenus",
   #                   "originalNameUsageID", "taxonRemarks", "source", "majorGroup", "tplId"):= NULL]
@@ -23,14 +23,14 @@ test_that("BotanicalCorrection", {
   # Chrysobalanaceae Licania alba (koko) "c"
   # Fabaceae Eperua falcata (wapa) "d"
   Data <- data.table(Site = "Nowhere",
-                     IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4), rep("e", 1), rep("f", 1), rep("g", 1)), # 7 ind
-                     Year = c(rep(c(2000:2003), 4), rep(2000, 3)) # 4 years each
+                     IdTree = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 4), rep("e", 1), rep("f", 1), rep("g", 1), rep("h", 1)), # 8 ind
+                     Year = c(rep(c(2000:2003), 4), rep(2000, 4)) # 4 years each
   )
   Data <- Data[order(IdTree, Year)]
-  Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4), rep("Sapindaceae", 1), rep("Clusiaceae", 1), rep("Burseraceae", 1))]
-  Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("EperuaFabaceae", 4), rep("Indet.Sapindaceae", 1), rep("Tovomita", 1), rep("Protium", 1))]
-  Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4), rep("Indet.", 1), rep("sp.5-CAY", 1), rep("opacum_subsp.rabelianum", 1))]
-  Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4), rep(NA, 3))]
+  Data[, Family := c(rep("Fabaceae", 4), rep("Lecythidaceae", 4), rep("Chrysobalanaceae", 4), rep("Fabaceae", 4), rep("Sapindaceae", 1), rep("Clusiaceae", 1), rep("Burseraceae", 1), rep("Clusiaceae", 1))]
+  Data[, Genus := c(rep("Dicorynia", 4), rep("Eschweilera", 4), rep("Licania", 4), rep("EperuaFabaceae", 4), rep("Indet.Sapindaceae", 1), rep("Tovomita", 1), rep("Protium", 1), rep("Tovomita", 1))]
+  Data[, Species := c(rep("guianensis", 4), rep("sagotiana", 4), rep("alba", 4), rep("falcata", 4), rep("Indet.", 1), rep("sp.5-CAY", 1), rep("opacum_subsp.rabelianum", 1), rep("Indet.", 1))]
+  Data[, VernName := c(rep("angelique", 4), rep("maho noir", 4), rep("koko", 4), rep("wapa", 4), rep(NA, 4))]
   Data[, Subspecies := NA_character_]
 
   # Create errors ---------------------------------------------------------------------------------------------------------
@@ -112,10 +112,10 @@ test_that("BotanicalCorrection", {
                           Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment])))
 
     # Variant botanical info per IdTree (A FAIRE)
-    # VarIdTree <- unique(Rslt[[r]][rowSums(is.na(Rslt[[r]])) == 0, .(IdTree, Family, Genus, Species, Subspecies, VernName)])[duplicated(IdTree), IdTree]
-    #
-    # expect_true(all(grepl("Different botanical informations",
-    #                       Rslt[[r]][IdTree %in% VarIdTree, Comment])))
+    VarIdTree <- unique(Rslt[[r]][rowSums(is.na(Rslt[[r]])) == 0, .(IdTree, Family, Genus, Species, Subspecies, VernName)])[duplicated(IdTree), IdTree]
+
+    expect_true(all(grepl("Different botanical informations",
+                          Rslt[[r]][IdTree %in% VarIdTree, Comment])))
 
 
   }

@@ -64,7 +64,7 @@
 #'                 list(ScientificName, ScientificNameCor,
 #'                 Family, FamilyCor, FamilyCorSource,
 #'                 Genus, GenusCor,
-#'                 Species, SpeciesCor,
+#'                 Species, SpeciesCor, Subspecies,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'
@@ -72,17 +72,20 @@
 #'                 list(ScientificName, ScientificNameCor,
 #'                 Family, FamilyCor, FamilyCorSource,
 #'                 Genus, GenusCor,
-#'                 Species, SpeciesCor,
+#'                 Species, SpeciesCor, Subspecies,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'\dontrun{
+#' WFO_Backbone <- file.choose()
+#' load(WFO_Backbone)
+#'
 #' RsltWFO <- BotanicalCorrection(TestData, Source = "WFO", WFOData = WFO_Backbone)
 #'
 #' ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
 #'                 list(ScientificName, ScientificNameCor,
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
-#'                 Species, SpeciesCor,
+#'                 Species, SpeciesCor, Subspecies,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'
@@ -90,7 +93,7 @@
 #'                 list(ScientificName, ScientificNameCor,
 #'                 Family, FamilyCor,
 #'                 Genus, GenusCor,
-#'                 Species, SpeciesCor,
+#'                 Species, SpeciesCor, Subspecies,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
 #'}
@@ -166,6 +169,8 @@ BotanicalCorrection <- function(
     # Detection of the suffix "aceae" in the species column (it is specific to the family name)
     Data[grep("aceae", SpeciesCor), `:=`(GenspFamily = ifelse(grep("aceae", SpeciesCor), SpeciesCor, GenspFamily),
                                          SpeciesCor = NA_character_)]
+
+    Data[!grep("aceae", GenspFamily), GenspFamily := NA_character_]
 
     # Remove special characters only for Genus (because in Species we want to keep them): ---------------------------------
     # remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
@@ -259,7 +264,7 @@ BotanicalCorrection <- function(
       Data[, ScientificNameCor := gsub("Indet", "", ScientificNameCor)]
       Data[, ScientificNameCor := gsub("indet", "", ScientificNameCor)]
 
-      # "Plants of the World Online" correction (more actual than WFO):
+      # "Plants of the World Online" correction (more actual than WFO): ---------------------------------------------------
       Data <- GenerateComment(Data,
                               condition = Data$ScientificNameCor %in% c("Tetragastris panamensis",
                                                                         "Protium picramnioides",
@@ -273,29 +278,42 @@ BotanicalCorrection <- function(
                  FamilyCor = "Burseraceae",
                  BotanicalCorrectionSource = "Plants of the World Online")]
 
-      WFmatch <- WorldFlora::WFO.match(spec.data = unique(Data[ScientificNameCor!= "Protium stevensonii",
+      # Genus not found but I don't know why: -----------------------------------------------------------------------------
+      # Data[GenusCor == "Tovomita",
+      #      FamilyCor := "Clusiaceae"]
+
+      # Special taxa vector
+      Specialtaxa <- c("Protium stevensonii")
+
+      WFmatch <- WorldFlora::WFO.match(spec.data = unique(Data[!ScientificNameCor %in% Specialtaxa,
                                                                ScientificNameCor]), # data to correct
                                        WFO.data = WFOData, # WFO data
+                                       no.dates = TRUE, # to speed
+                                       First.dist = TRUE,
+                                       Fuzzy.one = TRUE,
                                        Fuzzy.force = FALSE,
                                        Fuzzy.shortest = TRUE,
+                                       # squish = TRUE, # don't remove whitespace
+                                       spec.name.nonumber = TRUE, # if nbr take only the genus
+                                       spec.name.sub = FALSE, # don't remove " sp"
                                        verbose = FALSE)
       setDT(WFmatch) # in data.table
 
-      WFmatch <- WFmatch[, list(taxonomicStatus, Old.status, spec.name, scientificName, family)] # columns of interest
+      WFmatch <- WFmatch[, list(taxonomicStatus, Old.status, spec.name.ORIG, scientificName, family)] # columns of interest
       WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
       WFmatch[, taxonomicStatus := NULL] # remove the column
 
 
-      # Remove multiple matches case (faudrait garder la famille par contre)
-      WFmatch[spec.name %in% c(WFmatch[duplicated(WFmatch[, spec.name]), spec.name]), Old.status := ""]
-      WFmatch <- WFmatch[!duplicated(WFmatch[, spec.name])]
+      # Remove multiple matches case (but keep the family and prefer not synonym)
+      # WFmatch[spec.name.ORIG %in% c(WFmatch[duplicated(WFmatch[, spec.name.ORIG]), spec.name.ORIG]), Old.status := ""] # not necessary with fromLast = TRUE
+      WFmatch <- WFmatch[!duplicated(WFmatch[, spec.name.ORIG], fromLast = TRUE)] # the first is a synonym, the last can be the original name
 
       # Create the correction source
       WFmatch[, BotaCorSource := "World Flora Online"]
 
 
       # Join the corrected Genus and Species, by original 'ScientificNameCor'
-      Data <- merge(Data, WFmatch, by.x = "ScientificNameCor", by.y = "spec.name", all.x = TRUE)
+      Data <- merge(Data, WFmatch, by.x = "ScientificNameCor", by.y = "spec.name.ORIG", all.x = TRUE)
 
       Data[, ScientificNameCor := NULL] # remove previous column before create the new one
 
@@ -306,8 +324,16 @@ BotanicalCorrection <- function(
 
       setnames(Data, "scientificName", "ScientificNameCor") # rename columns
 
+      # For Genus not detected by WFO by already corrected the family
+      Data[is.na(ScientificNameCor) & !is.na(FamilyCor), ScientificNameCor := paste(GenusCor, SpeciesCor)]
+
       # No output species name if only genus in input
-      Data[is.na(SpeciesCor), ScientificNameCor := sub(" .*", "", ScientificNameCor) ]
+      Data[is.na(SpeciesCor) | grepl("Indet", SpeciesCor)| grepl("indet", SpeciesCor)| grepl("[0-9]", SpeciesCor),
+           ScientificNameCor := sub(" .*", "", ScientificNameCor) ]
+
+      # But we want to keep species name with number
+      Data[grepl("[0-9]", SpeciesCor),
+           ScientificNameCor := paste(ScientificNameCor, SpeciesCor)]
 
 
       # if "Synonym" :
@@ -315,7 +341,6 @@ BotanicalCorrection <- function(
                               condition = Data$Old.status %in% "SYNONYM",
                               comment = "'ScientificName' is a synonym of the accepted botanical name")
       Data[, Old.status := NULL] # remove the column
-
 
       # Create GenusCor and SpeciesCor
       Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)] # fixed = T : match split exactly
@@ -343,7 +368,7 @@ BotanicalCorrection <- function(
 
     Data[, VernNameCor := VernName]
 
-    BotaCols <- c("FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor")
+    BotaCols <- c("FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor", "FamilyCorSource", "BotanicalCorrectionSource")
 
     for(j in BotaCols){
       Data[,  (j) := ifelse(is.na(get(j)) & length(na.omit(unique(get(j)))) == 1,
@@ -383,12 +408,16 @@ BotanicalCorrection <- function(
 
   duplicated_ID <- CorresIDs <- vector("character")
 
+  if(DetectOnly %in% FALSE) vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNameCor")
+  if(DetectOnly %in% TRUE) vars <- c("IdTree", "Family", "Genus", "Species", "Subspecies", "VernName")
+
+
   # For each site
   for (s in unique(na.omit(Data$Site))) {
 
-    BotaIDCombination <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Family, Genus, Species, Subspecies, VernName)]
-    ))
+    BotaIDCombination <- unique(
+      Data[Data$Site == s, vars, with = FALSE]
+    )
 
     CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree)
 
