@@ -191,13 +191,24 @@ server <- function(input, output, session) { # server ####
   # move on to next tab
   observeEvent(input$submitTables, {
 
-    if(input$nTable == 1 & length(Data()) == 1) {
-      updateTabItems(session, "tabs", "Tidying")
-    } else {
-      updateCheckboxGroupButtons(session, "TablesToStack",
-                                 choices = unname(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]))
+    if(is.null(input$MeasLevel)) sendSweetAlert(
+      session = session,
+      title = "Oups !",
+      text = "You forgot to enter something in step 2...",
+      type = "error"
+    )
 
-      updateTabItems(session, "tabs", "Stacking")
+    if(!is.null(input$MeasLevel)) {
+
+      if(input$nTable == 1 & length(Data()) == 1) {
+        updateTabItems(session, "tabs", "Tidying")
+      } else {
+        updateCheckboxGroupButtons(session, "TablesToStack",
+                                   choices = unname(reactiveValuesToList(input)[paste0("TableName", 1:input$nTable)]))
+
+        updateTabItems(session, "tabs", "Stacking")
+      }
+
     }
 
   })
