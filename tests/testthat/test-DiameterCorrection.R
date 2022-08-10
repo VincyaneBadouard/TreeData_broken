@@ -48,16 +48,13 @@ test_that("DiameterCorrection", {
 
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
                regexp = "The 'CorrectionType' argument value must be among
-         'taper', 'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
+         'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
   expect_warning(DiameterCorrection(TestData, Digits = 1.2),
                  regexp = "The 'Digits' argument must be an integer")
 
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
-
-  expect_message(DiameterCorrection(HOMData, CorrectionType = "linear"),
-                 regexp = "You have the 'HOM' information in your dataset")
 
   expect_message(DiameterCorrection(POMData, CorrectionType = "linear", WhatToCorrect = "punctual"),
                  regexp = "You have the 'POM' information in your dataset")
@@ -96,10 +93,6 @@ test_that("DiameterCorrection", {
     DBHRange = 10,
     MinIndividualNbr = 1,
     Digits = 2L,
-
-    TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-    TaperFormula = function(DAB, HOM, TaperParameter) DAB / (2 * exp(- TaperParameter*(HOM - DefaultHOM))),
-
 
     DetectOnly = FALSE)
 

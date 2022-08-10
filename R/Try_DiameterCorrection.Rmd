@@ -1,0 +1,126 @@
+---
+title: "Try DiameterCorrection"
+author: "Vincyane Badouard"
+date: "10/08/2022"
+output: html_document
+---
+
+# Packages
+```{r}
+library(readr)
+library(TreeData)
+library(data.table)
+```
+# Data
+```{r}
+PanamaFormated <- read_csv("D:/VSC TmFO/Data/StandardisedData/panama-plots_formated.csv")
+setDT(PanamaFormated)
+PanamaFormated[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
+```
+
+# Corrections
+WhatToCorrect = c("POM change", "punctual", "shift"),
+CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
+
+## All
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("POM change", "punctual", "shift"),
+  CorrectionType = c("quadratic", "phylogenetic hierarchical"),
+  MinIndividualNbr = 1)
+```
+
+## POM change ------------------------------------------------------------------------------------------------------------
+### Individual
+#### Quadratic
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("POM change"),
+  CorrectionType = c("quadratic", "individual"),
+  MinIndividualNbr = 1)
+```
+#### Linear
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("POM change"),
+  CorrectionType = c("linear", "individual"),
+  MinIndividualNbr = 1)
+```
+
+### Phylogenetic hierarchical
+#### Quadratic
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("POM change"),
+  CorrectionType = c("quadratic", "phylogenetic hierarchical"),
+  MinIndividualNbr = 1)
+```
+#### Linear
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("POM change"),
+  CorrectionType = c("linear", "phylogenetic hierarchical"),
+  MinIndividualNbr = 1)
+```
+
+## Punctual --------------------------------------------------------------------------------------------------------------
+### Individual
+#### Quadratic
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("punctual"),
+  CorrectionType = c("quadratic", "individual"),
+  MinIndividualNbr = 1)
+```
+#### Linear
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("punctual"),
+  CorrectionType = c("linear", "individual"),
+  MinIndividualNbr = 1)
+```
+
+## Shift -----------------------------------------------------------------------------------------------------------------
+### Individual
+#### Quadratic
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("shift"),
+  CorrectionType = c("quadratic", "individual"),
+  MinIndividualNbr = 1)
+```
+#### Linear
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("shift"),
+  CorrectionType = c("linear", "individual"),
+  MinIndividualNbr = 1)
+```
+
+### Phylogenetic hierarchical
+#### Quadratic
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("shift"),
+  CorrectionType = c("quadratic", "phylogenetic hierarchical"),
+  MinIndividualNbr = 1)
+```
+#### Linear
+```{r}
+Rslt <- DiameterCorrection(
+  PanamaFormated,
+  WhatToCorrect = c("shift"),
+  CorrectionType = c("linear", "phylogenetic hierarchical"),
+  MinIndividualNbr = 1)
+```
+
