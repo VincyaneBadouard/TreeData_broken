@@ -743,14 +743,13 @@ server <- function(input, output, session) { # server ####
   observe({FormatedScientificNameOptions(sort(unique(DataFormated()$ScientificName)))})
 
 
-
   # Visualize output
-  output$FormatedTable <- renderDT(DataFormated(), rownames = FALSE,
+  output$FormatedTable <- renderDT(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
                                    options = list(pageLength = 8, scrollX=TRUE),
-                                   container = FotterWithHeader(DataFormated()),
+                                   container = FotterWithHeader(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
                                    selection = "none")
 
-  output$FormatedTableSummary <- renderPrint(summary(DataFormated()))
+  output$FormatedTableSummary <- renderPrint(summary(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
 
 
   # update stuff in the Corrections tab, based on the formated data
@@ -924,12 +923,12 @@ server <- function(input, output, session) { # server ####
     Rslt
   })
 
-  output$CorrectedTable <- renderDT(DataCorrected(), rownames = FALSE,
+  output$CorrectedTable <- renderDT(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE),
-                                    container = FotterWithHeader(DataCorrected()),
+                                    container = FotterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
                                     selection = "none")
 
-  output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()))
+  output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
 
 
   # place holder to put either corrected data or non corrected data
@@ -1003,7 +1002,7 @@ server <- function(input, output, session) { # server ####
 
 
 
-    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
+    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T)[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )])
 
 
     # show and work on Codes translation if necessary
@@ -1179,7 +1178,7 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$DontUseProfileOuput, {
     shinyjs::hide("DontUseProfileOuput")
 
-    DataOutput(DataDone())
+    DataOutput(DataDone()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )])
   })
 
   observeEvent(input$DontUseProfileOuput | input$UseProfileOutput, {
