@@ -508,11 +508,17 @@ server <- function(input, output, session) { # server ####
                                          "mm2/m2", "cm2/m2", "m2/m2",
                                          "mm2/ha", "cm2/ha", "m2/ha",
                                          "mm2/km2", "cm2/km2", "m2/km2"))
+
   VolumeByAreaUnitOptions<- reactiveVal(c("none",
                                           "mm3/m2", "cm3/m2", "m3/m2",
                                           "mm3/ha", "cm3/ha", "m3/ha",
                                           "mm3/km2", "cm3/km2", "m3/km2"))
 
+  MassByAreaUnitOptions <- reactiveVal(c("none",
+                                          "g/m2", "kg/m2", "Mg/m2",
+                                          "g/ha", "kg/ha", "Mg/ha",
+                                          "gC/m2", "kgC/m2", "MgC/m2",
+                                          "gC/ha", "kgC/ha", "MgC/ha"))
 
 
 
@@ -763,7 +769,11 @@ server <- function(input, output, session) { # server ####
   }, ignoreInit = T)
 
   observeEvent(input$GoToCodes, {
-    if(!is.null(input$Treecodes)) updateTabItems(session, "tabs", "Codes") else if(input$MeasLevel %in% c("Tree", "Stem")) updateTabItems(session, "tabs", "Correct") else updateTabItems(session, "tabs", "OutputFormat")
+    if(length(input$TreeCodes) > 0) {
+      updateTabItems(session, "tabs", "Codes")
+      } else {
+        if(input$MeasLevel %in% c("Tree", "Stem")) updateTabItems(session, "tabs", "Correct") else updateTabItems(session, "tabs", "OutputFormat")
+      }
   }, ignoreInit = TRUE)
 
 

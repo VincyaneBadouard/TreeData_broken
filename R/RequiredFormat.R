@@ -400,10 +400,11 @@ RequiredFormat <- function(
 
   # convert units to standards ####
 
-  units::remove_unit(c("ha", "ind"), c("hectare", "individual"))
+  units::remove_unit(c("ha", "ind", "gC"), c("hectare", "individual", "carbon"))
 
   units::install_unit("ha", "10000 m2", "hectare")
   units::install_unit("ind", name =  "individual")
+  units::install_unit("gC", "0.47 g", "carbon")
 
 
   StandardUnitTable <- do.call(rbind, lapply(grep("UnitMan", x$ItemID, value = T), function(i) {
@@ -696,7 +697,7 @@ RequiredFormat <- function(
 
   # return output ####
   ColumnsToReturn <- intersect(c(x$ItemID, grep("Original", colnames(Data), value = T)), colnames(Data))
-  ColumnsToReturn <- ColumnsToReturn[unlist(Data[, lapply(.SD, function(x) !all(is.na(x))), .SDcols = ColumnsToReturn] )]
+  # ColumnsToReturn <- ColumnsToReturn[unlist(Data[, lapply(.SD, function(x) !all(is.na(x))), .SDcols = ColumnsToReturn] )]
   return(Data[, ..ColumnsToReturn])
 
 }

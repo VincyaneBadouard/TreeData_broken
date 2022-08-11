@@ -113,10 +113,11 @@ ReversedRequiredFormat <- function(
 
   # Units reverting from standard one ####
 
-  units::remove_unit(c("ha", "ind"), c("hectare", "individual"))
+  units::remove_unit(c("ha", "ind", "gC"), c("hectare", "individual", "carbon"))
 
   units::install_unit("ha", "10000 m2", "hectare")
   units::install_unit("ind", name =  "individual")
+  units::install_unit("gC", "0.47 g", "carbon")
 
 
   StandardUnitTable <- do.call(rbind, lapply(grep("UnitMan", x$ItemID, value = T), function(i) {
