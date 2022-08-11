@@ -1,5 +1,6 @@
 test_that("BotanicalCorrection", {
 
+  options(warn = 2) # trace warning
 
   library(data.table)
 
@@ -84,9 +85,6 @@ test_that("BotanicalCorrection", {
 
   # Check the function work -----------------------------------------------------------------------------------------------
 
-  # options(warn = 2) # trace warning
-  # options(warn = 0) # when debug is over
-
   ## Detect Only: no correction, only comments ----------------------------------------------------------------------------
   RsltTPL <- BotanicalCorrection(Data, Source = "TPL", DetectOnly = TRUE)
   RsltWFO <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset, DetectOnly = TRUE)
@@ -166,6 +164,8 @@ test_that("BotanicalCorrection", {
 
   } # end corrected Rslt loop
 
+
+  options(warn = 0) # when debug is over
 
 
 })

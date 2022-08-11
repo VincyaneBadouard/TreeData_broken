@@ -50,8 +50,9 @@ With:
 \value{
 Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
-- \emph{DBHCor}: corrected trees diameter at default HOM
+- \emph{TaperCorDBH}: corrected trees diameter at default HOM
 - \emph{DiameterCorrectionMeth} = "taper"
+- \emph{HOMCor} = HOM corresponding to the \emph{TaperCorDBH} (= \emph{DefaultHOM})
 }
 \description{
 TaperCorrection

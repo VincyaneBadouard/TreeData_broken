@@ -29,8 +29,9 @@
 #'
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
-#'      - *DBHCor*: corrected trees diameter at default HOM
+#'      - *TaperCorDBH*: corrected trees diameter at default HOM
 #'      - *DiameterCorrectionMeth* = "taper"
+#'      - *HOMCor* = HOM corresponding to the *TaperCorDBH* (= *DefaultHOM*)
 #'
 #' @export
 #'
@@ -88,12 +89,12 @@ TaperCorrection <- function(
                             comment = paste0("HOM different from the default HOM"))
 
     if(DetectOnly %in% FALSE){
-      if(!"DBHCor" %in% names(Data))
-        Data[, DBHCor := numeric(.N) ] # start without value (I can't put NA because it's a logical, so it's a 0)
+      if(!"TaperCorDBH" %in% names(Data))
+        Data[, TaperCorDBH := numeric(.N) ] # start without value (I can't put NA because it's a logical, so it's a 0)
 
       # Apply taper correction  -------------------------------------------------------------------------------------------
-      Data[HOM == DefaultHOM, ("DBHCor") := ifelse(is.na(DBHCor) | DBHCor == 0, Diameter, DBHCor)] # At default POM, keep the measured value
-      Data[HOM > DefaultHOM, ("DBHCor") := TaperFormula(DAB = Diameter,
+      Data[HOM == DefaultHOM, ("TaperCorDBH") := ifelse(is.na(TaperCorDBH) | TaperCorDBH == 0, Diameter, TaperCorDBH)] # At default POM, keep the measured value
+      Data[HOM > DefaultHOM, ("TaperCorDBH") := TaperFormula(DAB = Diameter,
                                                         HOM = HOM,
                                                         TaperParameter = TaperParameter(DAB = Diameter, HOM = HOM))
       ]
@@ -102,9 +103,11 @@ TaperCorrection <- function(
       # Add the column with the correction method  ------------------------------------------------------------------------
 
       Data <- GenerateComment(Data,
-                              condition = ( Data[,HOM] > DefaultHOM & !is.na(Data[, DBHCor]) ),
+                              condition = ( Data[,HOM] > DefaultHOM & !is.na(Data[, TaperCorDBH]) ),
                               comment = "taper",
                               column = "DiameterCorrectionMeth")
+
+      Data[, HOMCor := DefaultHOM]
 
 
     } # end of the correction

@@ -6,7 +6,7 @@
 \usage{
 DiameterCorrection(
   Data,
-  KeepMeas = c("MaxPOM", "MaxDate"),
+  KeepMeas = c("MaxHOM", "MaxDate"),
   ByStem = TRUE,
   DefaultHOM = 1.3,
   MaxDBH = 500,
@@ -40,10 +40,14 @@ dataset must also contain the columns:
 \item \code{Family} (character)
 }}
 
-\item{KeepMeas}{Possible values: "MaxPOM", "MaxDate" (character, 1 value)
+\item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
+census year, on which to apply the correction:
+Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
-\item "MaxPOM":
-\item "MaxDate":
+\item "MaxHOM": apply the correction to the measurement taken at the
+\strong{highest POM}
+\item "MaxDate": apply the correction to the \strong{most recent measurement} (same
+year but more recent date)
 }}
 
 \item{ByStem}{must be equal to TRUE if your inventory contains the stem

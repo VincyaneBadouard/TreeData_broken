@@ -1,0 +1,108 @@
+#' UniqueMeasurement
+#'
+#' @param Data Dataset (data.table)
+#'
+#' @param KeepMeas In case of **multiple diameter measurements** in the same
+#'   census year, on which to apply the correction:
+#' Possible values: "MaxHOM", "MaxDate" (character).
+#'   - "MaxHOM": apply the correction to the measurement taken at the
+#'               **highest POM**
+#'   - "MaxDate": apply the correction to the **most recent measurement** (same
+#'                year but more recent date)
+#'
+#' @param ID Column name indicating the identifier of the individual (character)
+#'
+#' @return Dataset (data.table) with 1 measurement (1 row) per Year
+#'
+#' @export
+#'
+#' @examples
+#'
+#' library(data.table)
+#'
+#' Data <- data.table( # 7 rows
+#' IdStem = c(rep("a", 4), rep("b", 2), "c"),
+#' Year = c(rep(2000, 3), 2001, rep(2000, 3)),
+#' Date = as.Date(c("2000-01-10", "2000-01-20", "2000-01-30", "2001-01-10",
+#'                  rep("2000-01-10", 3))),
+#' HOM = c(rep(1, 3), 2, 1, 2, 1)
+#' )
+#' Data
+#'
+#' UniqueMeasurement(Data)
+#'
+UniqueMeasurement <- function(
+  Data,
+  KeepMeas = c("MaxHOM", "MaxDate"), # 1st HOM, then Date, or only one
+  ID = "IdStem"
+){
+
+  Rslt <- data.table()
+
+  # Separate duplicated and non duplicated --------------------------------------------------------------------------------
+
+  DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)] # duplicated ID-Years
+
+  if(nrow(DuplicatedID) > 0){
+
+    DuplicatedID[, IDYear := paste(V1, Year, sep = "/")] # code to detect
+
+    Data[, IDYear := paste(get(ID), Year, sep = "/")] # code to detect
+
+    DuplicatedRows <- Data[IDYear %in% DuplicatedID[, IDYear]] # rows with duplicated ID-Years
+
+    UniqueData <- Data[!DuplicatedRows, on = .NATURAL] # rows that do not have duplicate measurements
+
+    # nrow(Data) == nrow(DuplicatedRows) + nrow(UniqueData) # to check
+
+    # Keep the row with the upper POM -------------------------------------------------------------------------------------
+
+    if("MaxHOM" %in% KeepMeas){
+
+      DuplicatedRows[, MaxHOM := max(HOM), by = list(get(ID), Year)] # compute the max HOM
+      NowUniqueData <- DuplicatedRows[HOM == MaxHOM] # keep only this measurement
+      NowUniqueData[, MaxHOM := NULL] # remove obsolete col
+
+      if(nrow(rbind(UniqueData, NowUniqueData)) != nrow(unique(Data, by = c(ID, "Year"))) ){ # if there are still duplicates at the same POM
+
+        if("MaxDate" %in% KeepMeas) DuplicatedRows <- NowUniqueData # to continue with MaxDate
+
+        if(!"MaxDate" %in% KeepMeas)
+          stop("There are still several measurements per census year despite the choice of the maximum POM.
+                You can also select the most recent measurement (same Year but more recent Date) with KeepMeas = 'MaxDate'")
+
+      }else{ Rslt <- rbind(UniqueData, NowUniqueData) }
+
+    } # end "MaxHOM"
+
+    # Keep the row with the upper date ------------------------------------------------------------------------------------
+
+    if("MaxDate" %in% KeepMeas & nrow(Rslt) == 0){
+
+      DuplicatedRows[, MaxDate := max(Date), by = list(get(ID), Year)]
+      NowUniqueData <- DuplicatedRows[Date == MaxDate]
+      NowUniqueData[, MaxDate := NULL]
+
+      if(nrow(rbind(UniqueData, NowUniqueData)) == nrow(unique(Data, by = c(ID, "Year"))) ){ # if there are no more duplicates
+
+        Rslt <- rbind(UniqueData, NowUniqueData)
+
+      }else{
+
+        if(!"MaxHOM" %in% KeepMeas){
+          stop("There are still several measurements per census year despite the choice of the maximum POM.
+                You can also select the measurement taken at the highest POM with KeepMeas = 'MaxHOM'")
+
+        }else{ stop("There are still several measurements per census year
+             despite the choice of the maximum POM and the most recent measurement")}
+      }
+
+    } # end "MaxDate"
+
+    Data <- Rslt
+
+  } # end if duplicated
+
+  return(Data)
+
+}
