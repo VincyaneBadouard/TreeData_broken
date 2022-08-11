@@ -72,28 +72,60 @@
 #'   \item{Variety}{Value or column name in data set @ForestGeoSubset (none) corresponding to Variety name}
 #'   \item{Voucher}{Value or column name in data set @ForestGeoSubset (none) corresponding to Voucher code}
 #'   \item{SpeciesDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species density}
-#'   \item{SpeciesDensityunitMan}{Some value entered via interaction with the Shiny app}
 #'   \item{SpeciesBasalAreaDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species basal area density}
 #'   \item{SpeciesBasalAreaDensityUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your species basal area unit?}
 #'   \item{SpeciesTotalBasalArea}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species total basal area}
-#'   \item{SpeciesTotalBasalAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is yourindividual basal area unit?}
+#'   \item{SpeciesTotalBasalAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your basal area unit?}
 #'   \item{SpeciesVolume}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species volume}
 #'   \item{SpeciesVolumeUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your species volume unit?}
-#'   \item{Tidy}{Some value entered via interaction with the Shiny app}
-#'   \item{ClearValueName}{Some value entered via interaction with the Shiny app}
-#'   \item{TickedMelt3}{Some value entered via interaction with the Shiny app}
-#'   \item{Variablecolumns1}{Some value entered via interaction with the Shiny app}
-#'   \item{ValueName4}{Some value entered via interaction with the Shiny app}
-#'   \item{TickedMelt1}{Some value entered via interaction with the Shiny app}
-#'   \item{TickedMelt4}{Some value entered via interaction with the Shiny app}
-#'   \item{Variablecolumns3}{Some value entered via interaction with the Shiny app}
-#'   \item{ValueName3}{Some value entered via interaction with the Shiny app}
-#'   \item{TickedMelt2}{Some value entered via interaction with the Shiny app}
-#'   \item{Variablecolumns2}{Some value entered via interaction with the Shiny app}
-#'   \item{ValueName2}{Some value entered via interaction with the Shiny app}
-#'   \item{Variablecolumns4}{Some value entered via interaction with the Shiny app}
-#'   \item{ValueName1}{Some value entered via interaction with the Shiny app}
-#'   \item{AllCodes}{Some value entered via interaction with the Shiny app}
+#'   \item{PlotVolume}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot volume}
+#'   \item{PlotDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree Density}
+#'   \item{YPlotUTM}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot Y UTM coordinate}
+#'   \item{PlotElevation}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot elevation}
+#'   \item{SpeciesDensityUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your species density unit?}
+#'   \item{Subspecies}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subspecies name}
+#'   \item{PlotVolumeUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your plot volume unit?}
+#'   \item{PlotNDead}{Value or column name in data set @ForestGeoSubset (none) corresponding to Number of dead trees in the sampling unit}
+#'   \item{PlotNLive}{Value or column name in data set @ForestGeoSubset (none) corresponding to Number of living trees in the sampling unit}
+#'   \item{PlotSpeciesRichness}{Value or column name in data set @ForestGeoSubset (none) corresponding to Number of species}
+#'   \item{XSubplotUTM}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subplot X UTM coordinate}
+#'   \item{PlotBasalAreaDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot basal area density}
+#'   \item{YSubplotUTM}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subplot Y UTM coordinate}
+#'   \item{SpeciesCoverageIndex}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species Coverage Frequency}
+#'   \item{PlotElevationMan}{Value or column name in data set @ForestGeoSubset (265) corresponding to What is your plot elevation in meters above sea level?}
+#'   \item{SpeciesRelativeDensity}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species Relative Density}
+#'   \item{XPlotUTM}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot X UTM coordinate}
+#'   \item{SubplotLon}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subplot longitude}
+#'   \item{PlotLon}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot longitude}
+#'   \item{SpeciesRelativeDominance}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species Relative Dominance}
+#'   \item{PlotDensityUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your plot density unit?}
+#'   \item{PlotBasalAreaDensityUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your plot basal area unit?}
+#'   \item{SpeciesImportanceIndex}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species Importance Index}
+#'   \item{PlotLat}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot latitude}
+#'   \item{StemFieldNum}{Value or column name in data set @ForestGeoSubset (StemTag) corresponding to Stem tag}
+#'   \item{SpeciesAbundance}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species abundance}
+#'   \item{SubplotLat}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subplot latitude}
+#'   \item{SpeciesRelativeFrequency}{Value or column name in data set @ForestGeoSubset (none) corresponding to Species Relative Frequency}
+#'   \item{AllCodes}{Some value created via interaction with the Shiny app}
+#'   \item{MeasLevel}{Some value created via interaction with the Shiny app}
+#'   \item{Tidy}{Some value created via interaction with the Shiny app}
+#'   \item{ClearValueName}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt3}{Some value created via interaction with the Shiny app}
+#'   \item{Variablecolumns1}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName4}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt1}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName6}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName5}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName2}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt4}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt6}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt5}{Some value created via interaction with the Shiny app}
+#'   \item{Variablecolumns3}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName3}{Some value created via interaction with the Shiny app}
+#'   \item{TickedMelt2}{Some value created via interaction with the Shiny app}
+#'   \item{Variablecolumns2}{Some value created via interaction with the Shiny app}
+#'   \item{Variablecolumns4}{Some value created via interaction with the Shiny app}
+#'   \item{ValueName1}{Some value created via interaction with the Shiny app}
 #'   ...
 #' }
 

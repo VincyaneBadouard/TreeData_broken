@@ -6,13 +6,10 @@ test_that("RequiredFormat", {
   Data <- ParacouSubset
   input <- ParacouProfile
 
-  expect_warning(expect_warning(expect_warning(
+  expect_warning(expect_warning(
     DataFormated <- RequiredFormat(Data, input ),
     "MinDBH was calculated"),
-    "You did not provide a Census ID column"),
-    "You are missing stemIDs"
-  )
-
+    "You did not provide a Census ID column")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
@@ -400,6 +397,7 @@ test_that("RequiredFormat", {
   input$MinDBHUnitMan = "none"
   input$DateFormatMan = input$DateFormat
   input$DateFormat = NULL
+  input$MeasLevel = "Stem"
 
   expect_warning(DataFormated <- RequiredFormat(Data, input), "You are missing treeID")
 

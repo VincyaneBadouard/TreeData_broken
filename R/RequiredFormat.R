@@ -94,11 +94,16 @@ RequiredFormat <- function(
   names(Treecodes) <- rep(multiplecolumns, length(Treecodes))
   input[multiplecolumns] <- NULL
 
-  NewColNames[ colnames(Data) %in% Treecodes] <- paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])
+  Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])] <-  Data[, colnames(Data) %in% Treecodes]
+
+  NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes]))
+
 
   } else {
     if(!is.null(input$TreeCodes)) if(!input$TreeCodes %in% "none") {
-      NewColNames[ colnames(Data) %in% input$TreeCodes] <- paste0("Original_",input$TreeCodes)
+      Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])] <-  Data[, colnames(Data) %in% Treecodes]
+
+      NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes]))
     }
   }
 
