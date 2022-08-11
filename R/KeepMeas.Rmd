@@ -1,0 +1,105 @@
+---
+title: "KeepMeas"
+author: "Vincyane Badouard"
+date: "11/08/2022"
+output: html_document
+---
+
+# Packages
+```{r}
+library(data.table)
+```
+
+# Create Data
+```{r}
+# a 2000 "2000-01-10" 1 
+# a 2000 "2000-01-20" 1
+# a 2000 "2000-01-30" 1 -> to keep
+# a 2001 "2001-01-10" 2 -> to keep
+# b 2000 "2000-01-10" 1
+# b 2000 "2000-01-10" 2 -> to keep
+# c 2000 "2000-01-10" 1 -> to keep -> 4 rows
+
+Data <- data.table( # 7 rows
+  IdStem = c(rep("a", 4), rep("b", 2), "c"), 
+  Year = c(rep(2000, 3), 2001, rep(2000, 3)), 
+  Date = as.Date(c("2000-01-10", "2000-01-20", "2000-01-30", "2001-01-10", rep("2000-01-10", 3))),
+  HOM = c(rep(1, 3), 2, 1, 2, 1)
+)
+
+# Big
+# PanamaFormated <- read_csv("D:/VSC TmFO/Data/StandardisedData/panama-plots_formated.csv")
+# setDT(PanamaFormated)
+# PanamaFormated[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
+# Data <- PanamaFormated
+
+ID = "IdStem"
+KeepMeas = c("MaxHOM", "MaxDate")
+```
+
+
+# Separate duplicated and non duplicated
+```{r}
+# Keep Measurement: "MaxHOM"or "MaxDate"
+DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
+DuplicatedID[, IDYear := paste(V1, Year, sep = "/")]
+
+
+# if(nrow(DuplicatedID)>0)
+
+Data[, IDYear := paste(get(ID), Year, sep = "/")]
+
+DuplicatedRows <- Data[IDYear %in% DuplicatedID[, IDYear]]
+
+UniqueData <- Data[!DuplicatedRows, on = .NATURAL] # rows that do not have duplicate measurements
+
+# nrow(Data) == nrow(DuplicatedRows) + nrow(UniqueData) # to check
+
+```
+
+# Keep the row with the upper POM
+```{r}
+
+if("MaxHOM" %in% KeepMeas){
+  
+  DuplicatedRows[, MaxHOM := max(HOM), by = list(get(ID), Year)]
+  NowUniqueData <- DuplicatedRows[HOM == MaxHOM]
+  NowUniqueData[, MaxHOM := NULL]
+  
+  if(nrow(rbind(UniqueData, NowUniqueData)) != nrow(unique(Data, by = c(ID, "Year"))) ){ # if there are still duplicates at the same POM
+    DuplicatedRows <- NowUniqueData
+  }
+}
+```
+
+# Keep the row with the upper date
+```{r}
+if("MaxDate" %in% KeepMeas){
+
+    DuplicatedRows[, MaxDate := max(Date), by = list(get(ID), Year)]
+  NowUniqueData <- DuplicatedRows[Date == MaxDate]
+  NowUniqueData[, MaxDate := NULL]
+  
+  if(nrow(rbind(UniqueData, NowUniqueData)) == nrow(unique(Data, by = c(ID, "Year"))) ){ # if there are no more duplicates
+    
+    Rslt <- rbind(UniqueData, NowUniqueData)
+    
+  }else{
+    
+    truc <- rbind(UniqueData, NowUniqueData)
+    pat <- unique(Data, by = c(ID, "Year"))
+    
+    rio <-pat[!truc, on = .NATURAL] # 10
+    
+    # Keep Measurement: "MaxHOM"or "MaxDate"
+DuplicatedID <- NowUniqueData[duplicated(NowUniqueData[, list(get(ID), Year)]), list(get(ID), Year)]
+
+DuplicatedRows <- NowUniqueData[get(ID) %in% DuplicatedID[, V1] & Year %in% DuplicatedID[, Year]] # duplicated measurements
+    
+    stop("There are still several measurements per census year despite the choice of the maximum POM and the most recent measurement")
+  }
+  
+}
+```
+
+

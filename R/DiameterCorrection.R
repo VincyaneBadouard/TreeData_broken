@@ -14,9 +14,13 @@
 #'   - `Genus` (character)
 #'   - `Family` (character)
 #'
-#' @param KeepMeas Possible values: "MaxPOM", "MaxDate" (character, 1 value)
-#'   - "MaxPOM":
-#'   - "MaxDate":
+#' @param KeepMeas In case of **multiple diameter measurements** in the same
+#'   census year, on which to apply the correction:
+#' Possible values: "MaxHOM", "MaxDate" (character).
+#'   - "MaxHOM": apply the correction to the measurement taken at the
+#'               **highest POM**
+#'   - "MaxDate": apply the correction to the **most recent measurement** (same
+#'                year but more recent date)
 #'
 #' @param ByStem must be equal to TRUE if your inventory contains the stem
 #'   level, equal to FALSE if not, and in this case the correction is done by
@@ -115,7 +119,7 @@
 DiameterCorrection <- function(
   Data,
 
-  KeepMeas = c("MaxPOM", "MaxDate"),
+  KeepMeas = c("MaxHOM", "MaxDate"),
 
   ByStem = TRUE,
 
@@ -184,9 +188,9 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
-  # if(any(!is.na(Data$HOM)) & !any(CorrectionType  %in% "taper")) # HOM exists?
-  #   message("You have the 'HOM' information in your dataset.
-  #           We advise you to correct your diameters also with the 'taper' correction ('CorrectionType' argument)")
+  if(any(!is.na(Data$HOM)) & !"TaperCorDBH" %in% names(Data)) # HOM exists?
+    message("You have the 'HOM' information in your dataset.
+            We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)")
 
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
      any(!is.na(Data$POM)) & !any(WhatToCorrect %in% "POM change")) # POM exists?
@@ -207,21 +211,23 @@ DiameterCorrection <- function(
 
 
   # Check no duplicated IdTree/IdStem in a census ----------------------------------------------------------------------------
-  DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
+  # DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
+  #
+  # setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""))
+  #
+  # if(nrow(DuplicatedID) > 0){
+  #
+  #   b <- capture.output(DuplicatedID)
+  #   c <- paste(b, "\n", sep = "")
+  #   # cat("Your data set is:\n", c, "\n")
+  #
+  #   stop("Duplicated ", ID, "(s) in a census:\n", c, "\n")
+  #
+  # }
 
-  setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""))
+  # Remove duplicated measurements per Year because different POM or Date
+  Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
 
-  if(nrow(DuplicatedID) > 0){
-
-    b <- capture.output(DuplicatedID)
-    c <- paste(b, "\n", sep = "")
-    # cat("Your data set is:\n", c, "\n")
-
-    stop("Duplicated ", ID, "(s) in a census:\n", c, "\n")
-
-  }
-
-  # KeepMeas = c("MaxPOM", "MaxDate")
   # Remove duplicated measurements (randomly)
   # Data <- Data[!duplicated(Data[, list((get(ID), Year)], fromLast = TRUE)] # keep the last measurement
 
@@ -450,7 +456,7 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  # print(unique(DataTree[, IdTree])) # to debug
+  print(unique(DataTree[, IdStem])) # to debug
 
   # If not enough Diameter values
   if(sum(!is.na(DataTree$Diameter)) > 1){
@@ -460,7 +466,11 @@ DiameterCorrectionByTree <- function(
     # Arrange year in ascending order
     DataTree <- DataTree[order(Year)] # order de dt
 
-    DBHCor <- Diameter <- DataTree[, Diameter]
+    # If the taper correction has been made, start from it
+    if("TaperCorDBH" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, TaperCorDBH]
+    if(!"TaperCorDBH" %in% names(DataTree))  DBHCor <- Diameter <- DataTree[, Diameter]
+
+
     Time <- DataTree[, Year]
 
     # Pioneers species case
@@ -801,7 +811,10 @@ DiameterCorrectionByTree <- function(
       DataTree[, DBHCor := round(DBHCor, digits = Digits)] }
 
   }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
-    DataTree[, DBHCor := Diameter] # keep original Diameter
+
+    if("TaperCorDBH" %in% names(DataTree)) DataTree[, DBHCor := TaperCorDBH] # keep taper Diameter
+    if(!"TaperCorDBH" %in% names(DataTree))  DataTree[, DBHCor := Diameter] # keep original Diameter
+
 
     # DBH = 0 or > MaxDBH is impossible
     DataTree[DBHCor == 0 | DBHCor > MaxDBH, DBHCor := NA]
