@@ -18,16 +18,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                icon = icon("info-circle"),
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
-                                  ),
+                                  )
+                                  ,
 
-
-                                    # div(style="display:inline-block",
-                                    #     actionBttn(
-                                    #       inputId = "browser",
-                                    #       style = "minimal",
-                                    #       # label = helpText("Troubleshoot in R"),
-                                    #       icon = icon("r-project"))
-                                    # ),
                                   tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
