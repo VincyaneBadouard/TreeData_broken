@@ -5,10 +5,10 @@ account: valentineherr
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5708669
-bundleId: 6180775
+bundleId: 6192950
 url: https://valentineherr.shinyapps.io/TmFO_AccelNet/
-when: 1659988893.35547
-lastSyncTime: 1659988893.35547
+when: 1660245922.79728
+lastSyncTime: 1660245922.79728
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: AppTutorial.pptx|simple_app_backup|tests|VegX_app_backup
