@@ -7,8 +7,9 @@
 #'   - `ScientificName` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
-#'   - **`POM` (Point Of Measurement) (factor)** if you want to correct from the
-#'       **"POM change"**
+#'   - **`POM` (Point Of Measurement) (factor)** or
+#'     **`HOM` (Height Of Measurement) (numeric)** if you want to correct from
+#'      the **"POM change"**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must also contain the columns:
 #'   - `Genus` (character)
@@ -226,7 +227,10 @@ DiameterCorrection <- function(
   # }
 
   # Remove duplicated measurements per Year because different POM or Date
+  CompleteData <- copy(Data)
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
+
+  DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
 
   # Remove duplicated measurements (randomly)
   # Data <- Data[!duplicated(Data[, list((get(ID), Year)], fromLast = TRUE)] # keep the last measurement
@@ -297,8 +301,8 @@ DiameterCorrection <- function(
   )
   )) # do.call apply the 'rbind' to the lapply result
 
-  # Re-put the the rows without ID or Year --------------------------------------------------------------------------------
-  Data <- rbindlist(list(Data, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
+  # Re-put the the rows duplicated, or without ID or Year -----------------------------------------------------------------
+  Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
 
   if(DetectOnly %in% FALSE){
 
@@ -456,7 +460,7 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  print(unique(DataTree[, IdStem])) # to debug
+  if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
 
   # If not enough Diameter values
   if(sum(!is.na(DataTree$Diameter)) > 1){
@@ -487,20 +491,29 @@ DiameterCorrectionByTree <- function(
 
     # Correction with POM ---------------------------------------------------------------------------------------------------
     if("POM change" %in% WhatToCorrect){
+
+      # POM or HOM?
+      # If no POM take HOM
+      if((!"POM" %in% names(DataTree) | all(is.na(DataTree$POM))) &
+         ("HOM" %in% names(DataTree) & any(!is.na(DataTree$HOM))) ){ POMv <- "HOM"
+
+      }else{ POMv <- "POM"}
+
+
       ## POM change detection -----------------------------------------------------------------------------------------------
-      if(any(!is.na(DataTree$POM))) { # POM exists?
+      if(any(!is.na(DataTree[, get(POMv)]))) { # POM exists?
 
         # Check the POM value over the time
         # If POM decreases comment it
         DataTree <- GenerateComment(DataTree,
                                     condition = as.numeric(rownames(DataTree)) %in%
-                                      (which(diff(as.numeric(DataTree$POM)) < 0) +1),
+                                      (which(diff(as.numeric(DataTree[, get(POMv)])) < 0) +1),
                                     comment = "POM decrease")
 
         # POM change detection
         POMChange <- NA  # 1st val = NA because it's the default POM
-        for( n in (2:(length(DataTree$POM))) ){
-          POMChange <- c(POMChange, DataTree$POM[n-1] != DataTree$POM[n]) # (TRUE = POM change)
+        for( n in (2:(length(DataTree[, get(POMv)]))) ){
+          POMChange <- c(POMChange, DataTree[, get(POMv)][n-1] != DataTree[, get(POMv)][n]) # (TRUE = POM change)
         }
 
         raised = which(POMChange) # which are TRUE
@@ -793,12 +806,6 @@ DiameterCorrectionByTree <- function(
                     or the method needs to be improved")
       }
     }
-
-
-
-
-
-
 
 
     # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------

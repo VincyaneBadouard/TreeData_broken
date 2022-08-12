@@ -15,17 +15,99 @@ library(data.table)
 ```{r}
 PanamaFormated <- read_csv("D:/VSC TmFO/Data/StandardisedData/panama-plots_formated.csv")
 setDT(PanamaFormated)
+
+# Mal formaté :
 PanamaFormated[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
+PanamaFormated[, Species := ScientificName]
+PanamaFormated[, ScientificName := paste(Genus, Species)]
+
 ```
 
 # Corrections
 WhatToCorrect = c("POM change", "punctual", "shift"),
 CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
+# Machine à debug
+```{r}
+# "443136", "443175" still abnormal growth
+# "443233" pas de colleagues
+
+PanamaFormated <- UniqueMeasurement(PanamaFormated, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
+DataTree <- PanamaFormated[IdStem %in% "443280"]
+Data <- PanamaFormated
+DefaultHOM = 1.3
+MaxDBH = 500
+PositiveGrowthThreshold = 5
+NegativeGrowthThreshold = -2
+
+Pioneers = NULL
+PioneersGrowthThreshold = 7.5
+
+TrustMeasSet = "first"
+WhatToCorrect = c("POM change", "punctual", "shift")
+CorrectionType = c("quadratic", "phylogenetic hierarchical")
+
+DBHRange = 10
+MinIndividualNbr = 5
+Digits = 1L
+
+DetectOnly = FALSE
+
+```
+
+# Problèmes non résolus
+```{r}
+# IdStem = "1078509"
+DBHCor = c(3.7, 2.8, 2.8, 2.8, NA)
+cresc = c(-0.9, 0, 0)
+Time = c(2016, 2017, 2018, 2019, 2021)
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "linear") # cresc_Corr
+
+
+# IdStem = "1078558"
+DBHCor = c(1.1, 1.3, 1.5, 1.5, NA)
+cresc = c(0.2, 0.2, 0)
+Time = c(2016, 2017, 2018, 2019, 2021)
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "linear") # cresc_Corr
+
+# IdStem = "443136"
+DBHCor = c(17.7, 26.2, NA, 34.6, 34.6, 34.6, 38.0)
+cresc = c(0.85, NA, 0.9333333, 0, 0, 1.7)
+Time = c(1998, 2008, 2016, 2017, 2018, 2019, 2021)
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "linear") # cresc_Corr
+
+# IdStem = "443175"
+DBHCor = c(34.5, NA, 34.0, 34.6, 35.0, 34.9, NA)
+cresc = c(NA, -0.02777778,  0.6, 0.4, -0.1)
+Time = c(1998, 2008, 2016, 2017, 2018, 2019, 2021)
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "quadratic") # cresc_Corr
+RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "linear") # cresc_Corr
+
+# ------------------- Ca marche mieux avec le DBH qu'avec le cresc
+
+# IdStem = "443233"
+DBHCor = c(92.9, 77.1, 78.0, 78.7, 78.8, 78.2, 79.2) # ... c'est la 1ere valeur qui semble fausse, mais l'algorithme la considère toujours comme de référence (HOM à 1.3 partout)
+
+# IdStem = "443243" voir s'il passe avec le POM change (ya que HOM)
+
+```
+
+
 ## All
 ```{r}
 Rslt <- DiameterCorrection(
-  PanamaFormated,
+  PanamaFormated[!IdStem %in% c("443233", "443243")],
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("quadratic", "phylogenetic hierarchical"),
   MinIndividualNbr = 1)

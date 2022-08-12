@@ -9,8 +9,8 @@ test_that("RegressionInterpolation", {
   expect_error(RegressionInterpolation(Y = "Y", X = "X"),
                regexp = "The 'X' and 'Y' variables of the 'RegressionInterpolation' function must be numeric")
 
-  expect_error(RegressionInterpolation(Y = c(2, 3), X = c(1, 2, 3)),
-               regexp = "The variables X and Y must be of the same length")
+  # expect_error(RegressionInterpolation(Y = c(2, 3), X = c(1, 2, 3)),
+  #              regexp = "The variables X and Y must be of the same length")
 
   expect_error(RegressionInterpolation(Y = 1, X = 2, CorrectionType = TRUE),
                regexp = "The 'CorrectionType' argument value must be 'quadratic' and/or 'linear'")
