@@ -18,8 +18,8 @@ useSweetAlert()
 
 
 # read in csv file that has all we want to ask about the headers
-x <- read.csv("data/interactive_items.csv")
-x <- x[x$Activate, ]
+xall <- read.csv("data/interactive_items.csv")
+x <- xall[xall$Activate, ]
 x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
 x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
 x3 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none != "none", ]
