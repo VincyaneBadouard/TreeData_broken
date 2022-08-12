@@ -134,8 +134,15 @@ PhylogeneticHierarchicalCorrection <- function(
       # rs = 1
       for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
         # EstDBH = previous value + estimated cresc by regression interpolation
-        EstDBH <- DBHCor[cresc_abn[rs]] + cresc_Corr[cresc_abn[rs]]*diff(Time)[cresc_abn[rs]]
 
+        for(p in cresc_abn[rs]:1){ # if previous value is NA, take the takes the one before etc
+
+          if(!is.na(DBHCor[p])){ # when previous value is not NA
+            EstDBH <- DBHCor[p] + cresc_Corr[p]*(Time[cresc_abn[rs]+1]-Time[p])
+
+            break # stop the loop, and p stay in the environnement
+          }
+        }
 
         # Find colleagues ---------------------------------------------------------------------------------------------------------
         ## Species level
@@ -177,7 +184,7 @@ PhylogeneticHierarchicalCorrection <- function(
               }else if(nrow(Colleagues) == 0){
                 stop("There are no individuals of the same species (",unique(DataTree$ScientificName),")
                      and diameter category(",EstDBH - DBHRange/2,";",EstDBH + DBHRange/2,")
-                     as the estimated diameter(",EstDBH,") of the stem",unique(DataTree$IdStem),"")
+                     as the estimated diameter(",EstDBH,") of the stem ",unique(DataTree$IdStem),"")
 
               }else{stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
                        You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument)")}
@@ -195,7 +202,9 @@ PhylogeneticHierarchicalCorrection <- function(
 
         # Correct init shift ------------------------------------------------------------------------------------------------------
         # DBH[init shift] =  previous value + ColleaguesCrescMean
-        DBHCor[cresc_abn[rs]+1] <- DBHCor[cresc_abn[rs]] + ColleaguesCrescMean*diff(Time)[cresc_abn[rs]] # Correct with the corrected cresc, the corrected DBH
+
+        # p the previous value non-NA
+        DBHCor[cresc_abn[rs]+1] <- DBHCor[p] + ColleaguesCrescMean*(Time[cresc_abn[rs]+1]-Time[p]) # Correct with the corrected cresc, the corrected DBH
 
         # Add the column with the correction method  ------------------------------------------------------------------------
 

@@ -34,9 +34,12 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
 
                          "BD", "BCirc", "BPOM", "BHOM",
 
-                         ".", ".N", ".SD", "..ColumnsToReturn",
+                         ".", ".N", ".SD", ".NATURAL", "..ColumnsToReturn",
+
+                         "IDYear", "V1", "MaxHOM", "MaxDate",
 
                          "LifeStatusCor", "Comment",
+                         "TaperCorDBH",
                          "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth", "Cresc",
                          "HOMCor",
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",

@@ -87,7 +87,12 @@ ComputeColleaguesGrowthMean <- function(
       Time = ColleaguesSeq[IdStem %in% i, Year]
     )
 
+    # Compute cresc for individual i
+    if(nrow(ColleaguesSeq[IdStem == i]) > (length(ColleaguesCresc)+1) ) # 1 is for the fist value where cresc=NA
+      ColleaguesCresc [ (length(ColleaguesCresc)+1) :( nrow(ColleaguesSeq[IdStem == i])-1) ] <- NA # put NA errased at the vector end
+
     ColleaguesSeq[IdStem == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
+    # no cresc if no diameter
   }
 
   # Keep only rows with DBH in DBHRange -------------------------------------------------------------------------------------

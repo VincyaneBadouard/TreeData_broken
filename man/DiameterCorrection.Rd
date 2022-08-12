@@ -32,8 +32,9 @@ The dataset must contain the columns:
 \item \code{ScientificName} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
-\item \strong{\code{POM} (Point Of Measurement) (factor)} if you want to correct from the
-\strong{"POM change"}
+\item \strong{\code{POM} (Point Of Measurement) (factor)} or
+\strong{\code{HOM} (Height Of Measurement) (numeric)} if you want to correct from
+the \strong{"POM change"}
 If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
 dataset must also contain the columns:
 \item \code{Genus} (character)

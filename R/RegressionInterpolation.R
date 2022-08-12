@@ -59,8 +59,8 @@ RegressionInterpolation <- function(
     stop("The 'X' and 'Y' variables of the 'RegressionInterpolation' function must be numeric")
   }
   # X & Y of the same lenght
-  if(length(X) != length(Y))
-    stop("The variables X and Y must be of the same length ('RegressionInterpolation()' function)")
+  if(length(X) > length(Y)) Y[(length(Y)+1):length(X)] <- NA
+    # stop("The variables X and Y must be of the same length ('RegressionInterpolation()' function)")
 
   # CorrectionType (character)
   if(!any(any(CorrectionType %in% "quadratic") || any(CorrectionType %in% "linear")))
