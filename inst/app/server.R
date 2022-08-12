@@ -1226,23 +1226,47 @@ server <- function(input, output, session) { # server ####
 
       # Metadata ##
 
-      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataDone()), xall$ItemID)]]
-      OurStandardColumn <- colnames(DataDone())
+      OurStandardColumn <- colnames(DataOutput())
 
-      if(!is.null(profileOutput())) {
+      idxOriginal <- grep("Original$", OurStandardColumn)
+      idxTreeCodes <- grep("^Original_", OurStandardColumn)
+
+      if(!is.null(profileOutput()$TreeCodes)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
+
+
+      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
+      YourInputColumn[idxTreeCodes] <- gsub("Original_", "", OurStandardColumn[idxTreeCodes])
+      YourInputColumn[idxOriginal] <- reactiveValuesToList(input)[gsub("Original", "", OurStandardColumn[idxOriginal])]
+      if(!is.null(profileOutput()$TreeCodes)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
+
+
         m <- match(OurStandardColumn, xall$ItemID)
+
+        if(!is.null(profileOutput())) {
         OutputColumn <-  profileOutput()[xall$ItemID[m]]
-        OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        } else {
+          OutputColumn <- OurStandardColumn
+        }
+
+        m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
+        m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
+        if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+
+        OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+
+
+        if(!is.null(profileOutput())) {
         Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
       } else {
-        OutputColumn <- OurStandardColumn
-        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", xall$Unit[match(OurStandardColumn, xall$ItemID)]), ""))
+        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", xall$Unit[m]), ""))
       }
 
-      YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
+      YourInputColumn[sapply(YourInputColumn, is.null) | YourInputColumn%in%"none"] <- NA
       names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
-      OutputColumn[OutputColumn%in%"none"] <- NA
+      OutputColumn[sapply(OutputColumn, is.null) | OutputColumn%in%"none"] <- NA
 
 
       Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
@@ -1252,7 +1276,10 @@ server <- function(input, output, session) { # server ####
 
 
       Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),] #remove lines with for columns that are missing in input and output
-      Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
+
+      if(!is.null(profileOutput())) {
+        Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
+      }
 
 
       write.csv(Metadata, file = "metadata.csv", row.names = F)
@@ -1264,29 +1291,41 @@ server <- function(input, output, session) { # server ####
 
       write.csv(DataToSave[,Metadata$OutputColumn], file = "data.csv", row.names = FALSE)
 
-      # code Translation ##
-      CodeTranslationFinal$output$OutputValue <- sapply(CodeTranslationFinal$output$OutputValue, function(x) ifelse(is.null(x), NA, x)) # this is to avoid having a list
-      if(input$ApplyCodeTranslation > 0) write.csv(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], "tree_codes_translation.csv", row.names = FALSE)
+      # Tree Codes definitions ##
+      if(length(input$TreeCodes) > 0) write.csv(AllCodes()[, c("Column", "Value", "Definition")
+], "tree_codes_metadata.csv", row.names = FALSE)
+
+      # Tree Codes Translation ##
+
+      if(!is.null(input$ApplyCodeTranslation) & length(input$ApplyCodeTranslation ) > 0) {
+
+        CodeTranslationFinal$output$OutputValue <- sapply(CodeTranslationFinal$output$OutputValue, function(x) ifelse(is.null(x), NA, x)) # this is to avoid having a list
+
+        write.csv(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], "tree_codes_translation.csv", row.names = FALSE)
+      }
+
 
       # save ZIP
 
-      zip(zipfile=file, files=c("profile.rds","metadata.csv", "data.csv", "tree_codes_translation.csv"))
+      FilesToZip <- c("profile.rds","metadata.csv", "data.csv", "tree_codes_metadata.csv", "tree_codes_translation.csv")
 
-      file.remove("profile.rds","metadata.csv", "data.csv", "tree_codes_translation.csv")
+      zip(zipfile=file, files=FilesToZip[file.exists(FilesToZip)])
+
+      file.remove(FilesToZip)
     },
     contentType = "application/zip"
 
   )
 
-  # Save output data .csv
-  output$dbFile <- downloadHandler(
-    filename = function() {
-      paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
-    },
-    content = function(file) {
-      write.csv(DataOutput(), file, row.names = FALSE)
-    }
-  )
+  # # Save output data .csv
+  # output$dbFile <- downloadHandler(
+  #   filename = function() {
+  #     paste(gsub(".csv", "", input$file1$name), '_formated.csv', sep = '')
+  #   },
+  #   content = function(file) {
+  #     write.csv(DataOutput(), file, row.names = FALSE)
+  #   }
+  # )
 
   # Save profile .Rdata
 
@@ -1332,50 +1371,50 @@ server <- function(input, output, session) { # server ####
     }
   )
 
-  # Save metadata .csv
-
-  output$dbMetadata <- downloadHandler(
-    filename = function() {
-      paste(gsub(".csv", "", input$file1$name), '_Metadata.csv', sep = '')
-    },
-    content = function(file) {
-
-      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataDone()), xall$ItemID)]]
-      OurStandardColumn <- colnames(DataDone())
-
-      if(!is.null(profileOutput())) {
-        m <- match(OurStandardColumn, xall$ItemID)
-        OutputColumn <-  profileOutput()[xall$ItemID[m]]
-        OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
-
-      } else {
-        OutputColumn <- OurStandardColumn
-        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", xall$Unit[match(OurStandardColumn, xall$ItemID)]), ""))
-      }
-
-      YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
-      names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
-      # OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
-      OutputColumn[OutputColumn%in%"none"] <- NA
-
-
-      Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
-                             OurStandardColumn,
-                             OutputColumn = unlist(OutputColumn),
-                             Description = Description)
-
-      #remove lines with for columns that are missing in input and output
-      Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),]
-
-      # remove lines that don't even exist in output ptofile
-
-      Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]
-
-      # save
-      write.csv(Metadata, file = file, row.names = F)
-    }
-  )
+  # # Save metadata .csv
+  #
+  # output$dbMetadata <- downloadHandler(
+  #   filename = function() {
+  #     paste(gsub(".csv", "", input$file1$name), '_Metadata.csv', sep = '')
+  #   },
+  #   content = function(file) {
+  #
+  #     YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataDone()), xall$ItemID)]]
+  #     OurStandardColumn <- colnames(DataDone())
+  #
+  #     if(!is.null(profileOutput())) {
+  #       m <- match(OurStandardColumn, xall$ItemID)
+  #       OutputColumn <-  profileOutput()[xall$ItemID[m]]
+  #       OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+  #       Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
+  #
+  #     } else {
+  #       OutputColumn <- OurStandardColumn
+  #       Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", xall$Unit[match(OurStandardColumn, xall$ItemID)]), ""))
+  #     }
+  #
+  #     YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
+  #     names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
+  #     # OutputColumn[is.na(names(OutputColumn))|OutputColumn%in%"none"] <- NA
+  #     OutputColumn[OutputColumn%in%"none"] <- NA
+  #
+  #
+  #     Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
+  #                            OurStandardColumn,
+  #                            OutputColumn = unlist(OutputColumn),
+  #                            Description = Description)
+  #
+  #     #remove lines with for columns that are missing in input and output
+  #     Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),]
+  #
+  #     # remove lines that don't even exist in output ptofile
+  #
+  #     Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]
+  #
+  #     # save
+  #     write.csv(Metadata, file = file, row.names = F)
+  #   }
+  # )
 
   # Help tab ####
   output$AppGeneralWorkflow <- renderImage(

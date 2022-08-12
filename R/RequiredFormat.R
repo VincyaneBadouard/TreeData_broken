@@ -115,6 +115,8 @@ RequiredFormat <- function(
   ## delete columns we don't want (except the ones related to Treecodes)
   Data[which(is.na(colnames(Data)))] <- NULL
 
+  # save some Original columns
+  Data[,  paste0(intersect(names(Data),x$ItemID[x$SaveCopy]), "Original")] <- Data[, intersect(names(Data),x$ItemID[x$SaveCopy])]
 
   ## add columns missing
   Data[, setdiff(gsub("[[:punct:]]| ", "", x$ItemID[x$RequiredColumn]), gsub("[[:punct:]]| ", "", colnames(Data)))] <- NA
@@ -150,7 +152,7 @@ RequiredFormat <- function(
   ### Life status
   if( !is.null(input$LifeStatus)) {
     if(!input$LifeStatus %in% "none") {
-      Data[, LifeStatusOriginal := LifeStatus]
+      # Data[, LifeStatusOriginal := LifeStatus]
       Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
     }
   }
@@ -158,7 +160,7 @@ RequiredFormat <- function(
   ### commercial species
   if( !is.null(input$CommercialSp)) {
     if( !input$CommercialSp %in% "none") {
-    Data[, CommercialSpOriginal := CommercialSp]
+    # Data[, CommercialSpOriginal := CommercialSp]
     Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
   }
     }
@@ -186,7 +188,7 @@ RequiredFormat <- function(
     if(!input$Date %in% "none"){
 
       # save the orginal dates
-      Data[, DateOriginal := Date]
+      # Data[, DateOriginal := Date]
 
       # transform to standard format
       DateFormat <- trimws(input$DateFormatMan)
@@ -274,6 +276,8 @@ RequiredFormat <- function(
     if (input$TreeFieldNum %in% "none") {
 
         warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
+
+
         Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  , by = .(IdCensus)]
 
     }
