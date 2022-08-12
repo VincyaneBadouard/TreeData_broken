@@ -1271,6 +1271,8 @@ server <- function(input, output, session) { # server ####
       # save ZIP
 
       zip(zipfile=file, files=c("profile.rds","metadata.csv", "data.csv", "tree_codes_translation.csv"))
+
+      file.remove("profile.rds","metadata.csv", "data.csv", "tree_codes_translation.csv")
     },
     contentType = "application/zip"
 
