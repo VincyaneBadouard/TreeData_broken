@@ -1200,6 +1200,82 @@ server <- function(input, output, session) { # server ####
 
   # download tab ####
 
+  # Save all output as zip file
+
+  output$dbZIP <- downloadHandler(
+    filename = function() {
+      paste(gsub(".csv", "", input$file1$name), '.zip', sep = '')
+    },
+    content = function(file) {
+
+      # Profile ##
+
+      inputs_to_save <- c(names(input)[names(input) %in% x$ItemID], "MeasLevel", "Tidy", "VariableName", grep("Variablecolumns|TickedMelt|ValueName", names(input), value = T)) # names(input)
+
+      Profile <- list()
+      for(input.i in inputs_to_save){
+        Profile[[input.i]] <-  input[[input.i]]
+      }
+
+      Profile[["AllCodes"]] <- AllCodes()
+      Profile[["CodeTranslationFinal"]] <- CodeTranslationFinal$output
+
+
+      saveRDS(Profile, file = "profile.rds")
+
+
+      # Metadata ##
+
+      YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(colnames(DataDone()), xall$ItemID)]]
+      OurStandardColumn <- colnames(DataDone())
+
+      if(!is.null(profileOutput())) {
+        m <- match(OurStandardColumn, xall$ItemID)
+        OutputColumn <-  profileOutput()[xall$ItemID[m]]
+        OutputColumn[which(is.na(names(OutputColumn)))] <- xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
+
+      } else {
+        OutputColumn <- OurStandardColumn
+        Description = paste0(xall$Description[match(OurStandardColumn, xall$ItemID)], ifelse(!xall$Unit[match(OurStandardColumn, xall$ItemID)] %in% c("-", "year"), paste(" in", xall$Unit[match(OurStandardColumn, xall$ItemID)]), ""))
+      }
+
+      YourInputColumn[is.na(names(YourInputColumn))|YourInputColumn%in%"none"] <- NA
+      names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
+      OutputColumn[OutputColumn%in%"none"] <- NA
+
+
+      Metadata <- data.frame(YourInputColumn = unlist(YourInputColumn),
+                             OurStandardColumn,
+                             OutputColumn = unlist(OutputColumn),
+                             Description = Description)
+
+
+      Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),] #remove lines with for columns that are missing in input and output
+      Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
+
+
+      write.csv(Metadata, file = "metadata.csv", row.names = F)
+
+      # Formatted data ##
+
+      DataToSave <- DataOutput()
+      setDF(DataToSave)
+
+      write.csv(DataToSave[,Metadata$OutputColumn], file = "data.csv", row.names = FALSE)
+
+      # code Translation ##
+      CodeTranslationFinal$output$OutputValue <- sapply(CodeTranslationFinal$output$OutputValue, function(x) ifelse(is.null(x), NA, x)) # this is to avoid having a list
+      if(input$ApplyCodeTranslation > 0) write.csv(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")], "tree_codes_translation.csv", row.names = FALSE)
+
+      # save ZIP
+
+      zip(zipfile=file, files=c("profile.rds","metadata.csv", "data.csv", "tree_codes_translation.csv"))
+    },
+    contentType = "application/zip"
+
+  )
+
   # Save output data .csv
   output$dbFile <- downloadHandler(
     filename = function() {
