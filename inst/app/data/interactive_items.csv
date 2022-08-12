@@ -119,11 +119,7 @@ second column,pickerInput,choices,none,,BPOMUnitMan,What is your Basal POM unit?
 second column,pickerInput,choices,none,m,TreeHeightUnitMan,What is your tree height unit?,,none,none,TreeHeight,UnitOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,-,-,-
 second column,pickerInput,choices,none,TRUE,IsCommercialMan,Which of the following(s) indicate a commercial species?,,none,none,CommercialSp,CommercialOptions,list( `actions-box` = TRUE),TRUE,TRUE,FALSE,-,-,-
 second column,textInput,value,, ,ScientificNameSepMan,Character separating Genus and Species in Scientific name,,Genus,none,ScientificName,OtherCharacterOptions,FALSE,FALSE,TRUE,FALSE,-,-,-
-NA,,,,,LifeStatusOriginal,,,,,,,,NA,FALSE,NA,-,-,"LifeStatus as it was given in the input table, without any correction or transformation"
-NA,,,,,ScientificNameOriginal,,,,,,,,NA,FALSE,NA,-,-,"ScientificName as it was given in the input table, without any correction or transformation"
-NA,,,,,DateOriginal,,,,,,,,NA,FALSE,NA,-,-,"Date as it was given in the input table, without any correction or transformation"
-NA,,,,,DiameterOriginal,,,,,,,,NA,FALSE,NA,-,-,"Tree Diameter as it was given in the input table, without any correction or transformation"
-NA,,,,,CircOriginal,,,,,,,,NA,FALSE,NA,-,-,"Circ as it was given in the input table, without any correction or transformation"
-NA,,,,,CommercialSpOriginal,,,,,,,,NA,FALSE,NA,-,-,"IsCommercial as it was given in the input table, without any correction or transformation"
-NA,,,,,XXXOrginal,,,,,,,,NA,FALSE,NA,-,-,"Column coming straight from the original data, the name of it is [colomn name in the input data]Original"
+NA,,,,,XXXOriginal,,,,,,,,NA,FALSE,NA,-,-,"Column coming straight from the input data, without any correction or transformation"
+NA,,,,,Original_XXX,,,,,,,,NA,FALSE,NA,-,-,"One of the column(s) indicated as tree codes, as it is in the input data. The name of it is Original_[colomn name in the input data]. See tree_codes_metadata.csv for the definition of each value. If the output profile you selected also had tree codes, and you applied the translation, you should also have a tree_codes_translation.csv file in the zipfile. That file explains the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into."
+,,,,,TreeCodesOutput,,,,,,,,NA,FALSE,NA,,,One of the column(s) storing tree code information. See tree_codes_translation.csv file to understand the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into.
 NA,,,,,Comment,,,,,,,,NA,FALSE,NA,-,-,information about error
