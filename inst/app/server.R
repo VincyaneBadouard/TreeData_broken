@@ -1002,7 +1002,7 @@ server <- function(input, output, session) { # server ####
 
 
 
-    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T)[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )])
+    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
 
 
     # show and work on Codes translation if necessary
@@ -1178,7 +1178,7 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$DontUseProfileOuput, {
     shinyjs::hide("DontUseProfileOuput")
 
-    DataOutput(DataDone()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )])
+    DataOutput(DataDone())
   })
 
   observeEvent(input$DontUseProfileOuput | input$UseProfileOutput, {
@@ -1188,12 +1188,12 @@ server <- function(input, output, session) { # server ####
 
 
   # Visualize output
-  output$DataOutput <- renderDT(DataOutput(), rownames = FALSE,
+  output$DataOutput <- renderDT(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
                                 options = list(pageLength = 8, scrollX=TRUE),
-                                container = FotterWithHeader(DataOutput()),
+                                container = FotterWithHeader(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
                                 selection = "none")
 
-  output$DataOutputSummary <- renderPrint(summary(DataOutput()))
+  output$DataOutputSummary <- renderPrint(summary(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
 
 
 
@@ -1287,9 +1287,14 @@ server <- function(input, output, session) { # server ####
                              OutputColumn = unlist(OutputColumn),
                              Description = Description)
 
-      #remove lines with for columns that are msising in input and output
+      #remove lines with for columns that are missing in input and output
       Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),]
 
+      # remove lines that don't even exist in output ptofile
+
+      Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]
+
+      # save
       write.csv(Metadata, file = file, row.names = F)
     }
   )
