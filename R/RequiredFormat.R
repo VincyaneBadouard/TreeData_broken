@@ -38,10 +38,10 @@
 #'
 
 RequiredFormat <- function(
-  Data,
-  input,
-  x = NULL,
-  ThisIsShinyApp = FALSE
+    Data,
+    input,
+    x = NULL,
+    ThisIsShinyApp = FALSE
 ){
   # data(ParacouSubset)
   # data(ParacouProfile)
@@ -85,25 +85,26 @@ RequiredFormat <- function(
   NewColNames <- names(input[x$ItemID])[idx]
 
   ## deal with TreeCodes separately
-  ## repeat cases where multiple columns match one item (only checked for Treecodes, need to check what happens for other columns)
+  ## repeat cases where multiple columns match one item (only checked for TreeCodes, need to check what happens for other columns)
   multiplecolumns <- names(which(sapply(input[x$ItemID[!x$Group %in% "second column"]], length)>1))
   if(any(!multiplecolumns %in% "TreeCodes")) stop ("You've selected multiple columns for something other than 'TreeCodes', please contact us at herrmannv@si.edu")
 
   if(length(multiplecolumns) > 0 & all(multiplecolumns %in%  "TreeCodes")) {
-  Treecodes <- input[multiplecolumns][[1]]
-  names(Treecodes) <- rep(multiplecolumns, length(Treecodes))
-  input[multiplecolumns] <- NULL
+    TreeCodes <- input[multiplecolumns][[1]]
+    names(TreeCodes) <- rep(multiplecolumns, length(TreeCodes))
+    input[multiplecolumns] <- NULL
 
-  Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])] <-  Data[, colnames(Data) %in% Treecodes]
+    Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% TreeCodes])] <-  Data[, colnames(Data) %in% TreeCodes]
 
-  NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes]))
+    NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in%  TreeCodes]))
 
 
   } else {
-    if(!is.null(input$TreeCodes)) if(!input$TreeCodes %in% "none") {
-      Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes])] <-  Data[, colnames(Data) %in% Treecodes]
+    if(!is.null(input$TreeCodes) && !input$TreeCodes %in% "none") {
+      Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% input$TreeCodes])] <-  Data[, colnames(Data) %in% input$TreeCodes]
 
-      NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in% Treecodes]))
+      NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in%  input$TreeCodes]))
+
     }
   }
 
@@ -112,7 +113,7 @@ RequiredFormat <- function(
 
   colnames(Data) <- NewColNames
 
-  ## delete columns we don't want (except the ones related to Treecodes)
+  ## delete columns we don't want (except the ones related to TreeCodes)
   Data[which(is.na(colnames(Data)))] <- NULL
 
   # save some Original columns
@@ -160,10 +161,10 @@ RequiredFormat <- function(
   ### commercial species
   if( !is.null(input$CommercialSp)) {
     if( !input$CommercialSp %in% "none") {
-    # Data[, CommercialSpOriginal := CommercialSp]
-    Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
-  }
+      # Data[, CommercialSpOriginal := CommercialSp]
+      Data[, CommercialSp := ifelse(CommercialSp %in% input$IsCommercial, TRUE, FALSE)]
     }
+  }
 
   # LogicVar <- LogicVar[LogicVar %in% colnames(Data)]
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
@@ -185,34 +186,34 @@ RequiredFormat <- function(
 
   # put in date format
 
-    if(!input$Date %in% "none"){
+  if(!input$Date %in% "none"){
 
-      # save the orginal dates
-      # Data[, DateOriginal := Date]
+    # save the orginal dates
+    # Data[, DateOriginal := Date]
 
-      # transform to standard format
-      DateFormat <- trimws(input$DateFormatMan)
+    # transform to standard format
+    DateFormat <- trimws(input$DateFormatMan)
 
 
-      if(grepl("num|dec", DateFormat, ignore.case = T)) {
+    if(grepl("num|dec", DateFormat, ignore.case = T)) {
 
-        if(grepl("num", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")])
+      if(grepl("num", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(as.numeric(trimws(Date)), origin = "1970-01-01")])
 
-        if(grepl("dec", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))])
+      if(grepl("dec", DateFormat, ignore.case = T)) suppressWarnings(Data[, Date := as.Date(lubridate::date_decimal(as.numeric(trimws(Date))))])
 
-      } else {
+    } else {
 
-        DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
-        DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
+      DateFormat <- gsub("(?<=^)\\w|(?<=[[:punct:]])\\w", "%", DateFormat, perl = T, ignore.case = T) # replace first letter of each word by '%'
+      DateFormat <- gsub("yyy", "Y", DateFormat, ignore.case = T)# if remains 3 `y`, change to upper case Y
 
-        Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
-
-      }
-
-      # send warning if some dates translated as NA
-      if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+      Data[, Date := as.Date(trimws(as.character(Date)), format = DateFormat)]
 
     }
+
+    # send warning if some dates translated as NA
+    if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+
+  }
 
 
 
@@ -244,7 +245,7 @@ RequiredFormat <- function(
     Data$IdCensus <- as.character(Data$Year)
   }
 
- ## Site, Plot, subplot
+  ## Site, Plot, subplot
   if (input$Site %in% "none") {
     if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will consider you have only one site called 'SiteA'")
 
@@ -275,10 +276,10 @@ RequiredFormat <- function(
 
     if (input$TreeFieldNum %in% "none") {
 
-        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
+      warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
 
 
-        Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  , by = .(IdCensus)]
+      Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  , by = .(IdCensus)]
 
     }
 
@@ -286,7 +287,7 @@ RequiredFormat <- function(
 
     if (!input$TreeFieldNum %in% "none") {
 
-        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
+      warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
 
       if(any(is.na(Data$TreeFieldNum))) {
         Data[is.na(TreeFieldNum), TreeFieldNum := paste0(seq(1, .N), "_auto") , by = .(Site, Plot, Subplot, IdCensus)]
@@ -310,8 +311,8 @@ RequiredFormat <- function(
 
     if (input$StemFieldNum %in% "none") {
 
-        if (input$MeasLevel %in% "Stem") warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
-        Data[is.na(IdStem), IdStem := paste0(.(IdTree), "_", seq(1, .N), "_auto"), by = .(IdCensus, IdTree)]
+      if (input$MeasLevel %in% "Stem") warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
+      Data[is.na(IdStem), IdStem := paste0(.(IdTree), "_", seq(1, .N), "_auto"), by = .(IdCensus, IdTree)]
 
     }
 
@@ -325,7 +326,7 @@ RequiredFormat <- function(
         Data[is.na(StemFieldNum), StemFieldNum := paste0(seq(1, .N), "_auto") , by = .(IdCensus, IdTree)]
       }
 
-        Data[is.na(IdStem), IdStem := paste(IdTree, StemFieldNum, "auto", sep = "_"), by = .(IdCensus)]
+      Data[is.na(IdStem), IdStem := paste(IdTree, StemFieldNum, "auto", sep = "_"), by = .(IdCensus)]
 
     }
 
@@ -336,29 +337,29 @@ RequiredFormat <- function(
   ## Genus, Species, ScientificNameSepMan ####
 
   if(! input$MeasLevel %in% c("Plot")) {
-      ### Genus and species if we have ScientificName and ScientificNameSepMan
-  if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
+    ### Genus and species if we have ScientificName and ScientificNameSepMan
+    if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
 
-  ### ScientificName if we have Genus and species
+    ### ScientificName if we have Genus and species
 
-  if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" ) Data[, ScientificName := paste(Genus, Species)]
+    if(!input$Genus %in% "none" & !input$Species %in% "none" & input$ScientificName %in% "none" ) Data[, ScientificName := paste(Genus, Species)]
 
   }
 
 
   ## Diameter if we have circumference ####
   if(input$MeasLevel %in% c("Tree", "Stem")) {
-      if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You did not specify what column represents tree size (Diameter, Circonference, BD or basal circonference) in your data.")
+    if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You did not specify what column represents tree size (Diameter, Circonference, BD or basal circonference) in your data.")
 
-  if(input$Diameter %in% "none" & !input$Circ %in% "none") {
-    Data[, Diameter := round(Circ/pi, 2)]
-    input$DiameterUnitMan <- input$CircUnitMan
-  }
-  if(input$BD %in% "none" & !input$BCirc %in% "none") {
-    Data[, BD := round(BCirc/pi, 2)]
-    input$BDUnitMan <- input$BCircUnitMan
+    if(input$Diameter %in% "none" & !input$Circ %in% "none") {
+      Data[, Diameter := round(Circ/pi, 2)]
+      input$DiameterUnitMan <- input$CircUnitMan
+    }
+    if(input$BD %in% "none" & !input$BCirc %in% "none") {
+      Data[, BD := round(BCirc/pi, 2)]
+      input$BDUnitMan <- input$BCircUnitMan
 
-  }
+    }
   }
 
 

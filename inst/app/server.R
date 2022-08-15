@@ -1031,7 +1031,6 @@ server <- function(input, output, session) { # server ####
 
   })
 
-
   observeEvent(input$UseProfileOuput, {
     shinyjs::show("DontUseProfileOuput")
     shinyjs::hide("UseProfileOuput")
@@ -1048,27 +1047,32 @@ server <- function(input, output, session) { # server ####
     req(file)
 
 
-    profileOutput <- tryCatch({ readRDS(file)},
+    profileOutput(tryCatch({ readRDS(file)},
                               # warning = function(warn){
                               #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
                               # },
                               error = function(err){
                                 showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
-                              })
+                              }))
 
 
 
-    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput, x, ThisIsShinyApp = T))
+    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
 
 
     # show and work on Codes translation if necessary
-    if(!is.null(profileOutput$AllCodes) & !AllCodes()[1,1] %in% "You have not selected columns for codes") {
+    if(!(profileOutput()$AllCodes[1,1] %in% "You have not selected columns for codes" || AllCodes()[1,1] %in% "You have not selected columns for codes")) {
       shinyjs::show("CodeTranslationsDiv")
+
       output$uiCodeTranslations <-  renderUI({
         div(DTOutput("CodeTranslationTable"),
             br(),
+            actionBttn("SeeCodeDefs", "See definitions",
+                       style = "material-flat",
+                       size = "sm",
+                       color = "default"),
             br(),
-            DTOutput("CodeTranslationFinal"),
+            hidden(DTOutput("CodeTranslationFinal")),
             actionBttn(
               inputId = "ApplyCodeTranslation",
               label = "Apply Code Translation",
@@ -1090,7 +1094,7 @@ server <- function(input, output, session) { # server ####
       })
 
       AllCodesInput <- AllCodes()
-      AllCodesOutput <- profileOutput$AllCodes
+      AllCodesOutput <- profileOutput()$AllCodes
 
       AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
@@ -1133,35 +1137,20 @@ server <- function(input, output, session) { # server ####
         ), # this is generating the radio buttons in the body of the table
         server = FALSE)
 
-      # output$CodeTranslationTable <- renderHtmlTableWidget(
-      #   htmlTableWidget(
-      #       addHtmlTableStyle( CodeTranslationTable,
-      #                          css.rgroup = "text-align:left; font-weight:900",
-      #                          css.cgroup = "text-align:left; font-weight:900",
-      #                          css.header	= "text-align:center; font-weight:400"
-      #       ),
-      #       rgroup = unique(AllCodesInput$Column),
-      #       n.rgroup = c(table(AllCodesInput$Column)[unique(AllCodesInput$Column)]),
-      #       cgroup = unique(AllCodesOutput$Column),
-      #       n.cgroup =table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)],
-      #     number_of_entries = nrow(CodeTranslationTable) + length(unique(AllCodesInput$Column)))
-      #   )
-
-
-      # output$CodeTranslationTable <- renderDT(profileOutput$AllCodes)
+      # CodeTranslationTable(CodeTranslationTable)
+      CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
+                                            InputValue = AllCodesInput$Value,
+                                            InputDefinition = AllCodesInput$Definition)
     }
 
-    profileOutput(profileOutput)
-    # CodeTranslationTable(CodeTranslationTable)
-    CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
-                                          InputValue = AllCodesInput$Value,
-                                          InputDefinition = AllCodesInput$Definition)
-
-  })
 
 
-  observe({
-    req(CodeTranslationFinal$dt$InputValue)
+  }, priority = 2)
+
+  observeEvent(input$SeeCodeDefs, {
+
+    shinyjs::show("CodeTranslationFinal")
+     req(CodeTranslationFinal$dt$InputValue)
     # req(input$codes_MAIN)
     dt <- CodeTranslationFinal$dt
     dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_"), function(x) input[[x]])
@@ -1170,6 +1159,11 @@ server <- function(input, output, session) { # server ####
     dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x)) strsplit(x,"_")[[1]][[2]] else NULL)# remove the column part in the value
     CodeTranslationFinal$output <- dt
   })
+
+
+  # observe({
+  #
+  # }, priority = 1)
 
   output$CodeTranslationFinal <- renderDT({
     req(CodeTranslationFinal$output)
@@ -1263,9 +1257,20 @@ server <- function(input, output, session) { # server ####
     shinyjs::show("UseProfileOuput")
 
 
+    # reset profile and code translation inputs and table (some of these are probably not necessary... it took me a while to make this work but I can't tell what combination of this and other changes need to happen)
+    profileOutput <- reactiveVal(NULL)
 
+    lapply(paste(CodeTranslationFinal$dt$InputColumn, CodeTranslationFinal$dt$InputValue, sep = "_"), function(i) updateRadioButtons(session, inputId = i, choices=character(0), selected=character(0)))
+
+
+    CodeTranslationFinal$dt <- NULL
+    CodeTranslationFinal$output <- NULL
+
+    output$CodeTranslationTable <- NULL
+
+    # revert DataOutput
     DataOutput(DataDone())
-  })
+  }, priority = 10)
 
   observeEvent(input$DontUseProfileOuput | input$UseProfileOutput, {
     shinyjs::show("GoToDownload")
