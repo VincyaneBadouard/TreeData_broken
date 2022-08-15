@@ -652,7 +652,7 @@ tabItem("Codes",
                            inputId = "DontUseProfileOuput",
                            label = "Don't use profile",
                            style = "pill",
-                           color = "success"),
+                           color = "warning"),
                          hidden(actionBttn(
                            inputId = "GoToDownload",
                            label = "Go To Download",

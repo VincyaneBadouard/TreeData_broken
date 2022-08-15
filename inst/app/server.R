@@ -536,6 +536,8 @@ server <- function(input, output, session) { # server ####
                                           "gC/m2", "kgC/m2", "MgC/m2",
                                           "gC/ha", "kgC/ha", "MgC/ha"))
 
+  TreeCodesSepOptions <- reactiveVal(c("Punctuation character (,;-/...)" = "[[:punct:]]",
+                                       "No character (codes are concatenated)" = ""))
 
 
   LifeStatusOptions <- eventReactive(input$LifeStatus, {
@@ -596,7 +598,7 @@ server <- function(input, output, session) { # server ####
 
 
     lapply(c(1:nrow(x4)), function(i) {
-      if(!input[[x4$if_X2_isnot_none[i]]] %in% "none" ) {
+      if(!is.null(input[[x4$if_X2_isnot_none[i]]]) && !input[[x4$if_X2_isnot_none[i]]] %in% "none") {
         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "= get(x4$argValue[i])())")))
 
         shinyjs::show( x4$ItemID[i])
@@ -777,12 +779,12 @@ server <- function(input, output, session) { # server ####
 
 
   # Visualize output
-  output$FormatedTable <- renderDT(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
+  output$FormatedTable <- renderDT(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                    options = list(pageLength = 8, scrollX=TRUE),
-                                   container = FotterWithHeader(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
+                                   container = FotterWithHeader(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                    selection = "none")
 
-  output$FormatedTableSummary <- renderPrint(summary(DataFormated()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
+  output$FormatedTableSummary <- renderPrint(summary(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
 
 
   # update stuff in the Corrections tab, based on the formated data
@@ -821,7 +823,7 @@ server <- function(input, output, session) { # server ####
 
   observe({
     req(input$TreeCodes)
-    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(Value = unique(unlist(strsplit(as.character(x), "[[:punct:]]"))))), idcol = "Column" ), Definition = ""))
+    AllCodes(cbind(rbindlist(apply(TidyTable()[,input$TreeCodes, with = F], 2, function(x) data.frame(Value = unique(unlist(strsplit(as.character(x), input$TreeCodesSepMan))))), idcol = "Column" ), Definition = ""))
 
   })
 
@@ -956,12 +958,12 @@ server <- function(input, output, session) { # server ####
     Rslt
   })
 
-  output$CorrectedTable <- renderDT(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
+  output$CorrectedTable <- renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE),
-                                    container = FotterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
+                                    container = FotterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                     selection = "none")
 
-  output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
+  output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
 
 
   # place holder to put either corrected data or non corrected data
@@ -1032,6 +1034,7 @@ server <- function(input, output, session) { # server ####
 
   observeEvent(input$UseProfileOuput, {
     shinyjs::show("DontUseProfileOuput")
+    shinyjs::hide("UseProfileOuput")
 
 
     if(input$predefinedProfileOutput == "No") {
@@ -1069,9 +1072,19 @@ server <- function(input, output, session) { # server ####
             actionBttn(
               inputId = "ApplyCodeTranslation",
               label = "Apply Code Translation",
-              style = "float",
+              style = "material-flat",
               size = "sm",
               color = "success"
+            ),
+            hidden(
+              actionBttn(
+                inputId = "RevertCodeTranslation",
+                label = "Revert Code Translation",
+                style = "material-flat",
+                size = "sm",
+                color = "warning"
+              )
+
             )
         )
       })
@@ -1183,7 +1196,19 @@ server <- function(input, output, session) { # server ####
   })
 
 
+  observeEvent(input$RevertCodeTranslation, {
+    shinyjs::show("ApplyCodeTranslation")
+    shinyjs::hide("RevertCodeTranslation")
+
+    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+  })
+
   observeEvent(input$ApplyCodeTranslation, {
+
+    shinyjs::show("RevertCodeTranslation")
+    shinyjs::hide("ApplyCodeTranslation")
+
+
     DataOutput <- DataOutput()
 
     idx <- which(names(DataOutput) %in% paste0("Original_", input$TreeCodes))
@@ -1220,9 +1245,13 @@ server <- function(input, output, session) { # server ####
     for(j in OutCols) {
       CodesInput[,Final:=gsub(paste0(j, "_|\\<(\\w*?_\\w*?)\\>"), "", Translation)]
 
+      if(profileOutput()$TreeCodesSepMan %in% "")  CodesInput[, Final:=gsub(";", "", Final)] # replace ";" by "" if profileOutput()$TreeCodesSepMan is ""
+
       colnames(CodesInput) <- gsub("Final", j, colnames(CodesInput))
       CodesInput[,Final := NULL]
     }
+
+
 
     DataOutput(cbind(DataOutput, CodesInput[, ..OutCols]))
   })
@@ -1230,6 +1259,10 @@ server <- function(input, output, session) { # server ####
 
   observeEvent(input$DontUseProfileOuput, {
     shinyjs::hide("DontUseProfileOuput")
+    shinyjs::hide("CodeTranslationsDiv")
+    shinyjs::show("UseProfileOuput")
+
+
 
     DataOutput(DataDone())
   })
@@ -1241,12 +1274,12 @@ server <- function(input, output, session) { # server ####
 
 
   # Visualize output
-  output$DataOutput <- renderDT(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )], rownames = FALSE,
+  output$DataOutput <- renderDT(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                 options = list(pageLength = 8, scrollX=TRUE),
-                                container = FotterWithHeader(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]),
+                                container = FotterWithHeader(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                 selection = "none")
 
-  output$DataOutputSummary <- renderPrint(summary(DataOutput()[,lapply(.SD, function(x) {if(anyNA(x)) {NULL} else {x}} )]))
+  output$DataOutputSummary <- renderPrint(summary(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
 
 
 
