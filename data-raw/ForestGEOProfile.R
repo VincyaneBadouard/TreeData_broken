@@ -54,6 +54,7 @@ ForestGeoProfile <-
     SiteMan = "",
     IsLiveMan = c("alive", "broken below"),
     TreeCodes = "codes",
+    TreeCodesSepMan = "[[:punct:]]",
     Authority = "SpeciesID",
     TreeLat = "none",
     Genus = "Genus",

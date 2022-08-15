@@ -55,6 +55,7 @@
 #'   \item{SiteMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your site name ?}
 #'   \item{IsLiveMan}{Value or column name in data set @ForestGeoSubset (c("alive", "broken below")) corresponding to Which of your status(es) represent a LIVE tree?}
 #'   \item{TreeCodes}{Value or column name in data set @ForestGeoSubset (codes) corresponding to Select all the columns that give information about your tree, and/or your methods of measurements}
+#'   \item{TreeCodesSepMan}{Value or column name in data set @ForestGeoSubset ([[:punct:]]) corresponding to If you store multiple tree codes in one cell, what character separates each code?}
 #'   \item{Authority}{Value or column name in data set @ForestGeoSubset (SpeciesID) corresponding to  Taxonomic authority for the ID level}
 #'   \item{TreeLat}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree latitude}
 #'   \item{Genus}{Value or column name in data set @ForestGeoSubset (Genus) corresponding to Genus name}
