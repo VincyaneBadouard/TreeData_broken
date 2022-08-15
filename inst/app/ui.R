@@ -542,14 +542,20 @@ body <- dashboardBody(
                        color = "success"
                      ))),
 
-                     fluidRow(
+                     box(width = 12,
 
-                       column(width = 12,
+                       # column(width = 12,
+                              dropdownButton( title = h1("Our standard units"), icon = icon("info-circle"), size  ="sm", width = "500px",
+                                              datatable(x[!x$Unit %in% c("", "-"), c("ItemID", "Unit")],
+                                                        rownames = F,
+                                                        width = 300)
+                                            ),
                               h4("View of your formatted table:"),
                               DTOutput(outputId = "FormatedTable"),
                               h4("summary of your formatted table:"),
                               verbatimTextOutput("FormatedTableSummary")
-                       ))
+                       )
+              # )
 
 
     )),
