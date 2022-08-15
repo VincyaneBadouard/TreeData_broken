@@ -449,6 +449,8 @@ body <- dashboardBody(
 
                   # load a profile it one already exists
                   fileInput(inputId = "profile", div("You may also load your own profile", br(), em("(if you already used this app and saved your profile (.rds))")), accept = ".rds"),
+                  span(textOutput("RDSWarning"), style="color:red"),
+                  br(),
                   hidden(actionBttn(
                     inputId = "UseProfile",
                     label = "Click Twice here to use Profile",
@@ -633,6 +635,8 @@ tabItem("Codes",
 
                          # load a profile it one already exists
                          fileInput(inputId = "profileOutput", div("You may also load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds"),
+                         span(textOutput("RDSOutputWarning"), style="color:red"),
+                         br(),
                          hidden(actionBttn(
                            inputId = "UseProfileOuput",
                            label = "Apply Profile",

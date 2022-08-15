@@ -149,6 +149,22 @@ server <- function(input, output, session) { # server ####
 
   })
 
+  # give a pop up error if a files is not a csv file
+  observe({
+    lapply(1:input$nTable, function(i){
+      file <- input[[paste0("file", i)]]
+      req(file)
+      ext <- tools::file_ext(file$datapath)
+      if(ext != "csv") sendSweetAlert(
+        session = session,
+        title = "Oups !",
+        text = "The is not a CSV file!",
+        type = "error"
+      )
+    })
+
+  })
+
   # fill in Data, as a list, with one drawer per uploaded table, named as provided by user
 
   Data <- reactiveVal()
@@ -647,6 +663,25 @@ server <- function(input, output, session) { # server ####
 
   UserProfile <- reactiveVal()
 
+  observe({
+
+    req(input$profile$datapath)
+    file <- input$profile$datapath
+    ext <- tools::file_ext(file)
+
+
+    if(ext != "rds") sendSweetAlert(
+      session = session,
+      title = "Oups !",
+      text = "The is not a .rds file!",
+      type = "error")
+
+    if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
+    if(ext == "rds") output$RDSWarning <- renderText("")
+
+
+  })
+
   observeEvent(input$UseProfile, {
 
     if(input$predefinedProfile == "No") {
@@ -657,8 +692,6 @@ server <- function(input, output, session) { # server ####
       ext <- tools::file_ext(file)
     }
 
-    need(ext != "rds", "This is not a .rds file! Please upload a .rds file.")
-    # if(ext != "rds") output$RDSWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
 
 
     profile <- tryCatch({ readRDS(file)},
@@ -976,6 +1009,26 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$profileOutput, {
     shinyjs::show("UseProfileOuput")
   })
+
+  observe({
+
+    req(input$profileOutput$datapath)
+    file <- input$profileOutput$datapath
+    ext <- tools::file_ext(file)
+
+
+    if(ext != "rds") sendSweetAlert(
+      session = session,
+      title = "Oups !",
+      text = "The is not a .rds file!",
+      type = "error")
+
+    if(ext != "rds") output$RDSOutputWarning <- renderText("This is not a .rds file! Please upload a .rds file.")
+    if(ext == "rds") output$RDSOutputWarning <- renderText("")
+
+
+  })
+
 
   observeEvent(input$UseProfileOuput, {
     shinyjs::show("DontUseProfileOuput")
