@@ -51,3 +51,10 @@ makeUniqueID <- NS(character(0))
 #   "https://cdn.rawgit.com/lipis/flag-icon-css/master/flags/4x3/es.svg"
 #
 # )
+
+
+# create a helper for help pannels
+
+tabPanel_helper <- function(i) tabPanel(title = i,
+                                        includeMarkdown(paste0("www/", i, ".md")),
+                                        img(src = paste0(i, ".gif"), width = "100%"))
