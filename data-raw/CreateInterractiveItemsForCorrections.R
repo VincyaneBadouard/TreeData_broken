@@ -49,8 +49,8 @@ df_moreInfo <-
              ItemType = c("numericInput", "numericInput","pickerInput", "pickerInput", "textInput", "TBD", "numericInput", "pickerInput"),
              Multiple = c(F, F, F, T, F, "TBD", F, F),
              Options = c(F, F, "list(`live-search` = TRUE)",  "list( `actions-box` = TRUE)", F, "TBD", F, "list( `actions-box` = TRUE)"),
-             argument = c("value", "value", "choices", "choices", "value", "TBD", "value", "choices"),
-             argument2 = c(F, F, "selected", "selected", F, "TBD", F, "selected"),
+             Argument = c("value", "value", "choices", "choices", "value", "TBD", "value", "choices"),
+             Argument2 = c(F, F, "selected", "selected", F, "TBD", F, "selected"),
              argValue = c("OtherOptions", "OtherOptions", "LogicalOptions", "TBD", "OtherOptions", "TBD", "OtherOptions", "Function")) # TBD because some need to be column names, others need to be list of options given by default.
 
 
@@ -67,8 +67,8 @@ for(i in which(Fct_args$ItemType %in% "TBD")) {
     Fct_args$ItemType[i] <- "pickerInput"
     Fct_args$Multiple[i] <- T
     Fct_args$Options[i] <- "list( `actions-box` = TRUE)"
-    Fct_args$argument[i] <- "choices"
-    Fct_args$argument2[i] <- "selected"
+    Fct_args$Argument[i] <- "choices"
+    Fct_args$Argument2[i] <- "selected"
     Fct_args$argValue[i] <- "FormatedScientificNameOptions"
     Fct_args$ReactiveArgValue[i] <- TRUE
 
