@@ -66,9 +66,11 @@ classification
 }
 }
 \examples{
+\dontrun{
 library(data.table)
 data(TestData)
 
+# With The Plant List:
 Rslt <- BotanicalCorrection(TestData, Source = "TPL")
 
 ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
@@ -86,7 +88,8 @@ FamCor <- unique(Rslt[FamilyCor != Family,
                 Species, SpeciesCor, Subspecies,
                 BotanicalCorrectionSource, Comment)
                 ])
-\dontrun{
+
+# With World Flora Online:
 WFO_Backbone <- file.choose()
 load(WFO_Backbone)
 

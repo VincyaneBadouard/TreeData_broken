@@ -55,9 +55,11 @@
 #' @export
 #'
 #' @examples
+#'\dontrun{
 #' library(data.table)
 #' data(TestData)
 #'
+#'# With The Plant List:
 #' Rslt <- BotanicalCorrection(TestData, Source = "TPL")
 #'
 #' ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
@@ -75,7 +77,8 @@
 #'                 Species, SpeciesCor, Subspecies,
 #'                 BotanicalCorrectionSource, Comment)
 #'                 ])
-#'\dontrun{
+#'
+#'# With World Flora Online:
 #' WFO_Backbone <- file.choose()
 #' load(WFO_Backbone)
 #'
