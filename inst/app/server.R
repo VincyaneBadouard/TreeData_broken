@@ -806,7 +806,12 @@ server <- function(input, output, session) { # server ####
     if(length(input$TreeCodes) > 0) {
       updateTabItems(session, "tabs", "Codes")
       } else {
-        if(input$MeasLevel %in% c("Tree", "Stem")) updateTabItems(session, "tabs", "Correct") else updateTabItems(session, "tabs", "OutputFormat")
+        if(input$MeasLevel %in% c("Tree", "Stem")) {
+          updateTabItems(session, "tabs", "Correct")
+          } else {
+            updateTabItems(session, "tabs", "OutputFormat")
+            DataDone(DataFormated())
+          }
       }
   }, ignoreInit = TRUE)
 
@@ -1005,11 +1010,11 @@ server <- function(input, output, session) { # server ####
 
   observe( {
     if(input$predefinedProfileOutput != "No" )
-      shinyjs::show("UseProfileOuput")
+      shinyjs::show("UseProfileOutput")
   })
 
   observeEvent(input$profileOutput, {
-    shinyjs::show("UseProfileOuput")
+    shinyjs::show("UseProfileOutput")
   })
 
   observe({
@@ -1031,9 +1036,9 @@ server <- function(input, output, session) { # server ####
 
   })
 
-  observeEvent(input$UseProfileOuput, {
-    shinyjs::show("DontUseProfileOuput")
-    shinyjs::hide("UseProfileOuput")
+  observeEvent(input$UseProfileOutput, {
+    shinyjs::show("DontUseProfileOutput")
+    shinyjs::hide("UseProfileOutput")
 
 
     if(input$predefinedProfileOutput == "No") {
@@ -1268,10 +1273,10 @@ server <- function(input, output, session) { # server ####
   })
 
 
-  observeEvent(input$DontUseProfileOuput, {
-    shinyjs::hide("DontUseProfileOuput")
+  observeEvent(input$DontUseProfileOutput, {
+    shinyjs::hide("DontUseProfileOutput")
     shinyjs::hide("CodeTranslationsDiv")
-    shinyjs::show("UseProfileOuput")
+    shinyjs::show("UseProfileOutput")
 
 
     # reset profile and code translation inputs and table (some of these are probably not necessary... it took me a while to make this work but I can't tell what combination of this and other changes need to happen)
@@ -1289,7 +1294,7 @@ server <- function(input, output, session) { # server ####
     DataOutput(DataDone())
   }, priority = 10)
 
-  observeEvent(input$DontUseProfileOuput | input$UseProfileOutput, {
+  observeEvent(input$UseProfileOutput |input$DontUseProfileOutput, {
     shinyjs::show("GoToDownload")
 
   }, ignoreInit = T)

@@ -161,6 +161,23 @@ If you intend to translate these codes to match the ones of another profile (whi
 <p>These functions will add new columns to your data (indicated with <code>Corr</code> suffix) and won&#39;t alter your original columns.</p>
 
 <p>Note that some of these function are quite slow and it can take a few minutes for the output to show up.</p>
- <img src="www/Corrections.gif" width="80%"/><!--/html_preserve--></div></div>
+ <img src="www/Corrections.gif" width="80%"/> <h1>Selecting an output profile</h1>
+
+<p>You may select a pre-loaded profile or upload a .rds file that a colleague sent you.
+You may also choose to keep this app&#39;s standard by clicking &ldquo;don&#39;t use profile&rdquo;.</p>
+
+<p>The app is currently not able to handle deal with tree/stem &lt;&ndash;&gt; plot/species translation.</p>
+ <img src="www/Selecting an output profile.gif" width="80%"/> <h1>Translating your tree codes</h1>
+
+<p>If your profile has tree codes and the profile you selected as an output also do, you can look through both sets of codes and indicate when they are equivalent by checking the radio button.</p>
+
+<p>If you hover over the column names, you will see the definitions of the output profile.</p>
+
+<p>click on &ldquo;See definition&rdquo; to double check that the mapping of codes is correct. When you are happy, you can apply the mapping and you will see columns added to your table. They will have the column names that the output profile expect and will be filled with their codes.</p>
+ <img src="www/Code translation.gif" width="80%"/> <h1>Downloading the output data</h1>
+
+<p>Clicking on &ldquo;save all&rdquo; generates a zip file with all the files you should need. 
+If you have tree codes and applied a tree code mapping, the zip will include files relevant to that</p>
+ <img src="www/Download.gif" width="80%"/><!--/html_preserve--></div></div>
 </body>
 </html>

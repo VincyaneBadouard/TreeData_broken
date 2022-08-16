@@ -14,7 +14,7 @@ library(htmltools)
 img(src = "www/AppGeneralWorkflow.png", width = "80%")
 
 all_html <- NULL
-for(i in c("Upload", "Stack", "Merge", "Tidy", "Headers", "Codes", "Corrections")) {
+for(i in c("Upload", "Stack", "Merge", "Tidy", "Headers", "Codes", "Corrections", "Selecting an output profile", "Code translation", "Download")) {
 # i = "Codes"
   all_html <- paste(all_html, includeMarkdown(paste0("www/", i, ".md")))
   all_html <- paste(all_html, img(src = paste0("www/",i, ".gif"), width = "80%"))
