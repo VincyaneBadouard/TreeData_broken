@@ -2,7 +2,12 @@
 #'
 #' @param Y Response variable with missing value (NA) (numeric)
 #' @param X Explanatory variable (numeric)
+#'
 #' @param CorrectionType "quadratic" and/or "linear" (character)
+#'
+#' @param Local If FALSE, compute the regression on all the Y and X values, if
+#'   TRUE compute the regression between the 2 surrounding values of the missing
+#'   value (NA) (default: FALSE) (logical)
 #'
 #' @details The variables X and Y must be of the same length.
 #'
@@ -14,41 +19,24 @@
 #'
 #' @examples
 #'
-#' DBHCor = c(13, 14, 15, 16, 30, 19, 15, 21, 23)
-#' Time = c(2000, 2002, 2004, 2006, 2008, 2012, 2014, 2016, 2020)
+#' DBH = c(34.5, NA, 34.0, 34.6, 35.0, 34.9, NA)
+#' Time = c(1998, 2008, 2016, 2017, 2018, 2019, 2021)
+#' plot(Time, DBH)
+#'
+#'
+#' # Compute the corrected DBH
+#' DBHCor <- RegressionInterpolation(Y = DBH, X = Time, Local = FALSE)
+#'
+#' DBHCorLocal <- RegressionInterpolation(Y = DBH, X = Time, Local = TRUE)
+#'
 #' plot(Time, DBHCor)
-#'
-#' # Compute all cresc
-#' cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-#' cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
-#'
-#' # Replace abnormal cresc by NA in the DBH
-#' PositiveGrowthThreshold = 5
-#' NegativeGrowthThreshold = -2
-#' ab_cresc <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
-#' DBHCor[ab_cresc +1] <- NA # abnormal DBH <- NA
-#'
-#' # Re-compute without the abnormal growth
-#' cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-#'
-#' Y = cresc
-#' X = Time[-1]
-#' plot(X,Y)
-#'
-#' # Compute the corrected cresc
-#' cresc_Corr <- RegressionInterpolation(Y = Y, X = X,
-#'                                       CorrectionType = "quadratic")
-#'
-#' # Correct with the corrected cresc, the corrected DBH
-#' for(i in which(is.na(DBHCor))){
-#' DBHCor[i] <- DBHCor[i-1] + cresc_Corr[i-1] * diff(Time)[i-1]
-#' }
-#' plot(Time, DBHCor)
+#' plot(Time, DBHCorLocal)
 #'
 RegressionInterpolation <- function(
   Y,
   X,
-  CorrectionType = "quadratic"
+  CorrectionType = "linear",
+  Local = FALSE
 ){
 
   #### Arguments check ####
@@ -74,6 +62,17 @@ RegressionInterpolation <- function(
 
   Y[miss] <- sapply(miss, function(i) { # i = each value de miss
 
+    if(Local == TRUE){
+
+      yxval <- Select2FramingValues(i = i, Y = Y, X = X)
+      yval <- yxval$yval
+      xval <- yxval$xval
+
+    }else{
+      yval = Y
+      xval = X
+      }
+
     if(length(which(!is.na(Y))) < 2){
 
       yi <- Y[!is.na(Y)]
@@ -81,14 +80,21 @@ RegressionInterpolation <- function(
   }else if("quadratic" %in% CorrectionType & length(which(!is.na(Y))) > 2){
 
       # Degree 2 polynomial regression (= quadratic)
-      reg <- lm(Y ~ poly(X, degree = 2, raw = TRUE))$coef # 'degree' must be less than number of unique points
+      reg <- lm(yval ~ poly(xval, degree = 2, raw = TRUE))$coef # 'degree' must be less than number of unique points
       yi <- reg[1] + reg[2] * X[i] + reg[3] * X[i]^2 # (y = b + ax + cx^2),  DBHi = b + a YEARi + c YEARi^2
+
+      # plot(X, Y)
+      # curve(reg[1] + reg[2] * x + reg[3] *x^2, add=T)
 
     }else{ # "linear"
 
       # Linear regression: DBH ~ years
-      reg <- lm(Y ~ X)$coef # extract the coefs
+      reg <- lm(yval ~ xval)$coef # extract the coefs
       yi <- reg[1] + reg[2] * X[i] # (y = b + ax),  DBHi = b + a YEARi
+
+      # plot(X, Y)
+      # curve(reg[1] + reg[2] * x, add=T)
+
     }
 
     return(yi) # DBH of i, yi -> Y[miss]

@@ -129,7 +129,7 @@ PhylogeneticHierarchicalCorrection <- function(
     if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
 
       # Estimate cresc by regression
-      cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "quadratic")
+      cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear")
 
       # rs = 1
       for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
@@ -220,7 +220,7 @@ PhylogeneticHierarchicalCorrection <- function(
             # DBH[shift] = previous value + their cresc_abs
 
             # If NA in cresc_abs replace it by a interpolation value
-            cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "quadratic") # Compute the corrected cresc
+            cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "linear") # Compute the corrected cresc
 
             DBHCor[i] <- # then correct the other shift values
               DBHCor[i-1] + # New position of the previous value

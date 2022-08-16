@@ -114,7 +114,7 @@
 #' Rslt <- DiameterCorrection(
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("linear", "phylogenetic hierarchical"),
+#'     CorrectionType = c("quadratic", "phylogenetic hierarchical"),
 #'     MinIndividualNbr = 1)
 #'
 DiameterCorrection <- function(
@@ -134,7 +134,7 @@ DiameterCorrection <- function(
 
   TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -419,7 +419,7 @@ DiameterCorrection <- function(
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'   CorrectionType = c("linear", "individual")
+#'   CorrectionType = c("quadratic", "linear", "individual")
 #'   )
 #'
 DiameterCorrectionByTree <- function(
@@ -436,7 +436,7 @@ DiameterCorrectionByTree <- function(
 
   TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -533,11 +533,13 @@ DiameterCorrectionByTree <- function(
             # Remove incr between 2 shifts (take growth only intra seq)
             cresc[raised-1]  <- NA # cresc[which(is.na(cresc))+1] <- NA
             cresc_abs[raised-1] <- NA # cresc_abs[which(is.na(cresc_abs))+1] <- NA
+            DBHCor[raised] <- NA
 
             # Put NA if other abnormal incrementation
             AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
             cresc[AbnormalCrescs]  <- NA
             cresc_abs[AbnormalCrescs]  <- NA
+            DBHCor[AbnormalCrescs+1] <- NA
 
             if("individual" %in% CorrectionType) {
 
@@ -548,7 +550,7 @@ DiameterCorrectionByTree <- function(
                               cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold)) == 0){
 
                 # Replace NA by the correction --------------------------------------------------------------------------------
-                cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+                DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType) # Compute the corrected cresc
 
                 for(rs in 1:length(raised)){  # as many rs as POM changes
                   # DBH[init shift] = previous value + Estimated cresc
@@ -755,33 +757,29 @@ DiameterCorrectionByTree <- function(
 
       # Put NA if other abnormal incrementation
       AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
-      AbnormalCrescs <- which(AbnormalCrescs)
       cresc[AbnormalCrescs]  <- NA
       cresc_abs[AbnormalCrescs]  <- NA
-      DBHCor[AbnormalCrescs +1] <- NA
+      DBHCor[AbnormalCrescs+1] <- NA
 
       i <- which(is.na(DBHCor)) # id of all the NA to interpolate
-      print(i)
 
       # Check that only non-abnormal growths are kept
       if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
 
         # Replace NA by the correction ------------------------------------------------------------------------------------------
-        # Regression only with 2 values around the NA (local)
-        DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType, Local = TRUE) # Compute the corrected cresc
+        DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType) # Compute the corrected cresc
 
-        # Add the column with the correction method  ------------------------------------------------------------------------
-        if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
-          Meth <- "quadratic"
-        }else{
-          Meth <- "linear"
-        }
+          # Add the column with the correction method  ------------------------------------------------------------------------
+          if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
+            Meth <- "quadratic"
+          }else{
+            Meth <- "linear"
+          }
 
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (i),
-                                    comment = Meth,
-                                    column = "DiameterCorrectionMeth")
-
+          DataTree <- GenerateComment(DataTree,
+                                      condition = as.numeric(rownames(DataTree)) %in% (i),
+                                      comment = Meth,
+                                      column = "DiameterCorrectionMeth")
 
       }else{warning("There are still abnormal growths. Either the selected methods are insufficient
                     or the method needs to be improved")}

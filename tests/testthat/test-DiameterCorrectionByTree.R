@@ -111,7 +111,7 @@ test_that("DiameterCorrectionByTree", {
                                    DataTree,
                                    WhatToCorrect = "punctual",
                                    CorrectionType = "linear")
-  expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
+  expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
   expect_true(Rslt[4, DiameterCorrectionMeth] == "linear") # and "linear" in 'DiameterCorrectionMeth'
   expect_true(Rslt[4, Comment] == "Abnormal diameter value (punctual error)") # info in 'Comment'
