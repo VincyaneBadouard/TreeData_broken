@@ -128,12 +128,12 @@ test_that("DiameterCorrectionByTree", {
 
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
-                                   WhatToCorrect = "punctual",
-                                   CorrectionType = "quadratic")
+                                   WhatToCorrect = "punctual", # (local: 2 pts around the missing value)
+                                   CorrectionType = "linear") # we can do only linear regression and not quadratic with 2 points (local)
 
   expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
-  expect_true(Rslt[4, DiameterCorrectionMeth] == "quadratic") # and "linear" in 'DiameterCorrectionMeth'
+  expect_true(Rslt[4, DiameterCorrectionMeth] == "linear") # and "linear" in 'DiameterCorrectionMeth'
   expect_true(all(Rslt[-4, DiameterCorrectionMeth] == "")) # no correction meth for the other values
   expect_true(all(Rslt[, Comment] == "")) # no comment because no error
 

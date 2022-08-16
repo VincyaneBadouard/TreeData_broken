@@ -460,7 +460,7 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
+  # if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
 
   # If not enough Diameter values
   if(sum(!is.na(DataTree$Diameter)) > 1){
@@ -761,7 +761,6 @@ DiameterCorrectionByTree <- function(
       DBHCor[AbnormalCrescs +1] <- NA
 
       i <- which(is.na(DBHCor)) # id of all the NA to interpolate
-      print(i)
 
       # Check that only non-abnormal growths are kept
       if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
