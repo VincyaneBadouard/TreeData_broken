@@ -1055,6 +1055,23 @@ server <- function(input, output, session) { # server ####
                                 showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
                               }))
 
+ if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
+   expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
+
+   expand.grid(i = c("Species", "Plot"), o = c("Stem", "Tree"))), 1, paste, collapse = " ")) {
+
+
+
+   sendSweetAlert(
+     session = session,
+     title = "Sorry !",
+     text =  paste("The profile you selected is at the",  profileOutput()$MeasLevel, "level while yours is at the", input$MeasLevel, "level. We are not able to handle this yet."
+     ),
+     type = "error")
+
+   DataOutput(NULL)
+
+ } else {
 
 
     DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
@@ -1144,7 +1161,7 @@ server <- function(input, output, session) { # server ####
     }
 
 
-
+ }
   }, priority = 2)
 
   observeEvent(input$SeeCodeDefs, {
