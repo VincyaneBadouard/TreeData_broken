@@ -2,7 +2,7 @@ test_that("DiameterCorrection", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
   library(data.table)
-  data("TestData")
+  data(TestData)
 
   # Remove other errors types (non-unique idTree, missing Year)
   TestData <- TestData[!IdTree %in% c("100898", "101686")]

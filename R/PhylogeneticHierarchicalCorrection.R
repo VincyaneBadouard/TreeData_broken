@@ -241,7 +241,7 @@ PhylogeneticHierarchicalCorrection <- function(
 
     }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
 
-  }else{stop("ah indeed the case no cresc exists, code the method in this case")}
+  }else{stop("No cresc, code the method in this case")}
 
 
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------

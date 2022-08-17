@@ -10,6 +10,7 @@ output: html_document
 library(readr)
 library(TreeData)
 library(data.table)
+library(ggplot2)
 ```
 # Data
 ```{r}
@@ -27,13 +28,11 @@ PanamaFormated[, ScientificName := paste(Genus, Species)]
 WhatToCorrect = c("POM change", "punctual", "shift"),
 CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
 
-# Machine à debug
+## Machine à debug
 ```{r}
-# "443136", "443175" still abnormal growth
-# "443233" pas de colleagues
 
 PanamaFormated <- UniqueMeasurement(PanamaFormated, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
-DataTree <- PanamaFormated[IdStem %in% "1078509"]
+DataTree <- PanamaFormated[IdStem %in% "443106"]
 Data <- PanamaFormated
 DefaultHOM = 1.3
 MaxDBH = 500
@@ -45,7 +44,7 @@ PioneersGrowthThreshold = 7.5
 
 TrustMeasSet = "first"
 WhatToCorrect = c("POM change", "punctual", "shift")
-CorrectionType = c("quadratic", "phylogenetic hierarchical")
+CorrectionType = c("linear", "phylogenetic hierarchical")
 
 DBHRange = 10
 MinIndividualNbr = 5
@@ -55,7 +54,7 @@ DetectOnly = FALSE
 
 ```
 
-# Problèmes non résolus
+## Problèmes non résolus
 ```{r}
 # IdStem = "1078509"
 DBHCor = c(3.7, 2.8, 2.8, 2.8, NA)
@@ -113,11 +112,110 @@ DBHCor = c(92.9, 77.1, 78.0, 78.7, 78.8, 78.2, 79.2) # ... c'est la 1ere valeur 
 
 ## All
 ```{r}
-Rslt <- DiameterCorrection(
-  PanamaFormated[!IdStem %in% c("443233", "443243")],
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("quadratic", "phylogenetic hierarchical"),
-  MinIndividualNbr = 1)
+# Rslt <- DiameterCorrection(
+#   PanamaFormated[!IdStem %in% c("443233", "443243")],
+#   WhatToCorrect = c("POM change", "punctual", "shift"),
+#   CorrectionType = c("linear", "phylogenetic hierarchical"),
+#   MinIndividualNbr = 1)
+# 
+# save(Rslt, file = "PanamaDBHCor.rda")
+load("D:/VSC TmFO/Data/StandardisedData/PanamaDBHCor.rda")
+```
+
+```{r}
+IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
+RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
+
+pl <- lapply(IdStemCor, function(x)
+  ggplot(Rslt[IdStem == x]) +
+    aes(x = Year) +
+    # Duplicated measurement
+    geom_point(aes(y = Diameter,
+                   color = if(is.na(DBHCor)) 'Duplicated measurement'),
+               shape = "circle", size = 3.9) +
+    # Initial
+    geom_point(aes(y = Diameter,
+                   color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved')),
+               shape = "circle", size = 3.9) +
+    geom_text(aes(y = Diameter, label = HOM, colour = "HOM"), position = position_nudge(y = -0.3)) +
+    geom_line(aes(y = Diameter, color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved'))) +
+    
+    # Corrected
+    geom_point(aes(y = DBHCor,
+                   color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved')),
+               shape = "circle", size = 3.9) +
+    geom_text(aes(y = DBHCor, label = HOMCor, colour = "HOM"), position = position_nudge(y = -0.3)) +
+    geom_line(aes(y = DBHCor, color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved'))) +
+    
+    theme_minimal() +
+    scale_colour_manual(name = "Status", values = c("HOM" = "blue",
+                                                    "Conserved" = "black",
+                                                    "Initial" = "red",
+                                                    "Corrected" = "forestgreen",
+                                                    "Duplicated measurement" = "grey")) +
+    labs(title =  paste("IdStem: ",unique(RsltCor$IdStem),""),
+         x ="Year", y = "Diameter (cm)") #+
+)
+
+# ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = 1) # 8 pages
+
+ml <- gridExtra::marrangeGrob(pl, nrow=3, ncol=3)
+
+pdf("DiameterCorrectionPlots.pdf", width = 25, height = 10)
+print(ml)
+dev.off()
+```
+```{r}
+IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
+
+RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
+
+pdf("DiameterCorrectionPlots2.pdf", width = 25, height = 10)
+for(p in 1:(ceiling(length(unique(IdStemCor))/9))){ 
+  print(ggplot(RsltCor) +
+          aes(x = Year) +
+          # Duplicated measurement
+          geom_point(data = subset(RsltCor, !is.na(Diameter)),
+                     aes(y = Diameter,
+                         color = if(is.na(DBHCor)) 'Duplicated measurement'),
+                     shape = "circle", size = 3.9) +
+          # Initial
+          geom_point(data = subset(RsltCor, !is.na(Diameter)),
+                     aes(y = Diameter,
+                         color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved')),
+                     shape = "circle", size = 3.9) +
+          geom_text(data = subset(RsltCor, (!is.na(Diameter) & !is.na(HOM))),
+                    aes(y = Diameter, label = HOM, colour = "HOM"), position = position_nudge(y = -0.3)) +
+          geom_line(data = subset(RsltCor, !is.na(Diameter)),
+                    aes(y = Diameter, color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved'))) +
+          
+          # Corrected
+          geom_point(data = subset(RsltCor, !is.na(DBHCor)),
+                     aes(y = DBHCor,
+                         color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved')),
+                     shape = "circle", size = 3.9) +
+          geom_text(data = subset(RsltCor, (!is.na(DBHCor) & !is.na(HOMCor))),
+                    aes(y = DBHCor, label = HOMCor, colour = "HOM"), position = position_nudge(y = -0.3)) +
+          geom_line(data = subset(RsltCor, !is.na(DBHCor)),
+                    aes(y = DBHCor, color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved'))) +
+          
+          theme_minimal() +
+          scale_colour_manual(name = "Status", values = c("HOM" = "blue",
+                                                          "Conserved" = "black",
+                                                          "Initial" = "red",
+                                                          "Corrected" = "forestgreen",
+                                                          "Duplicated measurement" = "grey")) +
+          labs(
+            # title =  paste("IdStem: ",unique(RsltCor$IdStem),""),
+            x ="Year", y = "Diameter (cm)") +
+          
+          
+          ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = p) # why only 8?
+        
+  )
+  
+}
+dev.off()
 ```
 
 ## POM change ------------------------------------------------------------------------------------------------------------

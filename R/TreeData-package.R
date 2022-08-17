@@ -41,7 +41,7 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
                          "LifeStatusCor", "Comment",
                          "TaperCorDBH",
                          "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth", "Cresc",
-                         "HOMCor",
+                         "HOMCor", "POMcor",
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",
                          "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
                          "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",
