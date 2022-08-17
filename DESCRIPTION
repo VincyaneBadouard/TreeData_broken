@@ -33,7 +33,8 @@ Suggests:
     testthat (>= 3.0.4), 
     bslib, 
     shinytest,
-    lubridate
+    lubridate,
+    markdown
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.6)

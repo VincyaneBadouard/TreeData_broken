@@ -37,7 +37,7 @@ Species information,pickerInput,choices,none,ScientificName,ScientificName,Scien
 Species information,pickerInput,choices,none,VernName,VernName,Vernacular name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Vernacular name
 Species information,pickerInput,choices,none,Family,Family,Family name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Family name
 Species information,pickerInput,choices,none,Genus,Genus,Genus name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Genus name
-Species information,pickerInput,choices,none,Species,Species,Species name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Species name
+Species information,pickerInput,choices,none,Species,Species,Species name,one word,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Species name
 Species information,pickerInput,choices,none,Subspecies,Subspecies,Subspecies name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Subspecies name
 Species information,pickerInput,choices,none,Variety,Variety,Variety name,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Variety name
 Species information,pickerInput,choices,none,Voucher,Voucher,Voucher code,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,Voucher code for the species

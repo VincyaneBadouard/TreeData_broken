@@ -82,7 +82,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    browser()
+    # browser()
   })
 
   # upload tab ####
