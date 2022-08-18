@@ -47,6 +47,7 @@ Imports:
     shiny (>= 1.6.0),
     ggplot2 (>= 3.3.5),
     ggforce (>= 0.3.3),
+    ggrepel (>= 0.9.1),
     grDevices (>= 3.6),
     data.tree (>= 1.0.0),
     stringdist (>= 0.9.8),
