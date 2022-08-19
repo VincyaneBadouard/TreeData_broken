@@ -20,6 +20,7 @@ DiameterCorrection(
   DBHRange = 10,
   MinIndividualNbr = 5,
   Digits = 1L,
+  DBHCorForDeadTrees = TRUE,
   DetectOnly = FALSE
 )
 }
@@ -116,6 +117,10 @@ cm) (numeric, 1 value)}
 
 \item{Digits}{Number of decimal places to be used in the \code{DBHCor} column
 (Default: 1L) (integer)}
+
+\item{DBHCorForDeadTrees}{(logical) TRUE: return DBHCor also for dead trees.
+FALSE: do not return DBHCor for dead trees. In this case it is advisable to
+have corrected the tree life status with the \emph{StatusCorrection()} function.}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}

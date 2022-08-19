@@ -84,6 +84,10 @@
 #' @param Digits Number of decimal places to be used in the `DBHCor` column
 #'   (Default: 1L) (integer)
 #'
+#' @param DBHCorForDeadTrees (logical) TRUE: return DBHCor also for dead trees.
+#'   FALSE: do not return DBHCor for dead trees. In this case it is advisable to
+#'   have corrected the tree life status with the *StatusCorrection()* function.
+#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
@@ -140,6 +144,8 @@ DiameterCorrection <- function(
   MinIndividualNbr = 5,
   Digits = 1L,
 
+  DBHCorForDeadTrees = TRUE,
+
   DetectOnly = FALSE
 ){
 
@@ -189,19 +195,33 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
+  # Taper before if 'HOM' in the dataset and not 'TaperCorDBH'
   if(any(!is.na(Data$HOM)) & !"TaperCorDBH" %in% names(Data)) # HOM exists?
     message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)")
 
+  # If 'POM' 'POM change' correction is advised
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
      any(!is.na(Data$POM)) & !any(WhatToCorrect %in% "POM change")) # POM exists?
     message("You have the 'POM' information in your dataset.
             We advise you to correct your diameters also from the 'POM change' ('WhatToCorrect' argument)")
 
+  # 'POM change' correction needs 'POM' or 'HOM' values
+  if(!any(c("POM", "HOM") %in% names(Data)) | (all(is.na(Data$POM)) &  all(is.na(Data$HOM))) )
+    stop("You have chosen to make a 'POM change' correction,
+       but you do not have the necessary 'POM' or HOM' column in your dataset or they are empty")
+
   # In data.table
   setDT(Data)
 
   Data <- unique(Data)   # if there are duplicate rows, delete them
+
+  # Dataset with the dead trees if no correction wanted for them --------------------------------------------
+  if(DBHCorForDeadTrees == FALSE){
+    DeadTrees <- Data[LifeStatus == FALSE]
+    Data <- Data[LifeStatus == TRUE | is.na(LifeStatus)] # AliveTrees
+    # nrow(Data) == nrow(AliveTrees) + nrow(DeadTrees) # to check
+  }
 
 
   if(ByStem == TRUE){
@@ -226,7 +246,8 @@ DiameterCorrection <- function(
   #
   # }
 
-  # Remove duplicated measurements per Year because different POM or Date
+
+  # Remove duplicated measurements per Year because different POM or Date -----------------------------------
   CompleteData <- copy(Data)
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
 
@@ -260,10 +281,10 @@ DiameterCorrection <- function(
   Ids <- as.vector(na.omit(unique(Data[, get(ID)]))) # Tree Ids
 
   # Dataset with the rows without IDS ----------------------------------------------------------------------------------
-  DataIDNa <-  Data[is.na(get(ID))]
+  DataIDNa <- Data[is.na(get(ID))]
 
   # Dataset with the rows without Year ----------------------------------------------------------------------------------
-  DataYearNa <-  Data[is.na(Year)]
+  DataYearNa <- Data[is.na(Year)]
 
   # Taper correction ------------------------------------------------------------------------------------------------------
   # if("taper" %in% CorrectionType) {
@@ -301,9 +322,16 @@ DiameterCorrection <- function(
   )
   )) # do.call apply the 'rbind' to the lapply result
 
-  # Re-put the the rows duplicated, or without ID or Year -----------------------------------------------------------------
+  # Re-put the rows duplicated, or without ID or Year -----------------------------------------------------------------
   Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
 
+  # Re-put the dead trees in the dataset (if there are not corrected by choice)
+  if(DBHCorForDeadTrees == FALSE){
+    Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
+  }
+
+  # Order IDs and times in ascending order ----------------------------------------------------------------------------
+  Data <- Data[order(get(ID), Year)]
 
   return(Data)
 
@@ -451,7 +479,7 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
+  # if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
 
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # data.table::order
@@ -498,6 +526,11 @@ DiameterCorrectionByTree <- function(
          ("HOM" %in% names(DataTree) & any(!is.na(DataTree$HOM))) ){ POMv <- "HOM"
 
       }else{ POMv <- "POM"}
+
+      if(!any(c("POM", "HOM") %in% names(DataTree)) | (all(is.na(DataTree$POM)) &  all(is.na(DataTree$HOM))) )
+        message("You have chosen to make a 'POM change' correction,
+        but 'POM' and HOM' columns are empty for ", IdStem,".
+             This correction will therefore not be applied to this stem.")
 
 
       ## POM change detection -----------------------------------------------------------------------------------------------

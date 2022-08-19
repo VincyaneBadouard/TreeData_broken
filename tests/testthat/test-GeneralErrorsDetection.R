@@ -1,4 +1,4 @@
-test_that("ErrorsDetection", {
+test_that("GeneralErrorsDetection", {
 
   # Import data
   library(data.table)
@@ -11,27 +11,18 @@ test_that("ErrorsDetection", {
   NoPlotData <- TestData[, !c("Plot")]
 
   # Check the function argument
-  expect_error(ErrorsDetection(MatrixData),
+  expect_error(GeneralErrorsDetection(MatrixData),
                regexp = "Data must be a data.frame or data.table")
-
-  expect_error(ErrorsDetection(TestData, DeathConfirmation = TRUE),
-               regexp = "'DeathConfirmation' argument must be numeric")
-
-  expect_error(ErrorsDetection(TestData, DeathConfirmation = 2, UseSize = 10),
-               regexp = "The 'UseSize' argument of the 'ErrorsDetection' function must be logicals")
-
-
-  expect_error(ErrorsDetection(NoDBHData, DeathConfirmation = 2, UseSize = TRUE),
-               regexp = "the 'Diameter' column must be present in the dataset")
 
 
   # Check the function work
-  Rslt <- ErrorsDetection(TestData)
+  Rslt <- GeneralErrorsDetection(TestData)
 
   ## Remove *duplicated rows*
   expect_true(anyDuplicated(TestData)!= 0 & anyDuplicated(Rslt) == 0)
 
-  ## Check *missing value* in (X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
+  ## Check *missing value* in
+  # (X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
   Vars <- c("Plot", "Subplot", "Year", "TreeFieldNum", "IdTree",
             "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
             "XTreeUTM", "YTreeUTM", "Family", "Genus", "Species", "VernName")
@@ -146,15 +137,6 @@ test_that("ErrorsDetection", {
 
   ## Check *fix Plot and Subplot number* A FAIRE
 
-  # Internals
-  ## Check botanical identification (BotanicalCorrection)
-
-  ## Check the life status evolution of the trees (StatusCorrection)
-
-  ## Check diameter evolution of the trees (DiameterCorrection)
-
-  ## Check recruitment (RecruitmentCorrection)
-
 })
 
 # Remove *duplicated rows*
@@ -166,8 +148,3 @@ test_that("ErrorsDetection", {
 # Check for trees *outside the subplot*
 # Check *invariant coordinates per IdTree*
 # Check *fix Plot and Subplot number*
-
-# Check botanical identification (BotanicalCorrection)
-# Check the life status evolution of the trees (StatusCorrection)
-# Check diameter evolution of the trees (DiameterCorrection)
-# Check recruitment (RecruitmentCorrection)

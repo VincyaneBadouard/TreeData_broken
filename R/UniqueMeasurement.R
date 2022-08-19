@@ -1,18 +1,22 @@
 #' UniqueMeasurement
 #'
+#' @description Of the repeated measurements of an individual in the same census
+#'   year, keep only the measurements (rows)
+#'   taken at the **highest POM** (*KeepMeas = "MaxHOM"*),
+#'   and/or the **most recent measurement** (same year but more recent date)
+#'   (*KeepMeas = "MaxDate"*)
+#'
 #' @param Data Dataset (data.table)
 #'
-#' @param KeepMeas In case of **multiple diameter measurements** in the same
-#'   census year, on which to apply the correction:
+#' @param KeepMeas In case of **multiple measurements** in the same census year:
 #' Possible values: "MaxHOM", "MaxDate" (character).
-#'   - "MaxHOM": apply the correction to the measurement taken at the
-#'               **highest POM**
-#'   - "MaxDate": apply the correction to the **most recent measurement** (same
+#'   - "MaxHOM": keep the measurement taken at the **highest POM**
+#'   - "MaxDate": keep the **most recent measurement** (same
 #'                year but more recent date)
 #'
 #' @param ID Column name indicating the identifier of the individual (character)
 #'
-#' @return Dataset (data.table) with 1 measurement (1 row) per Year
+#' @return Dataset (data.table) with 1 measurement (1 row) per Year.
 #'
 #' @export
 #'
@@ -55,6 +59,7 @@ UniqueMeasurement <- function(
 
     # nrow(Data) == nrow(DuplicatedRows) + nrow(UniqueData) # to check
 
+
     # Keep the row with the upper POM -------------------------------------------------------------------------------------
 
     if("MaxHOM" %in% KeepMeas){
@@ -74,6 +79,7 @@ UniqueMeasurement <- function(
       }else{ Rslt <- rbind(UniqueData, NowUniqueData) }
 
     } # end "MaxHOM"
+
 
     # Keep the row with the upper date ------------------------------------------------------------------------------------
 

@@ -9,23 +9,25 @@ UniqueMeasurement(Data, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
 \arguments{
 \item{Data}{Dataset (data.table)}
 
-\item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
-census year, on which to apply the correction:
+\item{KeepMeas}{In case of \strong{multiple measurements} in the same census year:
 Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
-\item "MaxHOM": apply the correction to the measurement taken at the
-\strong{highest POM}
-\item "MaxDate": apply the correction to the \strong{most recent measurement} (same
+\item "MaxHOM": keep the measurement taken at the \strong{highest POM}
+\item "MaxDate": keep the \strong{most recent measurement} (same
 year but more recent date)
 }}
 
 \item{ID}{Column name indicating the identifier of the individual (character)}
 }
 \value{
-Dataset (data.table) with 1 measurement (1 row) per Year
+Dataset (data.table) with 1 measurement (1 row) per Year.
 }
 \description{
-UniqueMeasurement
+Of the repeated measurements of an individual in the same census
+year, keep only the measurements (rows)
+taken at the \strong{highest POM} (\emph{KeepMeas = "MaxHOM"}),
+and/or the \strong{most recent measurement} (same year but more recent date)
+(\emph{KeepMeas = "MaxDate"})
 }
 \examples{
 

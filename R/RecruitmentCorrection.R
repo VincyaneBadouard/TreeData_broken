@@ -107,6 +107,14 @@ RecruitmentCorrection <- function(
   # data.frame to data.table
   setDT(Data)
 
+  # Remove duplicated measurements per Year because different POM or Date -----------------------------------
+  CompleteData <- copy(Data)
+  Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
+
+  DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
+
+
+
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
 
   if(DetectOnly %in% FALSE){
@@ -119,13 +127,17 @@ RecruitmentCorrection <- function(
   # IdTrees vector
   Ids <- as.vector(na.omit(unique(Data$IdTree))) # Tree Ids
 
-  # Dataset with the rows without IdTree
+  # Dataset with the rows without IdTree ------------------------------------------------------------------------------
   DataIDNa <- Data[is.na(IdTree)]
+
+  # Dataset with the rows without Year --------------------------------------------------------------------------------
+  DataYearNa <- Data[is.na(Year)]
+
 
   # Apply for all the trees
   # i = "100635"
   Data <- do.call(rbind, lapply(Ids, function(i) RecruitmentCorrectionByTree(
-    Data[IdTree %in% i], # per IdTree, all censuses
+    Data[IdTree %in% i & !is.na(Year)], # per IdTree, all censuses
     MinDBH = MinDBH,
     PositiveGrowthThreshold = PositiveGrowthThreshold,
     InvariantColumns = InvariantColumns,
@@ -136,8 +148,13 @@ RecruitmentCorrection <- function(
   )
   )) # do.call apply the 'rbind' to the lapply result
 
-  # Re-put the rows without IdTree
-  Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
+  # Re-put the rows duplicated, or without ID or Year -----------------------------------------------------------------
+  Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
+
+
+  # Order IDs and times in ascending order ----------------------------------------------------------------------------
+  Data <- Data[order(get(ID), Year)]
+
 
   return(Data)
 
@@ -272,8 +289,8 @@ RecruitmentCorrectionByTree <- function(
   # data.frame to data.table
   setDT(DataTree)
 
-
-  # if there are no 'DBHCor' col, create it from the DBH col
+  # if there are no 'DBHCor' col, create it from the Diameter col
+  # (removes DBHCor values that are not of order RecruitmentCorrection at the end)
   InitialDT <- copy(DataTree)
   if(!"DBHCor" %in% names(DataTree))
     DataTree[, DBHCor := Diameter]
@@ -285,6 +302,7 @@ RecruitmentCorrectionByTree <- function(
   #### Compute annual diameter incrementation ####
   DBHCor <- DataTree[,DBHCor]
   Year <- DataTree[,Year]
+
   # Initialisation
   cresc <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
 
@@ -397,7 +415,9 @@ RecruitmentCorrectionByTree <- function(
     } # end: overgrown recruit
   } # end: if the plot have previous censuses
 
+  # If no 'DBHCor' initially in the dataset
   if(!"DBHCor" %in% names(InitialDT)){
+
     if(DetectOnly %in% TRUE) DataTree[, DBHCor := NULL] # if detect only, remove DBHCor if it didn't exist before
 
     if(DetectOnly %in% FALSE)

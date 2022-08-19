@@ -61,30 +61,30 @@ DiameterCorrectionPlot <- function(
                            color = if(is.na(DBHCor)) 'Duplicated measurement'),
                        shape = "circle", size = 3.9) +
             # Initial
-            geom_point(data = subset(RsltCor, !is.na(Diameter)),
+            geom_point(data = subset(DataCor, !is.na(Diameter)),
                        aes(y = Diameter,
                            color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved')),
                        shape = "circle", size = 3.9) +
-            geom_line(data = subset(RsltCor, !is.na(Diameter)),
+            geom_line(data = subset(DataCor, !is.na(Diameter)),
                       aes(y = Diameter, color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved'))) +
 
-            geom_text_repel(data = subset(RsltCor, (!is.na(Diameter) & !is.na(HOM))),
+            geom_text_repel(data = subset(DataCor, (!is.na(Diameter) & !is.na(HOM))),
                             aes(y = Diameter, label = HOM, colour = "HOM"),
                             point.size = 3.9, size = 3, direction = "y") +
 
             # Corrected
-            geom_line(data = subset(RsltCor, !is.na(DBHCor)),
+            geom_line(data = subset(DataCor, !is.na(DBHCor)),
                       aes(y = DBHCor, color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved'))) +
-            geom_point(data = subset(RsltCor, !is.na(DBHCor)),
+            geom_point(data = subset(DataCor, !is.na(DBHCor)),
                        aes(y = DBHCor,
                            color = ifelse(Diameter != DBHCor | is.na(Diameter), 'Corrected', 'Conserved')),
                        shape = "circle", size = 3.9) +
 
-            geom_text_repel(data = subset(RsltCor,
+            geom_text_repel(data = subset(DataCor,
                                           (!is.na(DBHCor) & !is.na(HOMCor) & (Diameter != DBHCor) | is.na(Diameter))),
                             aes(y = DBHCor, label = HOMCor, colour = "HOM"),
                             point.size = 3.9, size = 3, direction = "y") +
-            geom_text_repel(data = subset(RsltCor, (!is.na(DBHCor) & DiameterCorrectionMeth != "")),
+            geom_text_repel(data = subset(DataCor, (!is.na(DBHCor) & DiameterCorrectionMeth != "")),
                             aes(y = DBHCor, label = DiameterCorrectionMeth, colour = "Methode"),
                             point.size = 10, size = 3) +
 
@@ -103,7 +103,7 @@ DiameterCorrectionPlot <- function(
               x = "Year", y = "Diameter (cm)") +
 
 
-            ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = p) # why only 8?
+            ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = p)
 
     )
 
