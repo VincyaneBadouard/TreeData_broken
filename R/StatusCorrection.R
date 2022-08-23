@@ -15,7 +15,9 @@
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same
-#'   tree (character)
+#'   tree (character). It is recommended to use the columns that have already
+#'   been **corrected**, such as the columns containing the corrected botanical
+#'   information.
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric)  (Default = 2 censuses)
@@ -80,10 +82,10 @@
 StatusCorrection <- function(
   Data,
   InvariantColumns = c("Site",
-                       "Genus",
-                       "Species",
-                       "Family",
-                       "ScientificName"),
+                       "GenusCor",
+                       "SpeciesCor",
+                       "FamilyCor",
+                       "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   DetectOnly = FALSE,
@@ -119,11 +121,18 @@ StatusCorrection <- function(
 
   # Check if the InvariantColumns name exists in Data
   for(c in InvariantColumns){
-    if (!c %in% names(Data)){
+    if (!c %in% names(Data)){ cc <- gsub("Cor", "", c) # remove - Cor
+
+    if (!cc %in% names(Data)){ # Col without - Cor exists?
       stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,c,"is apparently not a dataset's column"))
+                 ,cc,"is apparently not a dataset's column"))
+
+    }else{ InvariantColumns[InvariantColumns == c] <- cc # If yes replace by the col name without cor
+    warning("",c," column does't exist. ",cc," column is therefore considered as InvariantColumns instead of ",c,"")
+
     }
-  }
+    } # if c doest exist
+  } # end c loop
 
   # UseSize-Diameter
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
@@ -137,6 +146,8 @@ StatusCorrection <- function(
 
   # data.frame to data.table
   setDT(Data)
+
+  Data[, IdTree := as.character(IdTree)]
 
 
   # Order IdTrees and times in ascending order
@@ -193,7 +204,9 @@ StatusCorrection <- function(
 #'
 #' @param InvariantColumns Vector with the names of the columns that are
 #'   supposed to have always the same value for each measurement of the same
-#'   tree (character)
+#'   tree (character). It is recommended to use the columns that have already
+#'   been **corrected**, such as the columns containing the corrected botanical
+#'   information.
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric)
@@ -267,10 +280,10 @@ StatusCorrectionByTree <- function(
   DataTree,
   PlotCensuses,
   InvariantColumns = c("Site",
-                       "Genus",
-                       "Species",
-                       "Family",
-                       "ScientificName"),
+                       "GenusCor",
+                       "SpeciesCor",
+                       "FamilyCor",
+                       "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   DetectOnly = FALSE,
@@ -475,66 +488,67 @@ StatusCorrectionByTree <- function(
   #### Enough/not enough occurrences of death to validate it ####
   # If there are things after the last occurrence of life
   # if(any(DataTree$LifeStatusCor %in% NA)){
-    if(any(DataTree$LifeStatusCor %in% TRUE)){
+  if(any(DataTree$LifeStatusCor %in% TRUE)){
 
 
-      # If there are things after the last occurrence of life
-      if(LastAlive != nrow(DataTree)){ # if the last seen alive is not the last row of the database
+    # If there are things after the last occurrence of life
+    if(LastAlive != nrow(DataTree)){ # if the last seen alive is not the last row of the database
 
-        #### if the one after the last one seen alive is Dead and it's not the last row ####
-        if((DataTree[LastAlive +1, LifeStatusCor] %in% FALSE) & (LastAlive +1 != nrow(DataTree))){
+      #### if the one after the last one seen alive is Dead and it's not the last row ####
+      if((DataTree[LastAlive +1, LifeStatusCor] %in% FALSE) & (LastAlive +1 != nrow(DataTree))){
+        if(DetectOnly %in% FALSE){
+
+          # Remove rows after the death (after correction) (User choice)
+          if(RemoveRAfterDeath %in% TRUE)
+            DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
+
+        }
+      }
+      #### if the one after the last one seen alive is Unseen ####
+      else if(DataTree[LastAlive +1, LifeStatusCor] %in% NA){
+
+        ##### If there is still a "death" occurrence #####
+        if(any(DataTree$LifeStatusCor %in% FALSE)){
+
+          LastDeath <- max(which(DataTree$LifeStatusCor %in% FALSE))
+
+          ###### If the death is not the last record ######
+          if(LastDeath < nrow(DataTree)){
+            unseen <- sum(DataTree[(LastAlive +1):(LastDeath-1), LifeStatusCor] %in% NA) # NA until the death (logicals vector)
+
+          }else{
+            unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
+          }
+          ##### No death record #####
+        }else{
+          unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
+        }
+
+        if(DeathConfirmation <= unseen){
+
+          # The comment
+          DataTree <- GenerateComment(
+            DataTree,
+            condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
+              DataTree[, LifeStatusCor] %in% NA,
+            comment = "When the tree is unseen a number of times >= DeathConfirmation, it is considered dead")
+
           if(DetectOnly %in% FALSE){
+
+            # The correction
+            DataTree[(LastAlive +1):(LastAlive +unseen), LifeStatusCor := FALSE] # Death validated
 
             # Remove rows after the death (after correction) (User choice)
             if(RemoveRAfterDeath %in% TRUE)
               DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
 
-          }
-        }
-        #### if the one after the last one seen alive is Unseen ####
-        else if(DataTree[LastAlive +1, LifeStatusCor] %in% NA){
+          } # correction end
 
-          ##### If there is still a "death" occurrence #####
-          if(any(DataTree$LifeStatusCor %in% FALSE)){
+        } # else if(DeathConfirmation > unseen) NAs remain NAs
 
-            LastDeath <- max(which(DataTree$LifeStatusCor %in% FALSE))
-
-            ###### If the death is not the last record ######
-            if(LastDeath < nrow(DataTree)){
-              unseen <- sum(DataTree[(LastAlive +1):(LastDeath-1), LifeStatusCor] %in% NA) # NA until the death (logicals vector)
-
-            }else{
-              unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
-            }
-            ##### No death record #####
-          }else{
-            unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
-          }
-
-          if(DeathConfirmation <= unseen){
-
-            # The comment
-            DataTree <- GenerateComment(DataTree,
-                                        condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
-                                          DataTree[, LifeStatusCor] %in% NA,
-                                        comment = "When the tree is unseen a number of times >= DeathConfirmation, it is considered dead")
-
-            if(DetectOnly %in% FALSE){
-
-              # The correction
-              DataTree[(LastAlive +1):(LastAlive +unseen), LifeStatusCor := FALSE] # Death validated
-
-              # Remove rows after the death (after correction) (User choice)
-              if(RemoveRAfterDeath %in% TRUE)
-                DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
-
-            } # correction end
-
-          } # else if(DeathConfirmation > unseen) NAs remain NAs
-
-        }
-      } # If there nothing after the last occurrence of life
-    } # if there is any alive
+      }
+    } # If there nothing after the last occurrence of life
+  } # if there is any alive
   # } # any NA ?
 
 
@@ -670,7 +684,7 @@ FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
 
   #### Function ####
 
-  # j = "ScientificName"
+  # j = "ScientificNameCor"
   for(j in InvariantColumns){
 
     if(any(is.na(NewRow[,get(j)]))){ # if the column is empty in the new rows (the "absent" trees)

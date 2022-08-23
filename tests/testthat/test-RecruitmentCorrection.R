@@ -37,7 +37,7 @@ test_that("RecruitmentCorrection", {
 
 
 
-  # Check the function work
+  # Check the function works
   Rslt <- RecruitmentCorrection(TestData)
 
 })

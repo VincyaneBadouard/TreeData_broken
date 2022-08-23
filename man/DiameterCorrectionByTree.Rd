@@ -32,9 +32,9 @@ The dataset must contain the columns:
 \itemize{
 \item \code{IdTree} (character)
 \item \code{IdStem} (character) if \emph{ByStem} argument = TRUE
-\item \code{ScientificName} (character)
-\item \code{Genus} (character)
-\item \code{Family} (character)
+\item \code{ScientificNameCor} (character)
+\item \code{GenusCor} (character)
+\item \code{FamilyCor} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
 }}
@@ -54,7 +54,7 @@ appears abnormal, but a negative measurement error can be allowed until -n
 "compensated". (numeric, 1 value)}
 
 \item{Pioneers}{Scientific names of the pioneer species of the site, as in
-the 'ScientificName' column (characters vector)}
+the 'ScientificNameCor' column (characters vector)}
 
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than x cm/year is considered abnormal (numeric, 1 value)}

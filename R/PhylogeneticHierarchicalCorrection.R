@@ -7,21 +7,21 @@
 #' @param DataTree A dataset corresponding to a single tree/stem's (1
 #'   IdTree/IdStem) measurements (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdStem' (character)
-#'   - 'ScientificName' (character)
-#'   - 'Genus' (character)
-#'   - 'Family' (character)
-#'   - 'Diameter' (numeric)
-#'   - 'Year' (numeric)
+#'   - `IdStem` (character)
+#'   - `ScientificNameCor` (character)
+#'   - `GenusCor` (character)
+#'   - `FamilyCor` (character)
+#'   - `Diameter` (numeric)
+#'   - `Year` (numeric)
 #'
 #' @param Data Complete dataset (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdStem' (character)
-#'   - 'ScientificName' (character)
-#'   - 'Genus' (character)
-#'   - 'Family' (character)
-#'   - 'Diameter' (numeric)
-#'   - 'Year' (numeric)
+#'   - `IdStem` (character)
+#'   - `ScientificNameCor` (character)
+#'   - `GenusCor` (character)
+#'   - `FamilyCor` (character)
+#'   - `Diameter` (numeric)
+#'   - `Year` (numeric)
 #'
 #' @param cresc Annual diameter increment (numeric)
 #' @param cresc_abs Absolute diameter increment (not divided by time between 2
@@ -58,13 +58,10 @@
 #'   originally measured growth.
 #'
 #' + Correct the 1st value in the series:
-#'   - Estimate the value that the 1st abnormal DBH should have: Estimated DBH =
-#'   previous DBH value + estimated growth by regression interpolation
-#'
-#'   - Find other individual of the the same diameter class (*DBHRange*) and of
-#'   the same species, genus, family or stand than the tree to correct, until
-#'   the minimum number of individuals required to consider the correction is
-#'   reached (*MinIndividualNbr*)
+#'   - Find other individual of the same diameter class (*DBHRange*) as the last
+#'   value before the one to correct, and of the same species, genus, family or
+#'   stand than the tree to correct, until the minimum number of individuals
+#'   required to consider the correction is reached (*MinIndividualNbr*)
 #'
 #'   - 1st abnormal DBH in the series = previous value + mean growth of the
 #'       other trees
@@ -110,139 +107,150 @@ PhylogeneticHierarchicalCorrection <- function(
   MinIndividualNbr = 5
 ){
 
+  # Secondary columns
+  BotaCol <- c("ScientificName", "Genus", "Family")
+
+  for(c in BotaCol){
+    cc <- paste0(c, "Cor")
+
+    ## Corrected col or not corrected?
+    if(cc %in% names(DataTree)){
+      if(c=="ScientificName") SfcName <- cc
+      if(c=="Genus") GenName <- cc
+      if(c=="Family") FamName <- cc
+
+
+    }else if(!cc %in% names(DataTree) & c %in% names(DataTree)){
+      if(c=="ScientificName") SfcName <- c
+      if(c=="Genus") GenName <- c
+      if(c=="Family") FamName <- c
+
+    }else if(!any(c(cc, c) %in% names(DataTree)))
+
+      stop("'DataTree' must contain the ",cc," or ",c," column to apply the phylogenetic hierarchical correction")
+  }
+
   #### Arguments check ####
 
-  # Check if the 'ScientificName' column exists
-  if(!"ScientificName" %in% names(DataTree)){
-    stop("'DataTree' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+  # Check if the bota columns exist in Data
+  BotaCol <- c(SfcName, GenName, FamName)
+  for(B in BotaCol){
+    if(!B %in% names(Data)){
+      stop("'Data' must contain the ",B," column to apply the phylogenetic hierarchical correction")
+    }
   }
-  if(!"ScientificName" %in% names(Data)){
-    stop("'Data' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
-  }
+
+  #### Function ####
+
+  # rs = 1
+  for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
+
+    for(p in cresc_abn[rs]:1){ # if previous value is NA, take the takes the one before etc
+
+      if(!is.na(DBHCor[p])){ # when previous value is not NA
+
+        # The previous value
+        PrevValue <- DBHCor[p]
+
+        break # stop the loop, and p stay in the environnement
+      }
+    }
 
 
-  # Estimate the shifted DBH ------------------------------------------------------------------------------------------------
-  if(length(cresc[!is.na(cresc)]) > 0){
-    # EstDBH <- previous value + estimated cresc by regression interpolation
+    # Find colleagues ---------------------------------------------------------------------------------------------------------
+    ## Species level
+    Colleagues <- Data[get(SfcName) == unique(DataTree[,get(SfcName)]) &
+                         (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
-    # Check that only non-abnormal growths are kept
-    if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
+    Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
 
-      # Estimate cresc by regression
-      cresc_Corr <- RegressionInterpolation(Y = cresc, X = Time[-1], CorrectionType = "linear")
 
-      # rs = 1
-      for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
-        # EstDBH = previous value + estimated cresc by regression interpolation
+    if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "species"
 
-        for(p in cresc_abn[rs]:1){ # if previous value is NA, take the takes the one before etc
+    }else{
+      ## Genus level
+      Colleagues <- Data[get(GenName) == unique(DataTree[, get(GenName)]) &
+                           (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
-          if(!is.na(DBHCor[p])){ # when previous value is not NA
-            EstDBH <- DBHCor[p] + cresc_Corr[p]*(Time[cresc_abn[rs]+1]-Time[p])
+      Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
 
-            break # stop the loop, and p stay in the environnement
-          }
-        }
+      if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "genus"
 
-        # Find colleagues ---------------------------------------------------------------------------------------------------------
-        ## Species level
-        Colleagues <- Data[ScientificName == unique(DataTree$ScientificName) &
-                             (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
+      }else{
+        ## Family level
+        Colleagues <- Data[get(FamName) == unique(DataTree[,get(FamName)]) &
+                             (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
         Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
 
-
-        if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "species"
+        if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "family"
 
         }else{
-          ## Genus level
-          Colleagues <- Data[Genus == unique(DataTree$Genus) &
-                               (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
+          ## Stand level
+          Colleagues <- Data[Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2)] # Diameter or DBHCor ?
 
           Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
 
-          if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "genus"
 
-          }else{
-            ## Family level
-            Colleagues <- Data[Family == unique(DataTree$Family) &
-                                 (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
+          if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "stand"
 
-            Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+          }else if(nrow(Colleagues) == 0){
+            stop("There are no individuals of the same species (",unique(DataTree[,get(SfcName)]),")
+                     and diameter category(",PrevValue - DBHRange/2,";",PrevValue + DBHRange/2,")
+                     as the estimated diameter(",PrevValue,") of the stem ",unique(DataTree$IdStem),"")
 
-            if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "family"
-
-            }else{
-              ## Stand level
-              Colleagues <- Data[Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
-
-              Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
-
-
-              if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "stand"
-
-              }else if(nrow(Colleagues) == 0){
-                stop("There are no individuals of the same species (",unique(DataTree$ScientificName),")
-                     and diameter category(",EstDBH - DBHRange/2,";",EstDBH + DBHRange/2,")
-                     as the estimated diameter(",EstDBH,") of the stem ",unique(DataTree$IdStem),"")
-
-              }else{stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
+          }else{stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
                        You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument)")}
 
-            } # end neither species nor genus or family level
-          } # end neither species nor genus level
-        } # end not species level
+        } # end neither species nor genus or family level
+      } # end neither species nor genus level
+    } # end not species level
 
-        # Compute mean diameter incrementation of the Colleagues (ColleaguesCrescMean) -----------------------------------------
-        ColleaguesCrescMean <- ComputeColleaguesGrowthMean(Colleagues = Colleagues, Data = Data,
-                                                           EstDBH = EstDBH,
-                                                           PositiveGrowthThreshold = PositiveGrowthThreshold,
-                                                           NegativeGrowthThreshold = NegativeGrowthThreshold,
-                                                           DBHRange = DBHRange)
+    # Compute mean diameter incrementation of the Colleagues (ColleaguesCrescMean) -----------------------------------------
+    ColleaguesCrescMean <- ComputeColleaguesGrowthMean(Colleagues = Colleagues, Data = Data,
+                                                       PrevValue = PrevValue,
+                                                       PositiveGrowthThreshold = PositiveGrowthThreshold,
+                                                       NegativeGrowthThreshold = NegativeGrowthThreshold,
+                                                       DBHRange = DBHRange)
 
-        # Correct init shift ------------------------------------------------------------------------------------------------------
-        # DBH[init shift] =  previous value + ColleaguesCrescMean
+    # Correct init shift ------------------------------------------------------------------------------------------------------
+    # DBH[init shift] =  previous value + ColleaguesCrescMean
 
-        # p the previous value non-NA
-        DBHCor[cresc_abn[rs]+1] <- DBHCor[p] + ColleaguesCrescMean*(Time[cresc_abn[rs]+1]-Time[p]) # Correct with the corrected cresc, the corrected DBH
+    # p the previous value non-NA
+    DBHCor[cresc_abn[rs]+1] <- DBHCor[p] + ColleaguesCrescMean*(Time[cresc_abn[rs]+1]-Time[p]) # Correct with the corrected cresc, the corrected DBH
+
+    # Add the column with the correction method  ------------------------------------------------------------------------
+
+    DataTree <- GenerateComment(DataTree,
+                                condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
+                                comment = Method,
+                                column = "DiameterCorrectionMeth")
+
+    if(length(DBHCor) > (cresc_abn[rs]+1)){ # if the init shift is not the last diameter value
+
+      # Correct the shift -------------------------------------------------------------------------------------------------------
+      for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
+        # DBH[shift] = previous value + their cresc_abs
+
+        # If NA in cresc_abs replace it by a interpolation value
+        cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "linear") # Compute the corrected cresc
+
+        DBHCor[i] <- # then correct the other shift values
+          DBHCor[i-1] + # New position of the previous value
+          cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
 
         # Add the column with the correction method  ------------------------------------------------------------------------
 
         DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
-                                    comment = Method,
+                                    condition = as.numeric(rownames(DataTree)) %in% (i),
+                                    comment = "shift realignment",
                                     column = "DiameterCorrectionMeth")
 
-        if(length(DBHCor) > (cresc_abn[rs]+1)){ # if the init shift is not the last diameter value
+      } # end i loop
 
-          # Correct the shift -------------------------------------------------------------------------------------------------------
-          for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-            # DBH[shift] = previous value + their cresc_abs
+    } # end : if the init shift is not the last diameter value
 
-            # If NA in cresc_abs replace it by a interpolation value
-            cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = "linear") # Compute the corrected cresc
-
-            DBHCor[i] <- # then correct the other shift values
-              DBHCor[i-1] + # New position of the previous value
-              cresc_abs_Corr[i-1] #  cresc_abs of the value we are correcting, not recalculated
-
-            # Add the column with the correction method  ------------------------------------------------------------------------
-
-            DataTree <- GenerateComment(DataTree,
-                                        condition = as.numeric(rownames(DataTree)) %in% (i),
-                                        comment = "shift realignment",
-                                        column = "DiameterCorrectionMeth")
-
-          } # end i loop
-
-        } # end : if the init shift is not the last diameter value
-
-      } # end rs loop
-
-    }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
-
-  }else{stop("No cresc, code the method in this case")}
-
+  } # end rs loop
 
   # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
   if("DBHCor" %in% names(DataTree)){

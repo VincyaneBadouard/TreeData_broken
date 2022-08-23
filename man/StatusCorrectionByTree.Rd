@@ -7,7 +7,8 @@
 StatusCorrectionByTree(
   DataTree,
   PlotCensuses,
-  InvariantColumns = c("Site", "Genus", "Species", "Family", "ScientificName"),
+  InvariantColumns = c("Site", "GenusCor", "SpeciesCor", "FamilyCor",
+    "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   DetectOnly = FALSE,
@@ -28,7 +29,9 @@ or integer)}
 
 \item{InvariantColumns}{Vector with the names of the columns that are
 supposed to have always the same value for each measurement of the same
-tree (character)}
+tree (character). It is recommended to use the columns that have already
+been \strong{corrected}, such as the columns containing the corrected botanical
+information.}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)}

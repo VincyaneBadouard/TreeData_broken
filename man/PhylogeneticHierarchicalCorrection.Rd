@@ -23,23 +23,23 @@ PhylogeneticHierarchicalCorrection(
 IdTree/IdStem) measurements (data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdStem' (character)
-\item 'ScientificName' (character)
-\item 'Genus' (character)
-\item 'Family' (character)
-\item 'Diameter' (numeric)
-\item 'Year' (numeric)
+\item \code{IdStem} (character)
+\item \code{ScientificNameCor} (character)
+\item \code{GenusCor} (character)
+\item \code{FamilyCor} (character)
+\item \code{Diameter} (numeric)
+\item \code{Year} (numeric)
 }}
 
 \item{Data}{Complete dataset (data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdStem' (character)
-\item 'ScientificName' (character)
-\item 'Genus' (character)
-\item 'Family' (character)
-\item 'Diameter' (numeric)
-\item 'Year' (numeric)
+\item \code{IdStem} (character)
+\item \code{ScientificNameCor} (character)
+\item \code{GenusCor} (character)
+\item \code{FamilyCor} (character)
+\item \code{Diameter} (numeric)
+\item \code{Year} (numeric)
 }}
 
 \item{cresc}{Annual diameter increment (numeric)}
@@ -91,12 +91,10 @@ originally measured growth.
 \itemize{
 \item Correct the 1st value in the series:
 \itemize{
-\item Estimate the value that the 1st abnormal DBH should have: Estimated DBH =
-previous DBH value + estimated growth by regression interpolation
-\item Find other individual of the the same diameter class (\emph{DBHRange}) and of
-the same species, genus, family or stand than the tree to correct, until
-the minimum number of individuals required to consider the correction is
-reached (\emph{MinIndividualNbr})
+\item Find other individual of the same diameter class (\emph{DBHRange}) as the last
+value before the one to correct, and of the same species, genus, family or
+stand than the tree to correct, until the minimum number of individuals
+required to consider the correction is reached (\emph{MinIndividualNbr})
 \item 1st abnormal DBH in the series = previous value + mean growth of the
 other trees
 }

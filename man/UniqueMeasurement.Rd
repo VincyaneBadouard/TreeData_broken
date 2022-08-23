@@ -12,7 +12,7 @@ UniqueMeasurement(Data, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
 \item{KeepMeas}{In case of \strong{multiple measurements} in the same census year:
 Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
-\item "MaxHOM": keep the measurement taken at the \strong{highest POM}
+\item "MaxHOM": keep the measurement taken at the \strong{highest HOM/POM}
 \item "MaxDate": keep the \strong{most recent measurement} (same
 year but more recent date)
 }}
@@ -42,6 +42,6 @@ HOM = c(rep(1, 3), 2, 1, 2, 1)
 )
 Data
 
-UniqueMeasurement(Data)
+UniqueMeasurement(TestData)
 
 }

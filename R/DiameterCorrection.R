@@ -2,9 +2,8 @@
 #'
 #' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
-#'   - `IdTree` (character)
-#'   - `IdStem` (character) if *ByStem* argument = TRUE
-#'   - `ScientificName` (character)
+#'   - `IdTree` or `IdStem` if *ByStem* argument = TRUE (character)
+#'   - `ScientificNameCor` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
 #'   - **`POM` (Point Of Measurement) (factor)** or
@@ -12,8 +11,8 @@
 #'      the **"POM change"**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must also contain the columns:
-#'   - `Genus` (character)
-#'   - `Family` (character)
+#'   - `GenusCor` (character)
+#'   - `FamilyCor` (character)
 #'
 #' @param KeepMeas In case of **multiple diameter measurements** in the same
 #'   census year, on which to apply the correction:
@@ -43,7 +42,7 @@
 #'   "compensated". (numeric, 1 value)
 #'
 #' @param Pioneers Scientific names of the pioneer species of the site, as in
-#'   the `ScientificName` column (characters vector)
+#'   the `ScientificNameCor` column (characters vector)
 #'
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
@@ -156,7 +155,7 @@ DiameterCorrection <- function(
 
   # Diameter column exists
   if(!"Diameter" %in% names(Data))
-    stop("The 'Diameter' (Diameter at Breast Height) column does't exist in the dataset")
+    stop("The 'Diameter' column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
   if(!all(unlist(lapply(list(DefaultHOM, MaxDBH,
@@ -176,12 +175,11 @@ DiameterCorrection <- function(
   TrustMeasSet <- match.arg(TrustMeasSet, choices = c("first", "last"))
 
   # WhatToCorrect
-  if(!any(WhatToCorrect %in% "POM change" | WhatToCorrect %in% "punctual"| WhatToCorrect %in% "shift"))
+  if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
     stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
 
   # CorrectionType
-  if(!any(CorrectionType %in% "quadratic"| CorrectionType %in% "linear"|
-          CorrectionType %in% "individual"| CorrectionType %in% "phylogenetic hierarchical"))
+  if(!any(c("linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType))
     stop("The 'CorrectionType' argument value must be among
          'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
 
@@ -223,11 +221,13 @@ DiameterCorrection <- function(
     # nrow(Data) == nrow(AliveTrees) + nrow(DeadTrees) # to check
   }
 
-
+  # ID
   if(ByStem == TRUE){
     ID <- "IdStem"
+    Data[, IdStem := as.character(IdStem)]
   }else if (ByStem == FALSE) {
     ID <- "IdTree"
+    Data[, IdTree := as.character(IdTree)]
   }
 
 
@@ -255,7 +255,6 @@ DiameterCorrection <- function(
 
   # Remove duplicated measurements (randomly)
   # Data <- Data[!duplicated(Data[, list((get(ID), Year)], fromLast = TRUE)] # keep the last measurement
-
 
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
@@ -347,9 +346,9 @@ DiameterCorrection <- function(
 #'   The dataset must contain the columns:
 #'   - `IdTree` (character)
 #'   - `IdStem` (character) if *ByStem* argument = TRUE
-#'   - `ScientificName` (character)
-#'   - `Genus` (character)
-#'   - `Family` (character)
+#'   - `ScientificNameCor` (character)
+#'   - `GenusCor` (character)
+#'   - `FamilyCor` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
 #'
@@ -368,7 +367,7 @@ DiameterCorrection <- function(
 #'   "compensated". (numeric, 1 value)
 #'
 #' @param Pioneers Scientific names of the pioneer species of the site, as in
-#'   the 'ScientificName' column (characters vector)
+#'   the 'ScientificNameCor' column (characters vector)
 #'
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
@@ -499,11 +498,28 @@ DiameterCorrectionByTree <- function(
 
     # Pioneers species case
 
-    if(any(na.omit(unique(DataTree[, ScientificName]) == Pioneers))){ # if it's a pioneer species
+    if(!is.null(Pioneers) & PioneersGrowthThreshold != PositiveGrowthThreshold){
 
-      PositiveGrowthThreshold <- PioneersGrowthThreshold # take the Pioneers growth threshold
-    }
+      ## ScientificNameCor or ScientificName?
+      if("ScientificNameCor" %in% names(DataTree)){
+        SfcName <- "ScientificNameCor"
 
+      }else if(!"ScientificNameCor" %in% names(DataTree) & "ScientificName" %in% names(DataTree)){
+        SfcName <- "ScientificName"
+
+      }else if(!any(c("ScientificNameCor", "ScientificName") %in% names(DataTree)))
+
+        stop("There are no 'ScientificNameCor' or 'ScientificName' column.
+           It is not possible to take into account the pioneer character of species in the diameter correction.
+             If you do not want to take into account the pioneer character in the diameter correction,
+             leave the argument Pioneers = NULL.")
+
+      if(any(na.omit(unique(DataTree[, get(SfcName)]) == Pioneers))){ # if it's a pioneer species
+
+        PositiveGrowthThreshold <- PioneersGrowthThreshold # take the Pioneers growth threshold
+      }
+
+    } # end Pioneers criteria
 
     # If the taper correction has been made, start from it
     if("TaperCorDBH" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, TaperCorDBH]
@@ -633,6 +649,8 @@ DiameterCorrectionByTree <- function(
 
               }
 
+            } # end if cresc != NA
+
               if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
 
                 DataTree <- PhylogeneticHierarchicalCorrection(
@@ -649,7 +667,6 @@ DiameterCorrectionByTree <- function(
 
               ## 3. + trunk width reduction factor (if POM change (only?)) ------------------------------------------------------
 
-            } # end if cresc != NA
           } # End correction "POM change"
 
         }# if there are POM changes
@@ -666,6 +683,11 @@ DiameterCorrectionByTree <- function(
         TrustMeasSet = TrustMeasSet,
         DetectOnly = DetectOnly)
       # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
+
+      if("punctual" %in% WhatToCorrect & !"phylogenetic hierarchical" %in% WhatToCorrect){
+
+      }
+
 
       if("DBHCor" %in% names(DataTree)){
         DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
@@ -769,6 +791,8 @@ DiameterCorrectionByTree <- function(
               }else{stop("There are still abnormal growths not detected upstream (method to be improved)")}
             }
 
+          } # end if cresc != NA
+
             if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
               DataTree <- PhylogeneticHierarchicalCorrection(
                 DataTree = DataTree,
@@ -783,7 +807,6 @@ DiameterCorrectionByTree <- function(
             }
 
             ## 3. + trunk width reduction factor (if POM change (only?)) ----------------------------------------------------------
-          } # end if cresc != NA
         } # End shift correction
       }
     }

@@ -17,7 +17,7 @@
 #'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
-#' @param EstDBH Estimated value of the diameter to correct (cm)
+#' @param PrevValue The last diameter value before the one to correct (cm)
 #'
 #' @param PositiveGrowthThreshold in cm/year : a tree
 #'   widening by more than x cm/year is considered abnormal (numeric, 1 value)
@@ -39,16 +39,16 @@
 #' @examples
 #' data(TestData)
 #'
-#' EstDBH <- 17 # Estimated DBH (cm)
+#' PrevValue <- 17 # Estimated DBH (cm)
 #' DBHRange = 10 # DBH range (cm)
 #'
 #' # Find colleagues
 #' Colleagues <- TestData[
 #' ScientificName == "Licania membranacea" & # same species as the tree to be corrected
-#' (Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2))] # Diameter or DBHCor ?
+#' (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 #'
 #' ColleaguesCrescMean <- ComputeColleaguesGrowthMean(Colleagues = Colleagues, Data = TestData,
-#'                                                    EstDBH = EstDBH,
+#'                                                    PrevValue = PrevValue,
 #'                                                    PositiveGrowthThreshold = 5,
 #'                                                    NegativeGrowthThreshold = -2,
 #'                                                    DBHRange = DBHRange)
@@ -56,7 +56,7 @@
 ComputeColleaguesGrowthMean <- function(
   Colleagues,
   Data,
-  EstDBH,
+  PrevValue,
   PositiveGrowthThreshold,
   NegativeGrowthThreshold,
   DBHRange
@@ -96,7 +96,7 @@ ComputeColleaguesGrowthMean <- function(
   }
 
   # Keep only rows with DBH in DBHRange -------------------------------------------------------------------------------------
-  Colleagues <- ColleaguesSeq[Diameter > (EstDBH - DBHRange/2) & Diameter < (EstDBH + DBHRange/2)] # Diameter or DBHCor ?
+  Colleagues <- ColleaguesSeq[Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2)] # Diameter or DBHCor ?
 
   # Compute mean(Colleaguescresc) -------------------------------------------------------------------------------------------
   ColleaguesCrescMean <- mean(

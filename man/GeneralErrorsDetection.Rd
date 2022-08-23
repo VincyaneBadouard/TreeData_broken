@@ -29,10 +29,8 @@ X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/
 IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 \item Check \strong{missing value} (NA/0) in the measurement variables: "Diameter",
 "HOM", "TreeHeight", "StemHeight"
-\item Check \strong{duplicated TreeFieldNum} in plot-subplot association in a census
-(at the site scale)
-\item Check of the \emph{unique association of the idTree with plot, subplot and
-TreeFieldNum} (at the site scale)
+\item Check of the \strong{unique association of the idTree with plot, subplot}
+\strong{and TreeFieldNum} (at the site scale)
 \item Check \strong{duplicated idTree/IdStem} in a census (at the site scale)
 \item Check for trees \strong{outside the subplot} (not implemented yet)
 \item Check \strong{invariant coordinates per IdTree/IdStem}

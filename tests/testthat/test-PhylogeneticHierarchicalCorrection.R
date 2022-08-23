@@ -18,10 +18,10 @@ test_that("PhylogeneticHierarchicalCorrection", {
   # Check the function argument ----------------------------------------------------------------------------------------
 
   expect_error(PhylogeneticHierarchicalCorrection(NoSctficDataTree),
-               regexp = "'DataTree' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+               regexp = "'DataTree' must contain the ScientificNameCor or ScientificName column to apply the phylogenetic hierarchical correction")
 
   expect_error(PhylogeneticHierarchicalCorrection(DataTree, NoSctficData),
-               regexp = "'Data' must contain the 'ScientificName' column to apply the phylogenetic hierarchical correction")
+               regexp = "'Data' must contain the ScientificName column to apply the phylogenetic hierarchical correction")
 
 
   # Check the function work ---------------------------------------------------------------------------------------------------------

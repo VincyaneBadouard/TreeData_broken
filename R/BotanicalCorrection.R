@@ -132,6 +132,8 @@ BotanicalCorrection <- function(
 
   setDT(Data) # data.frame to data.table
 
+  Data[, IdTree := as.character(IdTree)]
+
 
   # Missing value ---------------------------------------------------------------------------------------------------------
   # Family, ScientificName/Genus, species, VernName

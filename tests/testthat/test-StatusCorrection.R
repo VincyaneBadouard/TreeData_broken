@@ -5,6 +5,7 @@ test_that("StatusCorrection", {
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
+                         ScientificName = "Plant",
                          Year = rep(c(2012:2020), 5), # 9 census
                          Diameter = NA_real_)
   TestData <- TestData[order(IdTree, Year)]
@@ -58,7 +59,9 @@ test_that("StatusCorrection", {
 
   # Check the function work
 
-  Rslt <- StatusCorrection(TestData, InvariantColumns = "Site", UseSize = TRUE)
+  expect_warning(StatusCorrection(TestData, InvariantColumns = "ScientificNameCor"))
+
+  Rslt <- suppressWarnings(StatusCorrection(TestData, InvariantColumns = c("Site", "ScientificNameCor"), UseSize = TRUE))
 
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
 

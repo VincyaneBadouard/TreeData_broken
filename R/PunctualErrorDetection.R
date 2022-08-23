@@ -110,6 +110,7 @@ PunctualErrorDetection <- function(
 
         } # if there are values around ab
 
+
         # If only 2 values, with abnormal difference
         if(length(DBHCor[!is.na(DBHCor)]) == 2 & i==1){ # i =  chaque valeur aberrante
 
@@ -135,7 +136,8 @@ PunctualErrorDetection <- function(
 
           }
 
-        } # end : only values
+        } # end : only 2 values
+
 
         # Update diameter incrementation (for the i loop)--------------------------------------------------------------------
         cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)

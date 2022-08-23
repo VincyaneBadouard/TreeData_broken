@@ -14,7 +14,7 @@ RecruitmentCorrectionByTree(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
+\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree/Idstem)
 measurements (data.frame or data.table). The dataset should preferably
 contain the column of corrected diameters: 'DBHCor', otherwise the function
 will take the column "Diameter"}

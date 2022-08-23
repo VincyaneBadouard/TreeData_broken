@@ -13,10 +13,8 @@
 #'      IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 #'   - Check **missing value** (NA/0) in the measurement variables: "Diameter",
 #'      "HOM", "TreeHeight", "StemHeight"
-#'   - Check **duplicated TreeFieldNum** in plot-subplot association in a census
-#'      (at the site scale)
-#'   - Check of the *unique association of the idTree with plot, subplot and
-#'      TreeFieldNum* (at the site scale)
+#'   - Check of the **unique association of the idTree with plot, subplot**
+#'      **and TreeFieldNum** (at the site scale)
 #'   - Check **duplicated idTree/IdStem** in a census (at the site scale)
 #'   - Check for trees **outside the subplot** (not implemented yet)
 #'   - Check **invariant coordinates per IdTree/IdStem**
@@ -51,6 +49,15 @@ GeneralErrorsDetection <- function(
 
   # data.frame to data.table
   setDT(Data)
+
+  # ID
+  if(ByStem == TRUE){
+    ID <- "IdStem"
+    Data[, IdStem := as.character(IdStem)]
+  }else if (ByStem == FALSE) {
+    ID <- "IdTree"
+    Data[, IdTree := as.character(IdTree)]
+  }
 
   # Check duplicate rows ----------------------------------------------------------------------------------------------
   # if there are duplicate rows, delete them
@@ -105,50 +112,50 @@ GeneralErrorsDetection <- function(
   # Check duplicated TreeFieldNum in plot-subplot association ---------------------------------------------------------
 
   # Create "PlotSubNum" = "Site/Year/Plot/Subplot/TreeFieldNum"
-  Data[, PlotSubNum := paste(Site, Year, Plot, Subplot, TreeFieldNum, sep = "/")]
-
-  # y = 2017
-  # p=1
-  # c= 3
-  duplicated_num <- num <- vector("character")
-
-  # if any duplicats in this col
-  if(anyDuplicated(Data$PlotSubNum) != 0) {
-    # For each site
-    for (s in unique(na.omit(Data$Site))) {
-      # For each census
-      for (y in unique(na.omit(Data$Year))) {
-        # For each plot
-        for (p in unique(na.omit(Data$Plot))) {
-          # For each Subplot in this plot
-          for (c in unique(na.omit(Data[Data$Plot==p, Subplot]))) {
-
-            num <- Data[Data$Site == s & Data$Year == y
-                        & Data$Plot == p & Data$Subplot == c]$TreeFieldNum # all the TreeFieldNum for each Plot-Subplot combination
-
-            # if there are several TreeFieldNum per Plot-Subplot combination
-            if(anyDuplicated(num) != 0){
-              duplicated_num <- unique(num[duplicated(num)])
-
-              Data <- GenerateComment(Data,
-                                      condition =
-                                        Data[,Site] == s & Data[,Year] == y
-                                      & Data[,Plot] == p & Data[,Subplot] == c
-                                      & Data[,TreeFieldNum] %in% duplicated_num,
-                                      comment = "Duplicate TreeFieldNum in the same Plot and Subplot")
-
-              num <- vector("character")
-
-              warning("Duplicate TreeFieldNum(s) (",duplicated_num,") in the same Plot (",p,") and Subplot (",c,"), in ",y,"")
-
-            } else {num <- vector("character")}
-          } # end subplot loop
-        } # end plot loop
-      } # end year loop
-    } # end site loop
-  }
-
-  Data[, PlotSubNum := NULL]
+  # Data[, PlotSubNum := paste(Site, Year, Plot, Subplot, TreeFieldNum, sep = "/")]
+  #
+  # # y = 2017
+  # # p=1
+  # # c= 3
+  # duplicated_num <- num <- vector("character")
+  #
+  # # if any duplicats in this col
+  # if(anyDuplicated(Data$PlotSubNum) != 0) {
+  #   # For each site
+  #   for (s in unique(na.omit(Data$Site))) {
+  #     # For each census
+  #     for (y in unique(na.omit(Data$Year))) {
+  #       # For each plot
+  #       for (p in unique(na.omit(Data$Plot))) {
+  #         # For each Subplot in this plot
+  #         for (c in unique(na.omit(Data[Data$Plot==p, Subplot]))) {
+  #
+  #           num <- Data[Data$Site == s & Data$Year == y
+  #                       & Data$Plot == p & Data$Subplot == c]$TreeFieldNum # all the TreeFieldNum for each Plot-Subplot combination
+  #
+  #           # if there are several TreeFieldNum per Plot-Subplot combination
+  #           if(anyDuplicated(num) != 0){
+  #             duplicated_num <- unique(num[duplicated(num)])
+  #
+  #             Data <- GenerateComment(Data,
+  #                                     condition =
+  #                                       Data[,Site] == s & Data[,Year] == y
+  #                                     & Data[,Plot] == p & Data[,Subplot] == c
+  #                                     & Data[,TreeFieldNum] %in% duplicated_num,
+  #                                     comment = "Duplicate TreeFieldNum in the same Plot and Subplot")
+  #
+  #             num <- vector("character")
+  #
+  #             warning("Duplicate TreeFieldNum(s) (",duplicated_num,") in the same Plot (",p,") and Subplot (",c,"), in ",y,"")
+  #
+  #           } else {num <- vector("character")}
+  #         } # end subplot loop
+  #       } # end plot loop
+  #     } # end year loop
+  #   } # end site loop
+  # }
+  #
+  # Data[, PlotSubNum := NULL]
   # Data[TreeFieldNum == duplicated_num,.(Year = sort(Year), Plot, Subplot, TreeFieldNum, Comment)] # to check (1 duplicate)
 
 
@@ -185,12 +192,6 @@ GeneralErrorsDetection <- function(
 
 
   # Check duplicated IdTree/IdStem in a census ------------------------------------------------------------------------
-
-  if(ByStem == TRUE){
-    ID <- "IdStem"
-  }else if (ByStem == FALSE) {
-    ID <- "IdTree"
-  }
 
   # Create "SitYearID" = "Site/Year/ID"
   Data[, SitYearID := paste(Site, Year, get(ID), sep = "/")]

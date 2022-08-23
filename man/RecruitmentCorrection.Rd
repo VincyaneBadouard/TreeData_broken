@@ -6,16 +6,33 @@
 \usage{
 RecruitmentCorrection(
   Data,
+  ByStem = TRUE,
+  KeepMeas = c("MaxHOM", "MaxDate"),
   MinDBH = 10,
   PositiveGrowthThreshold = 5,
-  InvariantColumns = c("Site", "Genus", "Species", "Family", "ScientificName"),
+  InvariantColumns = c("Site", "GenusCor", "SpeciesCor", "FamilyCor",
+    "ScientificNameCor"),
   DetectOnly = FALSE
 )
 }
 \arguments{
 \item{Data}{(data.frame or data.table)
 The dataset should preferably contain the column of corrected diameters:
-'DBHCor', otherwise the function will take the column "DBH"}
+'DBHCor', otherwise the function will take the column 'Diameter'}
+
+\item{ByStem}{must be equal to TRUE if your inventory contains the stem
+level, equal to FALSE if not, and in this case the correction is done by
+tree (logical)}
+
+\item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
+census year, on which to apply the correction:
+Possible values: "MaxHOM", "MaxDate" (character).
+\itemize{
+\item "MaxHOM": apply the correction to the measurement taken at the
+\strong{highest POM}
+\item "MaxDate": apply the correction to the \strong{most recent measurement} (same
+year but more recent date)
+}}
 
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
 protocol (in cm) (numeric, 1 value) (Default = 10 cm)}

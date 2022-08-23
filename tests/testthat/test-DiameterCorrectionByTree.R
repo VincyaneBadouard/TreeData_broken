@@ -173,6 +173,9 @@ test_that("DiameterCorrectionByTree", {
   expect_true(Rslt[4, DiameterCorrectionMeth] %in% c("species","genus","family","stand")) # the 1st value is correct by linear regression
   expect_true(Rslt[5, DiameterCorrectionMeth] == "shift realignment") # the other value of the shift are just realigned
 
+  ### Only 2 values
+  DataTree$Diameter <- c(13, 20, NA, NA, NA)
+
   # Shift error --------------------------------------------------------------------------------------------------------
   ## individual correction ---------------------------------------------------------------------------------------------
   DataTree <- data.table(IdTree = "c",

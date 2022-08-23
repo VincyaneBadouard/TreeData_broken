@@ -28,9 +28,8 @@ DiameterCorrection(
 \item{Data}{Dataset (data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item \code{IdTree} (character)
-\item \code{IdStem} (character) if \emph{ByStem} argument = TRUE
-\item \code{ScientificName} (character)
+\item \code{IdTree} or \code{IdStem} if \emph{ByStem} argument = TRUE (character)
+\item \code{ScientificNameCor} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
 \item \strong{\code{POM} (Point Of Measurement) (factor)} or
@@ -38,8 +37,8 @@ The dataset must contain the columns:
 the \strong{"POM change"}
 If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
 dataset must also contain the columns:
-\item \code{Genus} (character)
-\item \code{Family} (character)
+\item \code{GenusCor} (character)
+\item \code{FamilyCor} (character)
 }}
 
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
@@ -72,7 +71,7 @@ appears abnormal, but a negative measurement error can be allowed until -n
 "compensated". (numeric, 1 value)}
 
 \item{Pioneers}{Scientific names of the pioneer species of the site, as in
-the \code{ScientificName} column (characters vector)}
+the \code{ScientificNameCor} column (characters vector)}
 
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
