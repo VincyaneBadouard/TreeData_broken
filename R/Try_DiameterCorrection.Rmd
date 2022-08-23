@@ -34,7 +34,7 @@ CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchic
 # Pas réussi à résoudre : "443186" (cresc_abs reste < -2)
 
 PanamaFormated <- UniqueMeasurement(PanamaFormated, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
-DataTree <- PanamaFormated[IdStem %in% "443241"]
+DataTree <- PanamaFormated[IdStem %in% "443323"]
 Data <- PanamaFormated
 DefaultHOM = 1.3
 MaxDBH = 500
@@ -46,11 +46,13 @@ PioneersGrowthThreshold = 7.5
 
 TrustMeasSet = "first"
 WhatToCorrect = c("POM change", "punctual", "shift")
-CorrectionType = c("linear", "phylogenetic hierarchical")
+CorrectionType = c("linear", "individual")
 
 DBHRange = 10
 MinIndividualNbr = 5
 Digits = 1L
+
+coef = 0.9
 
 DetectOnly = FALSE
 
@@ -134,7 +136,7 @@ RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = "linear") # cresc
 # 
 # save(Rslt_Phylo, file = "PanamaDBHCor_Phylo.rda")
 load("D:/VSC TmFO/Data/StandardisedData/PanamaDBHCor_Phylo.rda")
-# 
+
 # Rslt_Ind <- DiameterCorrection(
 #   PanamaFormated,
 #   WhatToCorrect = c("POM change", "punctual", "shift"),
@@ -147,7 +149,7 @@ save(Rslt_Ind, file = "PanamaDBHCor_Ind.rda")
 
 
 ```{r}
-Rslt <- Rslt_Ind
+Rslt <- Rslt_Phylo
 
 # Order IDs and times in ascending order 
 Rslt <- Rslt[order(IdStem, Year)]
@@ -156,7 +158,7 @@ IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
 
 RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
 
-pdf("DiameterCorrectionPlots_Ind.pdf", width = 25, height = 10)
+pdf("DiameterCorrectionPlots_Phylo.pdf", width = 25, height = 10)
 for(p in 1:(ceiling(length(unique(IdStemCor))/9))){ 
   print(ggplot(RsltCor) +
           aes(x = Year) +

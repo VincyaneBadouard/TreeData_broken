@@ -1,7 +1,7 @@
 #' PunctualErrorDetection
 #'
-#' @param DBHCor The diameter vector (numeric)
-#' @param Time Time variable (numeric)
+#' @param DBHCor Diameter vector (numeric)
+#' @param Time Time vector (numeric)
 #'
 #' @param PositiveGrowthThreshold in cm/year : a tree
 #'   widening by more than x cm/year is considered abnormal (numeric, 1 value)

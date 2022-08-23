@@ -152,7 +152,7 @@ test_that("DiameterCorrectionByTree", {
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
-  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "linear")) # the 1st value is correct by linear regression
+  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # the 1st value is correct by linear regression
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 
@@ -191,7 +191,7 @@ test_that("DiameterCorrectionByTree", {
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "Abnormal diameter value (shift error)")) # detect the POM change
-  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "linear")) # the 1st value is correct by linear regression
+  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # the 1st value is correct by linear regression
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 
@@ -228,7 +228,8 @@ test_that("DiameterCorrectionByTree", {
 
   expect_true(all(Rslt[3, Comment] == "Abnormal diameter value (punctual error)")) # detect the POM change
   expect_true(all(Rslt[c(5,8), Comment] == "Abnormal diameter value (shift error)")) # detect the POM change
-  expect_true(all(Rslt[c(3,5,8), DiameterCorrectionMeth] == "quadratic")) # the 1st value is correct by quadratic regression
+  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "quadratic")) # punctual error by regression
+  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # 1st value by weighted mean
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 
@@ -290,7 +291,8 @@ test_that("DiameterCorrectionByTree", {
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
   expect_true(all(Rslt[3, Comment] == "Abnormal diameter value (punctual error)")) # detect the punctual error
-  expect_true(all(Rslt[c(3,5,8), DiameterCorrectionMeth] == "quadratic")) # the 1st value is correct by linear regression
+  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "quadratic")) # punctual error by regression
+  expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # 1st value by weighted mean
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
 

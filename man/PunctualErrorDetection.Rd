@@ -14,9 +14,9 @@ PunctualErrorDetection(
 )
 }
 \arguments{
-\item{DBHCor}{The diameter vector (numeric)}
+\item{DBHCor}{Diameter vector (numeric)}
 
-\item{Time}{Time variable (numeric)}
+\item{Time}{Time vector (numeric)}
 
 \item{PositiveGrowthThreshold}{in cm/year : a tree
 widening by more than x cm/year is considered abnormal (numeric, 1 value)}

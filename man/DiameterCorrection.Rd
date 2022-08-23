@@ -21,6 +21,7 @@ DiameterCorrection(
   MinIndividualNbr = 5,
   Digits = 1L,
   DBHCorForDeadTrees = TRUE,
+  coef = 0.9,
   DetectOnly = FALSE
 )
 }
@@ -120,6 +121,8 @@ cm) (numeric, 1 value)}
 \item{DBHCorForDeadTrees}{(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
+
+\item{coef}{description... (numeric)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}

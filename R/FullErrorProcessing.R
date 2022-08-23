@@ -240,6 +240,8 @@ FullErrorProcessing <- function(
 
                                DBHCorForDeadTrees = DBHCorForDeadTrees,
 
+                               coef = coef,
+
                                DetectOnly = DetectOnly)
   }
 
