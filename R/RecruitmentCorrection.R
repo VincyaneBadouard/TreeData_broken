@@ -251,10 +251,10 @@ RecruitmentCorrectionByTree <- function(
   MinDBH = 10,
   PositiveGrowthThreshold = 5, # je garde ?
   InvariantColumns = c("Site",
-                       "Genus",
-                       "Species",
-                       "Family",
-                       "ScientificName"),
+                       "GenusCor",
+                       "SpeciesCor",
+                       "FamilyCor",
+                       "ScientificNameCor"),
   PlotCensuses,
   DetectOnly = FALSE
 ){

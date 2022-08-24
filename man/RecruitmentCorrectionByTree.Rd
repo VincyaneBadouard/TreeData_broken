@@ -8,7 +8,8 @@ RecruitmentCorrectionByTree(
   DataTree,
   MinDBH = 10,
   PositiveGrowthThreshold = 5,
-  InvariantColumns = c("Site", "Genus", "Species", "Family", "ScientificName"),
+  InvariantColumns = c("Site", "GenusCor", "SpeciesCor", "FamilyCor",
+    "ScientificNameCor"),
   PlotCensuses,
   DetectOnly = FALSE
 )

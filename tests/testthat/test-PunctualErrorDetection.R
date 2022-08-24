@@ -22,30 +22,19 @@ test_that("PunctualErrorDetection", {
 
 
   # If only 2 values, with abnormal difference --------------------------------------------------------------------------------------
-  DBHCor <- c(13, 30)
-  Time <- c(2000, 2002)
-
-  ## Check the different reading direction (TrustMeasSet) ---------------------------------------------------------------------------
-  # Trust the first value
-  Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "first")
-  expect_true(Rslt[1] == DBHCor[1]) # the 1st value don't change
-  expect_true(Rslt[2] == DBHCor[1]) # give the 1st value to the 2nd
-
-  # Trust the last value
-  Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "last")
-  expect_true(Rslt[2] == DBHCor[2]) # the 1st value don't change
-  expect_true(Rslt[1] == DBHCor[2]) # give the 1st value to the 2nd
-
-  ### Detect Only case
-  # Trust the first value
-  Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "first", DetectOnly = TRUE)
-  expect_true(Rslt[1] == DBHCor[1]) # the 1st value don't change
-  expect_true(is.na(Rslt[2])) # give the 1st value to the 2nd
-
-  # Trust the last value
-  Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "last", DetectOnly = TRUE)
-  expect_true(Rslt[2] == DBHCor[2]) # the 1st value don't change
-  expect_true(is.na(Rslt[1])) # give the 1st value to the 2nd
+  # DBHCor <- c(13, 30)
+  # Time <- c(2000, 2002)
+  #
+  # # Trust the first value
+  # Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time)
+  # expect_true(Rslt[1] == DBHCor[1]) # the 1st value don't change
+  # expect_true(Rslt[2] == DBHCor[1]) # give the 1st value to the 2nd
+  #
+  # ### Detect Only case
+  # # Trust the first value
+  # Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "first", DetectOnly = TRUE)
+  # expect_true(Rslt[1] == DBHCor[1]) # the 1st value don't change
+  # expect_true(is.na(Rslt[2])) # give the 1st value to the 2nd
 
 
 })

@@ -40,15 +40,17 @@ FullErrorProcessing <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"), # or NULL if juste taper
   CorrectionType = c("taper", "linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
+  OtherCrit = NULL,
   Digits = 1L,
 
   DBHCorForDeadTrees = TRUE,
+
+  coef = 0.9,
 
   # Recruitment
   MinDBH = 10
@@ -145,9 +147,6 @@ FullErrorProcessing <- function(
   if(!inherits(Pioneers, "character") & !is.null(Pioneers))
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
-  # TrustMeasSet
-  TrustMeasSet <- match.arg(TrustMeasSet, choices = c("first", "last"))
-
   # WhatToCorrect
   if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
     stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
@@ -230,12 +229,12 @@ FullErrorProcessing <- function(
                                Pioneers = Pioneers,
                                PioneersGrowthThreshold = PioneersGrowthThreshold,
 
-                               TrustMeasSet = TrustMeasSet,
                                WhatToCorrect = WhatToCorrect,
                                CorrectionType = CorrectionType,
 
                                DBHRange = DBHRange,
                                MinIndividualNbr = MinIndividualNbr,
+                               OtherCrit = OtherCrit,
                                Digits = Digits,
 
                                DBHCorForDeadTrees = DBHCorForDeadTrees,

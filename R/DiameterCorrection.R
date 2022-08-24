@@ -47,9 +47,6 @@
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
 #'
-#' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
-#'   (character, 1 value) (not implemented yet)
-#'
 #' @param WhatToCorrect Possible values: "POM change", "punctual", "shift"
 #'   (character)
 #'   - "POM change": detect POM change in the column `POM` and correct the
@@ -57,8 +54,7 @@
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
 #'   - "shift": detect if there is a shift of several Diameter values and
-#'              links them to the trust measurements set
-#'              (*TrustMeasSet* argument).
+#'              links them to the 1st measurements set.
 #'
 #' @param CorrectionType Possible values: "linear", "quadratic",
 #'   "individual", "phylogenetic hierarchical" (character).
@@ -79,6 +75,12 @@
 #'   cm) (numeric, 1 value)
 #' @param MinIndividualNbr Minimum number of individuals to take into account in
 #'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
+#'
+#' @param OtherCrit Other criteria to select the individuals used for the
+#'   calculation of the mean growth in the "phylogenetic hierarchical"
+#'   correction. Give the name of the column(s) for which the individuals must
+#'   have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
+#'   (character)
 #'
 #' @param Digits Number of decimal places to be used in the `DBHCor` column
 #'   (Default: 1L) (integer)
@@ -137,12 +139,12 @@ DiameterCorrection <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  TrustMeasSet = c("first", "last"),
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
+  OtherCrit = NULL,
   Digits = 1L,
 
   DBHCorForDeadTrees = TRUE,
@@ -174,9 +176,6 @@ DiameterCorrection <- function(
   # Pioneers (characters vector)
   if(!inherits(Pioneers, "character") & !is.null(Pioneers))
     stop("'Pioneers' argument must be a characters vector, or NULL")
-
-  # TrustMeasSet
-  TrustMeasSet <- match.arg(TrustMeasSet, choices = c("first", "last"))
 
   # WhatToCorrect
   if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
@@ -313,13 +312,16 @@ DiameterCorrection <- function(
     Pioneers = Pioneers,
     PioneersGrowthThreshold = PioneersGrowthThreshold,
 
-    TrustMeasSet = TrustMeasSet,
     WhatToCorrect = WhatToCorrect,
     CorrectionType = CorrectionType,
 
     DBHRange = DBHRange,
     MinIndividualNbr = MinIndividualNbr,
+    OtherCrit =  OtherCrit,
+
     Digits = Digits,
+
+    coef = coef,
 
     DetectOnly = DetectOnly
   )
@@ -376,16 +378,13 @@ DiameterCorrection <- function(
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
 #'
-#' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
-#'   (character, 1 value)
 #' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
 #'   - "POM change": detect POM change in the column 'POM' and correct
 #'                   the Diameter values from it.
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
 #'   - "shift": detect if there is a shift of several 'Diameter' values and
-#'              links them to the trust measurements set
-#'              (*TrustMeasSet* argument).
+#'              links them to the trust measurements set.
 #'
 #' @param CorrectionType c("linear", "quadratic", "individual", "phylogenetic
 #'   hierarchical") (character).
@@ -406,6 +405,12 @@ DiameterCorrection <- function(
 #'   cm) (numeric, 1 value)
 #' @param MinIndividualNbr Minimum number of individuals to take into account in
 #'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
+#'
+#' @param OtherCrit Other criteria to select the individuals used for the
+#'   calculation of the mean growth in the "phylogenetic hierarchical"
+#'   correction. Give the name of the column(s) for which the individuals must
+#'   have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
+#'   (character)
 #'
 #' @param Digits Number of decimal places to be used in the 'DBHCor' column
 #'   (Default: 1L) (integer)
@@ -458,12 +463,12 @@ DiameterCorrectionByTree <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
   MinIndividualNbr = 5,
+  OtherCrit = NULL,
   Digits = 1L,
 
   coef = 0.9,
@@ -486,7 +491,7 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  # if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
+  if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
 
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # data.table::order
@@ -624,7 +629,7 @@ DiameterCorrectionByTree <- function(
                 DBHCor = DBHCor, Time = Time,
                 PositiveGrowthThreshold = PositiveGrowthThreshold,
                 NegativeGrowthThreshold = NegativeGrowthThreshold,
-                DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr)
+                DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit)
 
               DBHCor <- DataTree[,DBHCor]
             }
@@ -641,29 +646,43 @@ DiameterCorrectionByTree <- function(
 
     # Punctual/shift error detection  + replace with NA if punctual ---------------------------------------------------------
     if(any("punctual" %in% WhatToCorrect | "shift" %in% WhatToCorrect)){
-      DBHCor <- PunctualErrorDetection(
-        DBHCor = DBHCor, Time = Time,
-        PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
-        TrustMeasSet = TrustMeasSet,
-        DetectOnly = DetectOnly)
-      # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
 
-      if("punctual" %in% WhatToCorrect & !"phylogenetic hierarchical" %in% WhatToCorrect){
+      if(length(DBHCor[!is.na(DBHCor)]) == 2){ # if only 2 non-NA values
 
+        TwoValCorRslt <- TwoValDiameterCor(DataTree = DataTree,
+                                           Data = Data,
+                                           DBHCor = DBHCor, Time = Time,
+                                           CorrectionType = CorrectionType,
+                                           PositiveGrowthThreshold = PositiveGrowthThreshold,
+                                           NegativeGrowthThreshold = NegativeGrowthThreshold,
+                                           DBHRange = DBHRange,
+                                           MinIndividualNbr = MinIndividualNbr,
+                                           OtherCrit = OtherCrit,
+                                           DetectOnly = DetectOnly)
+
+        DataTree <- TwoValCorRslt$DataTree
+        DBHCor <- TwoValCorRslt$DBHCor
+
+      }else{
+
+        DBHCor <- PunctualErrorDetection(
+          DBHCor = DBHCor, Time = Time,
+          PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
+          DetectOnly = DetectOnly)
+        # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
+
+        if("DBHCor" %in% names(DataTree)){
+          DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+        }
+
+        DataTree[,DBHCor := DBHCor]
+
+        DataTree <- GenerateComment(DataTree,
+                                    condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,Diameter])),
+                                    comment = paste0("Abnormal diameter value (punctual error)"))
+
+        if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
       }
-
-
-      if("DBHCor" %in% names(DataTree)){
-        DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
-      }
-
-      DataTree[,DBHCor := DBHCor]
-
-      DataTree <- GenerateComment(DataTree,
-                                  condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,Diameter])),
-                                  comment = paste0("Abnormal diameter value (punctual error)"))
-
-      if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
     }
 
     # Shift Correction ------------------------------------------------------------------------------------------------------
@@ -725,7 +744,7 @@ DiameterCorrectionByTree <- function(
               DBHCor = DBHCor, Time = Time,
               PositiveGrowthThreshold = PositiveGrowthThreshold,
               NegativeGrowthThreshold = NegativeGrowthThreshold,
-              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr)
+              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit)
 
             DBHCor <- DataTree[,DBHCor]
           }

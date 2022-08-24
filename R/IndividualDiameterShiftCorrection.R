@@ -86,7 +86,7 @@ IndividualDiameterShiftCorrection <- function(
 
   # length(cresc)-1 = length(DBHCor)
   if(length(DBHCor) > (length(cresc)+1) ) cresc[(length(cresc)+1):(length(DBHCor)-1)] <- NA
-  # if(length(DBHCor) > (length(cresc_abs)+1) ) cresc[(length(cresc_abs)+1):(length(DBHCor)-1)] <- NA
+  if(length(DBHCor) > (length(cresc_abs)+1) ) cresc_abs[(length(cresc_abs)+1):(length(DBHCor)-1)] <- NA
 
   # rs = 1
   for(rs in 1:length(cresc_abn)){  # as many rs as POM changes
@@ -135,25 +135,26 @@ IndividualDiameterShiftCorrection <- function(
     if(cresc_abn[rs]+1 < length(DBHCor)){ # if it's not the last value
 
       for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-        # DBH[shift] = previous value + their cresc_abs
+        # DBH[shift] = previous value + their original cresc_abs
 
-        # If NA in cresc_abs replace it by a interpolation value (creates errors)
-        # cresc_abs_Corr <- RegressionInterpolation(Y = cresc_abs, X = Time[-1], CorrectionType = CorrectionType) # Compute the corrected cresc
+        for(p in (i-1):1){ # if previous DBH value is NA, take the takes the one before etc
 
-        # DBHCor[i] <- # then correct the other shift values
-        #   DBHCor[i-1] + # New position of the previous value
-        #   cresc_abs[i-1] #  cresc_abs of the value we are correcting, not recalculated
+          if(!is.na(DBHCor[p])){ # when previous value is not NA
 
-        DBHCor[i] <- # then correct the other shift values
-          DBHCor[i-1] + # New position of the previous value
-          cresc[i-1]*diff(Time)[i-1] #  cresc_abs of the value we are correcting, not recalculated
+            DBHCor[i] <- # the new DBH
+              DBHCor[p] + # Non-NA previous value
+              cresc_abs[i-1] #  cresc_abs was calculated with the non-NA. We take the original cresc_abs
+
+            break # stop the loop
+          }
+        }
 
         if(!is.null(DataTree)){
           # Add the column with the correction method  ------------------------------------------------------------------------
           # DataTree[i, DiameterCorrectionMeth := "shift realignment"]
 
           DataTree <- GenerateComment(DataTree,
-                                      condition = as.numeric(rownames(DataTree)) %in% (i),
+                                      condition = as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor),
                                       comment = "shift realignment",
                                       column = "DiameterCorrectionMeth")
 

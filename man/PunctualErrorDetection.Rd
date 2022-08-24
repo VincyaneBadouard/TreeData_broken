@@ -9,7 +9,6 @@ PunctualErrorDetection(
   Time,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
-  TrustMeasSet = "first",
   DetectOnly = FALSE
 )
 }
@@ -26,9 +25,6 @@ positive measurement error (+n) cannot be corrected until the growth
 appears abnormal, but a negative measurement error can be allowed until -n
 (a tree does not decrease). Thus the positive measurement error (+n) is
 "compensated". (numeric, 1 value)}
-
-\item{TrustMeasSet}{Trust measurements set: the "first" or the "last" set
-(character, 1 value)}
 
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (Default: FALSE) (logical)}

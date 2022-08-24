@@ -12,9 +12,6 @@
 #'   (a tree does not decrease). Thus the positive measurement error (+n) is
 #'   "compensated". (numeric, 1 value)
 #'
-#' @param TrustMeasSet Trust measurements set: the "first" or the "last" set
-#'   (character, 1 value)
-#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (Default: FALSE) (logical)
 #'
@@ -45,8 +42,6 @@ PunctualErrorDetection <- function(
 
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
-
-  TrustMeasSet = "first",
 
   DetectOnly = FALSE
 ){
@@ -111,32 +106,32 @@ PunctualErrorDetection <- function(
         } # if there are values around ab
 
 
-        # If only 2 values, with abnormal difference
-        if(length(DBHCor[!is.na(DBHCor)]) == 2 & i==1){ # i =  chaque valeur aberrante
-
-          if(TrustMeasSet %in% "first"){
-            # trust the 1st one
-            if(DetectOnly %in% FALSE){ # correct now
-
-              DBHCor[!is.na(DBHCor)][2] <- DBHCor[!is.na(DBHCor)][1]
-
-            }else if(DetectOnly %in% TRUE){ # detect only
-              DBHCor[!is.na(DBHCor)][2] <- NA # Put NA to put a comment after (DBHCor will be delete)
-            }
-
-          }else if(TrustMeasSet %in% "last"){
-            # trust the 2nd one
-            if(DetectOnly %in% FALSE){ # correct now
-
-              DBHCor[!is.na(DBHCor)][1] <- DBHCor[!is.na(DBHCor)][2]
-
-            }else if(DetectOnly %in% TRUE){ # detect only
-              DBHCor[!is.na(DBHCor)][1] <- NA # Put NA to put a comment after (DBHCor will be delete)
-            }
-
-          }
-
-        } # end : only 2 values
+        # # If only 2 values, with abnormal difference
+        # if(length(DBHCor[!is.na(DBHCor)]) == 2 & i==1){ # i =  chaque valeur aberrante
+        #
+        #   if(TrustMeasSet %in% "first"){
+        #     # trust the 1st one
+        #     if(DetectOnly %in% FALSE){ # correct now
+        #
+        #       DBHCor[!is.na(DBHCor)][2] <- NA # DBHCor[!is.na(DBHCor)][1]
+        #
+        #     }else if(DetectOnly %in% TRUE){ # detect only
+        #       DBHCor[!is.na(DBHCor)][2] <- NA # Put NA to put a comment after (DBHCor will be delete)
+        #     }
+        #
+        #   }else if(TrustMeasSet %in% "last"){
+        #     # trust the 2nd one
+        #     if(DetectOnly %in% FALSE){ # correct now
+        #
+        #       DBHCor[!is.na(DBHCor)][1] <- NA # DBHCor[!is.na(DBHCor)][2]
+        #
+        #     }else if(DetectOnly %in% TRUE){ # detect only
+        #       DBHCor[!is.na(DBHCor)][1] <- NA # Put NA to put a comment after (DBHCor will be delete)
+        #     }
+        #
+        #   }
+        #
+        # } # end : only 2 values
 
 
         # Update diameter incrementation (for the i loop)--------------------------------------------------------------------

@@ -61,6 +61,13 @@ ComputeColleaguesGrowthMean <- function(
   NegativeGrowthThreshold,
   DBHRange
 ){
+
+  # POM or HOM?
+  if((!"POM" %in% names(Colleagues) | all(is.na(Colleagues$POM))) &
+     ("HOM" %in% names(Colleagues) & any(!is.na(Colleagues$HOM))) ){ POMv <- "HOM" # If no POM take HOM
+
+  }else{ POMv <- "POM"}
+
   # Work start --------------------------------------------------------------------------------------------------------------
   # Find their cresc at these DBHs and compute the average of these crescs
 
@@ -77,7 +84,7 @@ ComputeColleaguesGrowthMean <- function(
   ColleaguesSeq <- ColleaguesSeq[order(IdStem, Year)]
 
   # Compute cresc for each Colleague ----------------------------------------------------------------------------------------
-  # i = "100747"
+  # i = "614506"
   for(i in ColleaguesId){ # i : each Colleagues ind
 
     # i = "100747"
@@ -93,10 +100,23 @@ ComputeColleaguesGrowthMean <- function(
 
     ColleaguesSeq[IdStem == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
     # no cresc if no diameter
+
+
+    # No cresc during POM change
+    # POM change detection
+    POMchange <- NA  # 1st val = NA because it's the default POM
+    for( n in (2:(length(ColleaguesSeq[IdStem %in% i, get(POMv)]))) ){
+      POMchange <- c(POMchange, ColleaguesSeq[IdStem %in% i, get(POMv)][n-1] != ColleaguesSeq[IdStem %in% i, get(POMv)][n]) # (TRUE = POM change)
+    }
+
+    ColleaguesSeq[IdStem == i, POMChange := POMchange]
   }
 
+  # No cresc during POM change
+  Colleagues <- ColleaguesSeq[POMChange %in% FALSE]
+
   # Keep only rows with DBH in DBHRange -------------------------------------------------------------------------------------
-  Colleagues <- ColleaguesSeq[Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2)] # Diameter or DBHCor ?
+  Colleagues <- Colleagues[Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2)] # Diameter or DBHCor ?
 
   # Compute mean(Colleaguescresc) -------------------------------------------------------------------------------------------
   ColleaguesCrescMean <- mean(

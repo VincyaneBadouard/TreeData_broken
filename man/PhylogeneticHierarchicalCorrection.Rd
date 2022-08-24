@@ -15,7 +15,8 @@ PhylogeneticHierarchicalCorrection(
   PositiveGrowthThreshold,
   NegativeGrowthThreshold,
   DBHRange = 10,
-  MinIndividualNbr = 5
+  MinIndividualNbr = 5,
+  OtherCrit = NULL
 )
 }
 \arguments{
@@ -51,7 +52,7 @@ values) (numeric)}
 
 \item{DBHCor}{Diameter vector in cm (numeric)}
 
-\item{Time}{Time variable in years (numeric)}
+\item{Time}{Time vector in years (numeric)}
 
 \item{PositiveGrowthThreshold}{in cm/year : a tree
 widening by more than x cm/year is considered abnormal (numeric, 1 value)}
@@ -68,6 +69,11 @@ cm) (numeric, 1 value)}
 
 \item{MinIndividualNbr}{Minimum number of individuals to take into account in
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)}
+
+\item{OtherCrit}{Other criteria to select the individuals used for the
+calculation of the mean growth. Give the name of the column(s) for which the
+individuals must have the same value as the tree to correct (e.g. c("Plot",
+"Subplot")) (character)}
 }
 \value{
 Fill columns:
@@ -121,6 +127,7 @@ DataTree_output <- PhylogeneticHierarchicalCorrection(
     DBHCor = DataTree$Diameter, Time = DataTree$Year,
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
-    DBHRange = 10, MinIndividualNbr = 5
+    DBHRange = 10, MinIndividualNbr = 5,
+    OtherCrit = "Plot"
 )
 }

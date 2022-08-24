@@ -37,12 +37,6 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, Pioneers = T),
                regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
-  expect_error(DiameterCorrection(TestData, TrustMeasSet = T),
-               regexp = "'arg' must be NULL or a character vector")
-
-  expect_error(DiameterCorrection(TestData, TrustMeasSet = "T"),
-               regexp = 'should be one of')
-
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
                regexp = "The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
 
@@ -86,7 +80,6 @@ test_that("DiameterCorrection", {
     Pioneers = c("Cecropia","Pourouma"),
     PioneersGrowthThreshold = 7.5,
 
-    TrustMeasSet = "first",
     WhatToCorrect = c("POM change", "punctual", "shift"),
     CorrectionType = c("quadratic", "linear", "phylogenetic hierarchical"),
 

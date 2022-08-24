@@ -13,11 +13,11 @@ DiameterCorrectionByTree(
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  TrustMeasSet = "first",
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
+  OtherCrit = NULL,
   Digits = 1L,
   coef = 0.9,
   DetectOnly = FALSE
@@ -60,9 +60,6 @@ the 'ScientificNameCor' column (characters vector)}
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than x cm/year is considered abnormal (numeric, 1 value)}
 
-\item{TrustMeasSet}{Trust measurements set: the "first" or the "last" set
-(character, 1 value)}
-
 \item{WhatToCorrect}{c("POM change", "punctual", "shift") (character)
 \itemize{
 \item "POM change": detect POM change in the column 'POM' and correct
@@ -70,8 +67,7 @@ the Diameter values from it.
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
 \item "shift": detect if there is a shift of several 'Diameter' values and
-links them to the trust measurements set
-(\emph{TrustMeasSet} argument).
+links them to the trust measurements set.
 }}
 
 \item{CorrectionType}{c("linear", "quadratic", "individual", "phylogenetic
@@ -96,6 +92,12 @@ cm) (numeric, 1 value)}
 
 \item{MinIndividualNbr}{Minimum number of individuals to take into account in
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)}
+
+\item{OtherCrit}{Other criteria to select the individuals used for the
+calculation of the mean growth in the "phylogenetic hierarchical"
+correction. Give the name of the column(s) for which the individuals must
+have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
+(character)}
 
 \item{Digits}{Number of decimal places to be used in the 'DBHCor' column
 (Default: 1L) (integer)}
