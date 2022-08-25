@@ -83,13 +83,18 @@ TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
 TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 
 
-Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
+Rslt <- StatusCorrection(TestData[IdTree \%in\% selection],
+                         InvariantColumns = c("Site",
+                                              "Genus",
+                                              "Species",
+                                              "Family",
+                                              "ScientificName"))
 
 library(ggplot2)
 ggplot(Rslt) +
 aes(x = Year, y = LifeStatusCor) +
   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-  geom_smooth(span = 0.75) +
+  geom_line() +
   theme_minimal() +
   facet_wrap(vars(IdTree), scales = "free")
 

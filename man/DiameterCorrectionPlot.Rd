@@ -4,7 +4,7 @@
 \alias{DiameterCorrectionPlot}
 \title{Diameter Correction Plot}
 \usage{
-DiameterCorrectionPlot(Data)
+DiameterCorrectionPlot(Data, FileName = "DiameterCorrectionPlots.pdf")
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -17,6 +17,8 @@ The dataset must contain the columns:
 \code{HOM} (Height Of Measurement) (numeric)
 \code{HOMCor} (Corrected Height Of Measurement) (numeric)
 }}
+
+\item{FileName}{Name to give to the pdf file (ending with .pdf) (character)}
 }
 \value{
 Saves a pdf to the root of your R project with the plots of the

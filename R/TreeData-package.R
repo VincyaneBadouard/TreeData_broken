@@ -36,7 +36,7 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
 
                          ".", ".N", ".SD", ".NATURAL", "..ColumnsToReturn",
 
-                         "IDYear", "V1", "MaxHOM", "MaxDate",
+                         "IDYear", "V1", "MaxHOM", "MaxDate", "POMChange",
 
                          "LifeStatusCor", "Comment",
                          "TaperCorDBH",

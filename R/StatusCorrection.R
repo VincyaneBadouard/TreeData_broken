@@ -69,13 +69,18 @@
 #' TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 #'
 #'
-#' Rslt <- StatusCorrection(TestData[IdTree %in% selection])
+#' Rslt <- StatusCorrection(TestData[IdTree %in% selection],
+#'                          InvariantColumns = c("Site",
+#'                                               "Genus",
+#'                                               "Species",
+#'                                               "Family",
+#'                                               "ScientificName"))
 #'
 #' library(ggplot2)
 #' ggplot(Rslt) +
 #' aes(x = Year, y = LifeStatusCor) +
 #'   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-#'   geom_smooth(span = 0.75) +
+#'   geom_line() +
 #'   theme_minimal() +
 #'   facet_wrap(vars(IdTree), scales = "free")
 #'
@@ -263,7 +268,12 @@ StatusCorrection <- function(
 #' # Write the sequence
 #' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 #'
-#' Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021))
+#' Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
+#'                                InvariantColumns = c("Site",
+#'                                                     "Genus",
+#'                                                     "Species",
+#'                                                     "Family",
+#'                                                     "ScientificName"))
 #'
 #' library(ggplot2)
 #' ggplot(DataTree) +

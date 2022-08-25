@@ -109,7 +109,6 @@ PunctualErrorDetection <- function(
         # # If only 2 values, with abnormal difference
         # if(length(DBHCor[!is.na(DBHCor)]) == 2 & i==1){ # i =  chaque valeur aberrante
         #
-        #   if(TrustMeasSet %in% "first"){
         #     # trust the 1st one
         #     if(DetectOnly %in% FALSE){ # correct now
         #
@@ -118,18 +117,6 @@ PunctualErrorDetection <- function(
         #     }else if(DetectOnly %in% TRUE){ # detect only
         #       DBHCor[!is.na(DBHCor)][2] <- NA # Put NA to put a comment after (DBHCor will be delete)
         #     }
-        #
-        #   }else if(TrustMeasSet %in% "last"){
-        #     # trust the 2nd one
-        #     if(DetectOnly %in% FALSE){ # correct now
-        #
-        #       DBHCor[!is.na(DBHCor)][1] <- NA # DBHCor[!is.na(DBHCor)][2]
-        #
-        #     }else if(DetectOnly %in% TRUE){ # detect only
-        #       DBHCor[!is.na(DBHCor)][1] <- NA # Put NA to put a comment after (DBHCor will be delete)
-        #     }
-        #
-        #   }
         #
         # } # end : only 2 values
 

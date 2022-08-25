@@ -32,7 +32,7 @@ test_that("PunctualErrorDetection", {
   #
   # ### Detect Only case
   # # Trust the first value
-  # Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, TrustMeasSet = "first", DetectOnly = TRUE)
+  # Rslt <- PunctualErrorDetection(DBHCor = DBHCor, Time = Time, DetectOnly = TRUE)
   # expect_true(Rslt[1] == DBHCor[1]) # the 1st value don't change
   # expect_true(is.na(Rslt[2])) # give the 1st value to the 2nd
 

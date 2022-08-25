@@ -91,7 +91,12 @@ DataTree <- DataTree[order(Year)] # arrange years in ascending order
 # Write the sequence
 DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
 
-Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021))
+Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
+                               InvariantColumns = c("Site",
+                                                    "Genus",
+                                                    "Species",
+                                                    "Family",
+                                                    "ScientificName"))
 
 library(ggplot2)
 ggplot(DataTree) +

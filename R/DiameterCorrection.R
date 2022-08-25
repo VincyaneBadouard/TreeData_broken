@@ -498,8 +498,8 @@ DiameterCorrectionByTree <- function(
 
   if(!"TaperCorDBH" %in% names(DataTree)){
     if(DetectOnly %in% FALSE){
-      if("POM" %in% names(DataTree)) DataTree[, POMcor := POM[1]] # Corrected diameter is at the 1st POM
-      if("HOM" %in% names(DataTree)) DataTree[, HOMCor := HOM[1]] # Corrected diameter is at the 1st  HOM
+      if("POM" %in% names(DataTree)) DataTree[, POMcor := POM[!is.na(POM)][1]] # Corrected diameter is at the 1st POM
+      if("HOM" %in% names(DataTree)) DataTree[, HOMCor := HOM[!is.na(HOM)][1]] # Corrected diameter is at the 1st  HOM
     }
   }
 

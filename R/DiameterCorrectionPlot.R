@@ -9,6 +9,8 @@
 #'     `HOM` (Height Of Measurement) (numeric)
 #'     `HOMCor` (Corrected Height Of Measurement) (numeric)
 #'
+#' @param FileName Name to give to the pdf file (ending with .pdf) (character)
+#'
 #' @return Saves a pdf to the root of your R project with the plots of the
 #'   initial diameter values and proposed corrections, by IdStem.
 #'
@@ -25,7 +27,10 @@
 #' # DiameterCorrectionPlot(Rslt)
 #'
 DiameterCorrectionPlot <- function(
-  Data
+  Data,
+  # CorCol = "DBHCor",
+  # InitialCol = "Diameter",
+  FileName = "DiameterCorrectionPlots.pdf"
 ){
 
   #### Arguments check ####
@@ -51,15 +56,17 @@ DiameterCorrectionPlot <- function(
   DataCor <- Data[IdStem %in% IdStemCor] #  corrected stems
 
   # Plot --------------------------------------------------------------------------------------------------------------
-  pdf("DiameterCorrectionPlots.pdf", width = 25, height = 10)
+  pdf(FileName, width = 25, height = 10)
   for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
     print(ggplot(DataCor) +
             aes(x = Year) +
+
             # Duplicated measurement
             geom_point(data = subset(DataCor, !is.na(Diameter)),
                        aes(y = Diameter,
                            color = if(is.na(DBHCor)) 'Duplicated measurement'),
                        shape = "circle", size = 3.9) +
+
             # Initial
             geom_point(data = subset(DataCor, !is.na(Diameter)),
                        aes(y = Diameter,
