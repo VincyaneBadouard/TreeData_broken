@@ -129,7 +129,7 @@ takes the original \code{Diameter} value. If this value is 0 or > MaxDBH,
 library(data.table)
 data(TestData)
 
- DataTree <- data.table(IdTree = "c",
+ DataTree <- data.table(IdStem = "c",
       ScientificName = "A",
       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
@@ -140,5 +140,7 @@ Rslt <- DiameterCorrectionByTree(
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("linear", "individual")
   )
+
+DiameterCorrectionPlot(Rslt)
 
 }

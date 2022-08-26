@@ -11,6 +11,7 @@ StatusCorrectionByTree(
     "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   DetectOnly = FALSE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE
@@ -39,6 +40,9 @@ to be considered dead (numeric)}
 \item{UseSize}{Use the size presence as a witness of the living status of the
 tree (logical)}
 
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses
+between 2 'Alive', FALSE: does not add any rows (logical)}
+
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
 
@@ -63,7 +67,7 @@ Inspired by the code of Nino Page package (ForestData::correct_alive() and
 \itemize{
 \item if UseSize : if Diameter != NA -> Alive
 \item \emph{Dead} > Alive -> NA
-\item add rows for the forgotten censuses between 2 'Alive'
+\item add rows for the forgotten censuses between 2 'Alive' if chosen
 \item Alive > \emph{Dead}/\emph{NA} > Alive -> Alive
 \item Alive > \emph{NA} > Dead -> NA
 \item Alive > \emph{Dead} > NA -> Dead
@@ -98,15 +102,6 @@ Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
                                                     "Family",
                                                     "ScientificName"))
 
-library(ggplot2)
-ggplot(DataTree) +
-  aes(x = Year, y = LifeStatus) +
-  geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-  theme_minimal()
-
-ggplot(Rslt) +
-  aes(x = Year, y = LifeStatusCor) +
-  geom_point(shape = "circle", size = 4L, colour = "#46337E") +
-  theme_minimal()
+LifeStatusCorrectionPlot(Rslt)
 
 }

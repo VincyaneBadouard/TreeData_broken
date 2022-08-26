@@ -16,7 +16,8 @@ PhylogeneticHierarchicalCorrection(
   NegativeGrowthThreshold,
   DBHRange = 10,
   MinIndividualNbr = 5,
-  OtherCrit = NULL
+  OtherCrit = NULL,
+  coef
 )
 }
 \arguments{
@@ -74,6 +75,11 @@ cm) (numeric, 1 value)}
 calculation of the mean growth. Give the name of the column(s) for which the
 individuals must have the same value as the tree to correct (e.g. c("Plot",
 "Subplot")) (character)}
+
+\item{coef}{(numeric) Necessary argument in case the number of individuals is
+insufficient to apply the "phylogenetic hierarchical" correction, and in
+this case the "individual" correction is applied (see
+IndividualDiameterShiftCorrection() function)}
 }
 \value{
 Fill columns:

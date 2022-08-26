@@ -24,7 +24,7 @@ test_that("RecruitmentCorrection", {
                regexp = "'InvariantColumns' argument must be of character class")
 
   expect_error(RecruitmentCorrection(TestData,
-                                DetectOnly = "no"),
+                                     DetectOnly = "no"),
                regexp = "The 'DetectOnly' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
@@ -38,6 +38,11 @@ test_that("RecruitmentCorrection", {
 
 
   # Check the function works
-  Rslt <- RecruitmentCorrection(TestData)
+  Rslt <- RecruitmentCorrection(TestData,
+                                InvariantColumns = c("Site",
+                                                     "Genus",
+                                                     "Species",
+                                                     "Family",
+                                                     "ScientificName"))
 
 })

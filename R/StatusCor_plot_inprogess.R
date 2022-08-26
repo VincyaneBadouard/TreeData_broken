@@ -1,6 +1,4 @@
-# library(ggplot2)
-# ggplot(Rslt) +
-#   aes(x = Year, y = LifeStatusCor) +
+#
 # Rslt[,LifeStatusCor := as.character(LifeStatusCor)]
 # Rslt[,LifeStatus := as.character(LifeStatus)]
 # Rslt[is.na(LifeStatusCor), LifeStatusCor := "NA"]
@@ -14,6 +12,8 @@
 #   geom_line(aes(y = LifeStatus), colour = "red") +
 #   geom_point(aes(y = LifeStatusCor), shape = "circle", size = 3.9, colour = "forestgreen") +
 #   geom_line(aes(y = LifeStatusCor), colour = "forestgreen") +
+#   geom_point(data = aes(y = LifeStatusCor), shape = "circle", size = 3.9, colour = "black") +
+#   geom_line(aes(y = LifeStatusCor), colour = "black") +
 #   theme_minimal() +
 #   facet_wrap(vars(IdTree), scales = "free")
 #
@@ -46,6 +46,9 @@
 #   # Titles
 #   labs(
 #     # title =  paste("IdStem: ",unique(Rslt$IdStem),""),
-#     x = "Year", y = "LifeStatus")
+#     x = "Year", y = "LifeStatus") +
+#
+#   facet_wrap(vars(IdTree), scales = "free")
+#
 #
 #

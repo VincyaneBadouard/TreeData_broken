@@ -2,9 +2,9 @@
 % Please edit documentation in R/DiameterCorrectionPlot.R
 \name{DiameterCorrectionPlot}
 \alias{DiameterCorrectionPlot}
-\title{Diameter Correction Plot}
+\title{Plot diameter correction result}
 \usage{
-DiameterCorrectionPlot(Data, FileName = "DiameterCorrectionPlots.pdf")
+DiameterCorrectionPlot(Data, OnlyCorrected = FALSE, CorCol = "DBHCor")
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -14,21 +14,27 @@ The dataset must contain the columns:
 \item \code{Year} (numeric)
 \item \code{Diameter} (numeric)
 \item \code{DBHCor} (numeric)
-\code{HOM} (Height Of Measurement) (numeric)
-\code{HOMCor} (Corrected Height Of Measurement) (numeric)
+\item \code{HOM} (Height Of Measurement) (numeric)
+\item \code{HOMCor} (Corrected Height Of Measurement) (numeric)
 }}
 
-\item{FileName}{Name to give to the pdf file (ending with .pdf) (character)}
+\item{OnlyCorrected}{TRUE: plot only corrected stems, FALSE: plot all stems}
+
+\item{CorCol}{Corrected column name (character)}
 }
 \value{
-Saves a pdf to the root of your R project with the plots of the
-initial diameter values and proposed corrections, by IdStem.
+The plots of the initial diameter values and proposed corrections, by
+IdStem.
 }
 \description{
-Diameter Correction Plot
+Plot diameter correction result
 }
 \examples{
 
-# DiameterCorrectionPlot(Rslt)
+\dontrun{
+pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
+DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
+dev.off()
+}
 
 }

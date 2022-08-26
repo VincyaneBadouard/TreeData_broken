@@ -206,7 +206,7 @@ BotanicalCorrection <- function(
       # Correct spelling error & standardise botanical names ----------------------------------------------------------------
 
       # TPL correction with Taxonstand package
-      TPLCor <- suppressWarnings(Taxonstand::TPL(unique(Data$ScientificNameCor),
+      TPLCor <- suppressWarnings(Taxonstand::TPL(splist = unique(Data$ScientificNameCor),
                                                  corr = TRUE, diffchar = 20, max.distance = 1)
       ) # diffchar: maximum difference of characters nbr between input and output
       # with Genus and species marche pas bien pcq décale genre et sp quand on unique())

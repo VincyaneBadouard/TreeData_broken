@@ -24,8 +24,6 @@
 #'
 #' @param coef description... (numeric)
 #'
-#' @param CorrectionType "quadratic" and/or "linear" (character)
-#'
 #' @details Method:
 #' 1. Correct the 1st value of the shift ("weighted mean"):
 #'   - Compute the absolute difference between the DBH to correct and the others
@@ -80,8 +78,7 @@ IndividualDiameterShiftCorrection <- function(
   cresc,
   cresc_abs,
   cresc_abn,
-  coef = 0.9,
-  CorrectionType = "linear"
+  coef = 0.9
 ){
 
   # length(cresc)-1 = length(DBHCor)
@@ -98,10 +95,6 @@ IndividualDiameterShiftCorrection <- function(
 
     # Give respective weights to the growth (cresc) values according to the distance to the DBH to correct
     Weights <- exp(DBHDiffs*-coef) # DBH indices
-
-    # data.table(DBHDiffs = DBHDiffs,
-    #            cresc = c(NA, cresc),
-    #            Weights = Weights)
 
     Weights <- Weights[-1] # remove 1st value to be in cresc indices
 

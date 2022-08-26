@@ -39,9 +39,9 @@
 #' library(data.table)
 #'
 #' Data <- data.table(
-#'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2),
+#'       Diameter = c(13:16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2),
 #'       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-#'       HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+#'       HOM = c(1.3, NA, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 #'
 #' Rslt <- TaperCorrection(Data)
 #'
@@ -56,7 +56,7 @@ TaperCorrection <- function(
 ){
 
   #### Arguments check ####
-  Data
+  # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
@@ -82,10 +82,10 @@ TaperCorrection <- function(
   # In data.table
   setDT(Data)
 
-  if(any(Data[,HOM] > DefaultHOM)){ # if some measurements of the tree were made above the POM by default
+  if(any(Data[,HOM] != DefaultHOM)){ # if some measurements of the tree were made above the POM by default
 
     Data <- GenerateComment(Data,
-                            condition = (Data[,HOM] > DefaultHOM),
+                            condition = (Data[,HOM] != DefaultHOM),
                             comment = paste0("HOM different from the default HOM"))
 
     if(DetectOnly %in% FALSE){
@@ -94,17 +94,23 @@ TaperCorrection <- function(
 
       # Apply taper correction  -------------------------------------------------------------------------------------------
       Data[HOM == DefaultHOM, ("TaperCorDBH") := ifelse(is.na(TaperCorDBH) | TaperCorDBH == 0, Diameter, TaperCorDBH)] # At default POM, keep the measured value
-      Data[HOM > DefaultHOM, ("TaperCorDBH") := TaperFormula(DAB = Diameter,
+      Data[HOM != DefaultHOM, ("TaperCorDBH") := TaperFormula(DAB = Diameter,
                                                         HOM = HOM,
                                                         TaperParameter = TaperParameter(DAB = Diameter, HOM = HOM),
                                                         DefaultHOM = DefaultHOM)
       ]
 
 
+      # If no HOM value, we keep the original Diameter value
+      Data[!is.na(Diameter) & is.na(HOM), TaperCorDBH := Diameter]
+
+      # If corrected value is 0 (DBH = NA) put NA
+      Data[TaperCorDBH == 0 & is.na(Diameter), TaperCorDBH := NA_real_]
+
       # Add the column with the correction method  ------------------------------------------------------------------------
 
       Data <- GenerateComment(Data,
-                              condition = ( Data[,HOM] > DefaultHOM & !is.na(Data[, TaperCorDBH]) ),
+                              condition = ( Data[,HOM] != DefaultHOM & !is.na(Data[, TaperCorDBH]) ),
                               comment = "taper",
                               column = "DiameterCorrectionMeth")
 

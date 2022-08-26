@@ -115,14 +115,13 @@
 #' library(data.table)
 #' data(TestData)
 #'
-#' # Remove other errors types (non-unique idTree, missing Year)
-#' # TestData <- TestData[!IdTree %in% c("100898", "101686")]
-#'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("linear", "phylogenetic hierarchical"),
-#'     MinIndividualNbr = 1)
+#'     CorrectionType = c("linear", "individual"),
+#'     MinIndividualNbr = 1, Digits = 2L)
+#'
+#' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 #'
 DiameterCorrection <- function(
   Data,
@@ -439,7 +438,7 @@ DiameterCorrection <- function(
 #' library(data.table)
 #' data(TestData)
 #'
-#'  DataTree <- data.table(IdTree = "c",
+#'  DataTree <- data.table(IdStem = "c",
 #'       ScientificName = "A",
 #'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
 #'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
@@ -450,6 +449,8 @@ DiameterCorrection <- function(
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
 #'   CorrectionType = c("linear", "individual")
 #'   )
+#'
+#' DiameterCorrectionPlot(Rslt)
 #'
 DiameterCorrectionByTree <- function(
   DataTree,
@@ -491,14 +492,14 @@ DiameterCorrectionByTree <- function(
   # In data.table
   setDT(DataTree)
 
-  if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
+  # if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
 
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # data.table::order
 
   if(!"TaperCorDBH" %in% names(DataTree)){
     if(DetectOnly %in% FALSE){
-      if("POM" %in% names(DataTree)) DataTree[, POMcor := POM[!is.na(POM)][1]] # Corrected diameter is at the 1st POM
+      if("POM" %in% names(DataTree)) DataTree[, POMCor := POM[!is.na(POM)][1]] # Corrected diameter is at the 1st POM
       if("HOM" %in% names(DataTree)) DataTree[, HOMCor := HOM[!is.na(HOM)][1]] # Corrected diameter is at the 1st  HOM
     }
   }
@@ -609,8 +610,7 @@ DiameterCorrectionByTree <- function(
                                                                 DBHCor = DBHCor, Time = Time,
                                                                 cresc = cresc, cresc_abs = cresc_abs,
                                                                 cresc_abn = raised,
-                                                                coef = coef,
-                                                                CorrectionType = CorrectionType)
+                                                                coef = coef)
 
                 DataTree <- IndCorRslt$DataTree
                 DBHCor <- IndCorRslt$DBHCor
@@ -629,7 +629,7 @@ DiameterCorrectionByTree <- function(
                 DBHCor = DBHCor, Time = Time,
                 PositiveGrowthThreshold = PositiveGrowthThreshold,
                 NegativeGrowthThreshold = NegativeGrowthThreshold,
-                DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit)
+                DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit, coef = coef)
 
               DBHCor <- DataTree[,DBHCor]
             }
@@ -713,7 +713,7 @@ DiameterCorrectionByTree <- function(
 
         if(DetectOnly %in% FALSE){
 
-          # Remove incr between 2 shifts (take growth only intra seq)
+          # Remove abnormal growths
           cresc[cresc_abn] <- NA
           cresc_abs[cresc_abn] <- NA
 
@@ -725,8 +725,7 @@ DiameterCorrectionByTree <- function(
                                                               DBHCor = DBHCor, Time = Time,
                                                               cresc = cresc, cresc_abs = cresc_abs,
                                                               cresc_abn = cresc_abn,
-                                                              coef = coef,
-                                                              CorrectionType = CorrectionType)
+                                                              coef = coef)
 
               DataTree <- IndCorRslt$DataTree
               DBHCor <- IndCorRslt$DBHCor
@@ -744,7 +743,7 @@ DiameterCorrectionByTree <- function(
               DBHCor = DBHCor, Time = Time,
               PositiveGrowthThreshold = PositiveGrowthThreshold,
               NegativeGrowthThreshold = NegativeGrowthThreshold,
-              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit)
+              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit, coef = coef)
 
             DBHCor <- DataTree[,DBHCor]
           }

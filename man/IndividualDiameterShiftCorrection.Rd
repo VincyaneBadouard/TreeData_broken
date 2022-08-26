@@ -11,8 +11,7 @@ IndividualDiameterShiftCorrection(
   cresc,
   cresc_abs,
   cresc_abn,
-  coef = 0.9,
-  CorrectionType = "linear"
+  coef = 0.9
 )
 }
 \arguments{
@@ -35,8 +34,6 @@ values) with NA instead of abnormal values (numeric)}
 \item{cresc_abn}{Abnormal diameter increment positions (numeric)}
 
 \item{coef}{description... (numeric)}
-
-\item{CorrectionType}{"quadratic" and/or "linear" (character)}
 }
 \value{
 List of 2 objects:

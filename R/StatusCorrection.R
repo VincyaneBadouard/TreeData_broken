@@ -1,7 +1,7 @@
 #' Status Correction
 #'
-#' @description Detect errors or detect errors and correct the tree life status
-#'   evolution over the censuses.
+#' @description Detect errors, or detect errors and correct, the tree life
+#'   status evolution over the censuses.
 #'   Inspired by the code of Nino Page package (ForestData::correct_alive() and
 #'   .correct_alive_tree())
 #'
@@ -25,6 +25,9 @@
 #' @param UseSize Use the size presence as a witness of the living status of the
 #'   tree (logical) (Default = FALSE)
 #'
+#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses
+#'   between 2 'Alive', FALSE: does not add any rows (logical)
+#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
 #'
@@ -37,7 +40,7 @@
 #' @details
 #' - if UseSize : if Diameter != NA -> Alive
 #' - *Dead* > Alive -> NA
-#' - add rows for the forgotten censuses between 2 'Alive'
+#' - add rows for the forgotten censuses between 2 'Alive' if chosen
 #' - Alive > *Dead*/*NA* > Alive -> Alive
 #' - Alive > *NA* > Dead -> NA
 #' - Alive > *Dead* > NA -> Dead
@@ -76,13 +79,8 @@
 #'                                               "Family",
 #'                                               "ScientificName"))
 #'
-#' library(ggplot2)
-#' ggplot(Rslt) +
-#' aes(x = Year, y = LifeStatusCor) +
-#'   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-#'   geom_line() +
-#'   theme_minimal() +
-#'   facet_wrap(vars(IdTree), scales = "free")
+#'
+#' LifeStatusCorrectionPlot(Rslt)
 #'
 StatusCorrection <- function(
   Data,
@@ -93,6 +91,7 @@ StatusCorrection <- function(
                        "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   DetectOnly = FALSE,
 
   RemoveRBeforeAlive = FALSE,
@@ -174,6 +173,7 @@ StatusCorrection <- function(
     InvariantColumns = InvariantColumns,
     DeathConfirmation = DeathConfirmation,
     UseSize = UseSize,
+    AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
     DetectOnly = DetectOnly,
 
     RemoveRBeforeAlive = RemoveRBeforeAlive,
@@ -219,6 +219,9 @@ StatusCorrection <- function(
 #' @param UseSize Use the size presence as a witness of the living status of the
 #'   tree (logical)
 #'
+#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses
+#'   between 2 'Alive', FALSE: does not add any rows (logical)
+#'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
 #'
@@ -231,7 +234,7 @@ StatusCorrection <- function(
 #' @details
 #' - if UseSize : if Diameter != NA -> Alive
 #' - *Dead* > Alive -> NA
-#' - add rows for the forgotten censuses between 2 'Alive'
+#' - add rows for the forgotten censuses between 2 'Alive' if chosen
 #' - Alive > *Dead*/*NA* > Alive -> Alive
 #' - Alive > *NA* > Dead -> NA
 #' - Alive > *Dead* > NA -> Dead
@@ -275,16 +278,7 @@ StatusCorrection <- function(
 #'                                                     "Family",
 #'                                                     "ScientificName"))
 #'
-#' library(ggplot2)
-#' ggplot(DataTree) +
-#'   aes(x = Year, y = LifeStatus) +
-#'   geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-#'   theme_minimal()
-#'
-#' ggplot(Rslt) +
-#'   aes(x = Year, y = LifeStatusCor) +
-#'   geom_point(shape = "circle", size = 4L, colour = "#46337E") +
-#'   theme_minimal()
+#' LifeStatusCorrectionPlot(Rslt)
 #'
 StatusCorrectionByTree <- function(
   DataTree,
@@ -296,6 +290,7 @@ StatusCorrectionByTree <- function(
                        "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   DetectOnly = FALSE,
 
   RemoveRBeforeAlive = FALSE,
@@ -393,6 +388,8 @@ StatusCorrectionByTree <- function(
     FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
   }
 
+  if(AddRowsForForgottenCensuses == TRUE){
+
   #### Absents (logical vector of the PlotCensuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
 
   PlotCensuses <- sort(PlotCensuses) # increasing order
@@ -476,6 +473,7 @@ StatusCorrectionByTree <- function(
     } # end: Nabsents > 0
   }
 
+  } # end AddRowsForForgottenCensuses
 
   #### Alive > *Alive* > Alive ####
   if(any(DataTree$LifeStatusCor %in% TRUE)){

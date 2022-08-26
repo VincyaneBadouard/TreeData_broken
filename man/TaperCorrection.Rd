@@ -61,9 +61,9 @@ TaperCorrection
 library(data.table)
 
 Data <- data.table(
-      Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2),
+      Diameter = c(13:16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2),
       POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-      HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+      HOM = c(1.3, NA, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
 Rslt <- TaperCorrection(Data)
 

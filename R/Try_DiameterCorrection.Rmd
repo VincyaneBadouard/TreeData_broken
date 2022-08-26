@@ -52,7 +52,7 @@ Rslt_status <- StatusCorrection(PanamaFormated,
                                                      "ScientificName"))
 ```
 
-# Plot - status 
+### Plot - status 
 ```{r}
 Rslt <- Rslt_status
 # Order IDs and times in ascending order 
@@ -82,6 +82,9 @@ dev.off()
 ## Taper Correction
 ```{r}
 Rslt_taper <- TaperCorrection(Data = PanamaFormated)
+save(Rslt_taper, file = "PanamaDBHCor_taper.rda")
+
+DiameterCorrectionPlot(Rslt_taper, OnlyCorrected = TRUE, CorCol = "TaperCorDBH")
 ```
 ### Plot - Taper Correction
 ```{r}
@@ -99,10 +102,10 @@ for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
   print(ggplot(RsltCor) +
           aes(x = Year) +
           # Duplicated measurement
-          geom_point(data = subset(RsltCor, !is.na(Diameter)),
-                     aes(y = Diameter,
-                         color = if(is.na(TaperCorDBH)) 'Duplicated measurement'),
-                     shape = "circle", size = 3.9) +
+          # geom_point(data = subset(RsltCor, !is.na(Diameter)),
+          #            aes(y = Diameter,
+          #                color = if(is.na(TaperCorDBH)) 'Duplicated measurement'),
+          #            shape = "circle", size = 3.9) +
           # Initial 
           geom_point(data = subset(RsltCor, !is.na(Diameter)),
                      aes(y = Diameter,
@@ -134,7 +137,7 @@ for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
           
           # Colours 
           scale_colour_manual(name = "Status", values = c("Conserved" = "black",
-                                                          "Duplicated measurement" = "grey",
+                                                          # "Duplicated measurement" = "grey",
                                                           "Initial" = "red",
                                                           "Corrected" = "forestgreen",
                                                           "Methode" = "purple",
@@ -143,11 +146,12 @@ for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
           
           # Titles 
           labs(
-            # title =  paste("IdStem: ",unique(RsltCor$IdStem),""),
+            # title =  paste("Scientific name: ",unique(RsltCor$ScientificName),""),
             x ="Year", y = "Diameter (cm)") +
           
           
-          ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = p) 
+          ggforce::facet_wrap_paginate(vars(IdStem, ScientificName),
+                                       scales = "free", ncol = 3, nrow = 3, page = p) 
         
   )
   
@@ -186,11 +190,14 @@ Rslt <- Rslt_Ind
 # Order IDs and times in ascending order 
 Rslt <- Rslt[order(IdStem, Year)]
 
-IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
+RsltCor <- Rslt
+IdStemCor <- Rslt[, IdStem] #  corrected stems
 
-RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
+# IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
+# 
+# RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
 
-pdf("DiameterCorrectionPlots_Ind.pdf", width = 25, height = 10)
+pdf("DiameterCorrectionPlots_Ind_all.pdf", width = 25, height = 10)
 for(p in 1:(ceiling(length(unique(IdStemCor))/9))){ 
   print(ggplot(RsltCor) +
           aes(x = Year) +
@@ -243,7 +250,7 @@ for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
             x ="Year", y = "Diameter (cm)") +
           
           
-          ggforce::facet_wrap_paginate(vars(IdStem), scales = "free", ncol = 3, nrow = 3, page = p) 
+          ggforce::facet_wrap_paginate(vars(IdStem, ScientificName), scales = "free", ncol = 3, nrow = 3, page = p) 
         
   )
   
@@ -253,9 +260,12 @@ dev.off()
 
 ## Machine à debug
 ```{r}
+# options(warn = 2) # trace warning
+# options(warn = 0) # when debug is over
+
 
 PanamaFormated <- UniqueMeasurement(PanamaFormated, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
-DataTree <- PanamaFormated[IdStem %in% "437195"]
+DataTree <- PanamaFormated[IdStem %in% "443101"]
 Data <- PanamaFormated
 DefaultHOM = 1.3
 MaxDBH = 500
@@ -276,6 +286,12 @@ Digits = 1L
 coef = 0.9
 
 DetectOnly = FALSE
+
+DiameterCorrectionByTree(
+  DataTree, Data,
+  WhatToCorrect = c("POM change", "punctual", "shift"),
+  CorrectionType = c("linear", "phylogenetic hierarchical")
+)
 
 ```
 

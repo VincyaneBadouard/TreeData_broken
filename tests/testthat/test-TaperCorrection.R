@@ -4,9 +4,9 @@ test_that("TaperCorrection", {
   library(data.table)
   DataTree <- data.table(IdTree = "c",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
-                         Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
+                         Diameter = c(13:16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
                          POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-                         HOM = c(1.3, 1.3, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+                         HOM = c(1.3, NA, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
 
   NoHOM <- copy(DataTree)
   NoHOM[, HOM := NULL] # remove HOM column
@@ -38,7 +38,7 @@ test_that("TaperCorrection", {
 
   # No correction, only comments
   expect_true(all(!c("TaperCorDBH", "DiameterCorrectionMeth") %in% names(Rslt)) & "Comment" %in% names(Rslt))
-  expect_true(all(Rslt$Diameter == DataTree$Diameter)) # no change in the original column
+  expect_true(all(Rslt$Diameter %in% DataTree$Diameter)) # no change in the original column
 
   ## Correction ---------------------------------------------------------------------------------------------------------------------
   Rslt <- TaperCorrection(DataTree)
@@ -55,7 +55,15 @@ test_that("TaperCorrection", {
     return(same)
   }
 
-  expect_true(all(!compareNA(Rslt$Diameter, Rslt$TaperCorDBH) == Comment) & all(Comment == Methode))
+
+  # If HOM different from the default HOM -> comment
+  expect_true(all(na.omit((Rslt$HOM != 1.3) == Comment)))
+
+  # If correction -> methode
+  expect_true(all(!compareNA(Rslt$Diameter, Rslt$TaperCorDBH) == Methode))
+
+  # If initial value is NA, output value is NA too
+  expect_true(all(is.na(Rslt$Diameter) == is.na(Rslt$TaperCorDBH)))
 
   # Check the value of the "DiameterCorrectionMeth" column
   expect_true(all(Rslt$DiameterCorrectionMeth[Methode] == "taper"))

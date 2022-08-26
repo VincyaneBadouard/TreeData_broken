@@ -69,7 +69,12 @@ library(data.table)
 data(TestData)
 setnames(TestData, "Diameter", "DBHCor")
 
-Rslt <- RecruitmentCorrection(TestData)
+Rslt <- RecruitmentCorrection(TestData,
+                              InvariantColumns = c("Site",
+                                                   "Genus",
+                                                   "Species",
+                                                   "Family",
+                                                   "ScientificName"))
 IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
 TreesCorr <- Rslt[IdTree \%in\% IdCorr]
 

@@ -10,6 +10,7 @@ StatusCorrection(
     "ScientificNameCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   DetectOnly = FALSE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE
@@ -36,6 +37,9 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 \item{UseSize}{Use the size presence as a witness of the living status of the
 tree (logical) (Default = FALSE)}
 
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses
+between 2 'Alive', FALSE: does not add any rows (logical)}
+
 \item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
 
@@ -51,8 +55,8 @@ Fill the \emph{Comment} column with error type informations. If
 life status.
 }
 \description{
-Detect errors or detect errors and correct the tree life status
-evolution over the censuses.
+Detect errors, or detect errors and correct, the tree life
+status evolution over the censuses.
 Inspired by the code of Nino Page package (ForestData::correct_alive() and
 .correct_alive_tree())
 }
@@ -60,7 +64,7 @@ Inspired by the code of Nino Page package (ForestData::correct_alive() and
 \itemize{
 \item if UseSize : if Diameter != NA -> Alive
 \item \emph{Dead} > Alive -> NA
-\item add rows for the forgotten censuses between 2 'Alive'
+\item add rows for the forgotten censuses between 2 'Alive' if chosen
 \item Alive > \emph{Dead}/\emph{NA} > Alive -> Alive
 \item Alive > \emph{NA} > Dead -> NA
 \item Alive > \emph{Dead} > NA -> Dead
@@ -90,12 +94,7 @@ Rslt <- StatusCorrection(TestData[IdTree \%in\% selection],
                                               "Family",
                                               "ScientificName"))
 
-library(ggplot2)
-ggplot(Rslt) +
-aes(x = Year, y = LifeStatusCor) +
-  geom_point(shape = "circle", size = 3.9, colour = "#46337E") +
-  geom_line() +
-  theme_minimal() +
-  facet_wrap(vars(IdTree), scales = "free")
+
+LifeStatusCorrectionPlot(Rslt)
 
 }

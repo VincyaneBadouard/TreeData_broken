@@ -52,6 +52,11 @@
 #'   individuals must have the same value as the tree to correct (e.g. c("Plot",
 #'   "Subplot")) (character)
 #'
+#' @param coef (numeric) Necessary argument in case the number of individuals is
+#'   insufficient to apply the "phylogenetic hierarchical" correction, and in
+#'   this case the "individual" correction is applied (see
+#'   IndividualDiameterShiftCorrection() function)
+#'
 #' @return Fill columns:
 #'   - *DBHCor*: corrected trees diameter at default HOM
 #'   - *DiameterCorrectionMeth* = "species"/"genus"/"family"/"stand"/"shift
@@ -112,7 +117,8 @@ PhylogeneticHierarchicalCorrection <- function(
   NegativeGrowthThreshold,
   DBHRange = 10,
   MinIndividualNbr = 5,
-  OtherCrit = NULL
+  OtherCrit = NULL,
+  coef
 ){
 
   # Secondary columns
@@ -228,13 +234,26 @@ PhylogeneticHierarchicalCorrection <- function(
 
           if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "stand"
 
-          }else if(nrow(Colleagues) == 0){
-            stop("There are no individuals of the same species (",unique(DataTree[,get(SfcName)]),")
-                     and diameter category(",PrevValue - DBHRange/2,";",PrevValue + DBHRange/2,")
-                     as the estimated diameter(",PrevValue,") of the stem ",unique(DataTree$IdStem),"")
+          }else{warning("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
+                       You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument).
+                        The 'individual' correction is applied in this case.")
+            IndCorRslt <- IndividualDiameterShiftCorrection(DataTree = DataTree,
+                                                            DBHCor = DBHCor, Time = Time,
+                                                            cresc = cresc, cresc_abs = cresc_abs,
+                                                            cresc_abn = cresc_abn,
+                                                            coef = coef)
+            DataTree <- IndCorRslt$DataTree
+            DBHCor <- IndCorRslt$DBHCor
 
-          }else{stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
-                       You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument)")}
+            if("DBHCor" %in% names(DataTree)){
+              DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+            }
+
+            DataTree[, DBHCor := DBHCor]
+
+
+            return(DataTree)
+            } # end individual correction
 
         } # end neither species nor genus or family level
       } # end neither species nor genus level
@@ -297,6 +316,8 @@ PhylogeneticHierarchicalCorrection <- function(
   }
 
   DataTree[, DBHCor := DBHCor]
+
+
 
   return(DataTree)
 

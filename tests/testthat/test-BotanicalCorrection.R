@@ -1,6 +1,6 @@
 test_that("BotanicalCorrection", {
 
-  options(warn = 2) # trace warning
+  # options(warn = 2) # trace warning
 
   library(data.table)
 
@@ -92,7 +92,7 @@ test_that("BotanicalCorrection", {
   Rslt <- list(RsltTPL, RsltWFO)
 
   # r = 1
-  for(r in 1:length(Rslt)){ # (A FAIRE)
+  for(r in 1:length(Rslt)){
 
     # No correction, only comments
     expect_true(all(!(grepl("Cor", names(Rslt[[r]])))) & "Comment" %in% names(Rslt[[r]]))
@@ -165,7 +165,7 @@ test_that("BotanicalCorrection", {
   } # end corrected Rslt loop
 
 
-  options(warn = 0) # when debug is over
+  # options(warn = 0) # when debug is over
 
 
 })

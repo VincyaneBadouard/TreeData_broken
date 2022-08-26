@@ -152,13 +152,12 @@ processed.
 library(data.table)
 data(TestData)
 
-# Remove other errors types (non-unique idTree, missing Year)
-# TestData <- TestData[!IdTree \%in\% c("100898", "101686")]
-
 Rslt <- DiameterCorrection(
  TestData,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("linear", "phylogenetic hierarchical"),
-    MinIndividualNbr = 1)
+    CorrectionType = c("linear", "individual"),
+    MinIndividualNbr = 1, Digits = 2L)
+
+DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 
 }
