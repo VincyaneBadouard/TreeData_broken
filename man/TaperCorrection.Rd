@@ -60,11 +60,14 @@ TaperCorrection
 \examples{
 library(data.table)
 
-Data <- data.table(
-      Diameter = c(13:16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2),
-      POM = c(0, 0, 0, 0, 1, 1, 1, 2, 2),
-      HOM = c(1.3, NA, 1.3, 1.3, 1.5, 1.5, 1.5, 2, 2))
+Data <- data.table(IdStem = "A",
+      ScientificName = "Tree",
+      Year = c(1998, 2008, 2016, 2017, 2018, 2019, 2021),
+      Diameter = c(19, 19, 21.4, 22.6, 23.1, 23.1, 23.6),
+      HOM = c(1.30, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25))
 
 Rslt <- TaperCorrection(Data)
+
+DiameterCorrectionPlot(Rslt, CorCol = "TaperCorDBH")
 
 }

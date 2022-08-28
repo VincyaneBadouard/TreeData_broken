@@ -119,7 +119,7 @@ test_that("BotanicalCorrection", {
   }
 
   # Correction
-  RsltTPL <- BotanicalCorrection(Data, Source = "TPL")
+  RsltTPL <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset) # "TPL" (doest' work during the github actions)
   RsltWFO <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)
 
   Rslt <- list(RsltTPL, RsltWFO)

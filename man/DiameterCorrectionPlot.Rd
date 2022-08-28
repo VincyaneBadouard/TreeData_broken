@@ -4,7 +4,12 @@
 \alias{DiameterCorrectionPlot}
 \title{Plot diameter correction result}
 \usage{
-DiameterCorrectionPlot(Data, OnlyCorrected = FALSE, CorCol = "DBHCor")
+DiameterCorrectionPlot(
+  Data,
+  OnlyCorrected = FALSE,
+  CorCol = "DBHCor",
+  SeveralWindows = TRUE
+)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -33,7 +38,7 @@ Plot diameter correction result
 
 \dontrun{
 pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
-DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
+DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
 dev.off()
 }
 

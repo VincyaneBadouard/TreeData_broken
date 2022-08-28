@@ -22,16 +22,17 @@
 #'
 #'\dontrun{
 #' pdf("LifeStatusCorrectionPlots.pdf", width = 25, height = 10)
-#' LifeStatusCorrectionPlot(Rslt)
+#' LifeStatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
 #' dev.off()
 #'}
 #'
 LifeStatusCorrectionPlot <- function(
   Data,
-  OnlyCorrected = FALSE
+  OnlyCorrected = FALSE,
   # CorCol = "LifeStatusCor",
   # InitialCol = "LifeStatus",
   # FileName = "LifeStatusCorrectionPlots.pdf"
+  SeveralWindows = TRUE
 ){
 
   #### Arguments check ####
@@ -76,8 +77,12 @@ LifeStatusCorrectionPlot <- function(
 
   # Plot --------------------------------------------------------------------------------------------------------------
   # pdf(FileName, width = 25, height = 10)
+
+  if(SeveralWindows == TRUE)
+  dev.new()
+
   for(p in 1:(ceiling(length(unique(IdTreeCor))/9))){
-    Pl <- ggplot(DataCor) +
+    print(ggplot(DataCor) +
       aes(x = Year) +
 
       # Initial
@@ -108,12 +113,16 @@ LifeStatusCorrectionPlot <- function(
 
       ggforce::facet_wrap_paginate(vars(IdTree), scales = "free", ncol = min(n,3), nrow = i, page = p)
 
-    # )
+    )
+
+    if(SeveralWindows == TRUE & p < ceiling(length(unique(IdTreeCor))/9))
+      dev.new()
+
 
   }
   # dev.off()
 
 
-  return(Pl)
+  # return(Pl)
 
 }

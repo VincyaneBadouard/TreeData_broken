@@ -27,16 +27,16 @@
 #'
 #'\dontrun{
 #' pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
-#' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
+#' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
 #' dev.off()
 #'}
 #'
 DiameterCorrectionPlot <- function(
   Data,
   OnlyCorrected = FALSE,
-  CorCol = "DBHCor"
-  # InitialCol = "Diameter",
-  # FileName = "DiameterCorrectionPlots.pdf"
+  CorCol = "DBHCor",
+  # InitialCol = "Diameter"
+  SeveralWindows = TRUE
 ){
 
   #### Arguments check ####
@@ -86,64 +86,71 @@ DiameterCorrectionPlot <- function(
   }else{ i = 3}
 
   # Plot --------------------------------------------------------------------------------------------------------------
-  for(p in 1:(ceiling(length(unique(IdStemCor))/9))){
-    Pl <- ggplot(DataCor) +
+
+  if(SeveralWindows == TRUE)
+    dev.new()
+
+  for(p in seq_len(ceiling(length(unique(IdStemCor))/9))){
+    print(ggplot(DataCor) +
       aes(x = Year) +
 
       # Duplicated measurement
-      {
-        if(nrow(subset(DataCor, !is.na(Diameter) & is.na(get(CorCol)))) > 0)
-          geom_point(data = subset(DataCor, !is.na(Diameter) & is.na(get(CorCol))),
-                     aes(y = Diameter,
-                         color = 'Duplicated measurement'),
-                     shape = "circle", size = 3.9) } +
-          # Initial
-          geom_point(data = subset(DataCor, !is.na(Diameter)),
-                     aes(y = Diameter,
-                         color = ifelse(Diameter != get(CorCol), 'Initial', 'Conserved')),
-                     shape = "circle", size = 3.9) +
-          geom_line(data = subset(DataCor, !is.na(Diameter)),
-                    aes(y = Diameter, color = ifelse(Diameter != get(CorCol), 'Initial', 'Conserved'))) +
+      {if(nrow(subset(DataCor, !is.na(Diameter) & is.na(get(CorCol)))) > 0)
+        geom_point(data = subset(DataCor, !is.na(Diameter) & is.na(get(CorCol))),
+                   aes(y = Diameter,
+                       color = 'Duplicated measurement'),
+                   shape = "circle", size = 3.9) } +
+      # Initial
+      geom_point(data = subset(DataCor, !is.na(Diameter)),
+                 aes(y = Diameter,
+                     color = ifelse(Diameter != get(CorCol), 'Initial', 'Conserved')),
+                 shape = "circle", size = 3.9) +
+      geom_line(data = subset(DataCor, !is.na(Diameter)),
+                aes(y = Diameter, color = ifelse(Diameter != get(CorCol), 'Initial', 'Conserved'))) +
 
-          ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(Diameter) & !is.na(get(POMv)))),
-                                   aes(y = Diameter, label = get(POMv), colour = "HOM"),
-                                   point.size = 3.9, size = 3, direction = "y") +
+      ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(Diameter) & !is.na(get(POMv)))),
+                               aes(y = Diameter, label = get(POMv), colour = "HOM"),
+                               point.size = 3.9, size = 3, direction = "y") +
 
-          # Corrected
-          geom_line(data = subset(DataCor, !is.na(get(CorCol))),
-                    aes(y = get(CorCol), color = ifelse(Diameter != get(CorCol), 'Corrected', 'Conserved'))) +
-          geom_point(data = subset(DataCor, !is.na(get(CorCol))),
-                     aes(y = get(CorCol),
-                         color = ifelse(Diameter != get(CorCol) | is.na(Diameter), 'Corrected', 'Conserved')),
-                     shape = "circle", size = 3.9) +
+      # Corrected
+      geom_line(data = subset(DataCor, !is.na(get(CorCol))),
+                aes(y = get(CorCol), color = ifelse(Diameter != get(CorCol), 'Corrected', 'Conserved'))) +
+      geom_point(data = subset(DataCor, !is.na(get(CorCol))),
+                 aes(y = get(CorCol),
+                     color = ifelse(Diameter != get(CorCol) | is.na(Diameter), 'Corrected', 'Conserved')),
+                 shape = "circle", size = 3.9) +
 
-          ggrepel::geom_text_repel(data = subset(DataCor,
-                                                 (!is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter))),
-                                   aes(y = get(CorCol), label = get(POMcorv), colour = "HOM"),
-                                   point.size = 3.9, size = 3, direction = "y") +
-          ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(get(CorCol)) & DiameterCorrectionMeth != "")),
-                                   aes(y = get(CorCol), label = DiameterCorrectionMeth, colour = "Methode"),
-                                   point.size = 10, size = 3) +
+      ggrepel::geom_text_repel(data = subset(DataCor,
+                                             (!is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter))),
+                               aes(y = get(CorCol), label = get(POMcorv), colour = "HOM"),
+                               point.size = 3.9, size = 3, direction = "y") +
+      ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(get(CorCol)) & DiameterCorrectionMeth != "")),
+                               aes(y = get(CorCol), label = DiameterCorrectionMeth, colour = "Methode"),
+                               point.size = 10, size = 3) +
 
-          # Colours
-          scale_colour_manual(name = "Status", values = c("Conserved" = "black",
-                                                          "Duplicated measurement" = "grey",
-                                                          "Initial" = "red",
-                                                          "Corrected" = "forestgreen",
-                                                          "Methode" = "purple",
-                                                          "HOM" = "blue")) +
-          theme_minimal() +
+      # Colours
+      scale_colour_manual(name = "Status", values = c("Conserved" = "black",
+                                                      {if(nrow(subset(DataCor, !is.na(Diameter) & is.na(get(CorCol)))) > 0)
+                                                        "Duplicated measurement" = "grey" },
+                                                      "Initial" = "red",
+                                                      "Corrected" = "forestgreen",
+                                                      "Methode" = "purple",
+                                                      "HOM" = "blue")) +
+      theme_minimal() +
 
-          # Titles
-          labs(
-            # title =  paste("IdStem: ",unique(DataCor$IdStem),""),
-            x = "Year", y = "Diameter (cm)") +
+      # Titles
+      labs(
+        # title =  paste("IdStem: ",unique(DataCor$IdStem),""),
+        x = "Year", y = "Diameter (cm)") +
 
 
-          ggforce::facet_wrap_paginate(vars(IdStem, ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = p)
+      ggforce::facet_wrap_paginate(vars(IdStem, ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = p)
+    )
 
-      }
-
-    return(Pl)
-
+    if(SeveralWindows == TRUE & p < ceiling(length(unique(IdStemCor))/9))
+      dev.new()
   }
+
+  # return(Pl)
+
+}

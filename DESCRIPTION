@@ -46,7 +46,7 @@ Imports:
     data.table (>= 1.14.2),
     shiny (>= 1.6.0),
     ggplot2 (>= 3.3.5),
-    ggforce (>= 0.3.3),
+    ggforce (>= 0.3.4),
     ggrepel (>= 0.9.1),
     data.tree (>= 1.0.0),
     stringdist (>= 0.9.8),

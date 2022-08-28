@@ -50,6 +50,10 @@ Rslt_status <- StatusCorrection(PanamaFormated,
                                                      "Species",
                                                      "Family",
                                                      "ScientificName"))
+
+pdf("LifeStatusCorrectionPlots.pdf", width = 25, height = 10)
+LifeStatusCorrectionPlot(Rslt_status, OnlyCorrected = T, SeveralWindows = F)
+dev.off()
 ```
 
 ### Plot - status 
@@ -84,80 +88,11 @@ dev.off()
 Rslt_taper <- TaperCorrection(Data = PanamaFormated)
 save(Rslt_taper, file = "PanamaDBHCor_taper.rda")
 
-DiameterCorrectionPlot(Rslt_taper, OnlyCorrected = TRUE, CorCol = "TaperCorDBH")
-```
-### Plot - Taper Correction
-```{r}
-Rslt <- Rslt_taper
-
-# Order IDs and times in ascending order 
-Rslt <- Rslt[order(IdStem, Year)]
-
-IdStemCor <- Rslt[Diameter != TaperCorDBH, IdStem] #  corrected stems
-
-RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
-
 pdf("TaperCorrectionPlots.pdf", width = 25, height = 10)
-for(p in 1:(ceiling(length(unique(IdStemCor))/9))){ 
-  print(ggplot(RsltCor) +
-          aes(x = Year) +
-          # Duplicated measurement
-          # geom_point(data = subset(RsltCor, !is.na(Diameter)),
-          #            aes(y = Diameter,
-          #                color = if(is.na(TaperCorDBH)) 'Duplicated measurement'),
-          #            shape = "circle", size = 3.9) +
-          # Initial 
-          geom_point(data = subset(RsltCor, !is.na(Diameter)),
-                     aes(y = Diameter,
-                         color = ifelse(Diameter != TaperCorDBH, 'Initial', 'Conserved')),
-                     shape = "circle", size = 3.9) +
-          geom_line(data = subset(RsltCor, !is.na(Diameter)),
-                    aes(y = Diameter, color = ifelse(Diameter != TaperCorDBH, 'Initial', 'Conserved'))) +
-          
-          geom_text_repel(data = subset(RsltCor, (!is.na(Diameter) & !is.na(HOM))),
-                          aes(y = Diameter, label = HOM, colour = "HOM"),
-                          point.size = 3.9, size = 3, direction = "y") +
-          
-          # Corrected 
-          geom_line(data = subset(RsltCor, !is.na(TaperCorDBH)),
-                    aes(y = TaperCorDBH, color = ifelse(Diameter != TaperCorDBH, 'Corrected', 'Conserved'))) +
-          
-          geom_point(data = subset(RsltCor, !is.na(TaperCorDBH)),
-                     aes(y = TaperCorDBH,
-                         color = ifelse(Diameter != TaperCorDBH | is.na(Diameter), 'Corrected', 'Conserved')),
-                     shape = "circle", size = 3.9) +
-          
-          geom_text_repel(data = subset(RsltCor,
-                                        (!is.na(TaperCorDBH) & !is.na(HOMCor) & (Diameter != TaperCorDBH) | is.na(Diameter))),
-                          aes(y = TaperCorDBH, label = HOMCor, colour = "HOM"),
-                          point.size = 3.9, size = 3, direction = "y") +
-          geom_text_repel(data = subset(RsltCor, (!is.na(TaperCorDBH) & DiameterCorrectionMeth != "")),
-                          aes(y = TaperCorDBH, label = DiameterCorrectionMeth, colour = "Methode"),
-                          point.size = 10, size = 3) +
-          
-          # Colours 
-          scale_colour_manual(name = "Status", values = c("Conserved" = "black",
-                                                          # "Duplicated measurement" = "grey",
-                                                          "Initial" = "red",
-                                                          "Corrected" = "forestgreen",
-                                                          "Methode" = "purple",
-                                                          "HOM" = "blue")) +
-          theme_minimal() +
-          
-          # Titles 
-          labs(
-            # title =  paste("Scientific name: ",unique(RsltCor$ScientificName),""),
-            x ="Year", y = "Diameter (cm)") +
-          
-          
-          ggforce::facet_wrap_paginate(vars(IdStem, ScientificName),
-                                       scales = "free", ncol = 3, nrow = 3, page = p) 
-        
-  )
-  
-}
+DiameterCorrectionPlot(Rslt_taper, OnlyCorrected = TRUE, CorCol = "TaperCorDBH", SeveralWindows = F)
 dev.off()
 ```
+
 
 ## Diameter correction
 WhatToCorrect = c("POM change", "punctual", "shift"),
@@ -173,6 +108,7 @@ CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchic
 # save(Rslt_Phylo, file = "PanamaDBHCor_Phylo.rda")
 load("D:/VSC TmFO/Data/StandardisedData/PanamaDBHCor_Phylo.rda")
 
+
 # Rslt_Ind <- DiameterCorrection(
 #   PanamaFormated,
 #   WhatToCorrect = c("POM change", "punctual", "shift"),
@@ -181,81 +117,21 @@ load("D:/VSC TmFO/Data/StandardisedData/PanamaDBHCor_Phylo.rda")
 # 
 # save(Rslt_Ind, file = "PanamaDBHCor_Ind.rda")
 load("D:/VSC TmFO/Data/StandardisedData/PanamaDBHCor_Ind.rda")
+
 ```
 
 ### Plot - Diameter Correction
 ```{r}
-Rslt <- Rslt_Ind
+# # # Plot phylogenetic hierarchical correction
+# pdf("DiameterCorrectionPlots_Phylo.pdf", width = 25, height = 10)
+# DiameterCorrectionPlot(Rslt_Phylo, OnlyCorrected = TRUE, SeveralWindows = F)
+# dev.off()
+# # 
+# # # Plot individual correction
+# pdf("DiameterCorrectionPlots_Ind.pdf", width = 25, height = 10)
+# DiameterCorrectionPlot(Rslt_Ind, OnlyCorrected = TRUE, SeveralWindows = F)
+# dev.off()
 
-# Order IDs and times in ascending order 
-Rslt <- Rslt[order(IdStem, Year)]
-
-RsltCor <- Rslt
-IdStemCor <- Rslt[, IdStem] #  corrected stems
-
-# IdStemCor <- Rslt[Diameter != DBHCor, IdStem] #  corrected stems
-# 
-# RsltCor <- Rslt[IdStem %in% IdStemCor] #  corrected stems
-
-pdf("DiameterCorrectionPlots_Ind_all.pdf", width = 25, height = 10)
-for(p in 1:(ceiling(length(unique(IdStemCor))/9))){ 
-  print(ggplot(RsltCor) +
-          aes(x = Year) +
-          # Duplicated measurement
-          geom_point(data = subset(RsltCor, !is.na(Diameter)),
-                     aes(y = Diameter,
-                         color = if(is.na(DBHCor)) 'Duplicated measurement'),
-                     shape = "circle", size = 3.9) +
-          # Initial 
-          geom_point(data = subset(RsltCor, !is.na(Diameter)),
-                     aes(y = Diameter,
-                         color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved')),
-                     shape = "circle", size = 3.9) +
-          geom_line(data = subset(RsltCor, !is.na(Diameter)),
-                    aes(y = Diameter, color = ifelse(Diameter != DBHCor, 'Initial', 'Conserved'))) +
-          
-          geom_text_repel(data = subset(RsltCor, (!is.na(Diameter) & !is.na(HOM))),
-                          aes(y = Diameter, label = HOM, colour = "HOM"),
-                          point.size = 3.9, size = 3, direction = "y") +
-          
-          # Corrected 
-          geom_line(data = subset(RsltCor, !is.na(DBHCor)),
-                    aes(y = DBHCor, color = ifelse(Diameter != DBHCor, 'Corrected', 'Conserved'))) +
-          
-          geom_point(data = subset(RsltCor, !is.na(DBHCor)),
-                     aes(y = DBHCor,
-                         color = ifelse(Diameter != DBHCor | is.na(Diameter), 'Corrected', 'Conserved')),
-                     shape = "circle", size = 3.9) +
-          
-          geom_text_repel(data = subset(RsltCor,
-                                        (!is.na(DBHCor) & !is.na(HOMCor) & (Diameter != DBHCor) | is.na(Diameter))),
-                          aes(y = DBHCor, label = HOMCor, colour = "HOM"),
-                          point.size = 3.9, size = 3, direction = "y") +
-          geom_text_repel(data = subset(RsltCor, (!is.na(DBHCor) & DiameterCorrectionMeth != "")),
-                          aes(y = DBHCor, label = DiameterCorrectionMeth, colour = "Methode"),
-                          point.size = 10, size = 3) +
-          
-          # Colours 
-          scale_colour_manual(name = "Status", values = c("Conserved" = "black",
-                                                          "Duplicated measurement" = "grey",
-                                                          "Initial" = "red",
-                                                          "Corrected" = "forestgreen",
-                                                          "Methode" = "purple",
-                                                          "HOM" = "blue")) +
-          theme_minimal() +
-          
-          # Titles 
-          labs(
-            # title =  paste("IdStem: ",unique(RsltCor$IdStem),""),
-            x ="Year", y = "Diameter (cm)") +
-          
-          
-          ggforce::facet_wrap_paginate(vars(IdStem, ScientificName), scales = "free", ncol = 3, nrow = 3, page = p) 
-        
-  )
-  
-}
-dev.off()
 ```
 
 ## Machine à debug

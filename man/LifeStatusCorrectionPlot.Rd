@@ -4,7 +4,7 @@
 \alias{LifeStatusCorrectionPlot}
 \title{Plot life status correction result}
 \usage{
-LifeStatusCorrectionPlot(Data, OnlyCorrected = FALSE)
+LifeStatusCorrectionPlot(Data, OnlyCorrected = FALSE, SeveralWindows = TRUE)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -29,7 +29,7 @@ Plot life status correction result
 
 \dontrun{
 pdf("LifeStatusCorrectionPlots.pdf", width = 25, height = 10)
-LifeStatusCorrectionPlot(Rslt)
+LifeStatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
 dev.off()
 }
 
