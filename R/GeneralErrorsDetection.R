@@ -51,10 +51,12 @@ GeneralErrorsDetection <- function(
     stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
   # ---------------------------------------------------------------------------------------------------------
 
+  Data[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
+  Data[, Subplot := as.character(Subplot)]
 
   #### Function ####
 
-  # data.frame to data.table
+  # In data.table
   setDT(Data)
 
   # Check duplicate rows ------------------------------------------------------------------------------------
@@ -76,16 +78,19 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
 
     if(Vars[v] %in% names(Data)){ # If the column exists
+      if(!all(is.na(Data[,get(Vars[v])]))){ # if the column is not completely empty
 
-      Data <- GenerateComment(Data,
-                              condition = is.na(Data[,get(Vars[v])]),
-                              comment = paste0("Missing value in ", Vars[v]))
+        Data <- GenerateComment(Data,
+                                condition = is.na(Data[,get(Vars[v])]),
+                                comment = paste0("Missing value in ", Vars[v]))
 
-      warning(paste0("Missing value in ", Vars[v]))
-    }
-  }
+        # warning(paste0("Missing value in ", Vars[v]))
 
-  # Data[Comment != ""] # to check (13 comments)
+      } # not empty column
+    } # column exists
+  } # Vars loop
+
+  # Data[grepl("Missing value", Comment)] # to check
 
 
   # Measurement variables = 0 -----------------------------------------------------------------------------------------
@@ -99,11 +104,12 @@ GeneralErrorsDetection <- function(
                               condition = Data[,get(Vars[v])] == 0,
                               comment = paste0(Vars[v]," cannot be 0"))
 
-      warning(paste0(Vars[v]," cannot be 0"))
-
+      # warning(paste0(Vars[v]," cannot be 0"))
     }
   }
-  # Data[get(Vars) == 0] # to check
+
+
+  # Data[grepl("cannot be 0", Comment)] # to check
 
 
 
@@ -157,7 +163,7 @@ GeneralErrorsDetection <- function(
   # Data[TreeFieldNum == duplicated_num,.(Year = sort(Year), Plot, Subplot, TreeFieldNum, Comment)] # to check (1 duplicate)
 
 
-  # Check of the unique association of the IdTree with Plot-Subplot-TreeFieldNum, at the site scale -------------------
+  # Check of the unique association of the IdTree/IdStem with Plot-Subplot-TreeFieldNum, at the site scale -------------------
 
   duplicated_ID <- CorresIDs <- vector("character")
 
@@ -180,7 +186,14 @@ GeneralErrorsDetection <- function(
                               & Data[,IdTree] %in% duplicated_ID,
                               comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
 
-      warning("Non-unique association of the IdTree(s) (",duplicated_ID,") with Plot, Subplot and TreeFieldNum")
+      DuplicatedID <- unique(Data[IdTree %in% duplicated_ID,
+                                  .(IdTree, Plot, Subplot, TreeFieldNum)])
+      DuplicatedID <- DuplicatedID[order(IdTree)]
+
+      b <- capture.output(DuplicatedID)
+      c <- paste(b, "\n", sep = "")
+
+      warning("Non-unique association of IdTree(s) with Plot, Subplot and TreeFieldNum:\n", c, "\n")
 
     }
   } # end site loop
@@ -190,39 +203,33 @@ GeneralErrorsDetection <- function(
 
 
   # Check duplicated IdTree/IdStem in a census ------------------------------------------------------------------------
+  DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
 
-  # Create "SitYearID" = "Site/Year/ID"
-  Data[, SitYearID := paste(Site, Year, get(ID), sep = "/")]
+  if(nrow(DuplicatedID) > 0){
 
-  duplicated_ids <- ids <- vector("character")
+    DuplicatedID[, IDYear := paste(V1, Year, sep = "/")] # code to detect
 
-  # if any duplicates in this col
-  if(anyDuplicated(Data$SitYearID) != 0){
-    # For each site
-    for (s in unique(na.omit(Data$Site))) {
-      # For each census
-      for (y in unique(na.omit(Data$Year))) {
+    Data[, IDYear := paste(get(ID), Year, sep = "/")] # code to detect
 
-        ids <- Data[Data$Site == s & Data$Year == y, get(ID)] # all the IDs for each Site and Year combination
+    Data <- GenerateComment(Data,
+                            condition = Data$IDYear %in% DuplicatedID[, IDYear],
+                            comment = paste0("Duplicated '", ID, "' in the census"))
 
-        # if there are several IdTree/IdStem per Site and Year combination
-        if(anyDuplicated(ids) != 0){
-          duplicated_ids <- unique(ids[duplicated(ids)])
+    a <- Data[IDYear %in% DuplicatedID[, IDYear], .(Year, Plot, Subplot, TreeFieldNum, get(ID))]
+    setnames(a, "V5", ID)
+    a <- a[order(get(ID), Year)]
+    b <- capture.output(a)
+    c <- paste(b, "\n", sep = "")
 
-          Data <- GenerateComment(Data,
-                                  condition =
-                                    Data[,Site] == s & Data[,Year] == y
-                                  & Data[,get(ID)] %in% duplicated_ids,
-                                  comment = paste0("Duplicated '", ID, "' in the census"))
+    warning("Duplicated '", ID, "' in the census:\n", c, "\n")
+    warning("If these duplicates are normal in your protocol (several measurements per year), you can leave your dataset like that,
+the corrections taking into account only 1 measurement per year will consider the data to correct according to the 'KeepMeas' argument.
+If these duplicates are abnormal according to your protocol, we advise you to treat them before applying the corrections.")
 
-        }
-      } # end year loop
-    } # end site loop
+    Data[, IDYear := NULL]
   }
 
-  Data[, SitYearID := NULL]
-
-  # Data[IdTree == duplicated_ids,.(Year = sort(Year), Plot, Subplot, TreeFieldNum, IdTree, Comment)] # to check
+  # Data[grepl("Duplicated", Comment)] # to check
 
 
   # Check for trees outside the subplot (A FAIRE) ---------------------------------------------------------------------

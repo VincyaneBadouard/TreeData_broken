@@ -284,9 +284,11 @@ RecruitmentCorrectionByTree <- function(
     stop("The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
          of the 'RecruitmentCorrectionByTree' function must be 1 numeric value each")
 
-  # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  if(DetectOnly %in% FALSE){
+    # InvariantColumns
+    if (!inherits(InvariantColumns, "character"))
+      stop("'InvariantColumns' argument must be of character class")
+  }
 
   # PlotCensuses
   if (!inherits(PlotCensuses, c("numeric", "integer")))
@@ -320,11 +322,13 @@ RecruitmentCorrectionByTree <- function(
   #   stop(paste0("Tree ",unique(DataTree$IdTree)," has multiple plots: " ,paste0(unique(DataTree$Plot), collapse = "/")))
   # }
 
-  # Check if the InvariantColumns name exists in DataTree
-  for(c in InvariantColumns){
-    if(!c %in% names(DataTree)){
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,c,"is apparently not a dataset's column"))
+  if(DetectOnly %in% FALSE){
+    # Check if the InvariantColumns name exists in DataTree
+    for(c in InvariantColumns){
+      if(!c %in% names(DataTree)){
+        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                   ,c,"is apparently not a dataset's column"))
+      }
     }
   }
 

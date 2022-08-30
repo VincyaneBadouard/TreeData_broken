@@ -16,30 +16,33 @@ test_that("GeneralErrorsDetection", {
 
 
   # Check the function work
-  Rslt <- GeneralErrorsDetection(TestData)
+  TestData[, IdStem := NULL]
+  Rslt <- suppressWarnings(GeneralErrorsDetection(TestData))
 
   ## Remove *duplicated rows*
   expect_true(anyDuplicated(TestData)!= 0 & anyDuplicated(Rslt) == 0)
 
   ## Check *missing value* in
   # (X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/IdTree/Diameter/POM/HOM/Family/Genus/Species/VernName)
-  Vars <- c("Plot", "Subplot", "Year", "TreeFieldNum", "IdTree",
-            "Diameter", "POM", "TreeHeight", "StemHeight", "HOM",
+  Vars <- c("Plot", "Subplot", "Year", "TreeFieldNum", "IdTree", "IdStem",
+            "Diameter", "POM", "HOM", "TreeHeight", "StemHeight",
             "XTreeUTM", "YTreeUTM", "Family", "Genus", "Species", "VernName")
   # v =1
   for (v in 1:length(Vars)) {
-
     if(Vars[v] %in% names(Rslt)){ # If the column exists
+      if(!all(is.na(Rslt[,get(Vars[v])]))){ # if the column is not completely empty
 
-      MissingVal <- is.na(Rslt[,get(Vars[v])]) # any(MissingVal)
+        MissingVal <- is.na(Rslt[,get(Vars[v])]) # any(MissingVal)
 
-      expect_true(all(Rslt$Comment[MissingVal] != ""))
-    }
-  }
+        expect_true(all(grepl("Missing value", Rslt[MissingVal, Comment])))
+
+      } # not empty column
+    } # column exists
+  } # Vars loop
 
 
   ## Check *missing value* (NA/0) in the measurement variables
-  Vars <- c("Diameter", "HOM", "TreeHeight")
+  Vars <- c("Diameter", "HOM", "TreeHeight", "StemHeight")
   # v = 1
   for (v in 1:length(Vars)) {
 
@@ -47,7 +50,8 @@ test_that("GeneralErrorsDetection", {
 
       NullVal <- Rslt[,get(Vars[v])] %in% 0 # any(NullVal) # which(is.na(NullVal))
 
-      expect_true(all(Rslt$Comment[NullVal] != ""))
+      expect_true(all(grepl("cannot be 0", Rslt[NullVal, Comment])))
+
     }
   }
 
@@ -85,14 +89,14 @@ test_that("GeneralErrorsDetection", {
   # } # end site loop
 
 
-  ## Check of the *unique association of the idTree with plot, TreeFieldNum subplot and coordinates* (at the site scale)
+  ## Check of the *unique association of the idTree with plot, TreeFieldNum subplot* (at the site scale)
 
   duplicated_ID <- CorresIDs <- vector("character")
   # For each site
   for (s in unique(na.omit(Rslt$Site))) {
 
     correspondances <- na.omit(unique(
-      Rslt[Rslt$Site == s, .(IdTree, Plot, Subplot, TreeFieldNum, XTreeUTM, YTreeUTM)]
+      Rslt[Rslt$Site == s, .(IdTree, Plot, Subplot, TreeFieldNum)]
     ))
 
     CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
@@ -102,36 +106,52 @@ test_that("GeneralErrorsDetection", {
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
       NnUniqdIdTree <- (Rslt[,Site] == s
-                     & Rslt[,IdTree] %in% duplicated_ID)
+                        & Rslt[,IdTree] %in% duplicated_ID)
 
-      expect_true(all(Rslt$Comment[NnUniqdIdTree] != "")) # Rslt[NnUniqdIdTree]
+      expect_true(all(grepl("Non-unique association", Rslt[NnUniqdIdTree, Comment]))) # Rslt[NnUniqdIdTree]
 
     }
   } # end site loop
 
-  ## Check *duplicated idTree* in a census (at the site scale)
+  ## Check *duplicated IdTree* in a census (at the site scale)
 
-  duplicated_ids <- ids <- vector("character")
+  DuplicatedID <- Rslt[duplicated(Rslt[, list(IdTree, Year)]), list(IdTree, Year)]
+
+  if(nrow(DuplicatedID) > 0){
+
+    DuplicatedID[, IDYear := paste(IdTree, Year, sep = "/")] # code to detect
+
+    Rslt[, IDYear := paste(IdTree, Year, sep = "/")] # code to detect
+
+    DuplIdTree <- Rslt$IDYear %in% DuplicatedID[, IDYear] # any(DuplIdTree)
+
+
+    expect_true(all(grepl("Duplicated", Rslt[DuplIdTree, Comment])))
+    # Rslt[DuplIdTree]
+
+  }
+
+
+  ## Check *invariant coordinates per IdTree*
+  duplicated_ID <- CorresIDs <- vector("character")
+
   # For each site
   for (s in unique(na.omit(Rslt$Site))) {
-    # For each census
-    for (y in unique(na.omit(Rslt$Year))) {
 
-      ids <- Rslt[Rslt$Site == s & Rslt$Year == y,]$IdTree # all the IdTree for each Site and Year combination
+    CoordIDCombination <- na.omit(unique(
+      Rslt[Rslt$Site == s, c("IdTree", "XTreeUTM", "YTreeUTM"), with = FALSE]
+    ))
 
-      # if there are several IdTree per Site and Year combination
-      if(anyDuplicated(ids) != 0){
-        duplicated_ids <- unique(ids[duplicated(ids)])
+    CorresIDs <- CoordIDCombination[, IdTree] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
 
-        DuplIdTree <- (Rslt[,Site] == s & Rslt[,Year] == y
-                 & Rslt[,IdTree] %in% duplicated_ids)
+    if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
 
-        expect_true(all(Rslt$Comment[DuplIdTree] != "")) # Rslt[DuplIdTree]
+      duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      }
-    } # end year loop
+      expect_true(all(grepl("Different coordinates", Rslt[IdTree %in% duplicated_ID, Comment])))
+
+    }
   } # end site loop
-
 
   ## Check for trees *outside the subplot* A FAIRE
 

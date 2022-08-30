@@ -1,16 +1,50 @@
-#   - Check botanical identification (*BotanicalCorrection*)
-#   - Check the life status evolution of the trees (*StatusCorrection*)
-#   - Check diameter evolution of the trees (*DiameterCorrection*)
-#   - Check recruitment (*RecruitmentCorrection*)
-
+#' Full error processing
+#'
+#' @inheritParams GeneralErrorsDetection
+#' @inheritParams BotanicalCorrection
+#' @inheritParams StatusCorrection
+#' @inheritParams TaperCorrection
+#' @inheritParams DiameterCorrection
+#' @inheritParams RecruitmentCorrection
+#'
+#' @details Detect errors or detect and correct errors:
+#' - Check general errors (*GeneralErrorsDetection*)
+#' - Check botanical identification (*BotanicalCorrection*)
+#' - Check the life status evolution of the trees/stems (*StatusCorrection*)
+#' - Apply a taper allometry on diameters measured at heights different from the
+#'    default(*TaperCorrection*)
+#' - Check diameter evolution of the trees (*DiameterCorrection*)
+#' - Check tree/stem recruitment (*RecruitmentCorrection*)
+#'
+#' @seealso \link{GeneralErrorsDetection}, \link{BotanicalCorrection},
+#'   \link{StatusCorrection}, \link{TaperCorrection}, \link{DiameterCorrection},
+#'   \link{RecruitmentCorrection}
+#'
+#' @return The original dataset (data.table) with a *Comment* column containing
+#'   information on the errors detected per row, the correction columns, and
+#'   columns containing correction methods.
+#'
+#' @export
+#'
+#' @examples
+#' data(TestData)
+#' Rslt <- FullErrorProcessing(TestData, DetectOnly = TRUE)
+#'
+#'\dontrun{
+#' WFO_Backbone <- file.choose()
+#' load(WFO_Backbone)
+#' Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)
+#' Rslt_Panama <- FullErrorProcessing(PanamaFormated, Source = "WFO", WFOData = WFO_Backbone)
+#' }
+#'
 FullErrorProcessing <- function(
 
   Data,
 
-  DetectOnly,
+  DetectOnly = FALSE,
 
   # Botanical informations
-  Source,
+  Source = NULL,
   WFOData = NULL,
 
   # Life status
@@ -61,7 +95,7 @@ FullErrorProcessing <- function(
     stop("Data must be a data.frame or data.table")
 
   # Source
-  Source <- match.arg(Source, choices = c("TPL", "WFO"))
+  Source <- match.arg(Source, choices = c("TPL", "WFO", NULL))
 
   # WFOData
   if(Source == "WFO" & is.null(WFOData))
@@ -89,21 +123,6 @@ FullErrorProcessing <- function(
                          inherits, "logical"))))
     stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
-
-  # Check if the InvariantColumns name exists in Data
-  for(c in InvariantColumns){
-    if (!c %in% names(Data)){ cc <- gsub("Cor", "", c) # remove - Cor
-
-    if (!cc %in% names(Data)){ # Col without - Cor exists?
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,cc,"is apparently not a dataset's column"))
-
-    }else{ InvariantColumns[InvariantColumns == c] <- cc # If yes replace by the col name without cor
-    warning("",c," column does't exist. ",cc," column is therefore considered as InvariantColumns instead of ",c,"")
-
-    }
-    } # if c doest exist
-  } # end c loop
 
   # UseSize-Diameter
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
@@ -160,10 +179,10 @@ FullErrorProcessing <- function(
     Digits <- as.integer(Digits)
   }
 
-  # Taper before if 'HOM' in the dataset and not 'TaperCorDBH'
-  if(any(!is.na(Data$HOM)) & !"TaperCorDBH" %in% names(Data)) # HOM exists?
+  # Taper before if 'HOM' and no taper correction asked
+  if(any(!is.na(Data$HOM)) & !"taper" %in% CorrectionType) # HOM exists?
     message("You have the 'HOM' information in your dataset.
-            We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)")
+            We advise you to correct your diameters also with the 'taper' correction (CorrectionType = 'taper')")
 
   # If 'POM' 'POM change' correction is advised
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &

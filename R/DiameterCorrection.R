@@ -15,7 +15,7 @@
 #'   - `Family_TreeDataCor` (character)
 #'
 #' @param KeepMeas In case of **multiple diameter measurements** in the same
-#'   census year, on which to apply the correction:
+#'   census year:
 #' Possible values: "MaxHOM", "MaxDate" (character).
 #'   - "MaxHOM": apply the correction to the measurement taken at the
 #'               **highest POM**
@@ -240,22 +240,6 @@ DiameterCorrection <- function(
     # nrow(Data) == nrow(AliveTrees) + nrow(DeadTrees) # to check
   }
 
-  # Check no duplicated IdTree/IdStem in a census ----------------------------------------------------------------------------
-  # DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
-  #
-  # setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""))
-  #
-  # if(nrow(DuplicatedID) > 0){
-  #
-  #   b <- capture.output(DuplicatedID)
-  #   c <- paste(b, "\n", sep = "")
-  #   # cat("Your data set is:\n", c, "\n")
-  #
-  #   stop("Duplicated ", ID, "(s) in a census:\n", c, "\n")
-  #
-  # }
-
-
   # Remove duplicated measurements per Year because different POM or Date -----------------------------------
   CompleteData <- copy(Data)
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
@@ -267,7 +251,9 @@ DiameterCorrection <- function(
 
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+  if(DetectOnly %in% FALSE){
   if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
+  }
 
   # If no diameter value, write a comment
   Data <- GenerateComment(Data,

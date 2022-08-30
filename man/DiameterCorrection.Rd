@@ -42,7 +42,7 @@ dataset must also contain the columns:
 }}
 
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
-census year, on which to apply the correction:
+census year:
 Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
 \item "MaxHOM": apply the correction to the measurement taken at the

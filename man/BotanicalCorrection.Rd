@@ -4,7 +4,7 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, Source, WFOData = NULL, DetectOnly = FALSE)
+BotanicalCorrection(Data, Source = NULL, WFOData = NULL, DetectOnly = FALSE)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -24,6 +24,7 @@ The dataset must contain the columns:
 on the 2013 taxonomy)
 \item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
 but based on the 2022 taxonomy)
+\item NULL: if only error detection (DetectOnly = TRUE)
 }}
 
 \item{WFOData}{To be filled in if the argument \code{Source} = "WFO". Data set

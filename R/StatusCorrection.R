@@ -120,9 +120,11 @@ StatusCorrection <- function(
     to add rows to the census where the plot was inventoried, where the tree was alive, but not recorded")
   }
 
-  # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  if(DetectOnly %in% FALSE){
+    # InvariantColumns
+    if (!inherits(InvariantColumns, "character"))
+      stop("'InvariantColumns' argument must be of character class")
+  }
 
   # DeathConfirmation
   if (!inherits(DeathConfirmation, "numeric"))
@@ -134,20 +136,22 @@ StatusCorrection <- function(
     stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
-  # Check if the InvariantColumns name exists in Data
-  for(c in InvariantColumns){
-    if (!c %in% names(Data)){ cc <- gsub("_TreeDataCor", "", c) # remove _TreeDataCor
+  if(DetectOnly %in% FALSE){
+    # Check if the InvariantColumns name exists in Data
+    for(c in InvariantColumns){
+      if (!c %in% names(Data)){ cc <- gsub("_TreeDataCor", "", c) # remove _TreeDataCor
 
-    if (!cc %in% names(Data)){ # Col without - Cor exists?
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,cc,"is apparently not a dataset's column"))
+      if (!cc %in% names(Data)){ # Col without - Cor exists?
+        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
+                   ,cc,"is apparently not a dataset's column"))
 
-    }else{ InvariantColumns[InvariantColumns == c] <- cc # If yes replace by the col name without cor
-    warning("",c," column does't exist. ",cc," column is therefore considered as InvariantColumns instead of ",c,"")
+      }else{ InvariantColumns[InvariantColumns == c] <- cc # If yes replace by the col name without cor
+      warning("",c," column does't exist. ",cc," column is therefore considered as InvariantColumns instead of ",c,"")
 
-    }
-    } # if c doest exist
-  } # end c loop
+      }
+      } # if c doest exist
+    } # end c loop
+  }
 
   # UseSize-Diameter
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive

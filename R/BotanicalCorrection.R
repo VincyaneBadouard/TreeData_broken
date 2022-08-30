@@ -15,6 +15,7 @@
 #'           on the 2013 taxonomy)
 #'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
 #'           but based on the 2022 taxonomy)
+#'  - NULL: if only error detection (DetectOnly = TRUE)
 #'
 #' @param WFOData To be filled in if the argument `Source` = "WFO". Data set
 #'   with the static copy of the *World Flora Online* (WFO) Taxonomic Backbone
@@ -103,7 +104,7 @@
 #'
 BotanicalCorrection <- function(
   Data,
-  Source,
+  Source = NULL,
   WFOData = NULL,
   DetectOnly = FALSE
 ){
@@ -114,7 +115,7 @@ BotanicalCorrection <- function(
     stop("Data must be a data.frame or data.table")
 
   # Source
-  Source <- match.arg(Source, choices = c("TPL", "WFO"))
+  Source <- match.arg(Source, choices = c("TPL", "WFO", NULL))
 
   # WFOData
   if(Source == "WFO" & is.null(WFOData))
