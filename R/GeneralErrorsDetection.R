@@ -2,10 +2,6 @@
 #'
 #' @param Data Dataset (data.frame or data.table)
 #'
-#' @param ByStem must be equal to TRUE if your inventory contains the stem
-#'   level, equal to FALSE if not, and in this case the correction is done by
-#'   tree (logical)
-#'
 #' @details Detect errors
 #'   - Remove **duplicated rows**
 #'   - Check **missing value** in
@@ -13,9 +9,9 @@
 #'      IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 #'   - Check **missing value** (NA/0) in the measurement variables: "Diameter",
 #'      "HOM", "TreeHeight", "StemHeight"
-#'   - Check of the **unique association of the idTree with plot, subplot**
+#'   - Check of the **unique association of the IdTree with plot, subplot**
 #'      **and TreeFieldNum** (at the site scale)
-#'   - Check **duplicated idTree/IdStem** in a census (at the site scale)
+#'   - Check **duplicated IdTree/IdStem** in a census (at the site scale)
 #'   - Check for trees **outside the subplot** (not implemented yet)
 #'   - Check **invariant coordinates per IdTree/IdStem**
 #'   - Check **fix Plot and Subplot number** (not implemented yet)
@@ -35,8 +31,7 @@
 #' Rslt <- GeneralErrorsDetection(TestData)
 #'
 GeneralErrorsDetection <- function(
-  Data,
-  ByStem = TRUE
+  Data
 ){
 
   #### Arguments check ####
@@ -45,21 +40,24 @@ GeneralErrorsDetection <- function(
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(Data) | all(is.na(Data$IdStem))) &
+     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
+
+
   #### Function ####
 
   # data.frame to data.table
   setDT(Data)
 
-  # ID
-  if(ByStem == TRUE){
-    ID <- "IdStem"
-    Data[, IdStem := as.character(IdStem)]
-  }else if (ByStem == FALSE) {
-    ID <- "IdTree"
-    Data[, IdTree := as.character(IdTree)]
-  }
-
-  # Check duplicate rows ----------------------------------------------------------------------------------------------
+  # Check duplicate rows ------------------------------------------------------------------------------------
   # if there are duplicate rows, delete them
 
   if(anyDuplicated(Data) != 0)

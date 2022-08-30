@@ -26,15 +26,15 @@
 #'
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
-#'   - `FamilyCor` (character): corrected Family name
+#'   - `Family_TreeDataCor` (character): corrected Family name
 #'   - `FamilyCorSource` (character): source of the Family correction
-#'   - `GenusCor` (character): corrected Genus name
-#'   - `SpeciesCor` (character): corrected Species name
+#'   - `Genus_TreeDataCor` (character): corrected Genus name
+#'   - `Species_TreeDataCor` (character): corrected Species name
 #'   - `BotanicalCorrectionSource` (character): source of the Genus and Species
 #'       correction
-#'   - `ScientificNameCor` (character): corrected Scientific name
-#'   - `VernNameCor` (character): completed if information available at `IdTree`
-#'       level.
+#'   - `ScientificName_TreeDataCor` (character): corrected Scientific name
+#'   - `VernName_TreeDataCor` (character): completed if information available at
+#'       `IdTree` level.
 #'
 #'@details
 #' - No special characters (typography)
@@ -250,7 +250,7 @@ BotanicalCorrection <- function(
           BIOMASS::getTaxonomy(unique(Data$GenusCor), findOrder = FALSE)
         )
 
-      FamilyData <- setnames(FamilyData, "family", "FamilyCor") # rename columns
+      setnames(FamilyData, "family", "FamilyCor") # rename columns
 
 
       # Join Family table and the dataset
@@ -440,6 +440,12 @@ BotanicalCorrection <- function(
 
   # unique(Data[IdTree %in% duplicated_ID,
   #             .(IdTree = sort(IdTree), Family, Genus, Species, Subspecies, VernName)]) # to check
+
+  if(DetectOnly %in% FALSE){
+    # Rename correction columns
+    Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
+    setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol))
+  }
 
   return(Data)
 

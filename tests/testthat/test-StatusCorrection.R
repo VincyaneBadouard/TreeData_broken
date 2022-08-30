@@ -59,9 +59,9 @@ test_that("StatusCorrection", {
 
   # Check the function work
 
-  expect_warning(StatusCorrection(TestData, InvariantColumns = "ScientificNameCor"))
+  expect_warning(StatusCorrection(TestData, InvariantColumns = "ScientificName_TreeDataCor"))
 
-  Rslt <- suppressWarnings(StatusCorrection(TestData, InvariantColumns = c("Site", "ScientificNameCor"), UseSize = TRUE))
+  Rslt <- suppressWarnings(StatusCorrection(TestData, InvariantColumns = c("Site", "ScientificName_TreeDataCor"), UseSize = TRUE))
 
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
 
@@ -70,7 +70,7 @@ test_that("StatusCorrection", {
   for(i in Ids){
 
     Seq <- Rslt[IdTree %in% i, LifeStatus]
-    SeqCor <- Rslt[IdTree %in% i, LifeStatusCor]
+    SeqCor <- Rslt[IdTree %in% i, LifeStatus_TreeDataCor]
 
     ## No "dead" before "alive"
     LastAlive <- max(which(SeqCor %in% TRUE))
@@ -113,7 +113,7 @@ test_that("StatusCorrection", {
     if(length(DBHprst) > 0){
     expect_true(all(DBHprst %in% which(SeqCor==T)))
 }
-    ## Add a "Comment" value when "LifeStatus" != "LifeStatusCor"
+    ## Add a "Comment" value when "LifeStatus" != "LifeStatus_TreeDataCor"
     Comment <- Rslt[IdTree %in% i, Comment] != ""
 
     compareNA <- function(v1,v2) {

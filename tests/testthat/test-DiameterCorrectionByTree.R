@@ -22,7 +22,7 @@ test_that("DiameterCorrectionByTree", {
                regexp = "DataTree must be a data.frame or data.table")
 
   expect_error(DiameterCorrectionByTree(TwoInd),
-               regexp = "DataTree must correspond to only 1 same tree/stem so 1 same IdTree/IdStem")
+               regexp = "DataTree must correspond to only 1 same tree/stem so 1 same")
 
   # Check the function work --------------------------------------------------------------------------------------------
 

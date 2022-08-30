@@ -6,23 +6,18 @@
 \usage{
 RecruitmentCorrection(
   Data,
-  ByStem = TRUE,
   KeepMeas = c("MaxHOM", "MaxDate"),
   MinDBH = 10,
   PositiveGrowthThreshold = 5,
-  InvariantColumns = c("Site", "GenusCor", "SpeciesCor", "FamilyCor",
-    "ScientificNameCor"),
+  InvariantColumns = c("Site", "Genus_TreeDataCor", "Species_TreeDataCor",
+    "Family_TreeDataCor", "ScientificName_TreeDataCor"),
   DetectOnly = FALSE
 )
 }
 \arguments{
 \item{Data}{(data.frame or data.table)
 The dataset should preferably contain the column of corrected diameters:
-'DBHCor', otherwise the function will take the column 'Diameter'}
-
-\item{ByStem}{must be equal to TRUE if your inventory contains the stem
-level, equal to FALSE if not, and in this case the correction is done by
-tree (logical)}
+'DBH_TreeDataCor', otherwise the function will take the column 'Diameter'}
 
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
 census year, on which to apply the correction:
@@ -49,25 +44,25 @@ tree (character)}
 }
 \value{
 Add rows for forgotten recruits with them estimated DBH in the
-'DBHCor' column, create a 'CorrectedRecruit' col (logical) and fill the
-'Comment' column : "This DBH is/was the 1st recorded for this tree,
-according to its annual growth and the census done for this plot, it should
-have been recruited earlier according to your protocol (MinDBH)."
+'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical)
+and fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+tree, according to its annual growth and the census done for this plot, it
+should have been recruited earlier according to your protocol (MinDBH)."
 }
 \description{
 RecruitmentCorrection
 }
 \details{
 If the size of the tree has never changed, or if there is only one
-value the same value is kept for the added forgotten recruits.
-If the Diameter has not been corrected (DBHCor column does not exist), the
-function will create it for the forgotten recruits. It is strongly
-recommended to correct the Diameter before correcting the recruits
+value the same value is kept for the added forgotten recruits. If the
+Diameter has not been corrected ('Diameter_TreeDataCor' column does not
+exist), the function will create it for the forgotten recruits. It is
+strongly recommended to correct the Diameter before correcting the recruits
 }
 \examples{
 library(data.table)
 data(TestData)
-setnames(TestData, "Diameter", "DBHCor")
+setnames(TestData, "Diameter", "Diameter_TreeDataCor")
 
 Rslt <- RecruitmentCorrection(TestData,
                               InvariantColumns = c("Site",
@@ -80,7 +75,7 @@ TreesCorr <- Rslt[IdTree \%in\% IdCorr]
 
 library(ggplot2)
 ggplot(TreesCorr) +
-aes(x = Year, y = DBHCor) +
+aes(x = Year, y = Diameter_TreeDataCor) +
   geom_line(size = 0.5, colour = "#112446") +
   geom_point(shape = "circle", size = 1.5, mapping = aes(color = CorrectedRecruit)) +
   theme_minimal() +

@@ -40,10 +40,35 @@ shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app") # data.tree,
 ```
 
 
-**Load the exemple dataset stored in the package**
+**Load the example dataset stored in the package**
 ```{r}
 # data()
 ```
+
+# Metadata of the ouput columns of the TreeData package
+- Comment (character): error type informations
+**Bota**
+- FamilyCor (character): corrected Family name
+- FamilyCorSource (character): source of the Family correction
+- GenusCor (character): corrected Genus name
+- SpeciesCor (character): corrected Species name
+- BotanicalCorrectionSource (character): source of the Genus and Species
+correction
+- ScientificNameCor (character): corrected Scientific name
+- VernNameCor (character): completed if information available at IdTree
+level.
+**Life Status**
+LifeStatusCor (logical): corrected stem life status.
+**Taper**
+- TaperCorDBH (numeric): corrected trees diameter at default HOM
+**Diameter**
+- DBHCor (numeric): corrected trees diameter at default HOM
+- DiameterCorrectionMeth (character): diameter correction methode = "taper"/"linear"/"quadratic"/"weighted mean"
+/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift realignment"/"Same value".
+- POMCor (factor): POM value at which the corrected diameters are proposed. Corresponds to the 1st POM value at which the stem was measured
+- HOMCor (numeric): HOM value at which the corrected diameters are proposed. Corresponds to the DefaultHOM if Taper corection applied. If not, corresponds to the 1st HOM value at which the stem was measured
+**Recruitment**
+- CorrectedRecruit (logical): TRUE: the row was added to represent the year when the stem was larger than the minimum diameter, but absent from the dataset. FALSE: original dataset row.
 
 # All the functions of the package
 # Arguments presentation

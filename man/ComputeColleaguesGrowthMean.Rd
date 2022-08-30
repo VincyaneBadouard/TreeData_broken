@@ -21,12 +21,12 @@ the same genus, the same family or the same stand, depending on what the
 inventory proposes and the minimum selection criteria of the user
 ('\emph{MinIndividualNbr}' argument of \emph{PhylogeneticHierarchicalCorrection()}).
 (data.table)
-The dataset must contain the column: 'IdStem' (character)}
+The dataset must contain the column: 'IdStem' or 'IdTree' (character)}
 
 \item{Data}{(data.table)
 The dataset must contain the columns:
 \itemize{
-\item 'IdStem' (character)
+\item 'IdStem' or 'IdTree' (character)
 \item 'Diameter' (numeric)
 \item 'Year' (numeric)
 }}

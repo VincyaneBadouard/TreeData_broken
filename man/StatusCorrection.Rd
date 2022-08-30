@@ -6,8 +6,8 @@
 \usage{
 StatusCorrection(
   Data,
-  InvariantColumns = c("Site", "GenusCor", "SpeciesCor", "FamilyCor",
-    "ScientificNameCor"),
+  InvariantColumns = c("Site", "Genus_TreeDataCor", "Species_TreeDataCor",
+    "Family_TreeDataCor", "ScientificName_TreeDataCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
@@ -51,8 +51,8 @@ concerning the tree after its death? (logical)}
 }
 \value{
 Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add a \emph{LifeStatusCor} column with the corrected trees
-life status.
+\emph{DetectOnly} = FALSE, add a \emph{LifeStatus_TreeDataCor} column with the
+corrected trees life status.
 }
 \description{
 Detect errors, or detect errors and correct, the tree life

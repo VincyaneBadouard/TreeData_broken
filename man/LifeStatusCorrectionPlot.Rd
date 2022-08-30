@@ -13,14 +13,19 @@ The dataset must contain the columns:
 \item \code{IdTree} (character)
 \item \code{Year} (numeric)
 \item \code{LifeStatus} (logical or character)
-\item \code{LifeStatusCor} (logical or character)
+\item \code{LifeStatus_TreeDataCor} (logical or character)
 }}
 
-\item{OnlyCorrected}{TRUE: plot only corrected trees, FALSE: plot all trees}
+\item{OnlyCorrected}{TRUE: plot only corrected trees, FALSE: plot all trees
+(logical)}
+
+\item{SeveralWindows}{TRUE: return each page in a new window (better
+visualisation in Rstudio), FALSE: return each page in the same window
+(needed to save all the pages) (logical)}
 }
 \value{
 The plots of the initial diameter values and proposed corrections, by
-IdStem.
+IdStem/IdTree
 }
 \description{
 Plot life status correction result

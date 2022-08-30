@@ -10,6 +10,11 @@
 #'   - `HOMCor` (Corrected Height Of Measurement) (numeric)
 #'
 #' @param OnlyCorrected TRUE: plot only corrected stems, FALSE: plot all stems
+#'   (logical)
+#'
+#' @param SeveralWindows TRUE: return each page in a new window (better
+#'   visualisation in Rstudio), FALSE: return each page in the same window
+#'   (needed to save all the pages) (logical)
 #'
 #' @param CorCol Corrected column name (character)
 #'
@@ -20,6 +25,7 @@
 #'   position_nudge scale_colour_manual labs vars
 #' @importFrom ggforce facet_wrap_paginate
 #' @importFrom ggrepel geom_text_repel
+#' @importFrom grDevices dev.new
 #'
 #' @export
 #'
@@ -34,7 +40,7 @@
 DiameterCorrectionPlot <- function(
   Data,
   OnlyCorrected = FALSE,
-  CorCol = "DBHCor",
+  CorCol = "Diameter_TreeDataCor",
   # InitialCol = "Diameter"
   SeveralWindows = TRUE
 ){
@@ -45,6 +51,18 @@ DiameterCorrectionPlot <- function(
   if(!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(Data) | all(is.na(Data$IdStem))) &
+     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
+
+
   # POM or HOM? ----------------------------------------------------------------------------------------------------------
   # If no HOM take POM
   if((!"HOM" %in% names(Data) | all(is.na(Data$HOM))) &
@@ -52,36 +70,36 @@ DiameterCorrectionPlot <- function(
 
   }else{ POMv <- "HOM"}
 
-  if((!"HOMCor" %in% names(Data) | all(is.na(Data$HOMCor))) &
-     ("POMCor" %in% names(Data) & any(!is.na(Data$POMCor))) ){ POMcorv <- "POMCor"
+  if((!"HOM_TreeDataCor" %in% names(Data) | all(is.na(Data$HOM_TreeDataCor))) &
+     ("POM_TreeDataCor" %in% names(Data) & any(!is.na(Data$POM_TreeDataCor))) ){ POMcorv <- "POM_TreeDataCor"
 
-  }else{ POMcorv <- "HOMCor"}
+  }else{ POMcorv <- "HOM_TreeDataCor"}
 
   # Columns --------------------------------------------------------------------------------------------------------------
   # IdStem, Year, Diameter, DBHCor, HOM, HOMCor
-  if(!all(c("IdStem", "Year", "Diameter", CorCol, POMv, POMcorv) %in% names(Data)))
-    stop(paste0("'IdStem', 'Year', 'Diameter', '",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
+  if(!all(c("Year", "Diameter", CorCol, POMv, POMcorv) %in% names(Data)))
+    stop(paste0("'Year', 'Diameter', '",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
 
 
   #### Function ####
 
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
-  Data <- Data[order(IdStem, Year)]
+  Data <- Data[order(get(ID), Year)]
 
   if(OnlyCorrected == TRUE){
     # Only corrected stems ----------------------------------------------------------------------------------------------
-    IdStemCor <- Data[Diameter != get(CorCol), IdStem] #  corrected stems
+    IDCor <- Data[Diameter != get(CorCol), get(ID)] #  corrected stems
 
-    DataCor <- Data[IdStem %in% IdStemCor] #  corrected stems
+    DataCor <- Data[get(ID) %in% IDCor] #  corrected stems
 
   }else{
     DataCor <- Data
-    IdStemCor <- Data[, IdStem]
+    IDCor <- Data[, get(ID)]
   }
 
 
   # Define nrow and ncol for the facet
-  n <- length(unique(IdStemCor))
+  n <- length(unique(IDCor))
   if(n<3) { i = 1
   }else{ i = 3}
 
@@ -90,7 +108,7 @@ DiameterCorrectionPlot <- function(
   if(SeveralWindows == TRUE)
     dev.new()
 
-  for(p in seq_len(ceiling(length(unique(IdStemCor))/9))){
+  for(p in seq_len(ceiling(length(unique(IDCor))/9))){
     print(ggplot(DataCor) +
       aes(x = Year) +
 
@@ -140,14 +158,14 @@ DiameterCorrectionPlot <- function(
 
       # Titles
       labs(
-        # title =  paste("IdStem: ",unique(DataCor$IdStem),""),
+        # title =  paste("ID: ",unique(DataCor[, get(ID)]),""),
         x = "Year", y = "Diameter (cm)") +
 
 
-      ggforce::facet_wrap_paginate(vars(IdStem, ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = p)
+      ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = p)
     )
 
-    if(SeveralWindows == TRUE & p < ceiling(length(unique(IdStemCor))/9))
+    if(SeveralWindows == TRUE & p < ceiling(length(unique(IDCor))/9))
       dev.new()
   }
 

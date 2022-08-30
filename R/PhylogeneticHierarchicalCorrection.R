@@ -7,19 +7,19 @@
 #' @param DataTree A dataset corresponding to a single tree/stem's (1
 #'   IdTree/IdStem) measurements (data.table)
 #'   The dataset must contain the columns:
-#'   - `IdStem` (character)
-#'   - `ScientificNameCor` (character)
-#'   - `GenusCor` (character)
-#'   - `FamilyCor` (character)
+#'   - `IdStem` or `IdTree`(character)
+#'   - `ScientificName_TreeDataCor` (character)
+#'   - `Genus_TreeDataCor` (character)
+#'   - `Family_TreeDataCor` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
 #'
 #' @param Data Complete dataset (data.table)
 #'   The dataset must contain the columns:
 #'   - `IdStem` (character)
-#'   - `ScientificNameCor` (character)
-#'   - `GenusCor` (character)
-#'   - `FamilyCor` (character)
+#'   - `ScientificName_TreeDataCor` (character)
+#'   - `Genus_TreeDataCor` (character)
+#'   - `Family_TreeDataCor` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
 #'
@@ -121,11 +121,23 @@ PhylogeneticHierarchicalCorrection <- function(
   coef
 ){
 
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(DataTree) | all(is.na(DataTree$IdStem))) &
+     ("IdTree" %in% names(DataTree) & any(!is.na(DataTree$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(DataTree)) | (all(is.na(DataTree$IdStem)) &  all(is.na(DataTree$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
+
+
   # Secondary columns
   BotaCol <- c("ScientificName", "Genus", "Family")
 
   for(c in BotaCol){
-    cc <- paste0(c, "Cor")
+    cc <- paste0(c, "_TreeDataCor")
 
     ## Corrected col or not corrected?
     if(cc %in% names(DataTree)){
@@ -176,7 +188,7 @@ PhylogeneticHierarchicalCorrection <- function(
     Colleagues <- Data[get(SfcName) == unique(DataTree[,get(SfcName)]) &
                          (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
-    Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+    Colleagues <- Colleagues[get(ID) %in% Colleagues[duplicated(get(ID)), get(ID)]] # more than 1 diameter value
 
 
     if(!is.null(OtherCrit)){
@@ -185,14 +197,14 @@ PhylogeneticHierarchicalCorrection <- function(
       }
     }
 
-    if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "species"
+    if(length(unique(Colleagues[, get(ID)])) >= MinIndividualNbr){ Method <- "species"
 
     }else{
       ## Genus level
       Colleagues <- Data[get(GenName) == unique(DataTree[, get(GenName)]) &
                            (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
-      Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+      Colleagues <- Colleagues[get(ID) %in% Colleagues[duplicated(get(ID)), get(ID)]] # more than 1 diameter value
 
 
       if(!is.null(OtherCrit)){
@@ -201,14 +213,14 @@ PhylogeneticHierarchicalCorrection <- function(
         }
       }
 
-      if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "genus"
+      if(length(unique(Colleagues[, get(ID)])) >= MinIndividualNbr){ Method <- "genus"
 
       }else{
         ## Family level
         Colleagues <- Data[get(FamName) == unique(DataTree[,get(FamName)]) &
                              (Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2))] # Diameter or DBHCor ?
 
-        Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+        Colleagues <- Colleagues[get(ID) %in% Colleagues[duplicated(get(ID)), get(ID)]] # more than 1 diameter value
 
 
         if(!is.null(OtherCrit)){
@@ -217,13 +229,13 @@ PhylogeneticHierarchicalCorrection <- function(
           }
         }
 
-        if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "family"
+        if(length(unique(Colleagues[, get(ID)])) >= MinIndividualNbr){ Method <- "family"
 
         }else{
           ## Stand level
           Colleagues <- Data[Diameter > (PrevValue - DBHRange/2) & Diameter < (PrevValue + DBHRange/2)] # Diameter or DBHCor ?
 
-          Colleagues <- Colleagues[IdStem %in% Colleagues[duplicated(IdStem), IdStem]] # more than 1 diameter value
+          Colleagues <- Colleagues[get(ID) %in% Colleagues[duplicated(get(ID)), get(ID)]] # more than 1 diameter value
 
 
           if(!is.null(OtherCrit)){
@@ -232,7 +244,7 @@ PhylogeneticHierarchicalCorrection <- function(
             }
           }
 
-          if(length(unique(Colleagues[, IdStem])) >= MinIndividualNbr){ Method <- "stand"
+          if(length(unique(Colleagues[, get(ID)])) >= MinIndividualNbr){ Method <- "stand"
 
           }else{warning("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
                        You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument).

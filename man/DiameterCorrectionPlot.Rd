@@ -7,7 +7,7 @@
 DiameterCorrectionPlot(
   Data,
   OnlyCorrected = FALSE,
-  CorCol = "DBHCor",
+  CorCol = "Diameter_TreeDataCor",
   SeveralWindows = TRUE
 )
 }
@@ -23,9 +23,14 @@ The dataset must contain the columns:
 \item \code{HOMCor} (Corrected Height Of Measurement) (numeric)
 }}
 
-\item{OnlyCorrected}{TRUE: plot only corrected stems, FALSE: plot all stems}
+\item{OnlyCorrected}{TRUE: plot only corrected stems, FALSE: plot all stems
+(logical)}
 
 \item{CorCol}{Corrected column name (character)}
+
+\item{SeveralWindows}{TRUE: return each page in a new window (better
+visualisation in Rstudio), FALSE: return each page in the same window
+(needed to save all the pages) (logical)}
 }
 \value{
 The plots of the initial diameter values and proposed corrections, by

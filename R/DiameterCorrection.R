@@ -2,8 +2,8 @@
 #'
 #' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
-#'   - `IdTree` or `IdStem` if *ByStem* argument = TRUE (character)
-#'   - `ScientificNameCor` (character)
+#'   - `IdTree` or `IdStem` (character)
+#'   - `ScientificName_TreeDataCor` (character)
 #'   - `Diameter` (numeric)
 #'   - `Year` (numeric)
 #'   - **`POM` (Point Of Measurement) (factor)** or
@@ -11,8 +11,8 @@
 #'      the **"POM change"**
 #'   If you want to apply the **"phylogenetic hierarchical"** correction, the
 #'   dataset must also contain the columns:
-#'   - `GenusCor` (character)
-#'   - `FamilyCor` (character)
+#'   - `Genus_TreeDataCor` (character)
+#'   - `Family_TreeDataCor` (character)
 #'
 #' @param KeepMeas In case of **multiple diameter measurements** in the same
 #'   census year, on which to apply the correction:
@@ -21,10 +21,6 @@
 #'               **highest POM**
 #'   - "MaxDate": apply the correction to the **most recent measurement** (same
 #'                year but more recent date)
-#'
-#' @param ByStem must be equal to TRUE if your inventory contains the stem
-#'   level, equal to FALSE if not, and in this case the correction is done by
-#'   tree (logical)
 #'
 #' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
 #'   (numeric, 1 value)
@@ -42,7 +38,7 @@
 #'   "compensated". (numeric, 1 value)
 #'
 #' @param Pioneers Scientific names of the pioneer species of the site, as in
-#'   the `ScientificNameCor` column (characters vector)
+#'   the `ScientificName_TreeDataCor` column (characters vector)
 #'
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
@@ -96,15 +92,20 @@
 #'
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
-#'   - *DBHCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* =
-#'   "linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
+#'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
+#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"weighted
+#'       mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
+#'       "shift realignment"/"Same value".
+#'   - *POM_TreeDataCor* (factor): POM value at which the corrected diameters are proposed.
+#'       Corresponds to the 1st POM value at which the stem was measured.
+#'   - *HOM_TreeDataCor* (numeric): HOM value at which the corrected diameters
+#'       are proposed. Corresponds to the 1st HOM value at which the stem was
+#'       measured.
 #'
-#' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
-#'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
-#'   `DBHCor` takes NA.
-#'   Diameters not linked to an IdTree/IdStem or to a Census Year are not
-#'   processed.
+#' @details When there is only 1 `Diameter` value for a tree/stem,
+#'   `Diameter_TreeDataCor` takes the original `Diameter` value. If this value
+#'   is 0 or > MaxDBH, `Diameter_TreeDataCor` takes NA. Diameters not linked to
+#'   an IdTree/IdStem or to a Census Year are not processed.
 #'
 #' @importFrom utils capture.output
 #' @importFrom stats na.omit
@@ -127,8 +128,6 @@ DiameterCorrection <- function(
   Data,
 
   KeepMeas = c("MaxHOM", "MaxDate"),
-
-  ByStem = TRUE,
 
   DefaultHOM = 1.3,
   MaxDBH = 500,
@@ -157,6 +156,17 @@ DiameterCorrection <- function(
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
+
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(Data) | all(is.na(Data$IdStem))) &
+     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
 
   # Diameter column exists
   if(!"Diameter" %in% names(Data))
@@ -195,8 +205,8 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
-  # Taper before if 'HOM' in the dataset and not 'TaperCorDBH'
-  if(any(!is.na(Data$HOM)) & !"TaperCorDBH" %in% names(Data)) # HOM exists?
+  # Taper before if 'HOM' in the dataset and not 'TaperDBH_TreeDataCor'
+  if(any(!is.na(Data$HOM)) & !"TaperDBH_TreeDataCor" %in% names(Data)) # HOM exists?
     message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)")
 
@@ -217,21 +227,18 @@ DiameterCorrection <- function(
   Data <- unique(Data)   # if there are duplicate rows, delete them
 
   # Dataset with the dead trees if no correction wanted for them --------------------------------------------
+  if("LifeStatus_TreeDataCor" %in% names(Data)){ Status <- "LifeStatus_TreeDataCor"
+  }else if ("LifeStatusCor" %in% names(Data)){ Status <- "LifeStatusCor"
+  }else if ("LifeStatus" %in% names(Data)){ Status <- "LifeStatus"
+  }else{stop("You have chosen DBHCorForDeadTrees = FALSE.
+             To apply this choice the dataset must contain the column
+             'LifeStatus_TreeDataCor', 'LifeStatusCor' or 'LifeStatus'")}
+
   if(DBHCorForDeadTrees == FALSE){
-    DeadTrees <- Data[LifeStatus == FALSE]
-    Data <- Data[LifeStatus == TRUE | is.na(LifeStatus)] # AliveTrees
+    DeadTrees <- Data[get(Status) == FALSE]
+    Data <- Data[get(Status) == TRUE | is.na(get(Status))] # AliveTrees
     # nrow(Data) == nrow(AliveTrees) + nrow(DeadTrees) # to check
   }
-
-  # ID
-  if(ByStem == TRUE){
-    ID <- "IdStem"
-    Data[, IdStem := as.character(IdStem)]
-  }else if (ByStem == FALSE) {
-    ID <- "IdTree"
-    Data[, IdTree := as.character(IdTree)]
-  }
-
 
   # Check no duplicated IdTree/IdStem in a census ----------------------------------------------------------------------------
   # DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
@@ -268,12 +275,6 @@ DiameterCorrection <- function(
                           comment = "Missing value in 'Diameter'")
 
   #### Function ####
-
-  if(ByStem == TRUE){
-    ID <- "IdStem"
-  }else if (ByStem == FALSE) {
-    ID <- "IdTree"
-  }
 
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
   Data <- Data[order(get(ID), Year)]
@@ -337,6 +338,13 @@ DiameterCorrection <- function(
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
   Data <- Data[order(get(ID), Year)]
 
+  if(DetectOnly %in% FALSE){
+    # Rename correction columns
+    setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
+             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"))
+  }
+
+
   return(Data)
 
 }
@@ -349,8 +357,7 @@ DiameterCorrection <- function(
 #' @param Data Complete dataset (data.table) used if the "phylogenetic
 #'   hierarchical" correction (*CorrectionType* argument) is chosen.
 #'   The dataset must contain the columns:
-#'   - `IdTree` (character)
-#'   - `IdStem` (character) if *ByStem* argument = TRUE
+#'   - `IdStem` or `IdTree` (character)
 #'   - `ScientificNameCor` (character)
 #'   - `GenusCor` (character)
 #'   - `FamilyCor` (character)
@@ -422,9 +429,9 @@ DiameterCorrection <- function(
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *DBHCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"individual"
-#'   /phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
-#'   realignment")
+#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"weighted
+#'   mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift
+#'   realignment"/"Same value".
 #'
 #' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
 #'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
@@ -449,8 +456,8 @@ DiameterCorrection <- function(
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
 #'   CorrectionType = c("linear", "individual")
 #'   )
-#'
-#' DiameterCorrectionPlot(Rslt)
+#' setnames(Rslt, "POMCor", "POM_TreeDataCor")
+#' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 #'
 DiameterCorrectionByTree <- function(
   DataTree,
@@ -482,22 +489,33 @@ DiameterCorrectionByTree <- function(
   if (!inherits(DataTree, c("data.table", "data.frame")))
     stop("DataTree must be a data.frame or data.table")
 
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(DataTree) | all(is.na(DataTree$IdStem))) &
+     ("IdTree" %in% names(DataTree) & any(!is.na(DataTree$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(DataTree)) | (all(is.na(DataTree$IdStem)) &  all(is.na(DataTree$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
+
+
   # if there are several IdTrees
-  if(length(unique(DataTree$IdTree)) != 1 & length(unique(DataTree$IdStem)) != 1){
-    stop("DataTree must correspond to only 1 same tree/stem so 1 same IdTree/IdStem
-    (the IdTrees: " ,paste0(unique(DataTree$IdTree), collapse = "/"),",
-     the IdStems: " ,paste0(unique(DataTree$IdStem), collapse = "/"),")")
+  if(length(unique(DataTree[, get(ID)])) != 1){
+    stop("DataTree must correspond to only 1 same tree/stem so 1 same ",ID,"
+    (the ",ID,"s: " ,paste0(unique(DataTree[, get(ID)]), collapse = "/"),"")
   }
 
   # In data.table
   setDT(DataTree)
 
-  # if("IdStem" %in% names(DataTree)) print(unique(DataTree[, IdStem])) # to debug
+  # print(unique(DataTree[, get(ID)])) # to debug
 
   # Arrange year in ascending order
   DataTree <- DataTree[order(Year)] # data.table::order
 
-  if(!"TaperCorDBH" %in% names(DataTree)){
+  if(!"TaperDBH_TreeDataCor" %in% names(DataTree)){
     if(DetectOnly %in% FALSE){
       if("POM" %in% names(DataTree)) DataTree[, POMCor := POM[!is.na(POM)][1]] # Corrected diameter is at the 1st POM
       if("HOM" %in% names(DataTree)) DataTree[, HOMCor := HOM[!is.na(HOM)][1]] # Corrected diameter is at the 1st  HOM
@@ -514,16 +532,16 @@ DiameterCorrectionByTree <- function(
 
     if(!is.null(Pioneers) & PioneersGrowthThreshold != PositiveGrowthThreshold){
 
-      ## ScientificNameCor or ScientificName?
-      if("ScientificNameCor" %in% names(DataTree)){
-        SfcName <- "ScientificNameCor"
+      ## ScientificName_TreeDataCor or ScientificName?
+      if("ScientificName_TreeDataCor" %in% names(DataTree)){
+        SfcName <- "ScientificName_TreeDataCor"
 
-      }else if(!"ScientificNameCor" %in% names(DataTree) & "ScientificName" %in% names(DataTree)){
+      }else if(!"ScientificName_TreeDataCor" %in% names(DataTree) & "ScientificName" %in% names(DataTree)){
         SfcName <- "ScientificName"
 
-      }else if(!any(c("ScientificNameCor", "ScientificName") %in% names(DataTree)))
+      }else if(!any(c("ScientificName_TreeDataCor", "ScientificName") %in% names(DataTree)))
 
-        stop("There are no 'ScientificNameCor' or 'ScientificName' column.
+        stop("There are no 'ScientificName_TreeDataCor' or 'ScientificName' column.
            It is not possible to take into account the pioneer character of species in the diameter correction.
              If you do not want to take into account the pioneer character in the diameter correction,
              leave the argument Pioneers = NULL.")
@@ -536,8 +554,8 @@ DiameterCorrectionByTree <- function(
     } # end Pioneers criteria
 
     # If the taper correction has been made, start from it
-    if("TaperCorDBH" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, TaperCorDBH]
-    if(!"TaperCorDBH" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, Diameter]
+    if("TaperDBH_TreeDataCor" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, TaperDBH_TreeDataCor]
+    if(!"TaperDBH_TreeDataCor" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, Diameter]
 
     Time <- DataTree[, Year]
 
@@ -559,7 +577,7 @@ DiameterCorrectionByTree <- function(
 
       if(!any(c("POM", "HOM") %in% names(DataTree)) | (all(is.na(DataTree$POM)) &  all(is.na(DataTree$HOM))) )
         message("You have chosen to make a 'POM change' correction,
-        but 'POM' and HOM' columns are empty for ", IdStem,".
+        but 'POM' and HOM' columns are empty for ", unique(DataTree[, get(ID)]),".
              This correction will therefore not be applied to this stem.")
 
 
@@ -801,13 +819,7 @@ DiameterCorrectionByTree <- function(
 
       if(any(na.omit(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold))){
 
-        if("IdStem" %in% names(DataTree)){
-          ID <- unique(DataTree[, IdStem])
-        }else{
-          ID <- unique(DataTree[, IdTree])
-        }
-
-        warning("There are still abnormal growths for the tree/stem ", ID,". Either the selected methods are insufficient
+        warning("There are still abnormal growths for the tree/stem ", unique(DataTree[, get(ID)]),". Either the selected methods are insufficient
                     or the method needs to be improved")
       }
     }
@@ -824,8 +836,8 @@ DiameterCorrectionByTree <- function(
 
   }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
 
-    if("TaperCorDBH" %in% names(DataTree)) DataTree[, DBHCor := TaperCorDBH] # keep taper Diameter
-    if(!"TaperCorDBH" %in% names(DataTree))  DataTree[, DBHCor := Diameter] # keep original Diameter
+    if("TaperDBH_TreeDataCor" %in% names(DataTree)) DataTree[, DBHCor := TaperDBH_TreeDataCor] # keep taper Diameter
+    if(!"TaperDBH_TreeDataCor" %in% names(DataTree))  DataTree[, DBHCor := Diameter] # keep original Diameter
 
 
     # DBH = 0 or > MaxDBH is impossible

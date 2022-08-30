@@ -29,9 +29,10 @@
 #'
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
-#'      - *TaperCorDBH*: corrected trees diameter at default HOM
+#'      - *TaperDBH_TreeDataCor*: corrected trees diameter at default HOM
 #'      - *DiameterCorrectionMeth* = "taper"
-#'      - *HOMCor* = HOM corresponding to the *TaperCorDBH* (= *DefaultHOM*)
+#'      - *HOM_TreeDataCor* (numeric): HOM corresponding to the
+#'           *TaperDBH_TreeDataCor* (= *DefaultHOM*)
 #'
 #' @export
 #'
@@ -45,8 +46,7 @@
 #'       HOM = c(1.30, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25))
 #'
 #' Rslt <- TaperCorrection(Data)
-#'
-#' DiameterCorrectionPlot(Rslt, CorCol = "TaperCorDBH")
+#' DiameterCorrectionPlot(Rslt, CorCol = "TaperDBH_TreeDataCor")
 #'
 TaperCorrection <- function(
   Data,
@@ -121,6 +121,11 @@ TaperCorrection <- function(
 
 
     } # end of the correction
+  }
+
+  if(DetectOnly %in% FALSE){
+  # Rename correction columns
+  setnames(Data, c("TaperCorDBH", "HOMCor"), c("TaperDBH_TreeDataCor", "HOM_TreeDataCor"))
   }
 
   return(Data)

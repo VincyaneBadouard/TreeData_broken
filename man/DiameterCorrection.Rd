@@ -7,7 +7,6 @@
 DiameterCorrection(
   Data,
   KeepMeas = c("MaxHOM", "MaxDate"),
-  ByStem = TRUE,
   DefaultHOM = 1.3,
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
@@ -29,8 +28,8 @@ DiameterCorrection(
 \item{Data}{Dataset (data.frame or data.table)
 The dataset must contain the columns:
 \itemize{
-\item \code{IdTree} or \code{IdStem} if \emph{ByStem} argument = TRUE (character)
-\item \code{ScientificNameCor} (character)
+\item \code{IdTree} or \code{IdStem} (character)
+\item \code{ScientificName_TreeDataCor} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
 \item \strong{\code{POM} (Point Of Measurement) (factor)} or
@@ -38,8 +37,8 @@ The dataset must contain the columns:
 the \strong{"POM change"}
 If you want to apply the \strong{"phylogenetic hierarchical"} correction, the
 dataset must also contain the columns:
-\item \code{GenusCor} (character)
-\item \code{FamilyCor} (character)
+\item \code{Genus_TreeDataCor} (character)
+\item \code{Family_TreeDataCor} (character)
 }}
 
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
@@ -51,10 +50,6 @@ Possible values: "MaxHOM", "MaxDate" (character).
 \item "MaxDate": apply the correction to the \strong{most recent measurement} (same
 year but more recent date)
 }}
-
-\item{ByStem}{must be equal to TRUE if your inventory contains the stem
-level, equal to FALSE if not, and in this case the correction is done by
-tree (logical)}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}
@@ -72,7 +67,7 @@ appears abnormal, but a negative measurement error can be allowed until -n
 "compensated". (numeric, 1 value)}
 
 \item{Pioneers}{Scientific names of the pioneer species of the site, as in
-the \code{ScientificNameCor} column (characters vector)}
+the \code{ScientificName_TreeDataCor} column (characters vector)}
 
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
@@ -133,20 +128,25 @@ have corrected the tree life status with the \emph{StatusCorrection()} function.
 Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
-\item \emph{DBHCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} =
-"linear"/"quadratic"/"individual"/"phylogenetic hierarchical"
+\item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
+\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"weighted
+mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
+"shift realignment"/"Same value".
+\item \emph{POM_TreeDataCor} (factor): POM value at which the corrected diameters are proposed.
+Corresponds to the 1st POM value at which the stem was measured.
+\item \emph{HOM_TreeDataCor} (numeric): HOM value at which the corrected diameters
+are proposed. Corresponds to the 1st HOM value at which the stem was
+measured.
 }
 }
 \description{
 Diameter correction
 }
 \details{
-When there is only 1 \code{Diameter} value for a tree/stem, \code{DBHCor}
-takes the original \code{Diameter} value. If this value is 0 or > MaxDBH,
-\code{DBHCor} takes NA.
-Diameters not linked to an IdTree/IdStem or to a Census Year are not
-processed.
+When there is only 1 \code{Diameter} value for a tree/stem,
+\code{Diameter_TreeDataCor} takes the original \code{Diameter} value. If this value
+is 0 or > MaxDBH, \code{Diameter_TreeDataCor} takes NA. Diameters not linked to
+an IdTree/IdStem or to a Census Year are not processed.
 }
 \examples{
 library(data.table)

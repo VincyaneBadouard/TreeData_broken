@@ -31,8 +31,7 @@ measurements (data.frame or data.table).}
 hierarchical" correction (\emph{CorrectionType} argument) is chosen.
 The dataset must contain the columns:
 \itemize{
-\item \code{IdTree} (character)
-\item \code{IdStem} (character) if \emph{ByStem} argument = TRUE
+\item \code{IdStem} or \code{IdTree} (character)
 \item \code{ScientificNameCor} (character)
 \item \code{GenusCor} (character)
 \item \code{FamilyCor} (character)
@@ -112,9 +111,9 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
 \item \emph{DBHCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"individual"
-/phylogenetic hierarchical("species"/"genus"/"family"/"stand"/"shift
-realignment")
+\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"weighted
+mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift
+realignment"/"Same value".
 }
 }
 \description{
@@ -140,7 +139,7 @@ Rslt <- DiameterCorrectionByTree(
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("linear", "individual")
   )
-
-DiameterCorrectionPlot(Rslt)
+setnames(Rslt, "POMCor", "POM_TreeDataCor")
+DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 
 }

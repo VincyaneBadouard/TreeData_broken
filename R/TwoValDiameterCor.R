@@ -4,7 +4,7 @@
 #'   IdTree/IdStem) measurements (data.table)
 #'   If 'phylogenetic hierarchical' correction is asked, the dataset must
 #'   contain the columns:
-#'   - `IdStem` (character)
+#'   - `IdStem` or `IdTree`(character)
 #'   - `ScientificNameCor` (character)
 #'   - `GenusCor` (character)
 #'   - `FamilyCor` (character)
@@ -13,7 +13,7 @@
 #'
 #' @param Data Complete dataset (data.table)
 #'   The dataset must contain the columns:
-#'   - `IdStem` (character)
+#'   - `IdStem` or `IdTree` (character)
 #'   - `ScientificNameCor` (character)
 #'   - `GenusCor` (character)
 #'   - `FamilyCor` (character)

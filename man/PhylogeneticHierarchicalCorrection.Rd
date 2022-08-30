@@ -25,10 +25,10 @@ PhylogeneticHierarchicalCorrection(
 IdTree/IdStem) measurements (data.table)
 The dataset must contain the columns:
 \itemize{
-\item \code{IdStem} (character)
-\item \code{ScientificNameCor} (character)
-\item \code{GenusCor} (character)
-\item \code{FamilyCor} (character)
+\item \code{IdStem} or \code{IdTree}(character)
+\item \code{ScientificName_TreeDataCor} (character)
+\item \code{Genus_TreeDataCor} (character)
+\item \code{Family_TreeDataCor} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
 }}
@@ -37,9 +37,9 @@ The dataset must contain the columns:
 The dataset must contain the columns:
 \itemize{
 \item \code{IdStem} (character)
-\item \code{ScientificNameCor} (character)
-\item \code{GenusCor} (character)
-\item \code{FamilyCor} (character)
+\item \code{ScientificName_TreeDataCor} (character)
+\item \code{Genus_TreeDataCor} (character)
+\item \code{Family_TreeDataCor} (character)
 \item \code{Diameter} (numeric)
 \item \code{Year} (numeric)
 }}

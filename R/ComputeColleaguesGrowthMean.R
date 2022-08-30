@@ -9,11 +9,11 @@
 #'   inventory proposes and the minimum selection criteria of the user
 #'   ('*MinIndividualNbr*' argument of *PhylogeneticHierarchicalCorrection()*).
 #'   (data.table)
-#'   The dataset must contain the column: 'IdStem' (character)
+#'   The dataset must contain the column: 'IdStem' or 'IdTree' (character)
 #'
 #' @param Data (data.table)
 #'   The dataset must contain the columns:
-#'   - 'IdStem' (character)
+#'   - 'IdStem' or 'IdTree' (character)
 #'   - 'Diameter' (numeric)
 #'   - 'Year' (numeric)
 #'
@@ -62,6 +62,18 @@ ComputeColleaguesGrowthMean <- function(
   DBHRange
 ){
 
+  # IdStem or IdTree? ---------------------------------------------------------------------------------------
+  # If no IdStem take IdTree
+  if((!"IdStem" %in% names(Data) | all(is.na(Data$IdStem))) &
+     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){ ID <- "IdTree"
+
+  }else{ ID <- "IdStem"}
+
+  if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
+    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
+  # ---------------------------------------------------------------------------------------------------------
+
+
   # POM or HOM?
   if((!"POM" %in% names(Colleagues) | all(is.na(Colleagues$POM))) &
      ("HOM" %in% names(Colleagues) & any(!is.na(Colleagues$HOM))) ){ POMv <- "HOM" # If no POM take HOM
@@ -71,17 +83,17 @@ ComputeColleaguesGrowthMean <- function(
   # Work start --------------------------------------------------------------------------------------------------------------
   # Find their cresc at these DBHs and compute the average of these crescs
 
-  # Collect their IdStem ----------------------------------------------------------------------------------------------------
-  ColleaguesId <- unique(Colleagues[, IdStem])
+  # Collect their ID ----------------------------------------------------------------------------------------------------
+  ColleaguesId <- unique(Colleagues[, get(ID)])
 
   # DBH seq of the Colleagues -----------------------------------------------------------------------------------------------
-  ColleaguesSeq <- Data[IdStem %in% ColleaguesId]
+  ColleaguesSeq <- Data[get(ID) %in% ColleaguesId]
 
   # Remove duplicated measurements ----------------------------------------------------------------------------------------
-  ColleaguesSeq <- ColleaguesSeq[!duplicated(ColleaguesSeq[, list(IdStem, Year)])]
+  ColleaguesSeq <- ColleaguesSeq[!duplicated(ColleaguesSeq[, list(get(ID), Year)])]
 
-  # Order IdStems and times in ascending order
-  ColleaguesSeq <- ColleaguesSeq[order(IdStem, Year)]
+  # Order IDs and times in ascending order
+  ColleaguesSeq <- ColleaguesSeq[order(get(ID), Year)]
 
   # Compute cresc for each Colleague ----------------------------------------------------------------------------------------
   # i = "614506"
@@ -89,27 +101,27 @@ ComputeColleaguesGrowthMean <- function(
 
     # i = "100747"
     ColleaguesCresc <- ComputeIncrementation( # matrix (Rows: ind, Col: cresc)
-      Var = ColleaguesSeq[IdStem %in% i, Diameter], # Diameter or DBHCor ?
+      Var = ColleaguesSeq[get(ID) %in% i, Diameter], # Diameter or DBHCor ?
       Type = "annual",
-      Time = ColleaguesSeq[IdStem %in% i, Year]
+      Time = ColleaguesSeq[get(ID) %in% i, Year]
     )
 
     # Compute cresc for individual i
-    if(nrow(ColleaguesSeq[IdStem == i]) > (length(ColleaguesCresc)+1) ) # 1 is for the fist value where cresc=NA
-      ColleaguesCresc [ (length(ColleaguesCresc)+1) :( nrow(ColleaguesSeq[IdStem == i])-1) ] <- NA # put NA errased at the vector end
+    if(nrow(ColleaguesSeq[get(ID) == i]) > (length(ColleaguesCresc)+1) ) # 1 is for the fist value where cresc=NA
+      ColleaguesCresc [ (length(ColleaguesCresc)+1) :( nrow(ColleaguesSeq[get(ID) == i])-1) ] <- NA # put NA errased at the vector end
 
-    ColleaguesSeq[IdStem == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
+    ColleaguesSeq[get(ID) == i, Cresc := c(NA, ColleaguesCresc)] # crescs in the Colleagues table
     # no cresc if no diameter
 
 
     # No cresc during POM change
     # POM change detection
     POMchange <- NA  # 1st val = NA because it's the default POM
-    for( n in (2:(length(ColleaguesSeq[IdStem %in% i, get(POMv)]))) ){
-      POMchange <- c(POMchange, ColleaguesSeq[IdStem %in% i, get(POMv)][n-1] != ColleaguesSeq[IdStem %in% i, get(POMv)][n]) # (TRUE = POM change)
+    for( n in (2:(length(ColleaguesSeq[get(ID) %in% i, get(POMv)]))) ){
+      POMchange <- c(POMchange, ColleaguesSeq[get(ID) %in% i, get(POMv)][n-1] != ColleaguesSeq[get(ID) %in% i, get(POMv)][n]) # (TRUE = POM change)
     }
 
-    ColleaguesSeq[IdStem == i, POMChange := POMchange]
+    ColleaguesSeq[get(ID) == i, POMChange := POMchange]
   }
 
   # No cresc during POM change

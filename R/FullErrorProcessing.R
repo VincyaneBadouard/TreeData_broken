@@ -9,18 +9,16 @@ FullErrorProcessing <- function(
 
   DetectOnly,
 
-  ByStem = TRUE,
-
   # Botanical informations
   Source,
   WFOData = NULL,
 
   # Life status
   InvariantColumns = c("Site",
-                       "Genus",
-                       "Species",
-                       "Family",
-                       "ScientificName"),
+                       "Genus_TreeDataCor",
+                       "Species_TreeDataCor",
+                       "Family_TreeDataCor",
+                       "ScientificName_TreeDataCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   RemoveRBeforeAlive = FALSE,
@@ -219,8 +217,6 @@ FullErrorProcessing <- function(
 
                                KeepMeas = KeepMeas,
 
-                               ByStem = ByStem,
-
                                DefaultHOM = DefaultHOM,
                                MaxDBH = MaxDBH,
                                PositiveGrowthThreshold = PositiveGrowthThreshold,
@@ -247,7 +243,6 @@ FullErrorProcessing <- function(
   #### Recruitment ####
 
   Data <- RecruitmentCorrection(Data,
-                                ByStem = ByStem,
                                 KeepMeas = KeepMeas,
                                 MinDBH = MinDBH,
                                 PositiveGrowthThreshold = PositiveGrowthThreshold,

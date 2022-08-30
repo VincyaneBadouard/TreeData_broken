@@ -95,7 +95,7 @@ test_that("BotanicalCorrection", {
   for(r in 1:length(Rslt)){
 
     # No correction, only comments
-    expect_true(all(!(grepl("Cor", names(Rslt[[r]])))) & "Comment" %in% names(Rslt[[r]]))
+    expect_true(all(!(grepl("_TreeDataCor", names(Rslt[[r]])))) & "Comment" %in% names(Rslt[[r]]))
 
     # Missing value
     Rslt[[r]][is.na(Subspecies), Subspecies := ""] # Subspecies = NA is ok
@@ -128,29 +128,29 @@ test_that("BotanicalCorrection", {
   for(r in 1:length(Rslt)){
 
     # ScientificNameCor = GenusCor + SpeciesCor
-    # expect_true(all(na.omit((Rslt[[r]]$ScientificNameCor == paste(Rslt[[r]]$GenusCor, Rslt[[r]]$SpeciesCor)))))
-    expect_true(all(is.na(Rslt[[r]]$ScientificNameCor) == ( is.na(Rslt[[r]]$GenusCor) & is.na(Rslt[[r]]$SpeciesCor)) ))
+    # expect_true(all(na.omit((Rslt[[r]]$ScientificName_TreeDataCor == paste(Rslt[[r]]$Genus_TreeDataCor, Rslt[[r]]$Species_TreeDataCor)))))
+    expect_true(all(is.na(Rslt[[r]]$ScientificName_TreeDataCor) == ( is.na(Rslt[[r]]$Genus_TreeDataCor) & is.na(Rslt[[r]]$Species_TreeDataCor)) ))
 
     # No "aceae" in Genus or Species column --------------------------------------------------------------------------------
-    expect_true(!any(grepl("aceae", Rslt[[r]]$ScientificNameCor)))
+    expect_true(!any(grepl("aceae", Rslt[[r]]$ScientificName_TreeDataCor)))
 
     # Family if Genus (unless found in Genus /species col) ----------------------------------------------------------------
-    expect_true(all(!is.na(Rslt[[r]][!is.na(FamilyCor) & !grepl("Found in", RsltWFO$FamilyCorSource), GenusCor])))
+    expect_true(all(!is.na(Rslt[[r]][!is.na(Family_TreeDataCor) & !grepl("Found in", RsltWFO$FamilyCorSource), Genus_TreeDataCor])))
 
     # All Family names with -aceae
-    expect_true(all(grepl("aceae", na.omit(Rslt[[r]]$FamilyCor))))
+    expect_true(all(grepl("aceae", na.omit(Rslt[[r]]$Family_TreeDataCor))))
 
     # No special character in Genus and Family columns ---------------------------------------------------------------------
-    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$GenusCor)))
-    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$FamilyCor)))
+    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$Genus_TreeDataCor)))
+    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$Family_TreeDataCor)))
 
     # No space or underscore in Species column
-    expect_true(!any(grepl("[[:blank:]]", Rslt[[r]]$SpeciesCor)))
-    expect_true(!any(grepl("_", Rslt[[r]]$SpeciesCor)))
+    expect_true(!any(grepl("[[:blank:]]", Rslt[[r]]$Species_TreeDataCor)))
+    expect_true(!any(grepl("_", Rslt[[r]]$Species_TreeDataCor)))
 
     # No Indet in Family, no subsp in Species
-    expect_true(!any(grepl("Indet", Rslt[[r]]$FamilyCor)))
-    expect_true(!any(grepl("subsp", Rslt[[r]]$SpeciesCor)))
+    expect_true(!any(grepl("Indet", Rslt[[r]]$Family_TreeDataCor)))
+    expect_true(!any(grepl("subsp", Rslt[[r]]$Species_TreeDataCor)))
 
     # Subspecies
     expect_true(any(grepl("subsp", Rslt[[r]]$Subspecies)))

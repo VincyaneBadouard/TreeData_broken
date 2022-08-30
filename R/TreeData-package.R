@@ -38,10 +38,11 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
 
                          "IDYear", "V1", "MaxHOM", "MaxDate", "POMChange",
 
-                         "LifeStatusCor", "Comment",
-                         "TaperCorDBH",
-                         "CorrectedRecruit", "DBHCor", "DiameterCorrectionMeth", "Cresc",
-                         "HOMCor", "POMcor",
+                         "LifeStatusCor", 'LifeStatus_TreeDataCor', "Comment",
+                         "TaperCorDBH", "TaperDBH_TreeDataCor",
+                         "CorrectedRecruit",
+                         "DBHCor", "Diameter_TreeDataCor", "DiameterCorrectionMeth", "Cresc",
+                         "HOMCor", "POMCor",
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",
                          "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
                          "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",

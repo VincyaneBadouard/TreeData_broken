@@ -32,9 +32,6 @@ test_that("FillinInvariantColumns", {
   expect_error(FillinInvariantColumns(NewRow, InvariantColumns = "Site", DataTree = MatrixData),
                regexp = "DataTree must be a data.table")
 
-  expect_error(FillinInvariantColumns(NewRow, InvariantColumns = "Site", DataTree = TwoInd),
-               regexp = "DataTree must correspond to only 1 same tree so 1 same IdTree")
-
   expect_error(FillinInvariantColumns(NewRow, InvariantColumns = "Forest", DataTree = TestData),
                regexp = "InvariantColumns argument must contain one or several column names")
 

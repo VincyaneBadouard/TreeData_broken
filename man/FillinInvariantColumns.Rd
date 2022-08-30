@@ -13,8 +13,9 @@ FillinInvariantColumns(NewRow, InvariantColumns, DataTree, IdTree)
 supposed to have always the same value for each measurement of the same
 tree (character)}
 
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
-measurements, with the invariant columns and their value (data.table)}
+\item{DataTree}{A dataset corresponding to a single tree/stem (1
+IdTree/IdStem) measurements, with the invariant columns and their value
+(data.table)}
 
 \item{IdTree}{(character)}
 }

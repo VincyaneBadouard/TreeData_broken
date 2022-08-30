@@ -5,7 +5,7 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   TestData <- data.table(Site = "Imaginary forest",
                          IdTree = "a",
                          Year = seq(2000,2008, by = 2), # 2 years/census
-                         DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year) (if integer, it doesn't match with the linear model outputs)
+                         Diameter_TreeDataCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year) (if integer, it doesn't match with the linear model outputs)
                          CorrectedRecruit = FALSE, # The initial rows are not corrected recruits
                          Comment = ""
   )
@@ -16,11 +16,11 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   MatrixData <- as.matrix(TestData)
   TwoInd <- copy(TestData)
   TwoInd[Year == 2002, ("IdTree") := "b"]
-  NoDBHData <- TestData[, !c("DBHCor")]
+  NoDBHData <- TestData[, !c("Diameter_TreeDataCor")]
   NoDBHCorData <- copy(TestData)
-  setnames(NoDBHCorData, "DBHCor", "Diameter") # only Diameter
+  setnames(NoDBHCorData, "Diameter_TreeDataCor", "Diameter") # only Diameter
   OneDBHVal <- copy(TestData)
-  OneDBHVal[, ("DBHCor") := 13]
+  OneDBHVal[, ("Diameter_TreeDataCor") := 13]
 
   # Check the function argument
   expect_error(RecruitmentCorrectionByTree(MatrixData),
@@ -46,10 +46,10 @@ test_that("RecruitmentCorrectionByTreeByTree", {
   expect_warning(RecruitmentCorrectionByTree(NoDBHCorData, InvariantColumns = "Site", PlotCensuses = 2001),
                  regexp = "column does't exist in the dataset.")
 
-  expect_error(StatusCorrectionByTree(TwoInd, PlotCensuses = 2001),
-               regexp = "DataTree must correspond to only 1 same tree so 1 same IdTree")
+  expect_error(RecruitmentCorrectionByTree(TwoInd, PlotCensuses = 2001),
+               regexp = "DataTree must correspond to only 1 same tree/stem so 1 same")
 
-  expect_error(StatusCorrectionByTree(TwoInd, PlotCensuses = 2001),
+  expect_error(RecruitmentCorrectionByTree(TwoInd, PlotCensuses = 2001),
                regexp = "the IdTrees: a/b")
 
 
@@ -68,11 +68,11 @@ test_that("RecruitmentCorrectionByTreeByTree", {
                                       PlotCensuses = PlotCensuses)
 
   # Min(DBHCor) >= MinDBH
-  expect_true(min(Rslt$DBHCor) >= MinDBH)
+  expect_true(min(Rslt$Diameter_TreeDataCor) >= MinDBH)
 
   # Create new rows  and Fill CorrectedRecruit = TRUE for the previous missing censuses
   RecruitYear <- min(TestData[, Year])
-  FirstDBH <- TestData[!is.na(DBHCor), DBHCor][1] # 1st measured DBH
+  FirstDBH <- TestData[!is.na(Diameter_TreeDataCor), Diameter_TreeDataCor][1] # 1st measured DBH
   PrevCens <- PlotCensuses[which(PlotCensuses == RecruitYear)-1] # 1 census before the recruit year among the plot censuses
 
   if(FirstDBH > (MinDBH + (RecruitYear - PrevCens) * 0.5)){ # in my exemple the cresc = 0.5
@@ -90,16 +90,16 @@ test_that("RecruitmentCorrectionByTreeByTree", {
 
 
   # No aberrant growth
-  DBHCor <- Rslt[,DBHCor]
+  Diameter_TreeDataCor <- Rslt[,Diameter_TreeDataCor]
   Year <- Rslt[,Year]
 
-  cresc <- cresc_abs <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
+  cresc <- cresc_abs <- rep(0, length(Diameter_TreeDataCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
 
-  if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
+  if (sum(!is.na(Diameter_TreeDataCor)) > 1) { # if there is at least 1 measurement
 
-    cresc[which(!is.na(DBHCor))[-1] - 1] <- # 4 cresc for 5 dbh values ([-1]), shift all indices by 1 to the left (-1)
-      diff(DBHCor[!is.na(DBHCor)]) / diff(Year[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
-    cresc_abs[which(!is.na(DBHCor))[-1] - 1] <- diff(DBHCor[!is.na(DBHCor)])
+    cresc[which(!is.na(Diameter_TreeDataCor))[-1] - 1] <- # 4 cresc for 5 dbh values ([-1]), shift all indices by 1 to the left (-1)
+      diff(Diameter_TreeDataCor[!is.na(Diameter_TreeDataCor)]) / diff(Year[!is.na(Diameter_TreeDataCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
+    cresc_abs[which(!is.na(Diameter_TreeDataCor))[-1] - 1] <- diff(Diameter_TreeDataCor[!is.na(Diameter_TreeDataCor)])
   }
 
   NegativeGrowthThreshold = 2
@@ -112,8 +112,8 @@ test_that("RecruitmentCorrectionByTreeByTree", {
                                       InvariantColumns = "Site",
                                       PlotCensuses = PlotCensuses)
 
-  ForgRecruits <- unique(Rslt[CorrectedRecruit %in% TRUE, DBHCor])
-  MesurVal <- unique(OneDBHVal[CorrectedRecruit %in% FALSE, DBHCor])
+  ForgRecruits <- unique(Rslt[CorrectedRecruit %in% TRUE, Diameter_TreeDataCor])
+  MesurVal <- unique(OneDBHVal[CorrectedRecruit %in% FALSE, Diameter_TreeDataCor])
 
   expect_true(MesurVal==ForgRecruits)
 

@@ -4,14 +4,10 @@
 \alias{GeneralErrorsDetection}
 \title{General Errors Detection}
 \usage{
-GeneralErrorsDetection(Data, ByStem = TRUE)
+GeneralErrorsDetection(Data)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)}
-
-\item{ByStem}{must be equal to TRUE if your inventory contains the stem
-level, equal to FALSE if not, and in this case the correction is done by
-tree (logical)}
 }
 \value{
 The input dataset (data.table) with a new \emph{Comment} column with error
@@ -29,9 +25,9 @@ X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/
 IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName
 \item Check \strong{missing value} (NA/0) in the measurement variables: "Diameter",
 "HOM", "TreeHeight", "StemHeight"
-\item Check of the \strong{unique association of the idTree with plot, subplot}
+\item Check of the \strong{unique association of the IdTree with plot, subplot}
 \strong{and TreeFieldNum} (at the site scale)
-\item Check \strong{duplicated idTree/IdStem} in a census (at the site scale)
+\item Check \strong{duplicated IdTree/IdStem} in a census (at the site scale)
 \item Check for trees \strong{outside the subplot} (not implemented yet)
 \item Check \strong{invariant coordinates per IdTree/IdStem}
 \item Check \strong{fix Plot and Subplot number} (not implemented yet)

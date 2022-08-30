@@ -38,15 +38,15 @@ data.table)}
 Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
-\item \code{FamilyCor} (character): corrected Family name
+\item \code{Family_TreeDataCor} (character): corrected Family name
 \item \code{FamilyCorSource} (character): source of the Family correction
-\item \code{GenusCor} (character): corrected Genus name
-\item \code{SpeciesCor} (character): corrected Species name
+\item \code{Genus_TreeDataCor} (character): corrected Genus name
+\item \code{Species_TreeDataCor} (character): corrected Species name
 \item \code{BotanicalCorrectionSource} (character): source of the Genus and Species
 correction
-\item \code{ScientificNameCor} (character): corrected Scientific name
-\item \code{VernNameCor} (character): completed if information available at \code{IdTree}
-level.
+\item \code{ScientificName_TreeDataCor} (character): corrected Scientific name
+\item \code{VernName_TreeDataCor} (character): completed if information available at
+\code{IdTree} level.
 }
 }
 \description{

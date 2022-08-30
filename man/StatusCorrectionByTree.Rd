@@ -18,7 +18,7 @@ StatusCorrectionByTree(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree)
+\item{DataTree}{A dataset corresponding to a single tree's (1 IdTree/IdStem)
 measurements (data.frame or data.table)
 The \emph{LifeStatus} column must be coded as:
 - TRUE = alive,
@@ -101,7 +101,7 @@ Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
                                                     "Species",
                                                     "Family",
                                                     "ScientificName"))
-
+setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor")
 LifeStatusCorrectionPlot(Rslt)
 
 }

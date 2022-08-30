@@ -17,7 +17,7 @@ RecruitmentCorrectionByTree(
 \arguments{
 \item{DataTree}{A dataset corresponding to a single tree's (1 IdTree/Idstem)
 measurements (data.frame or data.table). The dataset should preferably
-contain the column of corrected diameters: 'DBHCor', otherwise the function
+contain the column of corrected diameters: 'Diameter_TreeDataCor', otherwise the function
 will take the column "Diameter"}
 
 \item{MinDBH}{Minimum diameter of trees inventoried according to your
@@ -37,10 +37,10 @@ tree (character)}
 }
 \value{
 Add rows for forgotten recruits with them estimated DBH in the
-'DBHCor' column, create a 'CorrectedRecruit' col (logical) and fill the
-'Comment' column : "This DBH is/was the 1st recorded for this tree,
-according to its annual growth and the census done for this plot, it should
-have been recruited earlier according to your protocol (MinDBH)."
+'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' column (logical)
+and fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+tree, according to its annual growth and the census done for this plot, it
+should have been recruited earlier according to your protocol (MinDBH)."
 }
 \description{
 RecruitmentCorrectionByTree
@@ -48,15 +48,15 @@ RecruitmentCorrectionByTree
 \details{
 If the size of the tree has never changed, or if there is only one
 value the same value is kept for the added forgotten recruits.
-If the Diameter has not been corrected (DBHCor column does not exist), the
+If the Diameter has not been corrected (Diameter_TreeDataCor column does not exist), the
 function will create it for the forgotten recruits. It is strongly
-recommended to correct the Diameter before correcting the recruits
+recommended to correct the Diameter before correcting the recruits.
 }
 \examples{
 library(data.table)
 DataTree <- data.table(IdTree = "a",
                        Year = seq(2000,2008, by = 2), # 2 years/census
-                       DBHCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
+                       Diameter_TreeDataCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
                        Site = "Imaginary forest"
 )
 # 1st DBH = 13 > MinDBH. In 1998 the tree was 12cm, 11cm in 1996 and 10cm in

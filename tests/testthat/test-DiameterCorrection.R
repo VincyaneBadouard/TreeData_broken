@@ -64,7 +64,7 @@ test_that("DiameterCorrection", {
     DetectOnly = TRUE)
 
   # No correction, only comments
-  expect_true(!"DBHCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
+  expect_true(!"Diameter_TreeDataCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
 
   ## Correction --------------------------------------------------------------------------------------------------------------------
   # options(warn = 2) # trace warning
@@ -72,7 +72,6 @@ test_that("DiameterCorrection", {
 
   Rslt <- DiameterCorrection(
     TestData,
-    ByStem = TRUE,
 
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
@@ -92,9 +91,9 @@ test_that("DiameterCorrection", {
   # Growth > 5 cm DBH/year & < -2 cm DBH/census
 
   # Comment and Methode if correction
-  expect_true(all(!is.na(Rslt[DBHCor != round(Diameter, digits = 2L), DiameterCorrectionMeth]))) # method when the DBH has been corrected
+  expect_true(all(!is.na(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), DiameterCorrectionMeth]))) # method when the DBH has been corrected
 
-  # expect_true(all(Rslt[DBHCor != round(Diameter, digits = 2L), Comment] != "")) # comment when the DBH has been corrected
+  # expect_true(all(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), Comment] != "")) # comment when the DBH has been corrected
 
 
 
