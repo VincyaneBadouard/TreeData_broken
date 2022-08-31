@@ -216,7 +216,7 @@ FullErrorProcessing <- function(
                            RemoveRAfterDeath = RemoveRAfterDeath)
 
   #### Taper ####
-  if("taper" %in% WhatToCorrect){
+  if("taper" %in% WhatToCorrect & "HOM" %in% names(Data) & any(!is.na(Data$HOM))){
 
     Data <- TaperCorrection(Data,
                             DefaultHOM = DefaultHOM,
