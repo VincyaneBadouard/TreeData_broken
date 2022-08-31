@@ -72,7 +72,9 @@
 #'   - Find other individual of the same diameter class (*DBHRange*) as the last
 #'   value before the one to correct, and of the same species, genus, family or
 #'   stand than the tree to correct, until the minimum number of individuals
-#'   required to consider the correction is reached (*MinIndividualNbr*)
+#'   required to consider the correction is reached (*MinIndividualNbr*). Take
+#'   only their non-abnormal growths that have not been measured to a different
+#'   HOM than their previous value.
 #'
 #'   - 1st abnormal DBH in the series = previous value + mean growth of the
 #'       other trees

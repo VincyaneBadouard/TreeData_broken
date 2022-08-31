@@ -38,8 +38,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(OnlyOne,
                                    OnlyOne,
                                    WhatToCorrect = c("POM change", "punctual", "shift"),
-                                   CorrectionType = c("quadratic", "linear",
-                                                      "individual", "phylogenetic hierarchical"))
+                                   CorrectionType = c("individual", "phylogenetic hierarchical"))
 
   expect_true(Rslt$Diameter == OnlyOne$Diameter) # same Diameter value
   expect_true(Rslt$DBHCor == OnlyOne$Diameter) # Keep the original Diameter value
@@ -55,8 +54,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(OnlyOne,
                                    OnlyOne,
                                    WhatToCorrect = c("POM change", "punctual", "shift"),
-                                   CorrectionType = c("quadratic", "linear",
-                                                      "individual", "phylogenetic hierarchical"))
+                                   CorrectionType = c("individual", "phylogenetic hierarchical"))
   expect_true(is.na(Rslt$DBHCor)) # impossible value
 
 
@@ -71,8 +69,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(OnlyOne,
                                    OnlyOne,
                                    WhatToCorrect = c("POM change", "punctual", "shift"),
-                                   CorrectionType = c("quadratic", "linear",
-                                                      "individual", "phylogenetic hierarchical"))
+                                   CorrectionType = c("individual", "phylogenetic hierarchical"))
   expect_true(is.na(Rslt$DBHCor)) # impossible value
 
 
@@ -110,10 +107,10 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "punctual",
-                                   CorrectionType = "linear")
+                                   CorrectionType = "individual")
   expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
-  expect_true(Rslt[4, DiameterCorrectionMeth] == "linear") # and "linear" in 'DiameterCorrectionMeth'
+  expect_true(Rslt[4, DiameterCorrectionMeth] == "local linear regression") # and "linear" in 'DiameterCorrectionMeth'
   expect_true(Rslt[4, Comment] == "Abnormal diameter value (punctual error)") # info in 'Comment'
   expect_true(all(Rslt[-4, DiameterCorrectionMeth] == "")) # no correction meth for the other values
   expect_true(all(Rslt[-4, Comment] == "")) # no comment for the other values
@@ -133,7 +130,7 @@ test_that("DiameterCorrectionByTree", {
 
   expect_true(Rslt[4, DBHCor] == 16) # the corrected value is 16, NOP c resté NA!!!
   expect_true(all(Rslt[-4, DBHCor] == DataTree[-4, Diameter])) # the other values remain the same
-  expect_true(Rslt[4, DiameterCorrectionMeth] == "linear") # and "linear" in 'DiameterCorrectionMeth'
+  expect_true(Rslt[4, DiameterCorrectionMeth] == "local linear regression") # and "linear" in 'DiameterCorrectionMeth'
   expect_true(all(Rslt[-4, DiameterCorrectionMeth] == "")) # no correction meth for the other values
   expect_true(all(Rslt[, Comment] == "")) # no comment because no error
 
@@ -148,7 +145,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "POM change",
-                                   CorrectionType = c("individual", "linear"))
+                                   CorrectionType = "individual")
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
@@ -166,7 +163,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    TestData,
                                    WhatToCorrect = "POM change",
-                                   CorrectionType = c("phylogenetic hierarchical", "linear"))
+                                   CorrectionType = "phylogenetic hierarchical")
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(Rslt[4, Comment] == "POM change") # detect the POM change
@@ -187,7 +184,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = "shift",
-                                   CorrectionType = c("individual", "linear"))
+                                   CorrectionType = "individual")
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "Abnormal diameter value (shift error)")) # detect the POM change
@@ -205,7 +202,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    TestData,
                                    WhatToCorrect = "shift",
-                                   CorrectionType = c("phylogenetic hierarchical", "quadratic"))
+                                   CorrectionType = c("phylogenetic hierarchical"))
 
   expect_true(all(Rslt[3:5, DBHCor] != DataTree[3:5, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(Rslt[3, Comment] == "Abnormal diameter value (shift error)") # detect the POM change
@@ -224,11 +221,11 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = c("punctual", "shift"),
-                                   CorrectionType = c("individual", "quadratic"))
+                                   CorrectionType = c("individual"))
 
   expect_true(all(Rslt[3, Comment] == "Abnormal diameter value (punctual error)")) # detect the POM change
   expect_true(all(Rslt[c(5,8), Comment] == "Abnormal diameter value (shift error)")) # detect the POM change
-  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "quadratic")) # punctual error by regression
+  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "local linear regression")) # punctual error by regression
   expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # 1st value by weighted mean
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
@@ -245,16 +242,16 @@ test_that("DiameterCorrectionByTree", {
   # Rslt <- suppressWarnings(DiameterCorrectionByTree(DataTree,
   #                                  DataTree,
   #                                  WhatToCorrect = c("POM change", "punctual"),
-  #                                  CorrectionType = c("taper", "quadratic"))
+  #                                  CorrectionType = c("taper", "individual"))
   #                         )
   #
   # expect_true(all(Rslt[HOM != 1.3, DBHCor] != DataTree[HOM != 1.3, Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   # expect_true(all(Rslt[HOM != 1.3, DiameterCorrectionMeth] %in% "taper"))
-  # expect_true(Rslt[3, DiameterCorrectionMeth] %in% "quadratic") # and "quadratic"
+  # expect_true(Rslt[3, DiameterCorrectionMeth] %in% "local linear regression") # and "linear"
   # expect_warning(DiameterCorrectionByTree(DataTree,
   #                                         DataTree,
   #                                         WhatToCorrect = c("POM change", "punctual"),
-  #                                         CorrectionType = c("taper", "quadratic")),
+  #                                         CorrectionType = c("taper", "individual")),
   #                regexp = "There are still abnormal growths")
 
   # taper + shift error ------------------------------------------------------------------------------------
@@ -268,7 +265,7 @@ test_that("DiameterCorrectionByTree", {
   # Rslt <- DiameterCorrectionByTree(DataTree,
   #                                  DataTree,
   #                                  WhatToCorrect = c("POM change", "shift"),
-  #                                  CorrectionType = c("taper", "individual", "linear"))
+  #                                  CorrectionType = c("taper", "individual"))
   #
   # Meth <- Rslt[HOM != 1.3, DiameterCorrectionMeth]
   #
@@ -286,12 +283,12 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    DataTree,
                                    WhatToCorrect = c("POM change", "punctual"),
-                                   CorrectionType = c("individual", "quadratic"))
+                                   CorrectionType = c("individual"))
 
   expect_true(all(Rslt[POM != "0", DBHCor] != DataTree[POM != "0", Diameter])) # corrected DBH when HOM is different of the the 1st HOM
   expect_true(all(Rslt[c(5,8), Comment] == "POM change")) # detect the POM change
   expect_true(all(Rslt[3, Comment] == "Abnormal diameter value (punctual error)")) # detect the punctual error
-  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "quadratic")) # punctual error by regression
+  expect_true(all(Rslt[3, DiameterCorrectionMeth] == "local linear regression")) # punctual error by regression
   expect_true(all(Rslt[c(5,8), DiameterCorrectionMeth] == "weighted mean")) # 1st value by weighted mean
   expect_true(all(Rslt[c(6,7,9), DiameterCorrectionMeth] == "shift realignment")) # the other value of the shift are just realigned
   expect_true(all(Rslt[, DBHCor] == c(13, 14, 15, 16, 17, 19, 20, 21, 23)))
@@ -314,7 +311,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(
     DataTree, TestData,
     WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("quadratic", "linear", "individual"))
+    CorrectionType = c("individual"))
 
   # Compute corrected diameter incrementation
   cresc <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "annual", Time = Rslt$Year)
@@ -337,7 +334,7 @@ test_that("DiameterCorrectionByTree", {
   Rslt <- DiameterCorrectionByTree(DataTree,
                                    TestData,
                                    WhatToCorrect = c("POM change", "punctual", "shift"),
-                                   CorrectionType = c("quadratic", "linear", "phylogenetic hierarchical"))
+                                   CorrectionType = c("phylogenetic hierarchical"))
 
   # Compute corrected diameter incrementation
   cresc <- ComputeIncrementation(Var = Rslt$DBHCor, Type = "annual", Time = Rslt$Year)

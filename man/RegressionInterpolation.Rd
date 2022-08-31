@@ -26,6 +26,8 @@ RegressionInterpolation
 }
 \details{
 The variables X and Y must be of the same length.
+Because local regression (\emph{Local} = TRUE) is done with the 2 framing values,
+this regression is always linear and not quadratic.
 }
 \examples{
 

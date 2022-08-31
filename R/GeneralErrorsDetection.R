@@ -43,15 +43,18 @@ GeneralErrorsDetection <- function(
   # IdStem or IdTree? ---------------------------------------------------------------------------------------
   # If no IdStem take IdTree
   if((!"IdStem" %in% names(Data) | all(is.na(Data$IdStem))) &
-     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){ ID <- "IdTree"
+     ("IdTree" %in% names(Data) & any(!is.na(Data$IdTree))) ){
+    ID <- "IdTree"
+    Data[, IdTree := as.character(IdTree)]
 
-  }else{ ID <- "IdStem"}
+  }else{ ID <- "IdStem"
+  Data[, IdStem := as.character(IdStem)]
+  }
 
   if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
     stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
   # ---------------------------------------------------------------------------------------------------------
 
-  Data[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
   Data[, Subplot := as.character(Subplot)]
 
   #### Function ####

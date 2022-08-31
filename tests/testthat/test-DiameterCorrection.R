@@ -60,7 +60,7 @@ test_that("DiameterCorrection", {
   ## Detect Only --------------------------------------------------------------------------------------------------------------------
   Rslt <- DiameterCorrection(
     TestData,
-    CorrectionType = c("quadratic", "linear", "individual", "phylogenetic hierarchical"),
+    CorrectionType = "phylogenetic hierarchical",
     DetectOnly = TRUE)
 
   # No correction, only comments

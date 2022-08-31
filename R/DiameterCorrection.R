@@ -52,12 +52,8 @@
 #'   - "shift": detect if there is a shift of several Diameter values and
 #'              links them to the 1st measurements set.
 #'
-#' @param CorrectionType Possible values: "linear", "quadratic",
-#'   "individual", "phylogenetic hierarchical" (character).
-#'   - "linear": interpolation by linear regression of the individual annual
-#'               growth over time.
-#'   - "quadratic": interpolation by quadratic regression  of the individual
-#'               annual growth over time.
+#' @param CorrectionType Possible values: "individual", "phylogenetic
+#'   hierarchical" (character).
 #'   - "individual": replace abnormal growth by interpolation from the
 #'                   individual values.
 #'   - "phylogenetic hierarchical": replace abnormal growth with the average
@@ -93,7 +89,7 @@
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"weighted
+#'   - *DiameterCorrectionMeth* = "local linear regression","weighted
 #'       mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 #'       "shift realignment"/"Same value".
 #'   - *POM_TreeDataCor* (factor): POM value at which the corrected diameters are proposed.
@@ -106,6 +102,9 @@
 #'   `Diameter_TreeDataCor` takes the original `Diameter` value. If this value
 #'   is 0 or > MaxDBH, `Diameter_TreeDataCor` takes NA. Diameters not linked to
 #'   an IdTree/IdStem or to a Census Year are not processed.
+#'   Punctual error correction only with linear regression and not quadratic,
+#'   because punctual errors are corrected from a local regression with the 2
+#'   framing values.
 #'
 #' @importFrom utils capture.output
 #' @importFrom stats na.omit
@@ -138,7 +137,7 @@ DiameterCorrection <- function(
   PioneersGrowthThreshold = 7.5,
 
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = "individual",
 
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -252,7 +251,7 @@ DiameterCorrection <- function(
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
   if(DetectOnly %in% FALSE){
-  if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
+    if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
   }
 
   # If no diameter value, write a comment
@@ -378,12 +377,8 @@ DiameterCorrection <- function(
 #'   - "shift": detect if there is a shift of several 'Diameter' values and
 #'              links them to the trust measurements set.
 #'
-#' @param CorrectionType c("linear", "quadratic", "individual", "phylogenetic
-#'   hierarchical") (character).
-#'   - "linear": interpolation by linear regression of the individual annual
-#'               growth over time.
-#'   - "quadratic": interpolation by quadratic regression  of the individual
-#'               annual growth over time.
+#' @param CorrectionType Possible values: "individual", "phylogenetic
+#'   hierarchical" (character).
 #'   - "individual": replace abnormal growth by interpolation from the
 #'                   individual values.
 #'   - "phylogenetic hierarchical": replace abnormal growth with the average
@@ -415,7 +410,7 @@ DiameterCorrection <- function(
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *DBHCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "linear"/"quadratic"/"weighted
+#'   - *DiameterCorrectionMeth* = "local linear regression"/"weighted
 #'   mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift
 #'   realignment"/"Same value".
 #'
@@ -458,7 +453,7 @@ DiameterCorrectionByTree <- function(
   PioneersGrowthThreshold = 7.5,
 
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = "individual",
 
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -781,15 +776,12 @@ DiameterCorrectionByTree <- function(
         DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType, Local = TRUE) # Compute the corrected cresc
 
         # Add the column with the correction method  ------------------------------------------------------------------------
-        if("quadratic" %in% CorrectionType & length(which(!is.na(Diameter))) > 3){
-          Meth <- "quadratic"
-        }else{
-          Meth <- "linear"
-        }
+        # Punctual error correction only with linear regression and not quadratic,
+        # because punctual errors are corrected from a local regression with the 2 framing values.
 
         DataTree <- GenerateComment(DataTree,
                                     condition = as.numeric(rownames(DataTree)) %in% (i),
-                                    comment = Meth,
+                                    comment = "local linear regression",
                                     column = "DiameterCorrectionMeth")
 
 

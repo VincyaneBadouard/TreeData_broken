@@ -14,7 +14,7 @@ DiameterCorrection(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = "individual",
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
@@ -83,13 +83,9 @@ interpolation.
 links them to the 1st measurements set.
 }}
 
-\item{CorrectionType}{Possible values: "linear", "quadratic",
-"individual", "phylogenetic hierarchical" (character).
+\item{CorrectionType}{Possible values: "individual", "phylogenetic
+hierarchical" (character).
 \itemize{
-\item "linear": interpolation by linear regression of the individual annual
-growth over time.
-\item "quadratic": interpolation by quadratic regression  of the individual
-annual growth over time.
 \item "individual": replace abnormal growth by interpolation from the
 individual values.
 \item "phylogenetic hierarchical": replace abnormal growth with the average
@@ -129,7 +125,7 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
 \item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"weighted
+\item \emph{DiameterCorrectionMeth} = "local linear regression","weighted
 mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 "shift realignment"/"Same value".
 \item \emph{POM_TreeDataCor} (factor): POM value at which the corrected diameters are proposed.
@@ -147,6 +143,9 @@ When there is only 1 \code{Diameter} value for a tree/stem,
 \code{Diameter_TreeDataCor} takes the original \code{Diameter} value. If this value
 is 0 or > MaxDBH, \code{Diameter_TreeDataCor} takes NA. Diameters not linked to
 an IdTree/IdStem or to a Census Year are not processed.
+Punctual error correction only with linear regression and not quadratic,
+because punctual errors are corrected from a local regression with the 2
+framing values.
 }
 \examples{
 library(data.table)

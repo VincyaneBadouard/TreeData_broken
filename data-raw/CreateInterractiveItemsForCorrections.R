@@ -6,10 +6,12 @@ db <- tools::Rd_db("TreeData")
 outfile <- tempfile()
 Fct_args <- NULL
 
-for(rd in c("ErrorsDetection.Rd",
+for(rd in c("GeneralErrorsDetection.Rd",
+            "BotanicalCorrection.Rd",
             "StatusCorrection.Rd",
             "TaperCorrection.Rd",
-            "DiameterCorrection.Rd")) {
+            "DiameterCorrection.Rd",
+            "RecruitmentCorrection.Rd")) {
 
   tools::Rd2HTML(db[[rd]], outfile)
 

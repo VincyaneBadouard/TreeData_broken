@@ -14,7 +14,7 @@ DiameterCorrectionByTree(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("linear", "individual", "phylogenetic hierarchical"),
+  CorrectionType = "individual",
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
@@ -69,13 +69,9 @@ interpolation.
 links them to the trust measurements set.
 }}
 
-\item{CorrectionType}{c("linear", "quadratic", "individual", "phylogenetic
-hierarchical") (character).
+\item{CorrectionType}{Possible values: "individual", "phylogenetic
+hierarchical" (character).
 \itemize{
-\item "linear": interpolation by linear regression of the individual annual
-growth over time.
-\item "quadratic": interpolation by quadratic regression  of the individual
-annual growth over time.
 \item "individual": replace abnormal growth by interpolation from the
 individual values.
 \item "phylogenetic hierarchical": replace abnormal growth with the average
@@ -111,7 +107,7 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
 \item \emph{DBHCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "linear"/"quadratic"/"weighted
+\item \emph{DiameterCorrectionMeth} = "local linear regression"/"weighted
 mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift
 realignment"/"Same value".
 }

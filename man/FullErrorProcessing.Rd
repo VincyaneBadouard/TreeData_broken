@@ -25,8 +25,8 @@ FullErrorProcessing(
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("taper", "linear", "individual", "phylogenetic hierarchical"),
+  WhatToCorrect = c("taper", "POM change", "punctual", "shift"),
+  CorrectionType = "individual",
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
@@ -136,13 +136,9 @@ interpolation.
 links them to the 1st measurements set.
 }}
 
-\item{CorrectionType}{Possible values: "linear", "quadratic",
-"individual", "phylogenetic hierarchical" (character).
+\item{CorrectionType}{Possible values: "individual", "phylogenetic
+hierarchical" (character).
 \itemize{
-\item "linear": interpolation by linear regression of the individual annual
-growth over time.
-\item "quadratic": interpolation by quadratic regression  of the individual
-annual growth over time.
 \item "individual": replace abnormal growth by interpolation from the
 individual values.
 \item "phylogenetic hierarchical": replace abnormal growth with the average

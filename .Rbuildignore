@@ -3,3 +3,6 @@
 ^\.github$
 ^data-raw$
 ^R\.\\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

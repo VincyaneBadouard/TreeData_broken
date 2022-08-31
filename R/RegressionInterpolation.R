@@ -10,6 +10,8 @@
 #'   value (NA) (default: FALSE) (logical)
 #'
 #' @details The variables X and Y must be of the same length.
+#' Because local regression (*Local* = TRUE) is done with the 2 framing values,
+#' this regression is always linear and not quadratic.
 #'
 #' @return Y (numeric) with interpolated missing values depending on the form of
 #'   model chosen (*CorrectionType*)
@@ -50,9 +52,11 @@ RegressionInterpolation <- function(
   if(length(X) > length(Y)) Y[(length(Y)+1):length(X)] <- NA
     # stop("The variables X and Y must be of the same length ('RegressionInterpolation()' function)")
 
-  # CorrectionType (character)
+  if(Local == FALSE){
+    # CorrectionType (character)
   if(!any(any(CorrectionType %in% "quadratic") || any(CorrectionType %in% "linear")))
     stop("The 'CorrectionType' argument value must be 'quadratic' and/or 'linear'")
+  }
 
   #### Function ####
 
@@ -65,12 +69,12 @@ RegressionInterpolation <- function(
     if(Local == TRUE){
 
       yxval <- Select2FramingValues(i = i, Y = Y, X = X)
-      yval <- yxval$yval
-      xval <- yxval$xval
+      yval <- yxval$yval # yval: the 2 Y values around i
+      xval <- yxval$xval # xval: the 2 X values corresponding to the two yval values
 
     }else{
-      yval = Y
-      xval = X
+      yval = Y # all Y values
+      xval = X # all X values
       }
 
     if(length(which(!is.na(Y))) < 2){

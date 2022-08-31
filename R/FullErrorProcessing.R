@@ -72,8 +72,8 @@ FullErrorProcessing <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("POM change", "punctual", "shift"), # or NULL if juste taper
-  CorrectionType = c("taper", "linear", "individual", "phylogenetic hierarchical"),
+  WhatToCorrect = c("taper", "POM change", "punctual", "shift"),
+  CorrectionType = "individual",
 
   DBHRange = 10,
   MinIndividualNbr = 5,
