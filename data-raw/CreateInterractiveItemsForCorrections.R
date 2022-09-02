@@ -6,7 +6,8 @@ db <- tools::Rd_db("TreeData")
 outfile <- tempfile()
 Fct_args <- NULL
 
-for(rd in c("GeneralErrorsDetection.Rd",
+for(rd in c("FullErrorProcessing.Rd",
+            "GeneralErrorsDetection.Rd",
             "BotanicalCorrection.Rd",
             "StatusCorrection.Rd",
             "TaperCorrection.Rd",
