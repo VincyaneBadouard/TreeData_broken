@@ -4,7 +4,8 @@ x <- xall[xall$Activate, ]
 
 # create the list
 
-AppProfile <- sapply(1:nrow(x), function(i) setNames(x[i, "AppDefaultProfile"],x[i, "ItemID"]))
+AppProfile <- lapply(1:nrow(x), function(i) x[i, "AppDefaultProfile"])
+AppProfile <- setNames(AppProfile, x$ItemID)
 
 # save
 saveRDS(AppProfile, "inst/app/data/AppProfile.rds")
