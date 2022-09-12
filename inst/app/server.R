@@ -834,7 +834,7 @@ server <- function(input, output, session) { # server ####
 
   observeEvent(input$UseProfileCodes, {
     dat <- AllCodes()
-    m <- match(dat$Value, UserProfile()$AllCodes$Value)
+    m <- match(paste(dat$Column, dat$Value), paste(UserProfile()$AllCodes$Column, UserProfile()$AllCodes$Value))
 
     if(any(is.na(m))) showNotification(paste("WARNING: The following codes are not in your profile, you will need to fill them manually in the table:", paste(paste(dat$Value[is.na(m)], "in column", dat$Column[is.na(m)]), collapse = ", ")), type = 'err', duration = NULL)
 
