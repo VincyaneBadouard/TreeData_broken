@@ -123,4 +123,21 @@ second column,radioButtons ,choices,[[:punct:]],[[:punct:]],TreeCodesSepMan,"If 
 NA,,,,,XXXOriginal,,,,,,,,NA,FALSE,NA,FALSE,-,-,"Column coming straight from the input data, without any correction or transformation"
 NA,,,,,Original_XXX,,,,,,,,NA,FALSE,NA,FALSE,-,-,"One of the column(s) indicated as tree codes, as it is in the input data. The name of it is Original_[colomn name in the input data]. See tree_codes_metadata.csv for the definition of each value. If the output profile you selected also had tree codes, and you applied the translation, you should also have a tree_codes_translation.csv file in the zipfile. That file explains the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into."
 NA,,,,,TreeCodesOutput,,,,,,,,NA,FALSE,NA,FALSE,,-,One of the column(s) storing tree code information. See tree_codes_translation.csv file to understand the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into.
-NA,,,,,Comment,,,,,,,,NA,FALSE,NA,FALSE,-,-,information about error
+NA,,,,,Comment,,,,,,,,NA,FALSE,NA,FALSE,-,-,error type informations
+,,,,,Family_TreeDataCor,,,,,,,,,,,,character,,corrected Family name
+,,,,,FamilyCorSource,,,,,,,,,,,,character,,source of the Family correction
+,,,,,Genus_TreeDataCor,,,,,,,,,,,,character,,corrected Genus name
+,,,,,Species_TreeDataCor,,,,,,,,,,,,character,,corrected Species name
+,,,,,BotanicalCorrectionSource,,,,,,,,,,,,character,,"source of the Genus and Species
+correction"
+,,,,,ScientificName_TreeDataCor,,,,,,,,,,,,character,,corrected ScientificName
+,,,,,VernName_TreeDataCor,,,,,,,,,,,,character,," completed if information available at IdTree
+level."
+,,,,,LifeStatus_TreeDataCor,,,,,,,,,,,,logical,,corrected stem life status.
+,,,,,TaperDBH_TreeDataCor,,,,,,,,,,,,numeric,,corrected trees diameter at default HOM
+,,,,,Diameter_TreeDataCor,,,,,,,,,,,,numeric,,corrected trees diameter at default HOM
+,,,,,DiameterCorrectionMeth,,,,,,,,,,,,character,,"diameter correction methode = ""taper""/""local linear regression""/""weighted mean""
+/phylogenetic hierarchical(""species""/""genus""/""family""/""stand"")/""shift realignment""/""Same value""."
+,,,,,POM_TreeDataCor,,,,,,,,,,,,factor,,POM value at which the corrected diameters are proposed. Corresponds to the 1st POM value at which the stem was measured
+,,,,,HOM_TreeDataCor,,,,,,,,,,,,numeric,,"HOM value at which the corrected diameters are proposed. Corresponds to the DefaultHOM if Taper correction applied. If not, corresponds to the 1st HOM value at which the stem was measured"
+,,,,,CorrectedRecruit,,,,,,,,,,,,logical,,"TRUE: the row was added to represent the year when the stem was larger than the minimum diameter, but absent from the dataset. FALSE: original dataset row."
