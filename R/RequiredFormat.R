@@ -123,7 +123,7 @@ RequiredFormat <- function(
   Data[, setdiff(gsub("[[:punct:]]| ", "", x$ItemID[x$RequiredColumn]), gsub("[[:punct:]]| ", "", colnames(Data)))] <- NA
 
   ## deal with case where one column represents more than one thing
-  DoubleFctColumn <- input[names(input) %in% x$ItemID[x$RequiredColumn] & !input %in% "none" & input %in% input[duplicated(input)]]
+  DoubleFctColumn <- input[names(input) %in% x$ItemID[x$RequiredColumn] & !input %in% "none" & input %in% input[duplicated(input) & names(input) %in% x$ItemID[x$RequiredColumn]]]
 
   for(j in names(DoubleFctColumn)) {
     if(all(is.na(Data[, j]))) Data[, j] <- Data[, names(DoubleFctColumn[DoubleFctColumn %in% DoubleFctColumn[[j]] & !names(DoubleFctColumn) %in% j])]
