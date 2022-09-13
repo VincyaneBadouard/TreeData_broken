@@ -26,7 +26,7 @@ FullErrorProcessing(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
   WhatToCorrect = c("taper", "POM change", "punctual", "shift"),
-  CorrectionType = "individual",
+  CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,

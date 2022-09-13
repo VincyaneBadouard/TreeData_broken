@@ -6,6 +6,15 @@ db <- tools::Rd_db("TreeData")
 outfile <- tempfile()
 Fct_args <- NULL
 
+
+# functio order:
+# 1. R/GeneralErrorsDetection.R
+# 2. R/BotanicalCorrection.R
+# 3. R/StatusCorrection.R
+# 4. R/TaperCorrection.R
+# 5. R/DiameterCorrection.R
+# 6. R/RecruitmentCorrection.R
+
 for(rd in c("FullErrorProcessing.Rd",
             "GeneralErrorsDetection.Rd",
             "BotanicalCorrection.Rd",
@@ -63,21 +72,83 @@ Fct_args <- cbind(Fct_args, df_moreInfo[match(sapply(Fct_args$Default, function(
 x <- read.csv("inst/app/data/interactive_items.csv")
 
 
+## fill out the TBD
+
+
+### ItemType
+
+#### first create a lookup table
+ItemType_lookup <- list(
+  Pioneers = list(
+    ItemType = "pickerInput",
+    Multiple = T,
+    Options = "list( `actions-box` = TRUE)",
+    Argument = "choices",
+    Argument2 = "selected",
+    argValue = "FormatedScientificNameOptions",
+    ReactiveArgValue = TRUE
+  ),
+  Source = list(
+    ItemType = "pickerInput",
+    Multiple = F,
+    Options = "list( `actions-box` = TRUE)",
+    Argument = "choices",
+    Argument2 = "selected",
+    argValue = "BotanicalSourceOptions",
+    ReactiveArgValue = FALSE
+  ),
+  WFOData = list(
+    ItemType = "pickerInput",
+    Multiple = F,
+    Options = "list( `actions-box` = TRUE)",
+    Argument = "choices",
+    Argument2 = "selected",
+    argValue = NA,
+    ReactiveArgValue = FALSE
+  ),
+  OtherCrit = list(
+    ItemType = "pickerInput",
+    Multiple = T,
+    Options = "list( `actions-box` = TRUE)",
+    Argument = "choices",
+    Argument2 = "selected",
+    argValue = "ColumnOptions",
+    ReactiveArgValue = TRUE
+  )
+)
+
+#### the fill out
+
 for(i in which(Fct_args$ItemType %in% "TBD")) {
 
+  idx <- which(names(ItemType_lookup) == gsub("<code>|</code>", "", regmatches(Fct_args$Label[i], regexpr("<code>.*?</code>",  Fct_args$Label[i]))))
 
-  if(grepl("ScientificName", Fct_args$Label[i])) {
-    Fct_args$ItemType[i] <- "pickerInput"
-    Fct_args$Multiple[i] <- T
-    Fct_args$Options[i] <- "list( `actions-box` = TRUE)"
-    Fct_args$Argument[i] <- "choices"
-    Fct_args$Argument2[i] <- "selected"
-    Fct_args$argValue[i] <- "FormatedScientificNameOptions"
-    Fct_args$ReactiveArgValue[i] <- TRUE
+  if(length(idx) == 1) {
+    Fct_args$ItemType[i] <- ItemType_lookup[[idx]]$ItemType
+    Fct_args$Multiple[i] <- ItemType_lookup[[idx]]$Multiple
+    Fct_args$Options[i] <- ItemType_lookup[[idx]]$Options
+    Fct_args$Argument[i] <- ItemType_lookup[[idx]]$Argument
+    Fct_args$Argument2[i] <- ItemType_lookup[[idx]]$Argument2
+    Fct_args$argValue[i] <- ItemType_lookup[[idx]]$argValue
+    Fct_args$ReactiveArgValue[i] <- ItemType_lookup[[idx]]$ReactiveArgValue
 
   } else { stop("Need to code for this argument")}
 
+  # if(grep(paste(names(ItemType_lookup), collapse = "|"), Fct_args$Label[i])) {
+  #   Fct_args$ItemType[i] <- "pickerInput"
+  #   Fct_args$Multiple[i] <- T
+  #   Fct_args$Options[i] <- "list( `actions-box` = TRUE)"
+  #   Fct_args$Argument[i] <- "choices"
+  #   Fct_args$Argument2[i] <- "selected"
+  #   Fct_args$argValue[i] <- "FormatedScientificNameOptions"
+  #   Fct_args$ReactiveArgValue[i] <- TRUE
+  #
+  # } else { stop("Need to code for this argument")}
+
 }
+
+
+### argValue
 
 for(i in which(Fct_args$argValue %in% "TBD")) {
 
@@ -88,7 +159,7 @@ for(i in which(Fct_args$argValue %in% "TBD")) {
   }
 
   if(!all(eval( Fct_args$Default[[i]]) %in% x$ItemID[x$Activate == T])){
-    Fct_args$argValue[i] <- deparse(Fct_args$Default[[i]])
+    Fct_args$argValue[i] <- paste(deparse(Fct_args$Default[[i]]), collapse = "")
     Fct_args$ReactiveArgValue[i] <- FALSE
     Fct_args$Default[i] <- paste0('c("', eval(Fct_args$Default[[i]])[1], '")')
   }

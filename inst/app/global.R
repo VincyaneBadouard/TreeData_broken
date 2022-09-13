@@ -39,7 +39,8 @@ xCorr <- read.csv("data/interactive_items_CorrerctionFunctions.csv")
 
 ## in the Codes tab (tree code pre-defined options)
 CodeOptions <-  read.csv("data/CodeOptions.csv")
-
+BotanicalSourceOptions <- list("The Plant List" = "TPL",
+                               "World Flora Online" = "WFO")
 
 # function to make unitque IDs (mostly for inactive buttons)
 
