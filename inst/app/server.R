@@ -1339,18 +1339,18 @@ server <- function(input, output, session) { # server ####
 
       # Metadata ##
 
-      OurStandardColumn <- colnames(DataOutput())
+      OurStandardColumn <- colnames(DataDone())
 
       idxOriginal <- grep("Original$", OurStandardColumn)
       idxTreeCodes <- grep("^Original_", OurStandardColumn)
 
-      if(!is.null(profileOutput()$TreeCodes)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
+      if(length(idxTreeCodes>0)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
 
 
       YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
       YourInputColumn[idxTreeCodes] <- gsub("Original_", "", OurStandardColumn[idxTreeCodes])
       YourInputColumn[idxOriginal] <- reactiveValuesToList(input)[gsub("Original", "", OurStandardColumn[idxOriginal])]
-      if(!is.null(profileOutput()$TreeCodes)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
+      if(length(idxTreeCodes>0)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
 
 
         m <- match(OurStandardColumn, xall$ItemID)
@@ -1363,11 +1363,11 @@ server <- function(input, output, session) { # server ####
 
         m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
         m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
-        if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+        if(length(idxTreeCodes>0)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
 
         OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
         OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        if(length(idxTreeCodes>0)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
         if(!is.null(profileOutput())) {
