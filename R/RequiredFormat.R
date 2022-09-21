@@ -274,15 +274,6 @@ RequiredFormat <- function(
     # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree
     if(input$IdTree %in% "none") Data$IdTree <- NA
 
-    if (input$TreeFieldNum %in% "none") {
-
-      warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
-
-
-      Data[is.na(IdTree), IdTree := paste(seq(1, .N), "_auto")  , by = .(IdCensus)]
-
-    }
-
     # if we have TreeFieldNum, we use it
 
     if (!input$TreeFieldNum %in% "none") {
@@ -298,6 +289,26 @@ RequiredFormat <- function(
       Data[is.na(IdTree), IdTree := paste(Site, Plot, Subplot, TreeFieldNum, "auto", sep = "_") , by = .(IdCensus)]
 
     }
+
+    # if we also don't have TreeFieldNum, we are just considering that each row within a plot and subplot is one tree (or we use stemID, which will take care of ForestPlot data where theyonly have idTree for multistem tree)
+
+    if (input$TreeFieldNum %in% "none") {
+
+      if (input$IdStem %in% "none") {
+        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
+
+
+        Data[is.na(IdTree), IdTree := paste0(seq(1, .N), "_auto")  , by = .(IdCensus)]
+      }
+
+      if (!input$IdStem %in% "none") {
+        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, BUT you did specify a column for Stem tags, so we are using IdStem to replace missing IdTree. WARNING: This was created to deal with ForestPlots data, where only  only multiple stems have an IdTree, so, in that particular case, it is safe to use IdStem as IdTree."))
+
+
+        Data[is.na(IdTree), IdTree := paste0(IdStem, "_auto")]
+      }
+    }
+
 
 
   }
