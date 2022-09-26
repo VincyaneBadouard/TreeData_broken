@@ -1277,7 +1277,7 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$DontUseProfileOutput, {
     shinyjs::hide("DontUseProfileOutput")
     shinyjs::hide("CodeTranslationsDiv")
-    shinyjs::show("UseProfileOutput")
+    # shinyjs::show("UseProfileOutput")
 
 
     # reset profile and code translation inputs and table (some of these are probably not necessary... it took me a while to make this work but I can't tell what combination of this and other changes need to happen)
@@ -1322,6 +1322,9 @@ server <- function(input, output, session) { # server ####
     },
     content = function(file) {
 
+      # list all files that are currently in wd (so we can compare with the ones that are created in this step and save only those)
+      before_files <- list.files()
+
       # Profile ##
 
       inputs_to_save <- c(names(input)[names(input) %in% x$ItemID], "MeasLevel", "Tidy", "VariableName", grep("Variablecolumns|TickedMelt|ValueName", names(input), value = T)) # names(input)
@@ -1345,13 +1348,13 @@ server <- function(input, output, session) { # server ####
       idxOriginal <- grep("Original$", OurStandardColumn)
       idxTreeCodes <- grep("^Original_", OurStandardColumn)
 
-      if(length(idxTreeCodes>0)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
+      if(!is.null(profileOutput()$TreeCodes)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
 
 
       YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
       YourInputColumn[idxTreeCodes] <- gsub("Original_", "", OurStandardColumn[idxTreeCodes])
       YourInputColumn[idxOriginal] <- reactiveValuesToList(input)[gsub("Original", "", OurStandardColumn[idxOriginal])]
-      if(length(idxTreeCodes>0)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
+      if(!is.null(profileOutput()$TreeCodes)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
 
 
         m <- match(OurStandardColumn, xall$ItemID)
@@ -1364,11 +1367,11 @@ server <- function(input, output, session) { # server ####
 
         m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
         m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
-        if(length(idxTreeCodes>0)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+        if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
 
         OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
         OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        if(length(idxTreeCodes>0)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+        if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
         if(!is.null(profileOutput())) {
@@ -1421,11 +1424,12 @@ server <- function(input, output, session) { # server ####
 
       # save ZIP
 
-      FilesToZip <- c("profile.rds","metadata.csv", "data.csv", "tree_codes_metadata.csv", "tree_codes_translation.csv")
+      FilesToZip <- setdiff(list.files(), before_files)
 
-      zip(zipfile=file, files=FilesToZip[file.exists(FilesToZip)])
+      zip(zipfile=file, files=FilesToZip)
 
       file.remove(FilesToZip)
+
     },
     contentType = "application/zip"
 
