@@ -82,7 +82,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    # browser()
+    browser()
   })
 
   # upload tab ####
@@ -1128,7 +1128,7 @@ server <- function(input, output, session) { # server ####
       for (i in seq_len(nrow(CodeTranslationTable))) {
         for(j in seq_len(ncol(CodeTranslationTable))) {
           if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-            '<input type="radio" name="%s_%s" value="%s" checked="checked"/>',
+            '<input type="radio" name="%s_%s" value="%s" checked="checked" data-waschecked="true"/>',
             AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
               '<input type="radio" name="%s_%s" value="%s"/>',
               AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
@@ -1148,17 +1148,38 @@ server <- function(input, output, session) { # server ####
           options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
                          rowGroup = list(dataSrc=c(1)),
                          columnDefs = list(list(visible=FALSE, targets=c(1))),
-                         fixedColumns = list(leftColumns = 1)),
+                         fixedColumns = list(leftColumns = 1)
+                         # ,
+                         # createdCell = JS(" function (td, cellData, rowData, row, col) {
+                         #
+                         # if ($(td).data('checked') == false) {
+                         # document.getElementById($(td).attr('id')).reset();
+                         # }
+                         # };")
+                         ),
           container = sketch,
           callback = JS("table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
           $this.attr('id', this.data()[1]+'_'+this.data()[0]);
           $this.addClass('shiny-input-radiogroup');
-        });
+          });
+          $('input[type=radio]').on('click', function () {
+            if ($(this).data('waschecked') == true) {
+              $(this).prop('checked', false);
+              $(this).data('waschecked', false);
+              Shiny.setInputValue($(this).attr('name'), '');
+
+            } else {
+              $(this).data('waschecked', true);
+                   }
+          });
+
         Shiny.unbindAll(table.table().node());
         Shiny.bindAll(table.table().node());")
         ), # this is generating the radio buttons in the body of the table
         server = FALSE)
+
+
 
       # CodeTranslationTable(CodeTranslationTable)
       CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
@@ -1173,13 +1194,15 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$SeeCodeDefs, {
 
     shinyjs::show("CodeTranslationFinal")
-     req(CodeTranslationFinal$dt$InputValue)
+
+    req(CodeTranslationFinal$dt$InputValue)
     # req(input$codes_MAIN)
     dt <- CodeTranslationFinal$dt
+
     dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_"), function(x) input[[x]])
     dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
     dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
-    dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x)) strsplit(x,"_")[[1]][[2]] else NULL)# remove the column part in the value
+    dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x) && x != "") strsplit(x,"_")[[1]][[2]] else NULL)# remove the column part in the value
     CodeTranslationFinal$output <- dt
   })
 
@@ -1254,13 +1277,15 @@ server <- function(input, output, session) { # server ####
     CodesInput[, Translation:=do.call(paste, c(.SD, sep = ";")), .SDcols=-seq_along(idx)]
     CodesInput[, grep("_Translated", colnames(CodesInput)):=NULL]
 
-    CodesInput[, Translation:=gsub("\\<[A-Z]*\\>[[:punct:]]", "", Translation)] # remove codes that don't have an equivalence
+    CodesInput[, Translation:=gsub("\\<[A-Z]*\\>", "", Translation)] # remove codes that don't have an equivalence
     CodesInput[, Translation:=gsub("\\b(\\w+)\\b\\s*\\W\\s*(?=.*\\1)", "", Translation, perl = T)] # remove duplicated -  this deals with n-1 relationship (if different input refer to the same output code )
+
 
     OutCols <- unique(na.omit(CodeTranslationFinal$output$OutputColumn))
 
     for(j in OutCols) {
       CodesInput[,Final:=gsub(paste0(j, "_|\\<(\\w*?_\\w*?)\\>"), "", Translation)]
+      # CodesInput[, Final:=gsub("^[[:punct:]]|[[:punct:]]$","", Final)] # remove leading and trailing punctuation NEED TO REDO THIS, NOT WORKING
 
       if(profileOutput()$TreeCodesSepMan %in% "")  CodesInput[, Final:=gsub(";", "", Final)] # replace ";" by "" if profileOutput()$TreeCodesSepMan is ""
 
@@ -1277,7 +1302,8 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$DontUseProfileOutput, {
     shinyjs::hide("DontUseProfileOutput")
     shinyjs::hide("CodeTranslationsDiv")
-    # shinyjs::show("UseProfileOutput")
+
+    if(input$predefinedProfileOutput != "No") shinyjs::show("UseProfileOutput")
 
 
     # reset profile and code translation inputs and table (some of these are probably not necessary... it took me a while to make this work but I can't tell what combination of this and other changes need to happen)

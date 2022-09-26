@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  # ,
-                                  #
-                                  # tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                                  ,
+
+                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -586,7 +586,14 @@ tabItem("Codes",
 
     tabItem(tabName = "Correct",
 
-            div(includeMarkdown("www/Corrections.md")),
+            div(includeMarkdown("www/Corrections.md"),
+                actionBttn(
+                  inputId = "SkipCorrections",
+                  label = "Skip Corrections",
+                  style = "material-flat",
+                  color = "warning"
+                )
+            ),
 
             lapply(unique(xCorr$Function), function(f) {
               box(
@@ -607,12 +614,6 @@ tabItem("Codes",
               style = "material-flat",
               color = "success"
             )),
-            actionBttn(
-              inputId = "SkipCorrections",
-              label = "Skip Corrections",
-              style = "material-flat",
-              color = "warning"
-            ),
             hidden(actionBttn(
               inputId = "GoToOutput",
               label = "Go To Output format",
