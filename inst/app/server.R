@@ -1096,13 +1096,13 @@ server <- function(input, output, session) { # server ####
                        color = "default"),
             br(),
             hidden(DTOutput("CodeTranslationFinal")),
-            actionBttn(
+            hidden(actionBttn(
               inputId = "ApplyCodeTranslation",
               label = "Apply Code Translation",
               style = "material-flat",
               size = "sm",
               color = "success"
-            ),
+            )),
             hidden(
               actionBttn(
                 inputId = "RevertCodeTranslation",
@@ -1194,6 +1194,7 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$SeeCodeDefs, {
 
     shinyjs::show("CodeTranslationFinal")
+    shinyjs::show("ApplyCodeTranslation")
 
     req(CodeTranslationFinal$dt$InputValue)
     # req(input$codes_MAIN)
