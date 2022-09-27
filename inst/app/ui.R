@@ -666,7 +666,7 @@ tabItem("Codes",
             )
             ),
             fluidRow(hidden(div(id = "CodeTranslationsDiv", box(width = 12,
-              h4("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes with the same difinitions, but you need to double check and fill out the rest of the codes"),
+              h4("The output profile you selected has a table of codes that you may want to match with your codes. We tried to help you out by already matching the codes with the same definitions, but you need to double check and fill out the rest of the codes"),
               h3("Help"),
               p(strong("Row names:"), "These are the your codes. They may come from multiple columns, indicated in the grey rows"),
               p(strong("Column names:"), "These are the codes in the output profile you selected. They may come from multiple columns, given at the top of the table."),
