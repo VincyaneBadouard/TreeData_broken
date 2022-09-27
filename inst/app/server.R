@@ -1285,7 +1285,8 @@ server <- function(input, output, session) { # server ####
 
     for(j in OutCols) {
       CodesInput[,Final:=gsub(paste0(j, "_|\\<(\\w*?_\\w*?)\\>"), "", Translation)]
-      # CodesInput[, Final:=gsub("^[[:punct:]]|[[:punct:]]$","", Final)] # remove leading and trailing punctuation NEED TO REDO THIS, NOT WORKING
+      CodesInput[, Final:=gsub("^[[:punct:]]*|[[:punct:]]*$","", Final)] # remove leading and trailing punctuation
+      CodesInput[, Final:= gsub("([[:punct:]]){2,}","\\1", Final)] # remove repeated punctuation
 
       if(profileOutput()$TreeCodesSepMan %in% "")  CodesInput[, Final:=gsub(";", "", Final)] # replace ";" by "" if profileOutput()$TreeCodesSepMan is ""
 
