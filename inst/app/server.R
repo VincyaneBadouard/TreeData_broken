@@ -1141,28 +1141,46 @@ server <- function(input, output, session) { # server ####
 
       output$CodeTranslationTable <- renderDT(
         datatable(
-          data = cbind(AllCodesInput$Column, CodeTranslationTable),
+          data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
+          rownames = F,
           selection = 'none',
           escape = FALSE,
           extensions = c('RowGroup', 'FixedColumns'),
           options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
-                         rowGroup = list(dataSrc=c(1)),
-                         columnDefs = list(list(visible=FALSE, targets=c(1))),
-                         fixedColumns = list(leftColumns = 1)
-                         # ,
-                         # createdCell = JS(" function (td, cellData, rowData, row, col) {
-                         #
-                         # if ($(td).data('checked') == false) {
-                         # document.getElementById($(td).attr('id')).reset();
-                         # }
-                         # };")
-                         ),
+                         rowGroup = list(dataSrc=c(0)),
+                         # columnDefs = list(list(visible=FALSE, targets=c(1))),
+                         fixedColumns = list(leftColumns = 2),
+                         initComplete =JS('
+
+                         // This to give count of code in the grey line that can collapse the code
+    function(settings, json) {
+
+
+
+              $("tr.dtrg-group").each(function(i) {
+              let old = $(this).children( "td" ).text()
+              let count = Object.keys($(this).nextUntil(".dtrg-group")).length -2;
+              $(this).children( "td" ).html(old + " (" + count+ ") ");
+              })
+
+
+
+    }
+')),
           container = sketch,
-          callback = JS("table.rows().every(function(i, tab, row) {
+          callback = JS("
+
+
+              // Add radiobuttons
+
+          table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
-          $this.attr('id', this.data()[1]+'_'+this.data()[0]);
+          $this.attr('id', this.data()[0]+'_'+this.data()[1]);
           $this.addClass('shiny-input-radiogroup');
           });
+
+            // allow radiobuttons to be deselected when clicked a second time
+
           $('input[type=radio]').on('click', function () {
             if ($(this).data('waschecked') == true) {
               $(this).prop('checked', false);
@@ -1174,8 +1192,21 @@ server <- function(input, output, session) { # server ####
                    }
           });
 
-        Shiny.unbindAll(table.table().node());
-        Shiny.bindAll(table.table().node());")
+
+            // collapse rows of same column
+
+
+            table.table().on('click', 'tr.dtrg-group', function () {
+             // $(this).children('td').innerHTML('Hello world!)
+
+              var rowsCollapse = $(this).nextUntil('.dtrg-group');
+              $(rowsCollapse).toggleClass('hidden');
+            });
+
+           // Not sure what this is but it is needed
+
+          Shiny.unbindAll(table.table().node());
+          Shiny.bindAll(table.table().node());")
         ), # this is generating the radio buttons in the body of the table
         server = FALSE)
 

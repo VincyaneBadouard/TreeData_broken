@@ -63,6 +63,9 @@ body <- dashboardBody(
 
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),# this is to edit Codes table
     tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"), # this is to edit Codes table
+    # tags$script(src = "https://code.jquery.com/jquery-3.5.1.js"), # this is to allow grouping of rows in Code translation table
+    # tags$script(src = "https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"), # this is to allow grouping of rows in Code translation table
+    tags$script(src = "collapse_rows.js"),
     tags$style(
       HTML(".shiny-notification {
              position:fixed;
@@ -76,6 +79,7 @@ body <- dashboardBody(
              .sw-dropdown-in {z-index: 3000006 !important;}
              .vscomp-search-container {z-index: 3000005 !important;}
              .vscomp-dropbox-container {z-index: 3000005 !important;}
+             tr.dtrg-group {cursor: pointer;}
 
            "
 
@@ -675,6 +679,8 @@ tabItem("Codes",
               tags$li("For each of your codes, select the radio button in the column that corresponds most to your defintion. We already selected the buttons for codes that match defintions perfectly."),
               tags$li("If there is no match, leave blank."),
               tags$li("When you are done, double check your selection in the next table. When you are satisfied, click on the 'Apply Code Translation' button."),
+              br(),
+              p(strong("Tip: You can collapse the rows by clicking on the gray ones")),
               # strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
               uiOutput("uiCodeTranslations"))))),
             fluidRow(
