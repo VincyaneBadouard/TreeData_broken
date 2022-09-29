@@ -230,9 +230,10 @@ server <- function(input, output, session) { # server ####
   })
 
   # stack tab ####
+  StackedTables <- reactiveVal()
 
-  StackedTables <- eventReactive(input$Stack, {
-    do.call(rbind, Data()[input$TablesToStack])
+  observeEvent(input$Stack, {
+    StackedTables(do.call(rbind, Data()[input$TablesToStack]))
   })
 
   observeEvent(input$Stack, {
@@ -410,12 +411,17 @@ server <- function(input, output, session) { # server ####
 
   # tidy tab ####
 
-  OneTable <- eventReactive(input$submitTables | input$GoToTidy | input$SkipMerge, {
+  OneTable <- reactiveVal()
+
+  observeEvent(input$submitTables | input$GoToTidy | input$SkipMerge,
+
+  # OneTable <- eventReactive(input$submitTables | input$GoToTidy | input$SkipMerge,
+                            {
 
     if(input$nTable == 1 & length(Data()) == 1) {
-      Data()[[1]]
+      OneTable(Data()[[1]])
     } else {
-      if(!is.null(MergedTables())) MergedTables() else  StackedTables()
+      if(length(MergedTables()) > 0 ) OneTable(MergedTables()) else  OneTable(StackedTables())
     }
 
 
@@ -424,6 +430,7 @@ server <- function(input, output, session) { # server ####
 
 
   observe({
+    req(length(OneTable()) > 0)
     groupNames <- split(names(OneTable()), cutree(hclust(stringdistmatrix(names(OneTable()))), h = 2))
     groupNames <- groupNames[sapply(groupNames, length) > 1]
     names(groupNames) <- sapply(groupNames, function(x) paste(Reduce(intersect, strsplit(x,"")), collapse=""))
@@ -464,7 +471,7 @@ server <- function(input, output, session) { # server ####
 
   })
 
-  TidyTable <- reactiveVal(NULL)
+  TidyTable <- reactiveVal()
 
   observeEvent(input$Tidy, {
 
@@ -756,11 +763,13 @@ server <- function(input, output, session) { # server ####
   })
 
   # format data
+  DataFormated <- reactiveVal()
 
-  DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
+  observeEvent(input$LaunchFormating | input$UpdateTable, {
+  # DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
     withCallingHandlers({
-      RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T)
+      DataFormated(RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T))
     },
     warning = function(warn){
       showNotification(paste(gsub("simpleWarning in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\), :", "", warn), collapse = ". "), type = 'warning', duration = NULL)
@@ -930,7 +939,11 @@ server <- function(input, output, session) { # server ####
   })
 
   # apply corrections
-  DataCorrected <- eventReactive(input$ApplyCorrections, {
+  DataCorrected <- reactiveVal()
+
+  observeEvent(input$ApplyCorrections, {
+
+  # DataCorrected <- eventReactive(input$ApplyCorrections, {
     Rslt <- DataFormated()
     lapply(
       unique(xCorr$Function),
@@ -961,7 +974,7 @@ server <- function(input, output, session) { # server ####
         }
       }
     )
-    Rslt
+    DataCorrected(Rslt)
   })
 
   output$CorrectedTable <- renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
@@ -1005,8 +1018,8 @@ server <- function(input, output, session) { # server ####
 
   # output tab ####
 
-  DataOutput <- reactiveVal(NULL)
-  profileOutput <- reactiveVal(NULL)
+  DataOutput <- reactiveVal()
+  profileOutput <- reactiveVal()
   CodeTranslationFinal <- reactiveValues(dt = NULL, output = NULL)
 
   observe( {
@@ -1123,16 +1136,16 @@ server <- function(input, output, session) { # server ####
 
         AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
-        CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_"), ncol = nrow(AllCodesOutput),
+        CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_mysep_"), ncol = nrow(AllCodesOutput),
                                        nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
 
         for (i in seq_len(nrow(CodeTranslationTable))) {
           for(j in seq_len(ncol(CodeTranslationTable))) {
             if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-              '<input type="radio" name="%s_%s" value="%s" checked="checked" data-waschecked="true"/>',
+              '<input type="radio" name="%s_mysep_%s" value="%s" checked="checked" data-waschecked="true"/>',
               AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
-                '<input type="radio" name="%s_%s" value="%s"/>',
+                '<input type="radio" name="%s_mysep_%s" value="%s"/>',
                 AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
           }
         }
@@ -1180,7 +1193,7 @@ server <- function(input, output, session) { # server ####
 
           table.rows().every(function(i, tab, row) {
           var $this = $(this.node());
-          $this.attr('id', this.data()[0]+'_'+this.data()[1]);
+          $this.attr('id', this.data()[0]+'_mysep_'+this.data()[1]);
           $this.addClass('shiny-input-radiogroup');
           });
 
@@ -1236,10 +1249,10 @@ server <- function(input, output, session) { # server ####
     # req(input$codes_MAIN)
     dt <- CodeTranslationFinal$dt
 
-    dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_"), function(x) input[[x]])
-    dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
-    dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_"))]
-    dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x) && x != "") strsplit(x,"_")[[1]][[2]] else NULL)# remove the column part in the value
+    dt$OutputValue <- sapply(paste(dt$InputColumn, dt$InputValue, sep = "_mysep_"), function(x) input[[x]])
+    dt$OutputColumn <- profileOutput()$AllCodes$Column[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_mysep_"))]
+    dt$OutputDefinition <- profileOutput()$AllCodes$Definition[match(dt$OutputValue, paste(profileOutput()$AllCodes$Column, profileOutput()$AllCodes$Value, sep = "_mysep_"))]
+    dt$OutputValue <-  lapply(dt$OutputValue, function(x) if(!is.null(x) && x != "") rev(strsplit(x,"_mysep_")[[1]])[[1]] else NULL) # remove the column part in the value
     CodeTranslationFinal$output <- dt
   })
 
@@ -1341,11 +1354,14 @@ server <- function(input, output, session) { # server ####
     shinyjs::hide("DontUseProfileOutput")
     shinyjs::hide("CodeTranslationsDiv")
 
-    if(input$predefinedProfileOutput != "No") shinyjs::show("UseProfileOutput")
+    # if(input$predefinedProfileOutput != "No") shinyjs::show("UseProfileOutput")
+    updateRadioButtons(session, 'predefinedProfileOutput', selected = "No")
 
 
     # reset profile and code translation inputs and table (some of these are probably not necessary... it took me a while to make this work but I can't tell what combination of this and other changes need to happen)
-    profileOutput <- reactiveVal(NULL)
+    profileOutput(NULL)
+    reset('profileOutput')
+
 
     lapply(paste(CodeTranslationFinal$dt$InputColumn, CodeTranslationFinal$dt$InputValue, sep = "_"), function(i) updateRadioButtons(session, inputId = i, choices=character(0), selected=character(0)))
 
@@ -1357,7 +1373,8 @@ server <- function(input, output, session) { # server ####
 
     # revert DataOutput
     DataOutput(DataDone())
-  }, priority = 10)
+
+  }, priority = 1000)
 
   observeEvent(input$UseProfileOutput |input$DontUseProfileOutput, {
     shinyjs::show("GoToDownload")
@@ -1412,7 +1429,11 @@ server <- function(input, output, session) { # server ####
       idxOriginal <- grep("Original$", OurStandardColumn)
       idxTreeCodes <- grep("^Original_", OurStandardColumn)
 
-      if(!is.null(profileOutput()$TreeCodes)) idxTreeCodesOut <- grep(paste(profileOutput()$TreeCodes, sep = "|"), OurStandardColumn)
+      if(!is.null(profileOutput()$TreeCodes)){
+
+        idxTreeCodesOut <- grep(paste(paste0("^", profileOutput()$TreeCodes, "$"), collapse = "|"), colnames(DataOutput()))
+        OurStandardColumn[idxTreeCodesOut] <- NA
+      }
 
 
       YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
@@ -1435,10 +1456,10 @@ server <- function(input, output, session) { # server ####
 
       OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
       OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-      if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- colnames(DataOutput())[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
-      if(!is.null(profileOutput())) {
+      if(length(profileOutput()) > 0) {
         Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
       } else {
@@ -1458,7 +1479,7 @@ server <- function(input, output, session) { # server ####
 
       Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),] #remove lines with for columns that are missing in input and output
 
-      if(!is.null(profileOutput())) {
+      if(length(profileOutput()) > 0) {
         Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
       }
 
@@ -1478,7 +1499,7 @@ server <- function(input, output, session) { # server ####
 
       # Tree Codes Translation ##
 
-      if(!is.null(input$ApplyCodeTranslation) & length(input$ApplyCodeTranslation ) > 0) {
+      if(!is.null(input$ApplyCodeTranslation) & length(input$ApplyCodeTranslation ) > 0 & length(CodeTranslationFinal$output) > 0) {
 
         CodeTranslationFinal$output$OutputValue <- sapply(CodeTranslationFinal$output$OutputValue, function(x) ifelse(is.null(x), NA, x)) # this is to avoid having a list
 
