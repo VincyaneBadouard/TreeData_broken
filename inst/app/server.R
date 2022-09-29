@@ -95,23 +95,23 @@ server <- function(input, output, session) { # server ####
       column(width = 6,
              # load button for main data file (csv format)
              box(#title = paste("Table", i),
-                 textInput(inputId = paste0("TableName", i),
-                           # label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
-                           label = NULL,
-                           value = paste0("Table", i)
-                 ),
-                 width = NULL,
-                 fileInput(inputId = paste0("file", i), "Choose CSV File (max 25MB)", accept = ".csv"),
-                 # does the dataframe have a header?
-                 dropdownButton( icon = icon("cog"), size  ="sm",
-                 checkboxInput( paste0("header", i), "Header", TRUE),
-                 # choose separator
-                 selectInput(inputId = paste0("cbSeparator", i),
-                             label = "Separator",
-                             choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
-                             selected = "auto"
-                 )),
-                 span(textOutput(outputId = paste0("CSVWarning", i)), style="color:red")
+               textInput(inputId = paste0("TableName", i),
+                         # label = "Give an explicit UNIQUE and SHORT name to this table. No space, no special character, no accent.",
+                         label = NULL,
+                         value = paste0("Table", i)
+               ),
+               width = NULL,
+               fileInput(inputId = paste0("file", i), "Choose CSV File (max 25MB)", accept = ".csv"),
+               # does the dataframe have a header?
+               dropdownButton( icon = icon("cog"), size  ="sm",
+                               checkboxInput( paste0("header", i), "Header", TRUE),
+                               # choose separator
+                               selectInput(inputId = paste0("cbSeparator", i),
+                                           label = "Separator",
+                                           choices = c("auto", ",", "\t",  "|", ";", ":"), # pb with tab
+                                           selected = "auto"
+                               )),
+               span(textOutput(outputId = paste0("CSVWarning", i)), style="color:red")
              )
       )
 
@@ -517,8 +517,8 @@ server <- function(input, output, session) { # server ####
                                    })
 
   DensityUnitOptions <- eventReactive(input$PlotArea,
-                                   {c("none", "individual/cm2", "individual/m2", "individual/ha", "individual/km2")
-                                   })
+                                      {c("none", "individual/cm2", "individual/m2", "individual/ha", "individual/km2")
+                                      })
 
   AreaByAreaUnitOptions <- reactiveVal(c("none",
                                          "mm2/m2", "cm2/m2", "m2/m2",
@@ -531,10 +531,10 @@ server <- function(input, output, session) { # server ####
                                           "mm3/km2", "cm3/km2", "m3/km2"))
 
   MassByAreaUnitOptions <- reactiveVal(c("none",
-                                          "g/m2", "kg/m2", "Mg/m2",
-                                          "g/ha", "kg/ha", "Mg/ha",
-                                          "gC/m2", "kgC/m2", "MgC/m2",
-                                          "gC/ha", "kgC/ha", "MgC/ha"))
+                                         "g/m2", "kg/m2", "Mg/m2",
+                                         "g/ha", "kg/ha", "Mg/ha",
+                                         "gC/m2", "kgC/m2", "MgC/m2",
+                                         "gC/ha", "kgC/ha", "MgC/ha"))
 
   TreeCodesSepOptions <- reactiveVal(c("Punctuation character (,;-/...)" = "[[:punct:]]",
                                        "No character (codes are concatenated)" = ""))
@@ -806,14 +806,14 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$GoToCodes, {
     if(length(input$TreeCodes) > 0) {
       updateTabItems(session, "tabs", "Codes")
+    } else {
+      if(input$MeasLevel %in% c("Tree", "Stem")) {
+        updateTabItems(session, "tabs", "Correct")
       } else {
-        if(input$MeasLevel %in% c("Tree", "Stem")) {
-          updateTabItems(session, "tabs", "Correct")
-          } else {
-            updateTabItems(session, "tabs", "OutputFormat")
-            DataDone(DataFormated())
-          }
+        updateTabItems(session, "tabs", "OutputFormat")
+        DataDone(DataFormated())
       }
+    }
   }, ignoreInit = TRUE)
 
 
@@ -1054,41 +1054,43 @@ server <- function(input, output, session) { # server ####
 
 
     profileOutput(tryCatch({ readRDS(file)},
-                              # warning = function(warn){
-                              #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-                              # },
-                              error = function(err){
-                                showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
-                              }))
+                           # warning = function(warn){
+                           #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
+                           # },
+                           error = function(err){
+                             showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                           }))
 
- if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
-   expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
+    if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
+      expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
 
-   expand.grid(i = c("Species", "Plot"), o = c("Stem", "Tree"))), 1, paste, collapse = " ")) {
-
-
-
-   sendSweetAlert(
-     session = session,
-     title = "Sorry !",
-     text =  paste("The profile you selected is at the",  profileOutput()$MeasLevel, "level while yours is at the", input$MeasLevel, "level. We are not able to handle this yet."
-     ),
-     type = "error")
-
-   DataOutput(NULL)
-
- } else {
+      expand.grid(i = c("Species", "Plot"), o = c("Stem", "Tree"))), 1, paste, collapse = " ")) {
 
 
-    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+
+      sendSweetAlert(
+        session = session,
+        title = "Sorry !",
+        text =  paste("The profile you selected is at the",  profileOutput()$MeasLevel, "level while yours is at the", input$MeasLevel, "level. We are not able to handle this yet."
+        ),
+        type = "error")
+
+      DataOutput(NULL)
+
+    } else {
 
 
-    # show and work on Codes translation if necessary
-    if(!(profileOutput()$AllCodes[1,1] %in% "You have not selected columns for codes" || AllCodes()[1,1] %in% "You have not selected columns for codes")) {
-      shinyjs::show("CodeTranslationsDiv")
+      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
 
-      output$uiCodeTranslations <-  renderUI({
-        div(DTOutput("CodeTranslationTable"),
+
+      # show and work on Codes translation if necessary
+      if(!(profileOutput()$AllCodes[1,1] %in% "You have not selected columns for codes" || AllCodes()[1,1] %in% "You have not selected columns for codes")) {
+        shinyjs::show("CodeTranslationsDiv")
+
+        output$uiCodeTranslations <-  renderUI({
+          div(
+            DTOutput("CodeTranslationTable"),
+            # uiOutput("uiCodeTranslationTable"),
             br(),
             actionBttn("SeeCodeDefs", "See definitions",
                        style = "material-flat",
@@ -1113,62 +1115,65 @@ server <- function(input, output, session) { # server ####
               )
 
             )
-        )
-      })
+          )
+        })
 
-      AllCodesInput <- AllCodes()
-      AllCodesOutput <- profileOutput()$AllCodes
+        AllCodesInput <- AllCodes()
+        AllCodesOutput <- profileOutput()$AllCodes
 
-      AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
+        AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
 
-      CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_"), ncol = nrow(AllCodesOutput),
-                                     nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
+        CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_"), ncol = nrow(AllCodesOutput),
+                                       nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
 
-      for (i in seq_len(nrow(CodeTranslationTable))) {
-        for(j in seq_len(ncol(CodeTranslationTable))) {
-          if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-            '<input type="radio" name="%s_%s" value="%s" checked="checked" data-waschecked="true"/>',
-            AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
-              '<input type="radio" name="%s_%s" value="%s"/>',
-              AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
+        for (i in seq_len(nrow(CodeTranslationTable))) {
+          for(j in seq_len(ncol(CodeTranslationTable))) {
+            if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
+              '<input type="radio" name="%s_%s" value="%s" checked="checked" data-waschecked="true"/>',
+              AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
+                '<input type="radio" name="%s_%s" value="%s"/>',
+                AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
+          }
         }
-      }
 
-      sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
+        # sketch if we keep one big codeTRanslationTable (not sepating into tabs)
+        sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
 
 
 
-      output$CodeTranslationTable <- renderDT(
-        datatable(
-          data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
-          rownames = F,
-          selection = 'none',
-          escape = FALSE,
-          extensions = c('RowGroup', 'FixedColumns'),
-          options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
-                         rowGroup = list(dataSrc=c(0)),
-                         # columnDefs = list(list(visible=FALSE, targets=c(1))),
-                         fixedColumns = list(leftColumns = 2),
-                         initComplete =JS('
+        output$CodeTranslationTable <- renderDT({
+          datatable(
+            data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
+            rownames = F,
+            selection = 'none',
+            escape = FALSE,
+            extensions = c('RowGroup', 'FixedColumns'),
+            options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
+                           rowGroup = list(dataSrc=c(0)),
+                           # columnDefs = list(list(visible=FALSE, targets=c(1))),
+                           fixedColumns = list(leftColumns = 2),
+                           initComplete =JS('
 
-                         // This to give count of code in the grey line that can collapse the code
+                         // This is to give the count n of  rows in the grey line that can collapse the n rows
     function(settings, json) {
 
 
 
               $("tr.dtrg-group").each(function(i) {
-              let old = $(this).children( "td" ).text()
-              let count = Object.keys($(this).nextUntil(".dtrg-group")).length -2;
-              $(this).children( "td" ).html(old + " (" + count+ ") ");
+
+                  var old = $(this).children( "td" ).html()
+                  var count = Object.keys($(this).nextUntil(".dtrg-group")).length -2;
+
+                  $(this).children( "td" ).html(old + " (" + count+ ") ");
               })
 
 
 
     }
 ')),
-          container = sketch,
-          callback = JS("
+            container = sketch,
+            callback = JS("
 
 
               // Add radiobuttons
@@ -1207,19 +1212,19 @@ server <- function(input, output, session) { # server ####
 
           Shiny.unbindAll(table.table().node());
           Shiny.bindAll(table.table().node());")
-        ), # this is generating the radio buttons in the body of the table
-        server = FALSE)
+          )}, # this is generating the radio buttons in the body of the table
+          server = FALSE)
 
 
 
-      # CodeTranslationTable(CodeTranslationTable)
-      CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
-                                            InputValue = AllCodesInput$Value,
-                                            InputDefinition = AllCodesInput$Definition)
+        # CodeTranslationTable(CodeTranslationTable)
+        CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
+                                              InputValue = AllCodesInput$Value,
+                                              InputDefinition = AllCodesInput$Definition)
+      }
+
+
     }
-
-
- }
   }, priority = 2)
 
   observeEvent(input$SeeCodeDefs, {
@@ -1416,24 +1421,24 @@ server <- function(input, output, session) { # server ####
       if(!is.null(profileOutput()$TreeCodes)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
 
 
-        m <- match(OurStandardColumn, xall$ItemID)
+      m <- match(OurStandardColumn, xall$ItemID)
 
-        if(!is.null(profileOutput())) {
+      if(!is.null(profileOutput())) {
         OutputColumn <-  profileOutput()[xall$ItemID[m]]
-        } else {
-          OutputColumn <- OurStandardColumn
-        }
+      } else {
+        OutputColumn <- OurStandardColumn
+      }
 
-        m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
-        m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
-        if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+      m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
+      m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
+      if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
 
-        OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-        if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- OurStandardColumn[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
-        if(!is.null(profileOutput())) {
+      if(!is.null(profileOutput())) {
         Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
       } else {
@@ -1469,7 +1474,7 @@ server <- function(input, output, session) { # server ####
 
       # Tree Codes definitions ##
       if(length(input$TreeCodes) > 0) write.csv(AllCodes()[, c("Column", "Value", "Definition")
-], "tree_codes_metadata.csv", row.names = FALSE)
+      ], "tree_codes_metadata.csv", row.names = FALSE)
 
       # Tree Codes Translation ##
 
