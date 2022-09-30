@@ -1020,6 +1020,7 @@ server <- function(input, output, session) { # server ####
 
   DataOutput <- reactiveVal()
   profileOutput <- reactiveVal()
+  UserCodeTranslationTable <- reactiveVal()
   CodeTranslationFinal <- reactiveValues(dt = NULL, output = NULL)
 
   observe( {
@@ -1048,6 +1049,27 @@ server <- function(input, output, session) { # server ####
     if(ext == "rds") output$RDSOutputWarning <- renderText("")
 
 
+  })
+
+  observe({
+
+    req(input$UserCodeTranslationTable)
+    file <- input$UserCodeTranslationTable$datapath
+
+    ext <- tools::file_ext(file)
+
+
+    if(ext != "csv") sendSweetAlert(
+      session = session,
+      title = "Oups !",
+      text = "The is not a .csvs file!",
+      type = "error") else UserCodeTranslationTable(read.csv(file))
+  })
+
+
+  observe({
+    req(length(UserCodeTranslationTable())>0)
+    shinyjs::show("updateCT")
   })
 
   observeEvent(input$UseProfileOutput, {
@@ -1105,7 +1127,7 @@ server <- function(input, output, session) { # server ####
             DTOutput("CodeTranslationTable"),
             # uiOutput("uiCodeTranslationTable"),
             br(),
-            actionBttn("SeeCodeDefs", "See definitions",
+            actionBttn("SeeCodeDefs", "See definitions/Update",
                        style = "material-flat",
                        size = "sm",
                        color = "default"),
@@ -1131,46 +1153,65 @@ server <- function(input, output, session) { # server ####
           )
         })
 
-        AllCodesInput <- AllCodes()
-        AllCodesOutput <- profileOutput()$AllCodes
+      }
+    }
 
-        AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
-
-        CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_mysep_"), ncol = nrow(AllCodesOutput),
-                                       nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
+  }, priority = 2)
 
 
-        for (i in seq_len(nrow(CodeTranslationTable))) {
-          for(j in seq_len(ncol(CodeTranslationTable))) {
-            if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
-              '<input type="radio" name="%s_mysep_%s" value="%s" checked="checked" data-waschecked="true"/>',
-              AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
-                '<input type="radio" name="%s_mysep_%s" value="%s"/>',
-                AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
-          }
+  observe({
+
+    req(!(profileOutput()$AllCodes[1,1] %in% "You have not selected columns for codes" || AllCodes()[1,1] %in% "You have not selected columns for codes"))
+
+    AllCodesInput <- AllCodes()
+    AllCodesOutput <- profileOutput()$AllCodes
+
+    AllCodesInput$Value[is.na(AllCodesInput$Value)] <- "NA"
+
+    # prepare this for later
+    CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
+                                          InputValue = AllCodesInput$Value,
+                                          InputDefinition = AllCodesInput$Definition)
+
+
+
+    # now prepare the code translation table
+    CodeTranslationTable <- matrix(paste(AllCodesOutput$Column, AllCodesOutput$Value, sep = "_mysep_"), ncol = nrow(AllCodesOutput),
+                                   nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
+
+
+      # if no user provided translation table, do our best looking at the definitions
+      for (i in seq_len(nrow(CodeTranslationTable))) {
+        for(j in seq_len(ncol(CodeTranslationTable))) {
+          if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
+            '<input type="radio" name="%s_mysep_%s" value="%s" checked="checked" data-waschecked="true"/>',
+            AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
+              '<input type="radio" name="%s_mysep_%s" value="%s"/>',
+              AllCodesInput$Column[i],  AllCodesInput$Value[i], CodeTranslationTable[i,j])
         }
-
-        # sketch if we keep one big codeTRanslationTable (not sepating into tabs)
-        sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
+      }
 
 
+    # sketch if we keep one big codeTRanslationTable (not sepating into tabs)
+    sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
 
-        output$CodeTranslationTable <- renderDT({
-          datatable(
-            data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
-            rownames = F,
-            selection = 'none',
-            escape = FALSE,
-            extensions = c('RowGroup', 'FixedColumns'),
-            options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
-                           rowGroup = list(dataSrc=c(0)),
-                           # columnDefs = list(list(visible=FALSE, targets=c(1))),
-                           fixedColumns = list(leftColumns = 2),
-                           initComplete =JS('
 
-                         // This is to give the count n of  rows in the grey line that can collapse the n rows
+
+    output$CodeTranslationTable <- renderDT({
+      datatable(
+        data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
+        rownames = F,
+        selection = 'none',
+        escape = FALSE,
+        extensions = c('RowGroup', 'FixedColumns'),
+        options = list(dom = 't', paging = FALSE, ordering = FALSE, scrollX=TRUE,
+                       rowGroup = list(dataSrc=c(0)),
+                       # columnDefs = list(list(visible=FALSE, targets=c(1))),
+                       fixedColumns = list(leftColumns = 2),
+                       initComplete =JS('
+
+                         // This is to give the count n of rows in the grey line that can collapse the n rows
     function(settings, json) {
-
 
 
               $("tr.dtrg-group").each(function(i) {
@@ -1185,8 +1226,8 @@ server <- function(input, output, session) { # server ####
 
     }
 ')),
-            container = sketch,
-            callback = JS("
+        container = sketch,
+        callback = JS("
 
 
               // Add radiobuttons
@@ -1225,20 +1266,50 @@ server <- function(input, output, session) { # server ####
 
           Shiny.unbindAll(table.table().node());
           Shiny.bindAll(table.table().node());")
-          )}, # this is generating the radio buttons in the body of the table
-          server = FALSE)
+      )}, # this is generating the radio buttons in the body of the table
+      server = FALSE)
 
 
 
-        # CodeTranslationTable(CodeTranslationTable)
-        CodeTranslationFinal$dt <- data.frame(InputColumn = AllCodesInput$Column,
-                                              InputValue = AllCodesInput$Value,
-                                              InputDefinition = AllCodesInput$Definition)
+
+  })
+
+  observeEvent(input$updateCT, {
+
+    AllCodesInput <- AllCodes()
+    AllCodesOutput <- profileOutput()$AllCodes
+
+    idx.i <- match(paste(UserCodeTranslationTable()$InputColumn, UserCodeTranslationTable()$InputValue), paste(AllCodesInput$Column, AllCodesInput$Value))
+    idx.j <-  match(paste(UserCodeTranslationTable()$OutputColumn, UserCodeTranslationTable()$OutputValue), paste(AllCodesOutput$Column, AllCodesOutput$Value))
+
+    # matches are when both idx.i and idx,j are not NA --> those shold be checked
+    # non matches is when one or the other is NA (technically only the output should be empty... but that is okay)
+
+    idx.checked <- !is.na(idx.i) & !is.na(idx.j)
+    idx.unchecked <- is.na(idx.i) | is.na(idx.j)
+
+    if(!all((idx.checked + idx.unchecked) == 1)) stop("this probbably means the .csv file with your code translation is not matching the input and output data well...")
+
+    for (i in seq_len(nrow(AllCodesInput))) {
+      for(j in seq_len(nrow(AllCodesOutput))) {
+
+        if(paste(i, j) %in% paste(idx.i[idx.checked], idx.j[idx.checked])) {
+
+          # set input value, which already exists, as that match
+
+          updateRadioButtons(session, inputId = paste0(AllCodesInput$Column[i],  "_mysep_", AllCodesInput$Value[i]), selected =  paste0(AllCodesOutput$Column[j],  "_mysep_", AllCodesOutput$Value[j]))
+
+        } else {
+
+          # reset the input value, in case there was a match before
+          updateRadioButtons(session, inputId = paste0(AllCodesInput$Column[i],  "_mysep_", AllCodesInput$Value[i]), selected = "")
+
+              }
       }
-
-
     }
-  }, priority = 2)
+
+
+  })
 
   observeEvent(input$SeeCodeDefs, {
 

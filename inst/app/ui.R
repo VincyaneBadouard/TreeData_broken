@@ -65,7 +65,6 @@ body <- dashboardBody(
     tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"), # this is to edit Codes table
     # tags$script(src = "https://code.jquery.com/jquery-3.5.1.js"), # this is to allow grouping of rows in Code translation table
     # tags$script(src = "https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"), # this is to allow grouping of rows in Code translation table
-    tags$script(src = "collapse_rows.js"),
     tags$style(
       HTML(".shiny-notification {
              position:fixed;
@@ -680,8 +679,11 @@ tabItem("Codes",
               tags$li("If there is no match, leave blank."),
               tags$li("When you are done, double check your selection in the next table. When you are satisfied, click on the 'Apply Code Translation' button."),
               br(),
+              fileInput("UserCodeTranslationTable", "If you have already been throught this and have a .csv file of your code translation table, you can upload it here to fill the table automatically."),
+              hidden(actionBttn("updateCT", label = "Update")),
               p(strong("Tip: You can collapse the rows by clicking on the gray ones")),
               # strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
+
               uiOutput("uiCodeTranslations"))))),
             fluidRow(
 
