@@ -171,6 +171,7 @@ RequiredFormat <- function(
 
 
   ## Date of measurement ####
+
   # concatenate if in 3 different columns
   if(!input$Month %in% "none" & !input$Day %in% "none" & input$Date %in% "none") {
     if(!input$Year %in% "none") {
@@ -183,6 +184,27 @@ RequiredFormat <- function(
     input$Date = "Date"
     input$DateFormatMan = "yyyy-mm-dd"
   }
+
+  # consider date as June 15th if not Date is given
+
+  if(input$Date %in% "none") {
+    if(!input$Year %in% "none") {
+      Data[, Date := paste0(Year, "-06-15")]
+      warning("You did not provided a Date of measurement but provided a Year. We consider the date as 15th June of the year so as to prevent NA.")
+      # overwrite input
+      input$Date = "Date"
+      input$DateFormatMan = "yyyy-mm-dd"
+
+      } else {
+      if(!input$YearMan %in% -999) Data[, Date := paste0(input$YearMan, "-06-15")]
+        warning("You did not provided a Date of measurement but provided a Year. We consider the date as 15th June of the year so as to prevent NA.")
+        # overwrite input
+        input$Date = "Date"
+        input$DateFormatMan = "yyyy-mm-dd"
+    }
+
+  }
+
 
   # put in date format
 
