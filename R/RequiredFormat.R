@@ -236,6 +236,20 @@ RequiredFormat <- function(
 
   }
 
+  ## Month
+  if(input$Month %in% "none") {
+    if(!input$Date %in% "none") Data[, Month := format(Date, "%m")]
+    Data$Month <- as.numeric(as.character(Data$Month))
+
+  }
+
+  ## Day
+  if(input$Day %in% "none") {
+    if(!input$Date %in% "none") Data[, Day := format(Date, "%d")]
+    Data$Day <- as.numeric(as.character(Data$Day))
+
+  }
+
   ## IdCensus
 
   if(input$IdCensus %in% "none") {
