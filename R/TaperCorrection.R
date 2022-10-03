@@ -1,5 +1,9 @@
 #' TaperCorrection
 #'
+#' @description Transform the tree diameter measured at a given height into the
+#'   diameter corresponding to the default measurement height (HOM), using an
+#'   allometry.
+#'
 #' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
 #'   - `Diameter` (numeric)

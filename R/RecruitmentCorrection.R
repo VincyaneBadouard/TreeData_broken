@@ -219,9 +219,10 @@ RecruitmentCorrection <- function(
 #'
 #' @details If the size of the tree has never changed, or if there is only one
 #'   value the same value is kept for the added forgotten recruits.
-#'   If the Diameter has not been corrected (Diameter_TreeDataCor column does not exist), the
-#'   function will create it for the forgotten recruits. It is strongly
-#'   recommended to correct the Diameter before correcting the recruits.
+#'   If the Diameter has not been corrected (Diameter_TreeDataCor column does
+#'   not exist), the function will create it for the forgotten recruits. It is
+#'   strongly recommended to correct the Diameter before correcting the
+#'   recruits.
 #'
 #' @return  Add rows for forgotten recruits with them estimated DBH in the
 #'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' column (logical)

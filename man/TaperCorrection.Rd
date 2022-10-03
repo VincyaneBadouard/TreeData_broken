@@ -8,8 +8,8 @@ TaperCorrection(
   Data,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
-    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
+  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(exp(-TaperParameter
+    * (HOM - DefaultHOM))),
   DetectOnly = FALSE
 )
 }
@@ -56,7 +56,9 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{TaperDBH_TreeDataCor} (= \emph{DefaultHOM})
 }
 \description{
-TaperCorrection
+Transform the tree diameter measured at a given height into the
+diameter corresponding to the default measurement height (HOM), using an
+allometry.
 }
 \examples{
 library(data.table)
