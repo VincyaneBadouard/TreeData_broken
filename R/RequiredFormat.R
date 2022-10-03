@@ -383,9 +383,13 @@ RequiredFormat <- function(
 
   ## Genus, Species, ScientificNameSepMan ####
 
-  if(! input$MeasLevel %in% c("Plot")) {
+  if(!input$MeasLevel %in% c("Plot")) {
     ### Genus and species if we have ScientificName and ScientificNameSepMan
-    if(input$Genus %in% "none" & input$Species %in% "none" & !input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") Data[, c("Genus", "Species") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(1,2))]
+    if(!input$ScientificName %in% "none" & !input$ScientificNameSepMan %in% "none") {
+      if(input$Genus %in% "none") Data[, c("Genus") := tstrsplit(ScientificName, input$ScientificNameSepMan, fixed = TRUE, keep  = c(1))]
+      if(input$Species %in% "none") Data[, c("Species") := tstrsplit(ScientificName, input$ScientificNameSepMan, fixed = TRUE, keep  = c(2))]
+      if(input$Subspecies %in% "none") Data[, c("Subspecies") := tstrsplit(ScientificName, input$ScientificNameSepMan , fixed = TRUE, keep  = c(3))]
+    }
 
     ### ScientificName if we have Genus and species
 
