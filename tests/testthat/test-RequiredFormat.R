@@ -356,7 +356,7 @@ test_that("RequiredFormat", {
   input$Genus =  input$Species = "none"
   input$ScientificNameSepMan = " "
 
-  DataFormated <- RequiredFormat(Data, input )
+  DataFormated <- RequiredFormat(Data, input)
 
   expect_true(all(!is.na(DataFormated$Genus[!is.na(DataFormated$ScientificName)])) & all(!is.na(DataFormated$Species[!is.na(DataFormated$ScientificName)])))
 
