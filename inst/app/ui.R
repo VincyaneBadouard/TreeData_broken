@@ -747,8 +747,8 @@ tabItem(tabName = "Save",
               tabPanel_helper("Corrections"),
               tabPanel(title = "Output",
                        tabsetPanel(
-                         tabPanel_helper("Selecting an output profile"),
-                         tabPanel_helper("Code translation")
+                         tabPanel_helper("Selecting_an_output_profile"),
+                         tabPanel_helper("Code_translation")
                        )),
               tabPanel_helper("Download")
             )

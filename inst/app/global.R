@@ -58,6 +58,6 @@ makeUniqueID <- NS(character(0))
 
 # create a helper for help pannels
 
-tabPanel_helper <- function(i) tabPanel(title = i,
+tabPanel_helper <- function(i) tabPanel(title = gsub("_", " ", i),
                                         includeMarkdown(paste0("www/", i, ".md")),
                                         img(src = paste0(i, ".gif"), width = "100%"))
