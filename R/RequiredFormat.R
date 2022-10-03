@@ -413,6 +413,11 @@ RequiredFormat <- function(
     }
   }
 
+  ## LifeForm if provided manuall
+  if(input$LifeForm %in% "none" & length(input$LifeFormMan) > 0) {
+    Data[, LifeForm := paste(input$LifeFormMan, collapse = ";")]
+    input$LifeForm  = "LifeForm"
+  }
 
 
   ## MinDBH if we don't have it

@@ -543,6 +543,12 @@ server <- function(input, output, session) { # server ####
                                          "gC/m2", "kgC/m2", "MgC/m2",
                                          "gC/ha", "kgC/ha", "MgC/ha"))
 
+  LifeFormOptions <- reactiveVal(c("trees",
+                                   "palms",
+                                   "lianas",
+                                   "bamboos"))
+
+
   TreeCodesSepOptions <- reactiveVal(c("Punctuation character (,;-/...)" = "[[:punct:]]",
                                        "No character (codes are concatenated)" = ""))
 
