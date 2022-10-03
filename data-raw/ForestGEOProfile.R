@@ -198,7 +198,7 @@ x <- read.csv("inst/app/data/interactive_items.csv")
 
 
 write.csv(
-  paste0(
+  gsub("\\]", "\\\\]", gsub("\\[", "\\\\[", paste0(
     "#'   \\item{",
     names(ForestGeoProfile),
     "}",
@@ -213,7 +213,7 @@ write.csv(
       )
     ),
     "}"
-  ),
+  ))),
   "clipboard",
   quote = F,
   row.names = F
