@@ -1500,7 +1500,7 @@ server <- function(input, output, session) { # server ####
       idxOriginal <- grep("Original$", OurStandardColumn)
       idxTreeCodes <- grep("^Original_", OurStandardColumn)
 
-      if(!is.null(profileOutput()$TreeCodes)){
+      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation){
 
         idxTreeCodesOut <- grep(paste(paste0("^", profileOutput()$TreeCodes, "$"), collapse = "|"), colnames(DataOutput()))
         OurStandardColumn[idxTreeCodesOut] <- NA
@@ -1510,7 +1510,7 @@ server <- function(input, output, session) { # server ####
       YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
       YourInputColumn[idxTreeCodes] <- gsub("Original_", "", OurStandardColumn[idxTreeCodes])
       YourInputColumn[idxOriginal] <- reactiveValuesToList(input)[gsub("Original", "", OurStandardColumn[idxOriginal])]
-      if(!is.null(profileOutput()$TreeCodes)) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
+      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
 
 
       m <- match(OurStandardColumn, xall$ItemID)
@@ -1523,18 +1523,18 @@ server <- function(input, output, session) { # server ####
 
       m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
       m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
-      if(!is.null(profileOutput()$TreeCodes)) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
 
       OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
       OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-      if(!is.null(profileOutput()$TreeCodes)) OutputColumn[idxTreeCodesOut] <- colnames(DataOutput())[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) OutputColumn[idxTreeCodesOut] <- colnames(DataOutput())[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
       if(length(profileOutput()) > 0) {
-        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
+        Description = paste0(xall$Description[m], ifelse(xall$EvalUnit[m], paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
       } else {
-        Description = paste0(xall$Description[m], ifelse(!xall$Unit[m] %in% c("-", "year"), paste(" in", xall$Unit[m]), ""))
+        Description = paste0(xall$Description[m], ifelse(!xall$EvalUnit[m], paste(" in", xall$Unit[m]), ""))
       }
 
       YourInputColumn[sapply(YourInputColumn, is.null) | YourInputColumn%in%"none"] <- NA
