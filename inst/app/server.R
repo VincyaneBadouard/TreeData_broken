@@ -1131,6 +1131,9 @@ server <- function(input, output, session) { # server ####
         output$uiCodeTranslations <-  renderUI({
           div(
             DTOutput("CodeTranslationTable"),
+            fluidRow(
+              box(width = NULL, title = "Output columns legend:",
+                  DTOutput("CodeTranslationTableLegend"))),
             # uiOutput("uiCodeTranslationTable"),
             br(),
             actionBttn("SeeCodeDefs", "See definitions/Update",
@@ -1199,7 +1202,7 @@ server <- function(input, output, session) { # server ####
 
 
     # sketch if we keep one big codeTRanslationTable (not sepating into tabs)
-    sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
+    sketch = HTML(paste0("<table><thead><tr><th colspan = 2></th>", paste(paste0("<th class = 'coloredcolumn' colspan =", table(AllCodesOutput$Column)[unique(AllCodesOutput$Column)], " style='text-align:left'>",unique(AllCodesOutput$Column), "</th>"), collapse = ""), "</tr><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400 title= '",AllCodesOutput$Definition, "'>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></thead><tfoot><tr><th></th><th></th>",paste(paste0("<th style= font-weight:400>", colnames(CodeTranslationTable), "</th>"), collapse = ""), "</tr></tfoot></table>")) # title is for tooltips
 
 
 
@@ -1214,24 +1217,7 @@ server <- function(input, output, session) { # server ####
                        rowGroup = list(dataSrc=c(0)),
                        # columnDefs = list(list(visible=FALSE, targets=c(1))),
                        fixedColumns = list(leftColumns = 2),
-                       initComplete =JS('
-
-                         // This is to give the count n of rows in the grey line that can collapse the n rows
-    function(settings, json) {
-
-
-              $("tr.dtrg-group").each(function(i) {
-
-                  var old = $(this).children( "td" ).html()
-                  var count = Object.keys($(this).nextUntil(".dtrg-group")).length -2;
-
-                  $(this).children( "td" ).html(old + " (" + count+ ") ");
-              })
-
-
-
-    }
-')),
+                       initComplete =JS(readLines("data/CodeTranslationTable_initcomplete.js"))),
         container = sketch,
         callback = JS("
 
@@ -1272,11 +1258,62 @@ server <- function(input, output, session) { # server ####
 
           Shiny.unbindAll(table.table().node());
           Shiny.bindAll(table.table().node());")
-      )}, # this is generating the radio buttons in the body of the table
+      )
+      }, # this is generating the radio buttons in the body of the table
       server = FALSE)
 
 
 
+    output$CodeTranslationTableLegend <- renderDT({
+      datatable(
+        data = matrix(unique( AllCodesOutput$Column), nrow = floor(sqrt(length(unique( AllCodesOutput$Column)))), byrow = T),
+        escape = FALSE,
+
+        rownames = F,
+        selection = 'none',
+
+        options = list(paging = FALSE, ordering = FALSE, scrollX=TRUE),
+
+        callback = JS('
+        var colors =
+        ["#A0ADC0",
+"#A0B9C6",
+"#A0C9CC",
+"#A0D2C9",
+"#A0D8C0",
+"#A0DFB3",
+"#A0E5A3",
+"#B1EBA0",
+"#C7F2A0",
+"#E1F8A0",
+"#FFFF9F",
+"#DDFF9A",
+"#B4FF95",
+"#91FF9D",
+"#8CFFCB",
+"#87FFFF",
+"#82FDFF",
+"#7DC4FF",
+"#7984FF",
+"#AB74FF",
+"#EF6FFF"];
+
+
+
+        table.$("thead").css({"display":"none"});
+
+        table.$("td").each(function(index) {
+                         $(this).css({"background-color": colors[index]});
+                          });
+
+
+        Shiny.unbindAll(table.table().node());
+        Shiny.bindAll(table.table().node());
+                      ')
+        )
+
+    },
+    server = FALSE)
 
   })
 
