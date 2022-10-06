@@ -546,7 +546,8 @@ server <- function(input, output, session) { # server ####
   LifeFormOptions <- reactiveVal(c("trees",
                                    "palms",
                                    "lianas",
-                                   "bamboos"))
+                                   "bamboos",
+                                   "seedlings"))
 
 
   TreeCodesSepOptions <- reactiveVal(c("Punctuation character (,;-/...)" = "[[:punct:]]",
@@ -1275,6 +1276,10 @@ server <- function(input, output, session) { # server ####
         options = list(paging = FALSE, ordering = FALSE, scrollX=TRUE),
 
         callback = JS('
+
+        // this is to make a legend for the colors of columns in the table above. This list of colors needs to match the one in www/CodeTranslationTable_initcomplete.js
+        // colors were found here: https://hihayk.github.io/scale/#10/10/15/0/-156/276/100/-60/FFFF9F/255/255/255/white
+
         var colors =
         ["#A0ADC0",
 "#A0B9C6",

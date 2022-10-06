@@ -16,7 +16,7 @@ function(settings, json) {
 // This is to color cells depending on what oclumn they belong to so it is easy to keep track when scroll left to right
 
 
-
+// colors were found here: https://hihayk.github.io/scale/#10/10/15/0/-156/276/100/-60/FFFF9F/255/255/255/white
 var colors = ["#A0ADC0",
 "#A0B9C6",
 "#A0C9CC",
