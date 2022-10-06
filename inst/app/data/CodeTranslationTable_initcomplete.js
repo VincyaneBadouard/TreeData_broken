@@ -28,16 +28,16 @@ var colors = ["#A0ADC0",
 "#C7F2A0",
 "#E1F8A0",
 "#FFFF9F",
-"#DDFF9A",
-"#B4FF95",
-"#91FF9D",
-"#8CFFCB",
-"#87FFFF",
-"#82FDFF",
-"#7DC4FF",
-"#7984FF",
-"#AB74FF",
-"#EF6FFF"];
+"#FFD39A",
+"#FF9F95",
+"#FF91C0",
+"#FF8CFD",
+"#EC87FF",
+"#A782FF",
+"#7DA1FF",
+"#79EEFF",
+"#74FFFF",
+"#6FFFBC"];
 
 
 var patterns = $("th.coloredcolumn").map(function() {
