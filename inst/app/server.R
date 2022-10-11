@@ -1079,18 +1079,54 @@ server <- function(input, output, session) { # server ####
     shinyjs::show("updateCT")
   })
 
+  observe({
+    if(input$predefinedProfileOutput != "No") shinyjs::hide("profileOutputfileInput")
+    if(input$predefinedProfileOutput == "No") shinyjs::show("profileOutputfileInput")
+
+  })
+
   observeEvent(input$UseProfileOutput, {
-    shinyjs::show("DontUseProfileOutput")
-    shinyjs::hide("UseProfileOutput")
 
 
     if(input$predefinedProfileOutput == "No") {
+
+      if(is.null(input$profileOutput)) {
+
+        sendSweetAlert(
+          session = session,
+          title = "Oups !",
+          text = "You forgot to upload an output Profile!",
+          type = "error"
+        )
+
+      }
+}}, priority = 1)
+
+  observeEvent(input$UseProfileOutput, {
+
+    shinyjs::show("DontUseProfileOutput")
+    shinyjs::hide("UseProfileOutput")
+
+    if(input$predefinedProfileOutput == "No") {
+
+      if(is.null(input$profileOutput)) shinyjs::hide("DontUseProfileOutput")
+
+
       file <- input$profileOutput$datapath
       ext <- tools::file_ext(file)
+
+
+
     } else {
       file <- paste0("data/", input$predefinedProfileOutput, "Profile.rds")
       ext <- tools::file_ext(file)
+
+
     }
+
+
+
+
 
     req(file)
 
@@ -1102,6 +1138,8 @@ server <- function(input, output, session) { # server ####
                            error = function(err){
                              showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
                            }))
+
+
 
     if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
       expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
@@ -1122,7 +1160,12 @@ server <- function(input, output, session) { # server ####
     } else {
 
 
+      if(input$predefinedProfileOutput == "App") {
+        DataOutput(DataDone())
+
+        } else {
       DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+      }
 
 
       # show and work on Codes translation if necessary
@@ -1368,6 +1411,7 @@ server <- function(input, output, session) { # server ####
 
 
   })
+
   observeEvent(input$SeeCodeDefs, {
 
     shinyjs::show("CodeTranslationFinal")
@@ -1418,7 +1462,12 @@ server <- function(input, output, session) { # server ####
     shinyjs::show("ApplyCodeTranslation")
     shinyjs::hide("RevertCodeTranslation")
 
-    DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+    if(input$predefinedProfileOutput == "App") {
+      DataOutput(DataDone())
+
+    } else {
+      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+    }
   })
 
   observeEvent(input$ApplyCodeTranslation, {
@@ -1500,15 +1549,19 @@ server <- function(input, output, session) { # server ####
     output$CodeTranslationTable <- NULL
 
     # revert DataOutput
-    DataOutput(DataDone())
+    DataOutput(NULL)
 
   }, priority = 1000)
 
-  observeEvent(input$UseProfileOutput |input$DontUseProfileOutput, {
+  observeEvent(input$UseProfileOutput, {
     shinyjs::show("GoToDownload")
 
   }, ignoreInit = T)
 
+  observeEvent(input$DontUseProfileOutput, {
+    shinyjs::hide("GoToDownload")
+
+  }, ignoreInit = T)
 
   # Visualize output
   output$DataOutput <- renderDT(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
@@ -1557,7 +1610,9 @@ server <- function(input, output, session) { # server ####
       idxOriginal <- grep("Original$", OurStandardColumn)
       idxTreeCodes <- grep("^Original_", OurStandardColumn)
 
-      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation){
+      CTwasApplied <- ifelse(is.null(input$ApplyCodeTranslation), FALSE, input$ApplyCodeTranslation > input$RevertCodeTranslation) # this is to know if we need to deal with code translation at all
+
+      if(!is.null(profileOutput()$TreeCodes) & CTwasApplied){
 
         idxTreeCodesOut <- grep(paste(paste0("^", profileOutput()$TreeCodes, "$"), collapse = "|"), colnames(DataOutput()))
         OurStandardColumn[idxTreeCodesOut] <- NA
@@ -1567,32 +1622,32 @@ server <- function(input, output, session) { # server ####
       YourInputColumn <- reactiveValuesToList(input)[xall$ItemID[match(OurStandardColumn, xall$ItemID)]]
       YourInputColumn[idxTreeCodes] <- gsub("Original_", "", OurStandardColumn[idxTreeCodes])
       YourInputColumn[idxOriginal] <- reactiveValuesToList(input)[gsub("Original", "", OurStandardColumn[idxOriginal])]
-      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
+      if(!is.null(profileOutput()$TreeCodes) & CTwasApplied) YourInputColumn[idxTreeCodesOut] <- paste(YourInputColumn[idxTreeCodes], collapse = " and/or ")
 
 
       m <- match(OurStandardColumn, xall$ItemID)
 
-      if(!is.null(profileOutput())) {
+      # if(!is.null(profileOutput())) {
         OutputColumn <-  profileOutput()[xall$ItemID[m]]
-      } else {
-        OutputColumn <- OurStandardColumn
-      }
+      # } else {
+      #   OutputColumn <- OurStandardColumn
+      # }
 
       m[idxOriginal] <- which(xall$ItemID %in% "XXXOriginal")
       m[idxTreeCodes] <- which(xall$ItemID %in% "Original_XXX")
-      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
+      if(!is.null(profileOutput()$TreeCodes) & CTwasApplied) m[idxTreeCodesOut] <- which(xall$ItemID %in% "TreeCodesOutput")
 
       OutputColumn[idxOriginal] <- OurStandardColumn[idxOriginal] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
       OutputColumn[idxTreeCodes] <- OurStandardColumn[idxTreeCodes] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
-      if(!is.null(profileOutput()$TreeCodes) & input$RevertCodeTranslation > input$RevertCodeTranslation) OutputColumn[idxTreeCodesOut] <- colnames(DataOutput())[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
+      if(!is.null(profileOutput()$TreeCodes) & CTwasApplied) OutputColumn[idxTreeCodesOut] <- colnames(DataOutput())[idxTreeCodesOut] # xall$ItemID[m[which(is.na(names(OutputColumn)))]]
 
 
-      if(length(profileOutput()) > 0) {
+      # if(length(profileOutput()) > 0) {
         Description = paste0(xall$Description[m], ifelse(xall$EvalUnit[m], paste(" in", profileOutput()[paste0(gsub("^X|^Y", "", xall$ItemID[m]),"UnitMan")]), ""))
 
-      } else {
-        Description = paste0(xall$Description[m], ifelse(!xall$EvalUnit[m], paste(" in", xall$Unit[m]), ""))
-      }
+      # } else {
+      #   Description = paste0(xall$Description[m], ifelse(!xall$EvalUnit[m], paste(" in", xall$Unit[m]), ""))
+      # }
 
       YourInputColumn[sapply(YourInputColumn, is.null) | YourInputColumn%in%"none"] <- NA
       names(YourInputColumn)[is.na(names(YourInputColumn))] <- "NA"
@@ -1607,9 +1662,12 @@ server <- function(input, output, session) { # server ####
 
       Metadata <- Metadata[!(is.na(Metadata$YourInputColumn) & is.na(Metadata$OutputColumn)),] #remove lines with for columns that are missing in input and output
 
-      if(length(profileOutput()) > 0) {
-        Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
-      }
+      # if(length(profileOutput()) > 0) {
+      Metadata <- Metadata[!profileOutput()[Metadata$OurStandardColumn] %in% "none", ]  # remove lines that don't even exist in output ptofile
+      # }
+
+
+      Metadata <- Metadata[apply(DataOutput()[,Metadata$OutputColumn, with = F], 2, function(x) !all(is.na(x))), ] # keep only the columns that are not all NAs
 
 
       write.csv(Metadata, file = "metadata.csv", row.names = F)

@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  # ,
-                                  #
-                                  # tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                                  ,
+
+                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -638,7 +638,8 @@ tabItem("Codes",
             fluidRow(box(width = 12,
                          radioButtons(inputId = "predefinedProfileOutput",
                                       label = div("Use a predifined format for your output?"),
-                                      choices = list("No thanks! I want my data in this app's standards" = "No",
+                                      choices = list("No thanks! I'll upload a profile I have handy." = "No",
+                                                     "This App's standard" = "App",
                                                      # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
                                                      "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO"#,
                                                      # "RBA: Red de Bosques Andinos" = "RBA"
@@ -646,19 +647,20 @@ tabItem("Codes",
                                       selected = "No"),
 
                          # load a profile it one already exists
-                         fileInput(inputId = "profileOutput", div("You may also load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds"),
+                         div(id = "profileOutputfileInput",
+                           fileInput(inputId = "profileOutput", div("Load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds")),
                          span(textOutput("RDSOutputWarning"), style="color:red"),
                          br(),
-                         hidden(actionBttn(
+                        actionBttn(
                            inputId = "UseProfileOutput",
                            label = "Apply Profile",
                            style = "pill",
-                           color = "success")),
-                         actionBttn(
+                           color = "success"),
+                        hidden(actionBttn(
                            inputId = "DontUseProfileOutput",
                            label = "Don't use profile",
                            style = "pill",
-                           color = "warning"),
+                           color = "warning")),
                          hidden(actionBttn(
                            inputId = "GoToDownload",
                            label = "Go To Download",
