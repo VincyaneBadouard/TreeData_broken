@@ -82,7 +82,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    # browser()
+    browser()
   })
 
   # upload tab ####
@@ -1190,10 +1190,10 @@ server <- function(input, output, session) { # server ####
                                    nrow = nrow(AllCodesInput), dimnames = list(AllCodesInput$Value, AllCodesOutput$Value), byrow = T)
 
 
-      # if no user provided translation table, do our best looking at the definitions
+      # if no user provided translation table, do our best looking at the definitions  - I added !llCodesInput$Definition[i] %in% "" to make sure empty definitions don't get matched
       for (i in seq_len(nrow(CodeTranslationTable))) {
         for(j in seq_len(ncol(CodeTranslationTable))) {
-          if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j]) CodeTranslationTable[i, j] = sprintf(
+          if(AllCodesInput$Definition[i] %in% AllCodesOutput$Definition[j] & ! AllCodesInput$Definition[i] %in% "") CodeTranslationTable[i, j] = sprintf(
             '<input type="radio" name="%s_mysep_%s" value="%s" checked="checked" data-waschecked="true"/>',
             AllCodesInput$Column[i], AllCodesInput$Value[i], CodeTranslationTable[i,j]) else CodeTranslationTable[i, j] = sprintf(
               '<input type="radio" name="%s_mysep_%s" value="%s"/>',
@@ -1327,6 +1327,15 @@ server <- function(input, output, session) { # server ####
     AllCodesInput <- AllCodes()
     AllCodesOutput <- profileOutput()$AllCodes
 
+    # first reset all radio buttons
+
+    for(id in paste0(AllCodesInput$Column,  "_mysep_", AllCodesInput$Value)) {
+      updateRadioButtons(session, inputId = id, selected = character(0))
+    }
+
+
+    # then figure out the ones that should be turned on
+
     idx.i <- match(paste(UserCodeTranslationTable()$InputColumn, UserCodeTranslationTable()$InputValue), paste(AllCodesInput$Column, AllCodesInput$Value))
     idx.j <-  match(paste(UserCodeTranslationTable()$OutputColumn, UserCodeTranslationTable()$OutputValue), paste(AllCodesOutput$Column, AllCodesOutput$Value))
 
@@ -1347,18 +1356,18 @@ server <- function(input, output, session) { # server ####
 
           updateRadioButtons(session, inputId = paste0(AllCodesInput$Column[i],  "_mysep_", AllCodesInput$Value[i]), selected =  paste0(AllCodesOutput$Column[j],  "_mysep_", AllCodesOutput$Value[j]))
 
-        } else {
-
-          # reset the input value, in case there was a match before
-          updateRadioButtons(session, inputId = paste0(AllCodesInput$Column[i],  "_mysep_", AllCodesInput$Value[i]), selected = "")
-
-              }
+        }
+        # else {
+        #
+        #   # reset the input value, in case there was a match before
+        #   updateRadioButtons(session, inputId = paste0(AllCodesInput$Column[i],  "_mysep_", AllCodesInput$Value[i]), selected = "")
+        #
+        #       }
       }
     }
 
 
   })
-
   observeEvent(input$SeeCodeDefs, {
 
     shinyjs::show("CodeTranslationFinal")
