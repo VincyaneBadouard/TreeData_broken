@@ -1488,11 +1488,11 @@ server <- function(input, output, session) { # server ####
       CodeTranslation <- CodeTranslationFinal$output[CodeTranslationFinal$output$InputColumn %in% gsub("Original_", "", j), ]
       CodeTranslation <- CodeTranslation[!is.na(CodeTranslation$OutputColumn),]
 
-      CodesInput[,OriginalTranslated := CodesInput[,..j]]
+      CodesInput[,OriginalTranslated := CodesInput[,j, with = F]]
 
       for(i in seq_len(nrow(CodeTranslation))) {
 
-        CodesInput[,OriginalTranslated:=gsub(paste0("\\<", CodeTranslation$InputValue[i], "\\>"), paste(CodeTranslation$OutputColumn[i], CodeTranslation$OutputValue[i], sep = "_"), OriginalTranslated)]
+        CodesInput[,OriginalTranslated := gsub(paste0("\\<", CodeTranslation$InputValue[i], "\\>"), paste(CodeTranslation$OutputColumn[i], CodeTranslation$OutputValue[i], sep = "_"), OriginalTranslated)]
 
       }
 
@@ -1504,7 +1504,7 @@ server <- function(input, output, session) { # server ####
     CodesInput[, Translation:=do.call(paste, c(.SD, sep = ";")), .SDcols=-seq_along(idx)]
     CodesInput[, grep("_Translated", colnames(CodesInput)):=NULL]
 
-    CodesInput[, Translation:=gsub("\\<[A-Z]*\\>", "", Translation)] # remove codes that don't have an equivalence
+    CodesInput[, Translation:=gsub("\\<[a-zA-Z0-9]*\\>", "", Translation)] # remove codes that don't have an equivalence
     CodesInput[, Translation:=gsub("\\b(\\w+)\\b\\s*\\W\\s*(?=.*\\1)", "", Translation, perl = T)] # remove duplicated -  this deals with n-1 relationship (if different input refer to the same output code )
 
 
