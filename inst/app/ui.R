@@ -295,7 +295,8 @@ body <- dashboardBody(
 
                      h1("Merging tables"),
                      h4("Select the tables that need to be merged and the key to merge them."),
-                     h4("The table on the left should be the most exhaustive table (the one you want to keep all the rows from.)"),
+                     h4("The first table should be the most exhaustive table (the one you want to keep all the rows from.)"),
+                     p(strong("Tip: You can name your tables in the 'upload' tab so you know which tbale is which in the dropdown menus here")),
                      # actionButton("addMerge", "Add a Merging relationship"),
                      # uiOutput("MergeTablesUI"),
                      # textOutput("test"),
