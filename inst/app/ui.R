@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  ,
-
-                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                          #         ,
+                          #
+                          #         tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -306,11 +306,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
 
                      #   hidden(div(id = "SelectColumns",
@@ -337,11 +337,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
                          actionBttn(
                            inputId = "Merge2",
                            label = "Merge tables",
