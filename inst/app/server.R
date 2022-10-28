@@ -82,7 +82,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    browser()
+    # browser()
   })
 
   # upload tab ####
@@ -545,9 +545,25 @@ server <- function(input, output, session) { # server ####
 
   LifeFormOptions <- reactiveVal(c("trees",
                                    "palms",
-                                   "lianas",
+                                   "lianas and/or vines",
                                    "bamboos",
-                                   "seedlings"))
+                                   "seedlings",
+                                   "shrubs",
+                                   "forbs and/or herbs",
+                                   "annuals",
+                                   "graminoids",
+                                   "geophytes",
+                                   "hydrophytes",
+                                   "parasites",
+                                   "epiphytes",
+                                   "lithophites",
+                                   "succulents",
+                                   "ferns",
+                                   "cycads",
+                                   "fungi",
+                                   "mosses",
+                                   "lichens"
+                                   ))
 
 
   TreeCodesSepOptions <- reactiveVal(c("Punctuation character (,;-/...)" = "[[:punct:]]",
