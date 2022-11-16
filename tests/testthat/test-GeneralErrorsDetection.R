@@ -1,7 +1,7 @@
 test_that("GeneralErrorsDetection", {
 
   # Import data
-  library(data.table)
+  suppressWarnings(library(data.table))
   data(TestData)
 
   # Create test data

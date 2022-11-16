@@ -27,9 +27,15 @@ GenerateComment <- function(Data, condition, comment, column = "Comment"){
   if(!column %in% names(Data)) Data[, column] <- ""
 
   # Apply the function 'CommentByRow' by row
-  for (r in 1:nrow(Data[condition,])) {
-   Data[condition,][r,] <- CommentByRow(Data[condition,][r,], comment, column)
-  }
+  # for (r in 1:nrow(Data[condition,])) {
+  #  Data[condition,][r,] <- CommentByRow(Data[condition,][r,], comment, column)
+  # }
+
+  Data[[column]][condition] <-
+    ifelse(Data[[column]][condition] == "",
+           comment,
+           paste(Data[[column]][condition], comment, sep = "/")
+    )
 
   return(Data) # in data.table
 }
@@ -63,8 +69,8 @@ CommentByRow <- function(row, comment, column = "Comment"){
   if(!column %in% names(row)) row[, column] <- ""
 
   row[, column] <- ifelse(row[, column] == "",
-                             comment,
-                             paste(row[, column], comment, sep ="/"))
+                          comment,
+                          paste(row[, column], comment, sep ="/"))
   return(row)
 }
 
