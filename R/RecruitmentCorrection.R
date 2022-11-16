@@ -378,11 +378,14 @@ RecruitmentCorrectionByTree <- function(
 
     # Growth criteria
     if(length(cresc) > 0){ # if there are a growth
-      Growth <- cresc[1]
+      Growth <- cresc[1] # 1st growth value
     }else{Growth <- PositiveGrowthThreshold} # if only 1 DBH value (no cresc)
 
+    # Maybe here we should round up the Growth, or propose a limit.
+
     # Detection
-    #### If the 1st DBH is larger than it would have been if at the previous census it was at the minimum DBH
+    #### If the 1st DBH is larger than it would have been if at the previous census
+    # it was at the minimum DBH
     if(FirstDBH > (MinDBH + (RecruitYear - PrevCens) * Growth)){ # ma proposition
 
       DataTree <- GenerateComment(DataTree,
