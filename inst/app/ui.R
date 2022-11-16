@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  ,
-
-                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                          #         ,
+                          #
+                          #         tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -295,7 +295,8 @@ body <- dashboardBody(
 
                      h1("Merging tables"),
                      h4("Select the tables that need to be merged and the key to merge them."),
-                     h4("The table on the left should be the most exhaustive table (the one you want to keep all the rows from.)"),
+                     h4("The first table should be the most exhaustive table (the one you want to keep all the rows from.)"),
+                     p(strong("Tip: You can name your tables in the 'upload' tab so you know which tbale is which in the dropdown menus here")),
                      # actionButton("addMerge", "Add a Merging relationship"),
                      # uiOutput("MergeTablesUI"),
                      # textOutput("test"),
@@ -306,11 +307,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
 
                      #   hidden(div(id = "SelectColumns",
@@ -337,11 +338,11 @@ body <- dashboardBody(
 
                          fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
                                   column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
 
                          fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
                                   column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
-                                  column(8,  virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                  column(8,  shinyWidgets::virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
                          actionBttn(
                            inputId = "Merge2",
                            label = "Merge tables",
@@ -638,7 +639,8 @@ tabItem("Codes",
             fluidRow(box(width = 12,
                          radioButtons(inputId = "predefinedProfileOutput",
                                       label = div("Use a predifined format for your output?"),
-                                      choices = list("No thanks! I want my data in this app's standards" = "No",
+                                      choices = list("No thanks! I'll upload a profile I have handy." = "No",
+                                                     "This App's standard" = "App",
                                                      # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
                                                      "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO"#,
                                                      # "RBA: Red de Bosques Andinos" = "RBA"
@@ -646,19 +648,20 @@ tabItem("Codes",
                                       selected = "No"),
 
                          # load a profile it one already exists
-                         fileInput(inputId = "profileOutput", div("You may also load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds"),
+                         div(id = "profileOutputfileInput",
+                           fileInput(inputId = "profileOutput", div("Load a profile you have on your machine", br(), em("(if you or a colleague already used this app and saved a profile (.rds))")), accept = ".rds")),
                          span(textOutput("RDSOutputWarning"), style="color:red"),
                          br(),
-                         hidden(actionBttn(
+                        actionBttn(
                            inputId = "UseProfileOutput",
                            label = "Apply Profile",
                            style = "pill",
-                           color = "success")),
-                         actionBttn(
+                           color = "success"),
+                        hidden(actionBttn(
                            inputId = "DontUseProfileOutput",
                            label = "Don't use profile",
                            style = "pill",
-                           color = "warning"),
+                           color = "warning")),
                          hidden(actionBttn(
                            inputId = "GoToDownload",
                            label = "Go To Download",
@@ -674,7 +677,7 @@ tabItem("Codes",
               p(strong("Row names:"), "These are the your codes. They may come from multiple columns, indicated in the grey rows"),
               p(strong("Column names:"), "These are the codes in the output profile you selected. They may come from multiple columns, given at the top of the table."),
               p("What to do:"),
-              tags$li("Hover over the codes in the column names to see the defintions of the profile you selected."),
+              # tags$li("Hover over the codes in the column names to see the defintions of the profile you selected."),
               tags$li("For each of your codes, select the radio button in the column that corresponds most to your defintion. We already selected the buttons for codes that match defintions perfectly."),
               tags$li("If there is no match, leave blank."),
               tags$li("When you are done, double check your selection in the next table. When you are satisfied, click on the 'Apply Code Translation' button."),
@@ -682,6 +685,7 @@ tabItem("Codes",
               fileInput("UserCodeTranslationTable", "If you have already been throught this and have a .csv file of your code translation table, you can upload it here to fill the table automatically."),
               hidden(actionBttn("updateCT", label = "Update")),
               p(strong("Tip: You can collapse the rows by clicking on the gray ones")),
+              p(strong("Tip: Hover over the codes in the column names to see the definitions.")),
               # strong(style = "color:red", "This is not implemented yet, so ignore for now, thanks!"),
 
               uiOutput("uiCodeTranslations"))))),
@@ -747,8 +751,8 @@ tabItem(tabName = "Save",
               tabPanel_helper("Corrections"),
               tabPanel(title = "Output",
                        tabsetPanel(
-                         tabPanel_helper("Selecting an output profile"),
-                         tabPanel_helper("Code translation")
+                         tabPanel_helper("Selecting_an_output_profile"),
+                         tabPanel_helper("Code_translation")
                        )),
               tabPanel_helper("Download")
             )

@@ -52,7 +52,6 @@ Imports:
     stringdist (>= 0.9.8),
     stats (>= 3.6.1),
     utils (>= 3.6.1),
-    grDevices (>= 4.0.3),
     Taxonstand (>= 2.4),
     WorldFlora (>= 1.10), 
     BIOMASS (>= 2.1.7), 
