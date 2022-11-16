@@ -7,3 +7,6 @@ Potentialimprovements
 .Rhistory
 docs
 .Rhistory
+
+data/TestDataCPnm.rda
+data/TestDataBCI.rda
