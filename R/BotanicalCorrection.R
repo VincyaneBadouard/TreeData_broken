@@ -119,9 +119,8 @@ BotanicalCorrection <- function(
 
   # WFOData
   if(Source == "WFO" & is.null(WFOData))
-    stop("You must provide the 'WFOData' argument,
-          a database as a static copy of the World Flora Online (WFO) Taxonomic Backbone,
-          when you choose Source = 'WFO'.")
+    stop("You must provide the 'WFOData' argument,  a database as a static copy of the
+         World Flora Online (WFO) Taxonomic Backbone, when you choose Source = 'WFO'.")
 
 
   # DetectOnly (logical)
@@ -153,7 +152,7 @@ BotanicalCorrection <- function(
 
   # Data[Comment != ""] # to check
 
-  if(DetectOnly %in% FALSE){
+  if (DetectOnly %in% FALSE){
 
     # Corrected columns initialisation --------------------------------------------------------------------------------------
     Data[, GenusCor := Genus]
@@ -231,11 +230,11 @@ BotanicalCorrection <- function(
       # Comment:
       ## if "Synonym" :
       Data <- GenerateComment(Data,
-                              condition = Data$Taxonomic.status == "Synonym",
+                              condition = Data$Taxonomic.status == "Synonym" & !is.na(Data$Taxonomic.status),
                               comment = "'ScientificName' is a synonym of the accepted botanical name")
       ## if Typo == TRUE :
       Data <- GenerateComment(Data,
-                              condition = Data$Typo == TRUE,
+                              condition = (Data$Typo == TRUE) & !is.na(Data$Typo),
                               comment = "Spelling error in the 'ScientificName'")
 
       # Remove columns that have become useless
