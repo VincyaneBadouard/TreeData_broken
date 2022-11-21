@@ -170,7 +170,21 @@ BotanicalCorrection <- function(
     Data[grep("aceae", GenusCor),  c("GenusCor", "GenspFamily")] <- Data[grep("aceae", GenusCor), c("GenspFamily", "GenusCor")]
 
     # For species: split at space or underscore, and create Subspecies
-    Data[, c("SpeciesCor", "Subspecies") := tstrsplit(Species, '\\[[:blank:]] |\\_')] # \\ devant une des possibilités. Le manque d'espace après le barre du "ou" (|) est important, le résultat n'est pas le même sinon
+    SpeciesInfo <- Data[, tstrsplit(Species, '\\[[:blank:]] |\\_')]
+
+    Data[, SpeciesCor := SpeciesInfo[,1]]
+
+    # if there is information on subspecies
+    if (ncol(SpeciesInfo) > 1) {
+      # paste subspecies info (all columns after the species name), removing NAs
+      SpeciesInfo[!is.na(V2),
+                  Subspecies := gsub(" NA", "", do.call(paste, .SD)),
+                  .SDcols = colnames(SpeciesInfo)[-1]]
+      Data[, Subspecies := SpeciesInfo$Subspecies]
+    }
+
+    rm(SpeciesInfo)
+
     # Detection of the suffix "aceae" in the species column (it is specific to the family name)
     Data[grep("aceae", SpeciesCor), `:=`(GenspFamily = ifelse(grep("aceae", SpeciesCor), SpeciesCor, GenspFamily),
                                          SpeciesCor = NA_character_)]
@@ -199,7 +213,7 @@ BotanicalCorrection <- function(
                           condition = grepl('[[:punct:]]', Data$Family), # TRUE if there are any special character
                           comment = "Special characters in the 'Family'")
 
-  if(DetectOnly %in% FALSE){
+  if (DetectOnly %in% FALSE){
 
     if(Source == "TPL"){
 
