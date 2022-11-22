@@ -124,31 +124,31 @@
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 #'
 DiameterCorrection <- function(
-  Data,
+    Data,
 
-  KeepMeas = c("MaxHOM", "MaxDate"),
+    KeepMeas = c("MaxHOM", "MaxDate"),
 
-  DefaultHOM = 1.3,
-  MaxDBH = 500,
-  PositiveGrowthThreshold = 5,
-  NegativeGrowthThreshold = -2,
+    DefaultHOM = 1.3,
+    MaxDBH = 500,
+    PositiveGrowthThreshold = 5,
+    NegativeGrowthThreshold = -2,
 
-  Pioneers = NULL,
-  PioneersGrowthThreshold = 7.5,
+    Pioneers = NULL,
+    PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = c("individual", "phylogenetic hierarchical"),
+    WhatToCorrect = c("POM change", "punctual", "shift"),
+    CorrectionType = c("individual", "phylogenetic hierarchical"),
 
-  DBHRange = 10,
-  MinIndividualNbr = 5,
-  OtherCrit = NULL,
-  Digits = 1L,
+    DBHRange = 10,
+    MinIndividualNbr = 5,
+    OtherCrit = NULL,
+    Digits = 1L,
 
-  DBHCorForDeadTrees = TRUE,
+    DBHCorForDeadTrees = TRUE,
 
-  coef = 0.9,
+    coef = 0.9,
 
-  DetectOnly = FALSE
+    DetectOnly = FALSE
 ){
 
   #### Arguments check ####
@@ -283,10 +283,14 @@ DiameterCorrection <- function(
 
 
 
-  # Apply for all the trees -----------------------------------------------------------------------------------------------
-  # i = "100635"
-  Data <- do.call(rbind, lapply(Ids, function(i) DiameterCorrectionByTree(
-    DataTree = Data[get(ID) %in% i & !is.na(Year)], # per ID, all censuses
+  # Apply to all the trees -----------------------------------------------------------------------------------------------
+
+
+  ## TODO apply function only on trees with previously detected problems > this
+  ## could save a lot of computing time
+
+  Data <- Data[, DiameterCorrectionByTree(
+    DataTree = Data[get(ID) == KeyCol & !is.na(Year)],
     Data = Data,
 
     DefaultHOM = DefaultHOM,
@@ -309,8 +313,12 @@ DiameterCorrection <- function(
     coef = coef,
 
     DetectOnly = DetectOnly
-  )
-  )) # do.call apply the 'rbind' to the lapply result
+  ),
+  .(KeyCol = get(ID))]
+
+  # remove unnecessary column
+  Data$KeyCol <- NULL
+
 
   # Re-put the rows duplicated, or without ID or Year -----------------------------------------------------------------
   Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
@@ -441,28 +449,28 @@ DiameterCorrection <- function(
 #' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 #'
 DiameterCorrectionByTree <- function(
-  DataTree,
-  Data,
+    DataTree,
+    Data,
 
-  DefaultHOM = 1.3,
-  MaxDBH = 500,
-  PositiveGrowthThreshold = 5,
-  NegativeGrowthThreshold = -2,
+    DefaultHOM = 1.3,
+    MaxDBH = 500,
+    PositiveGrowthThreshold = 5,
+    NegativeGrowthThreshold = -2,
 
-  Pioneers = NULL,
-  PioneersGrowthThreshold = 7.5,
+    Pioneers = NULL,
+    PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-  CorrectionType = "individual",
+    WhatToCorrect = c("POM change", "punctual", "shift"),
+    CorrectionType = "individual",
 
-  DBHRange = 10,
-  MinIndividualNbr = 5,
-  OtherCrit = NULL,
-  Digits = 1L,
+    DBHRange = 10,
+    MinIndividualNbr = 5,
+    OtherCrit = NULL,
+    Digits = 1L,
 
-  coef = 0.9,
+    coef = 0.9,
 
-  DetectOnly = FALSE
+    DetectOnly = FALSE
 ){
 
   #### Arguments check ####
@@ -674,7 +682,7 @@ DiameterCorrectionByTree <- function(
           DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
         }
 
-        DataTree[,DBHCor := DBHCor]
+        suppressWarnings(DataTree[, DBHCor := DBHCor])
 
         DataTree <- GenerateComment(DataTree,
                                     condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,Diameter])),
@@ -701,7 +709,7 @@ DiameterCorrectionByTree <- function(
           DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
         }
 
-        DataTree[,DBHCor := DBHCor]
+        suppressWarnings(DataTree[,DBHCor := DBHCor])
 
         DataTree <- GenerateComment(DataTree,
                                     condition = as.numeric(rownames(DataTree)) %in% (cresc_abn+1),
@@ -810,7 +818,8 @@ DiameterCorrectionByTree <- function(
         DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
       }
 
-      DataTree[, DBHCor := round(DBHCor, digits = Digits)] }
+      suppressWarnings(DataTree[, DBHCor := round(DBHCor, digits = Digits)])
+    }
 
   }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
 
