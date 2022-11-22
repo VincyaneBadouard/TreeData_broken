@@ -83,19 +83,19 @@
 #' LifeStatusCorrectionPlot(Rslt)
 #'
 StatusCorrection <- function(
-  Data,
-  InvariantColumns = c("Site",
-                       "Genus_TreeDataCor",
-                       "Species_TreeDataCor",
-                       "Family_TreeDataCor",
-                       "ScientificName_TreeDataCor"),
-  DeathConfirmation = 2,
-  UseSize = FALSE,
-  AddRowsForForgottenCensuses = TRUE,
-  DetectOnly = FALSE,
+    Data,
+    InvariantColumns = c("Site",
+                         "Genus_TreeDataCor",
+                         "Species_TreeDataCor",
+                         "Family_TreeDataCor",
+                         "ScientificName_TreeDataCor"),
+    DeathConfirmation = 2,
+    UseSize = FALSE,
+    AddRowsForForgottenCensuses = TRUE,
+    DetectOnly = FALSE,
 
-  RemoveRBeforeAlive = FALSE,
-  RemoveRAfterDeath = FALSE
+    RemoveRBeforeAlive = FALSE,
+    RemoveRAfterDeath = FALSE
 ){
 
   #### Arguments check ####
@@ -178,23 +178,25 @@ StatusCorrection <- function(
   # Dataset with the rows without ID
   DataIDNa <-  Data[is.na(get(ID))]
 
-  # Apply for all the trees
-  # i = "100635"
-  Data <- do.call(rbind, lapply(Ids, function(i) StatusCorrectionByTree(
-    DataTree = Data[get(ID) %in% i], # per ID, all censuses
-    PlotCensuses = as.vector(na.omit( # rm NA
-      unique(Data[Plot %in% unique(Data[get(ID) %in% i, Plot]),  Year]) # the censuses for the plot in which the tree is
-    )),
+  # censuses per plot
+  Data[, all_plot_censuses := paste(unique(na.omit(Year)), collapse = ", "), .(Plot)]
+
+  ## apply status correction per ID (tree or stem)
+  Data <- Data[, StatusCorrectionByTree(
+    DataTree = Data[get(ID) == KeyCol],
+    PlotCensuses = as.numeric(strsplit(unique(all_plot_censuses), ", ")[[1]]),
     InvariantColumns = InvariantColumns,
     DeathConfirmation = DeathConfirmation,
     UseSize = UseSize,
     AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
     DetectOnly = DetectOnly,
-
     RemoveRBeforeAlive = RemoveRBeforeAlive,
     RemoveRAfterDeath = RemoveRAfterDeath
-  )
-  )) # do.call apply the 'rbind' to the lapply result
+  ),
+  .(KeyCol = get(ID))]
+
+  # remove unnecessary column
+  Data$KeyCol <- NULL
 
   # Re-put the the rows without ID
   Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
@@ -302,20 +304,20 @@ StatusCorrection <- function(
 #' LifeStatusCorrectionPlot(Rslt)
 #'
 StatusCorrectionByTree <- function(
-  DataTree,
-  PlotCensuses,
-  InvariantColumns = c("Site",
-                       "GenusCor",
-                       "SpeciesCor",
-                       "FamilyCor",
-                       "ScientificNameCor"),
-  DeathConfirmation = 2,
-  UseSize = FALSE,
-  AddRowsForForgottenCensuses = TRUE,
-  DetectOnly = FALSE,
+    DataTree,
+    PlotCensuses,
+    InvariantColumns = c("Site",
+                         "GenusCor",
+                         "SpeciesCor",
+                         "FamilyCor",
+                         "ScientificNameCor"),
+    DeathConfirmation = 2,
+    UseSize = FALSE,
+    AddRowsForForgottenCensuses = TRUE,
+    DetectOnly = FALSE,
 
-  RemoveRBeforeAlive = FALSE,
-  RemoveRAfterDeath = FALSE
+    RemoveRBeforeAlive = FALSE,
+    RemoveRAfterDeath = FALSE
 ){
 
   #### Arguments check ####
