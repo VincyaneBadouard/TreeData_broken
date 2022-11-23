@@ -23,8 +23,7 @@ test_that("RecruitmentCorrection", {
   expect_error(RecruitmentCorrection(TestData, InvariantColumns = c(1:3)),
                regexp = "'InvariantColumns' argument must be of character class")
 
-  expect_error(RecruitmentCorrection(TestData,
-                                     DetectOnly = "no"),
+  expect_error(RecruitmentCorrection(TestData, DetectOnly = "no"),
                regexp = "The 'DetectOnly' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
@@ -36,6 +35,7 @@ test_that("RecruitmentCorrection", {
                regexp = "InvariantColumns argument must contain one or several column names")
 
 
+  expect_warning(RecruitmentCorrection(TestData), regexp = "column does't exist.")
 
   # Check the function works
   Rslt <- RecruitmentCorrection(TestData,
