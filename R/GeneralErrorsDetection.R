@@ -31,7 +31,7 @@
 #' Rslt <- GeneralErrorsDetection(TestData)
 #'
 GeneralErrorsDetection <- function(
-  Data
+    Data
 ){
 
   #### Arguments check ####
@@ -70,7 +70,7 @@ GeneralErrorsDetection <- function(
 
 
   # Missing values ----------------------------------------------------------------------------------------------------
-  # If the column exists, but have NA values
+  # If the column exists, but has NA values
 
   # Check bota : Family/Genus/Species/ScientificName/VernName
   # Check size : Diameter, POM(?)
@@ -80,7 +80,7 @@ GeneralErrorsDetection <- function(
 
   for (v in 1:length(Vars)) {
 
-    if(Vars[v] %in% names(Data)){ # If the column exists
+    if (Vars[v] %in% names(Data)){ # If the column exists
       if(!all(is.na(Data[,get(Vars[v])]))){ # if the column is not completely empty
 
         Data <- GenerateComment(Data,
@@ -103,9 +103,13 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data <- GenerateComment(Data,
-                              condition = Data[,get(Vars[v])] == 0,
-                              comment = paste0(Vars[v]," cannot be 0"))
+      Data <-
+        GenerateComment(
+          Data,
+          condition = (Data[, get(Vars[v])] == 0) &
+            !is.na(Data[, get(Vars[v])]),
+          comment = paste0(Vars[v], " cannot be 0")
+        )
 
       # warning(paste0(Vars[v]," cannot be 0"))
     }
@@ -183,11 +187,11 @@ GeneralErrorsDetection <- function(
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data <- GenerateComment(Data,
-                              condition =
-                                Data[,Site] == s
-                              & Data[,IdTree] %in% duplicated_ID,
-                              comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
+      Data <-
+        GenerateComment(Data,
+                        condition = (Data[, Site] == s) &
+                          (Data[, IdTree] %in% duplicated_ID),
+                        comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
 
       DuplicatedID <- unique(Data[IdTree %in% duplicated_ID,
                                   .(IdTree, Plot, Subplot, TreeFieldNum)])
@@ -206,7 +210,8 @@ GeneralErrorsDetection <- function(
 
 
   # Check duplicated IdTree/IdStem in a census ------------------------------------------------------------------------
-  DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
+  DuplicatedID <-
+    Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
 
   if(nrow(DuplicatedID) > 0){
 
@@ -214,20 +219,28 @@ GeneralErrorsDetection <- function(
 
     Data[, IDYear := paste(get(ID), Year, sep = "/")] # code to detect
 
-    Data <- GenerateComment(Data,
-                            condition = Data$IDYear %in% DuplicatedID[, IDYear],
-                            comment = paste0("Duplicated '", ID, "' in the census"))
+    Data <- GenerateComment(
+      Data,
+      condition = Data$IDYear %in% DuplicatedID[, IDYear],
+      comment = paste0("Duplicated '", ID, "' in the census")
+    )
 
-    a <- Data[IDYear %in% DuplicatedID[, IDYear], .(Year, Plot, Subplot, TreeFieldNum, get(ID))]
+    a <- Data[
+      IDYear %in% DuplicatedID[, IDYear],
+      .(Year, Plot, Subplot, TreeFieldNum, get(ID))
+    ]
     setnames(a, "V5", ID)
     a <- a[order(get(ID), Year)]
     b <- capture.output(a)
     c <- paste(b, "\n", sep = "")
 
     warning("Duplicated '", ID, "' in the census:\n", c, "\n")
-    warning("If these duplicates are normal in your protocol (several measurements per year), you can leave your dataset like that,
-the corrections taking into account only 1 measurement per year will consider the data to correct according to the 'KeepMeas' argument.
-If these duplicates are abnormal according to your protocol, we advise you to treat them before applying the corrections.")
+    warning("If these duplicates are normal in your protocol (because there are
+            several measurements per year), you can leave your dataset as it is,
+            the corrections taking into account one measurement per year will
+            consider the data as correct according to the 'KeepMeas' argument.
+            If these duplicates are abnormal according to your protocol,
+            we advise you to process them before applying the corrections.")
 
     Data[, IDYear := NULL]
   }
@@ -235,45 +248,60 @@ If these duplicates are abnormal according to your protocol, we advise you to tr
   # Data[grepl("Duplicated", Comment)] # to check
 
 
-  # Check for trees outside the subplot (A FAIRE) ---------------------------------------------------------------------
-  # Comparer PlotArea avec l'aire du MCP (Minimum Convex Polygon) des arbres a l'interieur de la parcelle.
-  # Si aire du MCP > x% plotArea -> error
+  # TODO Check for trees outside the subplot
+  # ---------------------------------------------------------------------
+  # Compare PlotArea with the MCP (Minimum Convex Polygon) area of the trees
+  # within the plot and return an error if the MCP area > x% plotArea
 
 
-  # Check invariant coordinates per IdTree/IdStem ---------------------------------------------------------------------
+  # Check invariant coordinates per IdTree/IdStem ------------------------------
 
   duplicated_ID <- CorresIDs <- vector("character")
 
   # For each site
   for (s in unique(na.omit(Data$Site))) {
+    CoordIDCombination <- na.omit(unique(Data[Data$Site == s, c(ID, "XTreeUTM", "YTreeUTM"), with = FALSE]))
 
-    CoordIDCombination <- na.omit(unique(
-      Data[Data$Site == s, c(ID, "XTreeUTM", "YTreeUTM"), with = FALSE]
-    ))
+    CorresIDs <-
+      CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
 
-    CorresIDs <- CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
+    if (!identical(CorresIDs, unique(CorresIDs))) {
+      # check if it's the same length, same ids -> 1 asso/ID
 
-    if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
+      duplicated_ID <-
+        unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
+      Data <- GenerateComment(
+        Data,
+        condition =
+          Data[, Site] == s
+        & Data[, get(ID)] %in% duplicated_ID,
+        comment = paste0(
+          "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
+          ID,
+          "'"
+        )
+      )
 
-      Data <- GenerateComment(Data,
-                              condition =
-                                Data[,Site] == s
-                              & Data[,get(ID)] %in% duplicated_ID,
-                              comment = paste0("Different coordinates (XTreeUTM, YTreeUTM) for a same '", ID,"'"))
-
-      warning(paste0("Different coordinates (XTreeUTM, YTreeUTM) for a same '", ID,"' (",duplicated_ID,")"))
+      warning(
+        paste0(
+          "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
+          ID,
+          "' (",
+          duplicated_ID,
+          ")"
+        )
+      )
 
     }
   } # end site loop
 
   # unique(Data[IdTree %in% duplicated_ID,
-  #             .(IdTree = sort(IdTree), XTreeUTM, YTreeUTM, Comment)]) # to check
+  #             .(IdTree = sort(IdTree), XTreeUTM, YTreeUTM, Comment)]) # check
 
 
-  # Check fix Plot and Subplot number (A FAIRE, Eliot a) --------------------------------------------------------------
-  # alerte quand le nombre de sous-parcelles/parcelles varie selon les années
+  # TODO Check fix Plot and Subplot number -----------------------
+  # alert when the number of sub-plots/plots varies from year to year
 
 
   return(Data)

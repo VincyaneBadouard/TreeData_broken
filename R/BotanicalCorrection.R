@@ -119,9 +119,8 @@ BotanicalCorrection <- function(
 
   # WFOData
   if(Source == "WFO" & is.null(WFOData))
-    stop("You must provide the 'WFOData' argument,
-          a database as a static copy of the World Flora Online (WFO) Taxonomic Backbone,
-          when you choose Source = 'WFO'.")
+    stop("You must provide the 'WFOData' argument,  a database as a static copy of the
+         World Flora Online (WFO) Taxonomic Backbone, when you choose Source = 'WFO'.")
 
 
   # DetectOnly (logical)
@@ -153,7 +152,7 @@ BotanicalCorrection <- function(
 
   # Data[Comment != ""] # to check
 
-  if(DetectOnly %in% FALSE){
+  if (DetectOnly %in% FALSE){
 
     # Corrected columns initialisation --------------------------------------------------------------------------------------
     Data[, GenusCor := Genus]
@@ -171,7 +170,21 @@ BotanicalCorrection <- function(
     Data[grep("aceae", GenusCor),  c("GenusCor", "GenspFamily")] <- Data[grep("aceae", GenusCor), c("GenspFamily", "GenusCor")]
 
     # For species: split at space or underscore, and create Subspecies
-    Data[, c("SpeciesCor", "Subspecies") := tstrsplit(Species, '\\[[:blank:]] |\\_')] # \\ devant une des possibilités. Le manque d'espace après le barre du "ou" (|) est important, le résultat n'est pas le même sinon
+    SpeciesInfo <- Data[, tstrsplit(Species, '\\[[:blank:]] |\\_')]
+
+    Data[, SpeciesCor := SpeciesInfo[,1]]
+
+    # if there is information on subspecies
+    if (ncol(SpeciesInfo) > 1) {
+      # paste subspecies info (all columns after the species name), removing NAs
+      SpeciesInfo[!is.na(V2),
+                  Subspecies := gsub(" NA", "", do.call(paste, .SD)),
+                  .SDcols = colnames(SpeciesInfo)[-1]]
+      Data[, Subspecies := SpeciesInfo$Subspecies]
+    }
+
+    rm(SpeciesInfo)
+
     # Detection of the suffix "aceae" in the species column (it is specific to the family name)
     Data[grep("aceae", SpeciesCor), `:=`(GenspFamily = ifelse(grep("aceae", SpeciesCor), SpeciesCor, GenspFamily),
                                          SpeciesCor = NA_character_)]
@@ -200,7 +213,7 @@ BotanicalCorrection <- function(
                           condition = grepl('[[:punct:]]', Data$Family), # TRUE if there are any special character
                           comment = "Special characters in the 'Family'")
 
-  if(DetectOnly %in% FALSE){
+  if (DetectOnly %in% FALSE){
 
     if(Source == "TPL"){
 
@@ -231,11 +244,11 @@ BotanicalCorrection <- function(
       # Comment:
       ## if "Synonym" :
       Data <- GenerateComment(Data,
-                              condition = Data$Taxonomic.status == "Synonym",
+                              condition = Data$Taxonomic.status == "Synonym" & !is.na(Data$Taxonomic.status),
                               comment = "'ScientificName' is a synonym of the accepted botanical name")
       ## if Typo == TRUE :
       Data <- GenerateComment(Data,
-                              condition = Data$Typo == TRUE,
+                              condition = (Data$Typo == TRUE) & !is.na(Data$Typo),
                               comment = "Spelling error in the 'ScientificName'")
 
       # Remove columns that have become useless

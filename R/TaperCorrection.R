@@ -89,15 +89,15 @@ TaperCorrection <- function(
   # In data.table
   setDT(Data)
 
-  if(any(Data[,HOM] != DefaultHOM)){ # if some measurements of the tree were made above the POM by default
+  if(any(Data[!is.na(HOM),HOM] != DefaultHOM)){ # if some measurements of the tree were made above the POM by default
 
     Data <- GenerateComment(Data,
-                            condition = (Data[,HOM] != DefaultHOM),
+                            condition = (Data[,HOM] != DefaultHOM) & !is.na(Data[,HOM]),
                             comment = paste0("HOM different from the default HOM"))
 
     if(DetectOnly %in% FALSE){
       if(!"TaperCorDBH" %in% names(Data))
-        Data[, TaperCorDBH := numeric(.N) ] # start without value (I can't put NA because it's a logical, so it's a 0)
+        Data[, TaperCorDBH := numeric(.N) ] # start without value (cannot be NA because it's a logical, so it's a 0)
 
       # Apply taper correction  -------------------------------------------------------------------------------------------
       Data[HOM == DefaultHOM, ("TaperCorDBH") := ifelse(is.na(TaperCorDBH) | TaperCorDBH == 0, Diameter, TaperCorDBH)] # At default POM, keep the measured value
@@ -117,7 +117,9 @@ TaperCorrection <- function(
       # Add the column with the correction method  ------------------------------------------------------------------------
 
       Data <- GenerateComment(Data,
-                              condition = ( Data[,HOM] != DefaultHOM & !is.na(Data[, TaperCorDBH]) ),
+                              condition = ( Data[,HOM] != DefaultHOM &
+                                              !is.na(Data[, TaperCorDBH]) &
+                                              !is.na(Data[,HOM]) ),
                               comment = "taper",
                               column = "DiameterCorrectionMeth")
 
