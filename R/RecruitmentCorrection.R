@@ -337,7 +337,7 @@ RecruitmentCorrectionByTree <- function(
     stop("The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
          of the 'RecruitmentCorrectionByTree' function must be 1 numeric value each")
 
-  if(!DetectOnly){
+  if(DetectOnly == FALSE){
     # InvariantColumns
     if (!inherits(InvariantColumns, "character"))
       stop("'InvariantColumns' argument must be of character class")
