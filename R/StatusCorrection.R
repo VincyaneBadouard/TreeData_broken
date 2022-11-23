@@ -39,6 +39,8 @@
 #'
 #' @details
 #' - if UseSize : if Diameter != NA -> Alive
+#' If (the value in bold is modified by the value given after the arrow):
+#' (the ">" gives the chronological order of the sequence)
 #' - *Dead* > Alive -> NA
 #' - add rows for the forgotten censuses between 2 'Alive' if chosen
 #' - Alive > *Dead*/*NA* > Alive -> Alive

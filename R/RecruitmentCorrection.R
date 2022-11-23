@@ -272,9 +272,10 @@ RecruitmentCorrection <- function(
 #'
 #' @details If the size of the tree has never changed, or if there is only one
 #'   value the same value is kept for the added forgotten recruits.
-#'   If the Diameter has not been corrected (Diameter_TreeDataCor column does not exist), the
-#'   function will create it for the forgotten recruits. It is strongly
-#'   recommended to correct the Diameter before correcting the recruits.
+#'   If the Diameter has not been corrected (Diameter_TreeDataCor column does
+#'   not exist), the function will create it for the forgotten recruits. It is
+#'   strongly recommended to correct the Diameter before correcting the
+#'   recruits.
 #'
 #' @return  Add rows for forgotten recruits with them estimated DBH in the
 #'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' column (logical)
@@ -418,8 +419,10 @@ RecruitmentCorrectionByTree <- function(
 
     # Growth criteria
     if(length(cresc) > 0){ # if there are a growth
-      Growth <- cresc[1]
+      Growth <- cresc[1] # 1st growth value
     }else{Growth <- PositiveGrowthThreshold} # if only 1 DBH value (no cresc)
+
+    # Maybe here we should round up the Growth, or propose a limit.
 
     # Detection
     #### If the 1st DBH is larger than it would have been if at the previous census it was at the minimum DBH
