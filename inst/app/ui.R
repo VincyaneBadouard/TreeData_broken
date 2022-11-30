@@ -90,7 +90,7 @@ body <- dashboardBody(
     tabItem(tabName = "Upload",
 
             fluidRow(
-
+              box(width = 12,
               actionBttn(
                 inputId = makeUniqueID("inactive"),
                 label = div(
@@ -98,14 +98,15 @@ body <- dashboardBody(
                   br()),
                 style = "stretch",
                 color = "success"),
-              box(width = 12,
-                  # helpText("Some text and then ", code("some code"), "."),
-                  helpText(code('shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")'),
-                           br(),
-                           br(),
-                           '# If you have run this app in the past and you think/know the TreeData package has been updated since, you may need to restart you R session and re-install TreeData package (using code below) before running the app again',
-                           br(),
-                           code('devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)')
+
+                  helpText(code('
+                   devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)
+                                shiny::runGitHub( "VincyaneBadouard/TreeData", subdir = "inst/app")')
+                           # br(),
+                           # br(),
+                           # '# If you have run this app in the past and you think/know the TreeData package has been updated since, you may need to restart you R session and re-install TreeData package (using code below) before running the app again',
+                           # br(),
+                           # code('devtools::install_github("VincyaneBadouard/TreeData", build_vignettes = TRUE)')
 
 
                            ),
