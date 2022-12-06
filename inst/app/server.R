@@ -583,15 +583,15 @@ server <- function(input, output, session) { # server ####
   LogicalOptions <- reactive(c(TRUE, FALSE))
 
   # update each element base on the options created above
-  observe({
+  # observe({
 
     lapply(1:nrow(x1), function(i) {
 
-      eval(parse(text = paste(paste0("update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$Argument[i],"= get(x1$argValue[i])())")))
+      eval(parse(text = paste(paste0("observe({update", firstUpper(x1$ItemType[i])), "(session, inputId = x1$ItemID[i],", x1$Argument[i],"= get(x1$argValue[i])()) })")))
 
     })
 
-  })
+  # })
 
   observe({
 
@@ -609,7 +609,9 @@ server <- function(input, output, session) { # server ####
 
     })
 
+  })
 
+  observe({
     lapply(c(1:nrow(x3)), function(i) {
       if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" ) {
 
@@ -626,7 +628,9 @@ server <- function(input, output, session) { # server ####
 
     })
 
+  })
 
+  observe({
     lapply(c(1:nrow(x4)), function(i) {
       if(!is.null(input[[x4$if_X2_isnot_none[i]]]) && !input[[x4$if_X2_isnot_none[i]]] %in% "none") {
         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "= get(x4$argValue[i])())")))
@@ -641,7 +645,9 @@ server <- function(input, output, session) { # server ####
       }
 
     })
+  })
 
+  observe({
     lapply(c(1:nrow(x5)), function(i) {
       if(input[[x5$if_X1_is_none[i]]] %in% "none" &  input[[x5$if_X2_is_none[i]]] %in% "none") {
         eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "= get(x5$argValue[i])())")))
@@ -657,7 +663,9 @@ server <- function(input, output, session) { # server ####
       }
 
     })
+  })
 
+  observe({
     if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
       if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
         eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "= get(x6$argValue[i])())")))
