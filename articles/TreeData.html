@@ -62,10 +62,12 @@
 
 
 
-<script src="TreeData_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>TreeData</h1>
-            <h3 data-toc-skip class="subtitle">Forest Inventories Harmonization &amp; Correction</h3>
+            <h3 data-toc-skip class="subtitle">Forest Inventories
+Harmonization &amp; Correction</h3>
             
       
       <small class="dont-index">Source: <a href="https://github.com/VincyaneBadouard/TreeData/blob/HEAD/vignettes/TreeData.Rmd" class="external-link"><code>vignettes/TreeData.Rmd</code></a></small>
@@ -97,7 +99,7 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TreeData::RunApp() # doest' work, why?</span></span>
-<span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/runUrl.html" class="external-link">runGitHub</a></span><span class="op">(</span> <span class="st">"VincyaneBadouard/TreeData"</span>, subdir <span class="op">=</span> <span class="st">"inst/app"</span><span class="op">)</span> <span class="co"># data.tree, stringdist</span></span></code></pre></div>
+<span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/runUrl.html" class="external-link">runGitHub</a></span><span class="op">(</span> <span class="st">"VincyaneBadouard/TreeData"</span>, subdir <span class="op">=</span> <span class="st">"inst/app"</span><span class="op">)</span> <span class="co"># data.tree, stringdist</span></span></code></pre></div>
 <p><strong>Load the example dataset stored in the package</strong></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># data()</span></span></code></pre></div>
@@ -110,24 +112,45 @@
 <em>Comment</em> (character): error type informations</li>
 </ul>
 <p><strong>Bota</strong><br>
-- <em>Family_TreeDataCor</em> (character): corrected <em>Family</em> name<br>
-- <em>FamilyCorSource</em> (character): source of the <em>Family</em> correction<br>
-- <em>Genus_TreeDataCor</em> (character): corrected <em>Genus</em> name<br>
-- <em>Species_TreeDataCor</em> (character): corrected <em>Species</em> name<br>
-- <em>BotanicalCorrectionSource</em> (character): source of the <em>Genus</em> and <em>Species</em> correction<br>
-- <em>ScientificName_TreeDataCor</em> (character): corrected <em>ScientificName</em><br>
-- <em>VernName_TreeDataCor</em> (character): completed if information available at <em>IdTree</em> level.</p>
+- <em>Family_TreeDataCor</em> (character): corrected <em>Family</em>
+name<br>
+- <em>FamilyCorSource</em> (character): source of the <em>Family</em>
+correction<br>
+- <em>Genus_TreeDataCor</em> (character): corrected <em>Genus</em>
+name<br>
+- <em>Species_TreeDataCor</em> (character): corrected <em>Species</em>
+name<br>
+- <em>BotanicalCorrectionSource</em> (character): source of the
+<em>Genus</em> and <em>Species</em> correction<br>
+- <em>ScientificName_TreeDataCor</em> (character): corrected
+<em>ScientificName</em><br>
+- <em>VernName_TreeDataCor</em> (character): completed if information
+available at <em>IdTree</em> level.</p>
 <p><strong>Life Status</strong><br>
-- <em>LifeStatus_TreeDataCor</em> (logical): corrected stem life status.</p>
+- <em>LifeStatus_TreeDataCor</em> (logical): corrected stem life
+status.</p>
 <p><strong>Taper</strong><br>
-- <em>TaperDBH_TreeDataCor</em> (numeric): corrected trees diameter at default <em>HOM</em></p>
+- <em>TaperDBH_TreeDataCor</em> (numeric): corrected trees diameter at
+default <em>HOM</em></p>
 <p><strong>Diameter</strong><br>
-- <em>Diameter_TreeDataCor</em> (numeric): corrected trees diameter at default <em>HOM</em><br>
-- <em>DiameterCorrectionMeth</em> (character): diameter correction methode = “<em>taper</em>”/“<em>local linear regression</em>”/“<em>weighted mean</em>” /phylogenetic hierarchical(“<em>species</em>”/“<em>genus</em>”/“<em>family</em>”/“<em>stand</em>”)/“<em>shift realignment</em>”/“<em>Same value</em>”.<br>
-- <em>POM_TreeDataCor</em> (factor): <em>POM</em> value at which the corrected diameters are proposed. Corresponds to the 1st <em>POM</em> value at which the stem was measured<br>
-- <em>HOM_TreeDataCor</em> (numeric): <em>HOM</em> value at which the corrected diameters are proposed. Corresponds to the <em>DefaultHOM</em> if <em>Taper</em> correction applied. If not, corresponds to the 1st <em>HOM</em> value at which the stem was measured</p>
+- <em>Diameter_TreeDataCor</em> (numeric): corrected trees diameter at
+default <em>HOM</em><br>
+- <em>DiameterCorrectionMeth</em> (character): diameter correction
+methode = “<em>taper</em>”/“<em>local linear
+regression</em>”/“<em>weighted mean</em>” /phylogenetic
+hierarchical(“<em>species</em>”/“<em>genus</em>”/“<em>family</em>”/“<em>stand</em>”)/“<em>shift
+realignment</em>”/“<em>Same value</em>”.<br>
+- <em>POM_TreeDataCor</em> (factor): <em>POM</em> value at which the
+corrected diameters are proposed. Corresponds to the 1st <em>POM</em>
+value at which the stem was measured<br>
+- <em>HOM_TreeDataCor</em> (numeric): <em>HOM</em> value at which the
+corrected diameters are proposed. Corresponds to the <em>DefaultHOM</em>
+if <em>Taper</em> correction applied. If not, corresponds to the 1st
+<em>HOM</em> value at which the stem was measured</p>
 <p><strong>Recruitment</strong><br>
-- <em>CorrectedRecruit</em> (logical): TRUE: the row was added to represent the year when the stem was larger than the minimum diameter, but absent from the dataset. FALSE: original dataset row.</p>
+- <em>CorrectedRecruit</em> (logical): TRUE: the row was added to
+represent the year when the stem was larger than the minimum diameter,
+but absent from the dataset. FALSE: original dataset row.</p>
 </div>
 <div class="section level2">
 <h2 id="all-the-functions-of-the-package">All the functions of the package<a class="anchor" aria-label="anchor" href="#all-the-functions-of-the-package"></a>
@@ -155,37 +178,62 @@
 <div class="section level3">
 <h3 id="general-errors-detection">General errors detection<a class="anchor" aria-label="anchor" href="#general-errors-detection"></a>
 </h3>
-<p>Detect errors - Remove <strong>duplicated rows</strong> - Check <strong>missing value</strong> in X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/ IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName - Check <strong>missing value</strong> (NA/0) in the measurement variables: “Diameter”, “HOM”, “TreeHeight”, “StemHeight” - Check of the <strong>unique association of the IdTree with plot, subplot</strong> <strong>and TreeFieldNum</strong> (at the site scale) - Check <strong>duplicated IdTree/IdStem</strong> in a census (at the site scale) - Check for trees <strong>outside the subplot</strong> (not implemented yet) - Check <strong>invariant coordinates per IdTree/IdStem</strong> - Check <strong>fix Plot and Subplot number</strong> (not implemented yet)</p>
+<p>Detect errors - Remove <strong>duplicated rows</strong> - Check
+<strong>missing value</strong> in
+X-YTreeUTM/PlotArea/Plot/Subplot/Year/TreeFieldNum/
+IdTree/IdStem/Diameter/POM/HOM/Family/Genus/Species/VernName - Check
+<strong>missing value</strong> (NA/0) in the measurement variables:
+“Diameter”, “HOM”, “TreeHeight”, “StemHeight” - Check of the
+<strong>unique association of the IdTree with plot, subplot</strong>
+<strong>and TreeFieldNum</strong> (at the site scale) - Check
+<strong>duplicated IdTree/IdStem</strong> in a census (at the site
+scale) - Check for trees <strong>outside the subplot</strong> (not
+implemented yet) - Check <strong>invariant coordinates per
+IdTree/IdStem</strong> - Check <strong>fix Plot and Subplot
+number</strong> (not implemented yet)</p>
 </div>
 <div class="section level3">
 <h3 id="botanical-identification-correction">Botanical identification correction<a class="anchor" aria-label="anchor" href="#botanical-identification-correction"></a>
 </h3>
 <ul>
 <li>No special characters (typography)</li>
-<li>No family name in the Genus and Species columns (the suffix “aceae” is specific to the family name.</li>
-<li>Correct spelling of botanical names (<em>Taxonstand or WorldFlora</em>)</li>
-<li>Family &amp; Scientific names match (<em>BIOMASS::getTaxonomy or WorldFlora</em>)</li>
-<li>Update the scientific botanical names with the current phylogenetic classification</li>
-<li>Check <strong>invariant botanical informations per IdTree</strong> (1 IdTree = 1 family, 1 scientific and 1 vernacular name)</li>
+<li>No family name in the Genus and Species columns (the suffix “aceae”
+is specific to the family name.</li>
+<li>Correct spelling of botanical names (<em>Taxonstand or
+WorldFlora</em>)</li>
+<li>Family &amp; Scientific names match (<em>BIOMASS::getTaxonomy or
+WorldFlora</em>)</li>
+<li>Update the scientific botanical names with the current phylogenetic
+classification</li>
+<li>Check <strong>invariant botanical informations per IdTree</strong>
+(1 IdTree = 1 family, 1 scientific and 1 vernacular name)</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="life-status">Life status<a class="anchor" aria-label="anchor" href="#life-status"></a>
 </h3>
 <ul>
-<li><p>if UseSize argument chosen : if Diameter != NA -&gt; Alive If (the value in bold is modified by the value given after the arrow): (the “&gt;” gives the chronological order of the sequence)</p></li>
+<li><p>if UseSize argument chosen : if Diameter != NA -&gt; Alive If
+(the value in bold is modified by the value given after the arrow): (the
+“&gt;” gives the chronological order of the sequence)</p></li>
 <li><p><em>Dead</em> &gt; Alive -&gt; NA</p></li>
-<li><p>add rows for the forgotten censuses between 2 ‘Alive’ if chosen</p></li>
-<li><p>Alive &gt; <em>Dead</em>/<em>NA</em> &gt; Alive -&gt; Alive</p></li>
+<li><p>add rows for the forgotten censuses between 2 ‘Alive’ if
+chosen</p></li>
+<li><p>Alive &gt; <em>Dead</em>/<em>NA</em> &gt; Alive -&gt;
+Alive</p></li>
 <li><p>Alive &gt; <em>NA</em> &gt; Dead -&gt; NA</p></li>
 <li><p>Alive &gt; <em>Dead</em> &gt; NA -&gt; Dead</p></li>
-<li><p>Alive &gt; <em>NA</em> &gt; <em>NA</em>: if DeathConfirmation &gt; unseens -&gt; NA if DeathConfirmation =&lt; unseens -&gt; Dead</p></li>
+<li><p>Alive &gt; <em>NA</em> &gt; <em>NA</em>: if DeathConfirmation
+&gt; unseens -&gt; NA if DeathConfirmation =&lt; unseens -&gt;
+Dead</p></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="taper-correction">Taper correction<a class="anchor" aria-label="anchor" href="#taper-correction"></a>
 </h3>
-<p>Transform the tree diameter measured at a given height into the diameter corresponding to the default measurement height (HOM), using an allometry.</p>
+<p>Transform the tree diameter measured at a given height into the
+diameter corresponding to the default measurement height (HOM), using an
+allometry.</p>
 </div>
 <div class="section level3">
 <h3 id="diameter-correction">Diameter correction<a class="anchor" aria-label="anchor" href="#diameter-correction"></a>
