@@ -342,7 +342,7 @@ ReversedRequiredFormat <- function(
   #
 
   # untidy if wanted ####
-  if(Untidy & input$Tidy > 0) {
+  if(Untidy && input$Tidy > 0) {
 
     VariableName <- names(input)[input == input$VariableName & names(input) %in% x$ItemID]
 

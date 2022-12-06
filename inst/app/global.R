@@ -21,6 +21,7 @@ useSweetAlert()
 
 # read in csv file that has all we want to ask about the headers
 xall <- read.csv("data/interactive_items.csv")
+xall <- xall[order(xall$Order),]
 x <- xall[xall$Activate, ]
 x1 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
 x2 <- x[x$if_X1_is_none != "none" & x$if_X2_is_none == "none" & x$if_X2_isnot_none == "none", ]
@@ -31,6 +32,9 @@ x6 <- x[x$if_X1_is_none == "none" & x$if_X2_is_none != "none" & x$if_X2_isnot_no
 
 if(!all(unlist(sapply(list(x1, x2, x3, x4, x5, x6), "[[", "ItemID")) %in% x$ItemID)) stop ("not all interactive items are implemented in the app")
 
+secondColumn <- do.call(rbind,list(x2, x3, x4, x5, x6))
+
+if(!all(!is.na(secondColumn$GroupSecondColumn))) stop ("not all items in second columns have a group")
 
 # correction function interactive items
 

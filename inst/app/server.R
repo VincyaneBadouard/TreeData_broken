@@ -82,7 +82,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    # browser()
+    browser()
   })
 
   # upload tab ####
@@ -593,112 +593,203 @@ server <- function(input, output, session) { # server ####
 
   # })
 
-  observe({
+    itemsToUpdate <- reactiveVal()
+    itemsToResetAndHide <- reactiveVal()
 
-    lapply(c(1:nrow(x2)), function(i) {
-      if(input[[x2$if_X1_is_none[i]]] %in% "none") {
-        eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "= get(x2$argValue[i])())")))
+    observe({
+      itemsToUpdate(c(x2$ItemID[reactiveValuesToList(input)[x2$if_X1_is_none] %in% "none"],
 
-        shinyjs::show( x2$ItemID[i])
+                      x3$itemID[reactiveValuesToList(input)[x3$if_X1_is_none] %in% "none" &
+                                  !reactiveValuesToList(input)[x3$if_X2_isnot_none] %in% "none"],
 
-      } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "='",  x2$default[i], "')")))
+                      x4$ItemID[!reactiveValuesToList(input)[x4$if_X2_isnot_none] %in% "none"],
 
-        shinyjs::hide( x2$ItemID[i])
-      }
+                      x5$ItemID[reactiveValuesToList(input)[x5$if_X1_is_none] %in% "none" &
+                                  reactiveValuesToList(input)[x5$if_X2_is_none] %in% "none"],
 
+
+                      x6$ItemID[reactiveValuesToList(input)[x6$if_X2_is_none] %in% "none" &
+                                  !reactiveValuesToList(input)[x6$if_X2_isnot_none] %in% "none"]))
     })
 
-  })
+    observe({
 
-  observe({
-    lapply(c(1:nrow(x3)), function(i) {
-      if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" ) {
+      itemsToResetAndHide(secondColumn$ItemID[!secondColumn$ItemID%in% itemsToUpdate()])
 
-        eval(parse(text = paste(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "= get(x3$argValue[i])())")))
-
-        shinyjs::show( x3$ItemID[i])
+      })
 
 
-      } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "='",  x3$default[i], "')")))
 
-        shinyjs::hide( x3$ItemID[i])
+    observe({
+      for(id in itemsToUpdate()) {
+        i <- which(secondColumn$ItemID %in% id)
+
+        # first update the options
+
+        eval(parse(text = paste(paste0("update", firstUpper(secondColumn$ItemType[i])), "(session, inputId = secondColumn$ItemID[i],", secondColumn$Argument[i], "= get(secondColumn$argValue[i])())")))
+
+        # then update value if user provided profile
+
+        if(!is.null(UserProfile()[[id]])) {
+            eval(parse(text = paste(paste0("update", firstUpper(secondColumn$ItemType[i])), "(session, inputId = secondColumn$ItemID[i],",  ifelse(secondColumn$Argument[i] %in% "choices", "selected", "value"), "= UserProfile()[[id]])")))
+        }
+
+
+        # and make sure we can see the item
+        shinyjs::show(id)
       }
-
     })
 
-  })
+    observe({
 
-  observe({
-    lapply(c(1:nrow(x4)), function(i) {
-      if(!is.null(input[[x4$if_X2_isnot_none[i]]]) && !input[[x4$if_X2_isnot_none[i]]] %in% "none") {
-        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "= get(x4$argValue[i])())")))
+      for(id in itemsToResetAndHide()) {
+        i <- which(secondColumn$ItemID %in% id)
 
-        shinyjs::show( x4$ItemID[i])
+        eval(parse(text = paste0(paste0("update", firstUpper(secondColumn$ItemType[i])), "(session, inputId = secondColumn$ItemID[i],", secondColumn$Argument[i], "='",  secondColumn$default[i], "')")))
 
-      } else {
-        eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "='", x4$Default[i], "')")))
+        shinyjs::hide(id)
+      }})
 
-        shinyjs::hide( x4$ItemID[i])
 
-      }
 
-    })
-  })
+    # observe({
+    #
+    #   for(g in unique(x2$GroupSecondColumn)) {
+    #     idx = which(x2$GroupSecondColumn %in% g)
+    #
+    #
+    #     lapply(idx, function(i) {
+    #       if(input[[x2$if_X1_is_none[i]]] %in% "none") {
+    #         eval(parse(text = paste(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "= get(x2$argValue[i])())")))
+    #
+    #         shinyjs::show( x2$ItemID[i])
+    #
+    #       } else {
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x2$ItemType[i])), "(session, inputId = x2$ItemID[i],", x2$Argument[i], "='",  x2$default[i], "')")))
+    #
+    #         shinyjs::hide( x2$ItemID[i])
+    #       }
+    #
+    #     })
+    #
+    #
+    #
+    #   }
+    #
+    # })
+    #
+    # observe({
+    #   for(g in unique(x3$GroupSecondColumn)) {
+    #     idx = which(x3$GroupSecondColumn %in% g)
+    #
+    #     lapply(idx, function(i) {
+    #       if(input[[x3$if_X1_is_none[i]]] %in% "none" & !input[[x3$if_X2_isnot_none[i]]] %in% "none" ) {
+    #
+    #         eval(parse(text = paste(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "= get(x3$argValue[i])())")))
+    #
+    #         shinyjs::show( x3$ItemID[i])
+    #
+    #
+    #       } else {
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x3$ItemType[i])), "(session, inputId = x3$ItemID[i],", x3$Argument[i], "='",  x3$default[i], "')")))
+    #
+    #         shinyjs::hide( x3$ItemID[i])
+    #       }
+    #
+    #     })
+    #
+    #   }
+    #
+    # })
+    # observe({
+    #   for(g in unique(x4$GroupSecondColumn)) {
+    #     idx = which(x4$GroupSecondColumn %in% g)
+    #
+    #
+    #     lapply(idx, function(i) {
+    #       if(!is.null(input[[x4$if_X2_isnot_none[i]]]) && !input[[x4$if_X2_isnot_none[i]]] %in% "none") {
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "= get(x4$argValue[i])())")))
+    #
+    #         shinyjs::show( x4$ItemID[i])
+    #
+    #       } else {
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x4$ItemType[i])), "(session,inputId = x4$ItemID[i],", x4$Argument[i], "='", x4$Default[i], "')")))
+    #
+    #         shinyjs::hide( x4$ItemID[i])
+    #
+    #       }
+    #
+    #     })
+    #
+    #
+    #   }
+    # })
+    # observe({
+    #   for(g in unique(x5$GroupSecondColumn)) {
+    #     idx = which(x5$GroupSecondColumn %in% g)
+    #
+    #
+    #     lapply(idx, function(i) {
+    #       if(input[[x5$if_X1_is_none[i]]] %in% "none" &  input[[x5$if_X2_is_none[i]]] %in% "none") {
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "= get(x5$argValue[i])())")))
+    #
+    #         shinyjs::show( x5$ItemID[i])
+    #
+    #       } else {
+    #
+    #         eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "='", x5$Default[i], "')")))
+    #
+    #         shinyjs::hide( x5$ItemID[i])
+    #
+    #       }
+    #
+    #     })
+    #
+    #   }
+    # })
+    #
+    # observe({
+    #   if(nrow(x6) > 0 ) {
+    #     for(g in unique(x6$GroupSecondColumn)) {
+    #       idx = which(x6$GroupSecondColumn %in% g)
+    #
+    #
+    #       lapply(idx, function(i) {
+    #         if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
+    #           eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "= get(x6$argValue[i])())")))
+    #
+    #           shinyjs::show( x6$ItemID[i])
+    #
+    #         } else {
+    #
+    #           eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "='", x6$Default[i], "')")))
+    #
+    #           shinyjs::hide( x6$ItemID[i])
+    #
+    #         }
+    #
+    #       })
+    #
+    #     }
+    #   }
+    # })
 
-  observe({
-    lapply(c(1:nrow(x5)), function(i) {
-      if(input[[x5$if_X1_is_none[i]]] %in% "none" &  input[[x5$if_X2_is_none[i]]] %in% "none") {
-        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "= get(x5$argValue[i])())")))
-
-        shinyjs::show( x5$ItemID[i])
-
-      } else {
-
-        eval(parse(text = paste0(paste0("update", firstUpper(x5$ItemType[i])), "(session,inputId = x5$ItemID[i],", x5$Argument[i], "='", x5$Default[i], "')")))
-
-        shinyjs::hide( x5$ItemID[i])
-
-      }
-
-    })
-  })
-
-  observe({
-    if(nrow(x6) > 0 ) lapply(c(1:nrow(x6)), function(i) {
-      if(input[[x6$if_X2_is_none[i]]] %in% "none" & !input[[x6$if_X2_isnot_none[i]]] %in% "none") {
-        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "= get(x6$argValue[i])())")))
-
-        shinyjs::show( x6$ItemID[i])
-
-      } else {
-
-        eval(parse(text = paste0(paste0("update", firstUpper(x6$ItemType[i])), "(session,inputId = x6$ItemID[i],", x6$Argument[i], "='", x6$Default[i], "')")))
-
-        shinyjs::hide( x6$ItemID[i])
-
-      }
-
-    })
-
-  })
 
   ## handle upload and use of profile (updating what is selected)
 
-  gimme_value <- reactiveVal(0)
-
+  # gimme_value <- reactiveVal(0)
+  #
   observe( {
     if(input$predefinedProfile != "No" )
       shinyjs::show("UseProfile")
-    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
-    gimme_value(0)
+  #   updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+  #   gimme_value(0)
   })
-
+  #
   observeEvent(input$profile, {
     shinyjs::show("UseProfile")
-    updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
-    gimme_value(0)
+  #   updateActionButton(session, inputId = "UseProfile", label = "Click Twice here to use Profile")
+  #   gimme_value(0)
   })
 
   UserProfile <- reactiveVal()
@@ -752,7 +843,7 @@ server <- function(input, output, session) { # server ####
     MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not be doing a good job for items other than those in x4...
     MissingItemIDProfile <- MissingItemIDProfile[!x$Multiple[match(MissingItemIDProfile, x$ItemID)]] # remove cases where Multiple - TRUE because in those cases, there is no default so it will always be NULL... Bummer because it could be missing for real, but I don't know how else to do it
 
-    if(length(MissingItemIDProfile) > 0 & gimme_value() == 1) {
+    if(length(MissingItemIDProfile) > 0 ){ #& gimme_value() == 1) {
       showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
     }
 
@@ -761,7 +852,7 @@ server <- function(input, output, session) { # server ####
     InValidItemID <- setdiff(names(profile), ValidItemID)
     InValidItemID <- InValidItemID[InValidItemID %in% x$ItemID]
 
-    if(length(InValidItemID) > 0 & gimme_value() == 1) {
+    if(length(InValidItemID) > 0 ) { #& gimme_value() == 1) {
 
       if(length(InValidItemID) < 20 & input$predefinedProfile  %in% "App") NULL else  showNotification(paste("The profile you selected does not seem to correspond to your data. The items that do not match your data are:", paste0(InValidItemID, " (in ", x$Group[match(InValidItemID, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand (or make sure you picked the right profile). Also, please double check that the info in the second column is filled out properly."), type = 'err', duration = NULL)
     }
@@ -775,14 +866,14 @@ server <- function(input, output, session) { # server ####
       # updateTextInput(session, "Site", value = profile$Site)
     }
 
-    if(gimme_value() == 1) {
-      updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
-    }
-
-    if(gimme_value() == 0) {
-      updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
-      gimme_value(gimme_value() + 1)
-    }
+    # if(gimme_value() == 1) {
+    #   updateActionButton(session, inputId = "UseProfile", label = "Thanks!")
+    # }
+    #
+    # if(gimme_value() == 0) {
+    #   updateActionButton(session, inputId = "UseProfile", label = "click one more time!")
+    #   gimme_value(gimme_value() + 1)
+    # }
 
     UserProfile(profile)
   })
@@ -1148,10 +1239,6 @@ server <- function(input, output, session) { # server ####
 
     }
 
-
-
-
-
     req(file)
 
 
@@ -1162,8 +1249,6 @@ server <- function(input, output, session) { # server ####
                            error = function(err){
                              showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
                            }))
-
-
 
     if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
       expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
@@ -1191,9 +1276,10 @@ server <- function(input, output, session) { # server ####
       DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
       }
 
-
       # show and work on Codes translation if necessary
       if(!(profileOutput()$AllCodes[1,1] %in% "You have not selected columns for codes" || AllCodes()[1,1] %in% "You have not selected columns for codes")) {
+
+
         shinyjs::show("CodeTranslationsDiv")
 
         output$uiCodeTranslations <-  renderUI({
@@ -1233,7 +1319,7 @@ server <- function(input, output, session) { # server ####
       }
     }
 
-  }, priority = 2)
+    }, priority = 2)
 
 
   observe({

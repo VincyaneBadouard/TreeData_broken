@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                          #         ,
-                          #
-                          #         tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                                  ,
+
+                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -458,7 +458,7 @@ body <- dashboardBody(
                   br(),
                   hidden(actionBttn(
                     inputId = "UseProfile",
-                    label = "Click Twice here to use Profile",
+                    label = "Click here to use Profile",
                     style = "pill",
                     color = "success")
                   )),
@@ -527,12 +527,35 @@ body <- dashboardBody(
                          style = "pill",
                          color = "warning")
                        ,   strong("  Fill in information that is not in your columns"),
-                       p("ATTENTION: do this after completing step 1 otherwise it will turn blank again."),
-                       lapply(which(x$ItemID %in% unlist(lapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
+                       p("ATTENTION: do this after completing step 1 otherwise this will get overwritten."),
 
-                         eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$Argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, paste0(", multiple = TRUE, selected = '", x$Default[i], "')"), ")"))))
 
-                       }),
+                       # lapply(which(x$ItemID %in% unlist(lapply(list(x2, x3, x4, x5, x6), "[[", "ItemID"))), function(i) {
+                       #
+                       #   eval(parse(text = paste0(x$ItemType[i], "(inputId = x$ItemID[i], label = ifelse(x$helpText[i] %in% '', x$Label[i], paste0(x$Label[i], ' (', x$helpText[i], ')')),", x$Argument[i], "='", x$Default[i], "'", ifelse(x$Options[i] != FALSE, paste0(", options = ", x$Options[i]), ""), ifelse(x$Multiple[i] %in% TRUE, paste0(", multiple = TRUE, selected = '", x$Default[i], "')"), ")"))))
+                       #
+                       # }),
+
+                       div(id="seconColumnWrapper",
+
+                           lapply(unique(secondColumn$GroupSecondColumn), function(g) {div(h3(g),
+                                                                       # h3(g),
+                                                                       do.call(div, lapply(which(secondColumn$GroupSecondColumn %in% g), function(i) {
+
+                                                                         eval(parse(text = paste0(secondColumn$ItemType[i], "(inputId = secondColumn$ItemID[i], label = ifelse(secondColumn$helpText[i] %in% '', secondColumn$Label[i], paste0(secondColumn$Label[i], ' (', secondColumn$helpText[i], ')')),", secondColumn$Argument[i], "='", secondColumn$Default[i], "'", ifelse(secondColumn$Options[i] != FALSE, paste0(", options = ", secondColumn$Options[i]), ""), ifelse(secondColumn$Multiple[i] %in% TRUE, paste0(", multiple = TRUE, selected = '", secondColumn$Default[i], "')"), ")"))))
+
+                                                                       })),
+                                                                       label = g,
+                                                                       icon = icon("sliders", verify_fa = FALSE),
+                                                                       size = "lg",
+                                                                       circle = FALSE,
+                                                                       tooltip = tooltipOptions(title = "Click to see inputs !")
+
+
+                           )
+                           })
+                       ),
+
                        actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
                      ),
                      box(title = "Save your profile",
