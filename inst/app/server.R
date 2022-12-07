@@ -234,7 +234,15 @@ server <- function(input, output, session) { # server ####
   StackedTables <- reactiveVal()
 
   observeEvent(input$Stack, {
-    StackedTables(do.call(rbind, Data()[input$TablesToStack]))
+    withCallingHandlers({
+      StackedTables(do.call(rbind, Data()[input$TablesToStack]))
+    },
+    warning = function(warn){
+      showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+    },
+    error = function(err){
+      shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+    })
   })
 
   observeEvent(input$Stack, {
@@ -324,7 +332,17 @@ server <- function(input, output, session) { # server ####
     if(input$rightTable2 == "MergedTables") y <-  get(input$rightTable2)()
     if(input$rightTable2 != "MergedTables" & input$rightTable2 != "StackedTables") y <- Data()[[input$rightTable2]]
 
-    MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
+    # MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
+
+    withCallingHandlers({
+      MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
+    },
+    warning = function(warn){
+      showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+    },
+    error = function(err){
+      shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+    })
 
     shinyjs::show("GoToTidy")
     shinyjs::hide("addMerge")
@@ -338,7 +356,17 @@ server <- function(input, output, session) { # server ####
     if(input$leftTable == "StackedTables") x <-  get(input$leftTable)() else x <- Data()[[input$leftTable]]
     if(input$rightTable == "StackedTables") y <-  get(input$rightTable)() else y <- Data()[[input$rightTable]]
 
-    MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
+    # MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
+
+    withCallingHandlers({
+      MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
+    },
+    warning = function(warn){
+      showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+    },
+    error = function(err){
+      shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+    })
 
     if(n_tables_after_stack() > 2 ) {
       shinyjs::show("addMerge")
@@ -488,7 +516,16 @@ server <- function(input, output, session) { # server ####
 
     names(Variablecolumns) <- ValueName
 
-    TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName, variable.factor = FALSE)) #,  value.name = names(Variablecolumns[TickedMelt])
+
+    withCallingHandlers({
+      TidyTable(melt(OneTable(), measure.vars	= Variablecolumns[TickedMelt], variable.name =  input$VariableName, variable.factor = FALSE)) #,  value.name = names(Variablecolumns[TickedMelt])
+    },
+    warning = function(warn){
+      showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+    },
+    error = function(err){
+      shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+    })
   }, ignoreInit = TRUE)
 
   observeEvent(input$Tidy, {
@@ -1274,7 +1311,18 @@ server <- function(input, output, session) { # server ####
         DataOutput(DataDone())
 
         } else {
-      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+      # DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+
+          withCallingHandlers({
+            DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+          },
+          warning = function(warn){
+            showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+          },
+          error = function(err){
+            shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+          })
+
       }
 
       # show and work on Codes translation if necessary
