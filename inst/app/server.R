@@ -197,7 +197,8 @@ server <- function(input, output, session) { # server ####
     cnames = lapply(Data(), colnames)
 
     lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]] , rownames = FALSE,
-                                                              options = list(pageLength = 8, scrollX=TRUE),
+                                                              options = list(pageLength = 8, scrollX=TRUE,
+                                                                             autoWidth = TRUE, columnDefs =     lapply(unname(which(nchar(Data()[[i]][1,]) > 25 ))-1, function(x) list(width = paste0(nchar(Data()[[i]][1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
                                                               container = FotterWithHeader(Data()[[i]]),
                                                               selection = "none")
     )
@@ -240,7 +241,9 @@ server <- function(input, output, session) { # server ####
     shinyjs::hide("SkipStack")
 
     output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
-                                     options = list(pageLength = 8, scrollX=TRUE),
+                                     options = list(pageLength = 8, scrollX=TRUE,
+                                                    autoWidth = TRUE,
+                                                    columnDefs = lapply(unname(which(nchar(StackedTables()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(StackedTables()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
                                      container = FotterWithHeader(StackedTables()),
                                      selection = "none")
 
@@ -391,7 +394,9 @@ server <- function(input, output, session) { # server ####
     output$mergedTablesSummary <- renderPrint(summary(MergedTables()))
 
     output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
-                                    options = list(pageLength = 8, scrollX=TRUE),
+                                    options = list(pageLength = 8, scrollX=TRUE,
+                                                   autoWidth = TRUE,
+                                                   columnDefs = lapply(unname(which(nchar(MergedTables()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(MergedTables()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
                                     container = FotterWithHeader(MergedTables()),
                                     selection = "none")
 
@@ -490,7 +495,9 @@ server <- function(input, output, session) { # server ####
     shinyjs::show("GoToHeaders")
 
     output$TidyTable <- renderDT(TidyTable(), rownames = FALSE,
-                                 options = list(pageLength = 8, scrollX=TRUE),
+                                 options = list(pageLength = 8, scrollX=TRUE,
+                                                autoWidth = TRUE,
+                                                columnDefs = lapply(unname(which(nchar(TidyTable()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(TidyTable()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
                                  container = FotterWithHeader(TidyTable()),
                                  selection = "none")
 
