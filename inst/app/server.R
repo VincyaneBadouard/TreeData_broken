@@ -833,11 +833,8 @@ server <- function(input, output, session) { # server ####
 
 
     profile <- tryCatch({ readRDS(file)},
-                        # warning = function(warn){
-                        #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-                        # },
                         error = function(err){
-                          showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                          shiny:::reactiveStop(showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL))
                         })
 
     if(!is.null(profile$AllCodes)) {
@@ -904,7 +901,7 @@ server <- function(input, output, session) { # server ####
       showNotification(paste(gsub("simpleWarning in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\), :", "", warn), collapse = ". "), type = 'warning', duration = NULL)
     },
     error = function(err){
-      showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL)
+      shiny:::reactiveStop(showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", err), type = 'err', duration = NULL))
     })
 
 
@@ -1098,7 +1095,7 @@ server <- function(input, output, session) { # server ####
           # #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
           # # },
           # error = function(err){
-          #   showNotification(err, type = 'err', duration = NULL)
+          #     shiny:::reactiveStop(showNotification(err, type = 'err', duration = NULL))
           # })
         }
       }
@@ -1250,11 +1247,8 @@ server <- function(input, output, session) { # server ####
 
 
     profileOutput(tryCatch({ readRDS(file)},
-                           # warning = function(warn){
-                           #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-                           # },
                            error = function(err){
-                             showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL)
+                             shiny:::reactiveStop(showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL))
                            }))
 
     if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
