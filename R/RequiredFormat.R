@@ -177,7 +177,7 @@ RequiredFormat <- function(
     if(!input$Year %in% "none") {
       Data[, Date := paste(trimws(Year), trimws(Month), trimws(Day), sep = "-")]
     } else {
-      if(!input$YearMan %in% -999) Data[, Date := paste(input$YearMan, trimws(Month), trimws(Day), sep = "-")] else warning("You did not provide a Year or date.")
+      if(!input$YearMan %in% -999) Data[, Date := paste(input$YearMan, trimws(Month), trimws(Day), sep = "-")] else warning("You did not provide a Year so we can't recreate a date using your Month and Day columns.")
     }
 
     # overwrite input
@@ -252,7 +252,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else warning("You did not provide Date or Year")
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else warning("You did not provide Date nor Year")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
