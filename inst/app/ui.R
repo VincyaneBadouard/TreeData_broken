@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  ,
-
-                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                                  # ,
+                                  #
+                                  # tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -269,7 +269,7 @@ body <- dashboardBody(
 
                 column(width = 12,
                        h4("View of your stacked tables:"),
-                       DTOutput(outputId = "StackedTables"),
+                       DT::DTOutput(outputId = "StackedTables"),
                        h4("summary of your stacked tables:"),
                        verbatimTextOutput("StackedTablesSummary")
                 )
@@ -372,7 +372,7 @@ body <- dashboardBody(
 
               column(width = 12,
                      h4("View of your merged tables:"),
-                     DTOutput(outputId = "mergedTables"),
+                     DT::DTOutput(outputId = "mergedTables"),
                      h4("summary of your merged tables:"),
                      verbatimTextOutput("mergedTablesSummary")
               )
@@ -439,7 +439,7 @@ body <- dashboardBody(
 
               column(width = 12,
                      h4("View of your tidy table:"),
-                     DTOutput(outputId = "TidyTable"),
+                     DT::DTOutput(outputId = "TidyTable"),
                      h4("summary of your tidy table:"),
                      verbatimTextOutput("TidyTableSummary")
               ))
@@ -587,7 +587,7 @@ body <- dashboardBody(
                                                         width = 300)
                                             ),
                               h4("View of your formatted table:"),
-                              DTOutput(outputId = "FormatedTable"),
+                              DT::DTOutput(outputId = "FormatedTable"),
                               h4("summary of your formatted table:"),
                               verbatimTextOutput("FormatedTableSummary")
                        )
@@ -612,7 +612,7 @@ tabItem("Codes",
         # uiOutput("uiCodes"),
         br(),
         box(width = NULL,
-            DTOutput("CodeTable", height =  "600px"))
+            DT::DTOutput("CodeTable", height =  "600px"))
         # tags$hr(),
         # h2("Edited table:"),
         # tableOutput("NewCodeTable")
@@ -660,7 +660,7 @@ tabItem("Codes",
 
               column(width = 12,
                      h4("View of your corrected table:"),
-                     withSpinner(DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner"),
+                     withSpinner(DT::DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner"),
                      h4("summary of your corrected table:"),
                      withSpinner(verbatimTextOutput("CorrectedTableSummary"), color="#0dc5c1", id = "spinner")
               ))
@@ -725,7 +725,7 @@ tabItem("Codes",
 
               column(width = 12,
                      h4("View of your final table:"),
-                     withSpinner(DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner"),
+                     withSpinner(DT::DTOutput(outputId = "DataOutput"),color="#0dc5c1", id = "spinner"),
                      h4("summary of your final table:"),
                      withSpinner(verbatimTextOutput("DataOutputSummary"),color="#0dc5c1", id = "spinner")
               ))

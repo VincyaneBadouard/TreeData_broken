@@ -65,3 +65,35 @@ makeUniqueID <- NS(character(0))
 tabPanel_helper <- function(i) tabPanel(title = gsub("_", " ", i),
                                         includeMarkdown(paste0("www/", i, ".md")),
                                         img(src = paste0(i, ".gif"), width = "100%"))
+
+
+myTableHeader <- function (data, type = c("head", "foot"), escape = TRUE, ...)
+{
+  names = colnames(data)
+  fstRow = data[1,]
+
+  widths = nchar(fstRow, keepNA = F, allowNA=TRUE)
+  widths[is.na(widths)] <- 2
+  type = match.arg(type)
+
+  f = tags[[sprintf("t%s", type)]]
+
+  f(tags$tr(mapply(
+    function(n, w) {
+      if (w > 50)
+        tags$th(n, style = paste0("width:", w * 2, "px;"))
+      else
+        tags$th(n)
+    },
+    n = DT:::escapeColNames(names, escape),
+    w = unname(widths),
+    SIMPLIFY  = F
+  )), ...)
+}
+
+myTableFooter <- function (names, escape = TRUE)
+{
+  myTableHeader(names, "foot", escape)
+}
+
+

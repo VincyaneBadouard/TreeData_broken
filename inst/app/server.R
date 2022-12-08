@@ -16,10 +16,11 @@ firstUpper <- function(x) {
 }
 
 # my function to repeat headers at bottom
-FotterWithHeader <- function(x) {
+FooterWithHeader <- function(x) {
   paste0("<table>",
-         tableHeader(x),
-         tableFooter(x),"</table>"
+         myTableHeader(x), # see definition in global.R
+         myTableFooter(x), # see definition in global.R
+         "</table>"
   )
 }
 
@@ -82,7 +83,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    browser()
+    # browser()
   })
 
   # upload tab ####
@@ -128,7 +129,7 @@ server <- function(input, output, session) { # server ####
     do.call(tabsetPanel, c(id='t', type = "tabs", lapply(names(Data()), function(i) {
       tabPanel(
         title=i,
-        DTOutput(outputId = i)
+        DT::DTOutput(outputId = i)
       )
     })))
 
@@ -196,10 +197,10 @@ server <- function(input, output, session) { # server ####
 
     cnames = lapply(Data(), colnames)
 
-    lapply(names(Data()), function(i) output[[i]] <- renderDT(Data()[[i]] , rownames = FALSE,
+    lapply(names(Data()), function(i) output[[i]] <- DT::renderDT(Data()[[i]] , rownames = FALSE,
                                                               options = list(pageLength = 8, scrollX=TRUE,
-                                                                             autoWidth = TRUE, columnDefs =     lapply(unname(which(nchar(Data()[[i]][1,]) > 25 ))-1, function(x) list(width = paste0(nchar(Data()[[i]][1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
-                                                              container = FotterWithHeader(Data()[[i]]),
+                                                                             autoWidth = TRUE),
+                                                              container = FooterWithHeader(Data()[[i]]),
                                                               selection = "none")
     )
   })
@@ -248,11 +249,10 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$Stack, {
     shinyjs::hide("SkipStack")
 
-    output$StackedTables <- renderDT(StackedTables(), rownames = FALSE,
+    output$StackedTables <- DT::renderDT(StackedTables(), rownames = FALSE,
                                      options = list(pageLength = 8, scrollX=TRUE,
-                                                    autoWidth = TRUE,
-                                                    columnDefs = lapply(unname(which(nchar(StackedTables()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(StackedTables()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
-                                     container = FotterWithHeader(StackedTables()),
+                                                    autoWidth = TRUE),
+                                     container = FooterWithHeader(StackedTables()),
                                      selection = "none")
 
     output$StackedTablesSummary <- renderPrint(summary(StackedTables()))
@@ -421,11 +421,10 @@ server <- function(input, output, session) { # server ####
 
     output$mergedTablesSummary <- renderPrint(summary(MergedTables()))
 
-    output$mergedTables <- renderDT(MergedTables(), rownames = FALSE,
+    output$mergedTables <- DT::renderDT(MergedTables(), rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE,
-                                                   autoWidth = TRUE,
-                                                   columnDefs = lapply(unname(which(nchar(MergedTables()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(MergedTables()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
-                                    container = FotterWithHeader(MergedTables()),
+                                                   autoWidth = TRUE),
+                                    container = FooterWithHeader(MergedTables()),
                                     selection = "none")
 
 
@@ -531,11 +530,10 @@ server <- function(input, output, session) { # server ####
   observeEvent(input$Tidy, {
     shinyjs::show("GoToHeaders")
 
-    output$TidyTable <- renderDT(TidyTable(), rownames = FALSE,
+    output$TidyTable <- DT::renderDT(TidyTable(), rownames = FALSE,
                                  options = list(pageLength = 8, scrollX=TRUE,
-                                                autoWidth = TRUE,
-                                                columnDefs = lapply(unname(which(nchar(TidyTable()[1,]) > 25 ))-1, function(x) list(width = paste0(nchar(TidyTable()[1,])[x+1]*2, "px"), targets = x))), # +1 and -1 is because if the rownames = FALSE,
-                                 container = FotterWithHeader(TidyTable()),
+                                                autoWidth = TRUE),
+                                 container = FooterWithHeader(TidyTable()),
                                  selection = "none")
 
     output$TidyTableSummary <- renderPrint(summary(TidyTable()))
@@ -952,9 +950,9 @@ server <- function(input, output, session) { # server ####
 
 
   # Visualize output
-  output$FormatedTable <- renderDT(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
+  output$FormatedTable <- DT::renderDT(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                    options = list(pageLength = 8, scrollX=TRUE),
-                                   container = FotterWithHeader(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
+                                   container = FooterWithHeader(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                    selection = "none")
 
   output$FormatedTableSummary <- renderPrint(summary(DataFormated()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
@@ -1035,14 +1033,14 @@ server <- function(input, output, session) { # server ####
   })
 
 
-  output[["CodeTable"]] <- renderDT({
+  output[["CodeTable"]] <- DT::renderDT({
     datatable(
       data =
         AllCodes(),
       selection = "none",
       escape = FALSE,
       rownames = FALSE,
-      container = FotterWithHeader(AllCodes()),
+      container = FooterWithHeader(AllCodes()),
       options = list(
         paging = F,
         searching = F,
@@ -1140,9 +1138,9 @@ server <- function(input, output, session) { # server ####
     DataCorrected(Rslt)
   })
 
-  output$CorrectedTable <- renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
+  output$CorrectedTable <- DT::renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                     options = list(pageLength = 8, scrollX=TRUE),
-                                    container = FotterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
+                                    container = FooterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                     selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
@@ -1333,10 +1331,10 @@ server <- function(input, output, session) { # server ####
 
         output$uiCodeTranslations <-  renderUI({
           div(
-            DTOutput("CodeTranslationTable"),
+            DT::DTOutput("CodeTranslationTable"),
             fluidRow(
               box(width = NULL, title = "Output columns legend:",
-                  DTOutput("CodeTranslationTableLegend"))),
+                  DT::DTOutput("CodeTranslationTableLegend"))),
             # uiOutput("uiCodeTranslationTable"),
             br(),
             actionBttn("SeeCodeDefs", "See definitions/Update",
@@ -1344,7 +1342,7 @@ server <- function(input, output, session) { # server ####
                        size = "sm",
                        color = "default"),
             br(),
-            hidden(DTOutput("CodeTranslationFinal")),
+            hidden(DT::DTOutput("CodeTranslationFinal")),
             hidden(actionBttn(
               inputId = "ApplyCodeTranslation",
               label = "Apply Code Translation",
@@ -1409,7 +1407,7 @@ server <- function(input, output, session) { # server ####
 
 
 
-    output$CodeTranslationTable <- renderDT({
+    output$CodeTranslationTable <- DT::renderDT({
       datatable(
         data = cbind(AllCodesInput$Column, rownames(CodeTranslationTable), CodeTranslationTable),
         rownames = F,
@@ -1467,7 +1465,7 @@ server <- function(input, output, session) { # server ####
 
 
 
-    output$CodeTranslationTableLegend <- renderDT({
+    output$CodeTranslationTableLegend <- DT::renderDT({
       datatable(
         data = matrix(unique( AllCodesOutput$Column), nrow = floor(sqrt(length(unique( AllCodesOutput$Column)))), byrow = T),
         escape = FALSE,
@@ -1592,7 +1590,7 @@ server <- function(input, output, session) { # server ####
   #
   # }, priority = 1)
 
-  output$CodeTranslationFinal <- renderDT({
+  output$CodeTranslationFinal <- DT::renderDT({
     req(CodeTranslationFinal$output)
     datatable(CodeTranslationFinal$output[c("InputColumn", "InputValue", "OutputColumn", "OutputValue", "InputDefinition", "OutputDefinition")],
               options = list( paging = FALSE, scrollX=TRUE),
@@ -1723,9 +1721,9 @@ server <- function(input, output, session) { # server ####
   }, ignoreInit = T)
 
   # Visualize output
-  output$DataOutput <- renderDT(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
+  output$DataOutput <- DT::renderDT(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
                                 options = list(pageLength = 8, scrollX=TRUE),
-                                container = FotterWithHeader(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
+                                container = FooterWithHeader(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
                                 selection = "none")
 
   output$DataOutputSummary <- renderPrint(summary(DataOutput()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
