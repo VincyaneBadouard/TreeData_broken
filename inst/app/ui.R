@@ -79,6 +79,7 @@ body <- dashboardBody(
              .vscomp-search-container {z-index: 3000005 !important;}
              .vscomp-dropbox-container {z-index: 3000005 !important;}
              tr.dtrg-group {cursor: pointer;}
+             table-layout: fixed;
 
            "
 

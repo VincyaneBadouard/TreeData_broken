@@ -81,7 +81,7 @@ myTableHeader <- function (data, type = c("head", "foot"), escape = TRUE, ...)
   f(tags$tr(mapply(
     function(n, w) {
       if (w > 50)
-        tags$th(n, style = paste0("width:", w * 2, "px;"))
+        tags$th(n, style = paste0("min-width:", w * 2, "px;"))
       else
         tags$th(n)
     },
