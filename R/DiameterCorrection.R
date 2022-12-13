@@ -118,7 +118,7 @@
 #' Rslt <- DiameterCorrection(
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("linear", "individual"),
+#'     CorrectionType = c("individual"),
 #'     MinIndividualNbr = 1, Digits = 2L)
 #'
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
@@ -186,13 +186,10 @@ DiameterCorrection <- function(
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # WhatToCorrect
-  if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
-    stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
+  WhatToCorrect <- match.arg(WhatToCorrect, several.ok = TRUE)
 
   # CorrectionType
-  if(!any(c("linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType))
-    stop("The 'CorrectionType' argument value must be among
-         'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
+  CorrectionType <- match.arg(CorrectionType, several.ok = TRUE)
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
@@ -443,7 +440,7 @@ DiameterCorrection <- function(
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'   CorrectionType = c("linear", "individual")
+#'   CorrectionType = "individual"
 #'   )
 #' setnames(Rslt, "POMCor", "POM_TreeDataCor")
 #' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
