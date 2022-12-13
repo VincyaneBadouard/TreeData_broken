@@ -165,13 +165,10 @@ FullErrorProcessing <- function(
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # WhatToCorrect
-  if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
-    stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
+  WhatToCorrect <- match.arg(WhatToCorrect, several.ok = TRUE)
 
   # CorrectionType
-  if(!any(c("taper","linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType))
-    stop("The 'CorrectionType' argument value must be among
-         'taper', 'linear', quadratic', 'individual' and 'phylogenetic hierarchical'")
+  CorrectionType <- match.arg(CorrectionType, several.ok = TRUE)
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
