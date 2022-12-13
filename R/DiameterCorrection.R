@@ -331,7 +331,7 @@ DiameterCorrection <- function(
   if(DetectOnly %in% FALSE){
     # Rename correction columns
     setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
-             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"))
+             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
   }
 
 
@@ -442,7 +442,7 @@ DiameterCorrection <- function(
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
 #'   CorrectionType = "individual"
 #'   )
-#' setnames(Rslt, "POMCor", "POM_TreeDataCor")
+#' setnames(Rslt, "POMCor", "POM_TreeDataCor", skip_absent=TRUE)
 #' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 #'
 DiameterCorrectionByTree <- function(
