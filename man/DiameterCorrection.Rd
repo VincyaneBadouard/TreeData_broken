@@ -154,7 +154,7 @@ data(TestData)
 Rslt <- DiameterCorrection(
  TestData,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("linear", "individual"),
+    CorrectionType = c("individual"),
     MinIndividualNbr = 1, Digits = 2L)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
