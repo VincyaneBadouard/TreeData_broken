@@ -236,7 +236,7 @@ links them to the 1st measurements set.
 <td><code>CorrectionType</code></td>
 <td>
 <p>Possible values: ""individual"", ""phylogenetic
-hierarchical"" (character).
+hierarchical"" (character, 1 value).
 </p>
 
 <ul>
@@ -256,7 +256,7 @@ at the specific level, we switch to the genus level etc.
 </ul>
 </td>
 </tr>
-","FullErrorProcessingCorrectionType","c(""individual"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
+","FullErrorProcessingCorrectionType","c(""individual"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
 "FullErrorProcessing","<tr valign=""top"">
 <td><code>DBHRange</code></td>
 <td>
@@ -582,7 +582,7 @@ links them to the 1st measurements set.
 <td><code>CorrectionType</code></td>
 <td>
 <p>Possible values: ""individual"", ""phylogenetic
-hierarchical"" (character).
+hierarchical"" (character, 1 value).
 </p>
 
 <ul>
@@ -602,7 +602,7 @@ at the specific level, we switch to the genus level etc.
 </ul>
 </td>
 </tr>
-","DiameterCorrectionCorrectionType","c(""individual"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
+","DiameterCorrectionCorrectionType","c(""individual"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>DBHRange</code></td>
 <td>

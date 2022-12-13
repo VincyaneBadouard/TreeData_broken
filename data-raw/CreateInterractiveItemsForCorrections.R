@@ -1,3 +1,5 @@
+library(TreeData)
+
 # get the Rd from the package
 db <- tools::Rd_db("TreeData")
 
@@ -67,6 +69,10 @@ df_moreInfo <-
 
 
 Fct_args <- cbind(Fct_args, df_moreInfo[match(sapply(Fct_args$Default, function(x) paste(class(eval(x)), class(x))), df_moreInfo$class), -1], ReactiveArgValue = T) # by default is a reactive in the app, but when list of option defined in the function, it will be changed to FALSE
+
+
+## change multiple to FALSE if "1 value" is in description
+Fct_args$Multiple[grepl('1 value', Fct_args$Label)] <- FALSE
 
 ## get the list of columns
 x <- read.csv("inst/app/data/interactive_items.csv")

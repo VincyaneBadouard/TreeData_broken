@@ -84,7 +84,7 @@ links them to the 1st measurements set.
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
-hierarchical" (character).
+hierarchical" (character, 1 value).
 \itemize{
 \item "individual": replace abnormal growth by interpolation from the
 individual values.

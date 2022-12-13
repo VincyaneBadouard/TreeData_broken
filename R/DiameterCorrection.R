@@ -53,7 +53,7 @@
 #'              links them to the 1st measurements set.
 #'
 #' @param CorrectionType Possible values: "individual", "phylogenetic
-#'   hierarchical" (character).
+#'   hierarchical" (character, 1 value).
 #'   - "individual": replace abnormal growth by interpolation from the
 #'                   individual values.
 #'   - "phylogenetic hierarchical": replace abnormal growth with the average
@@ -189,7 +189,7 @@ DiameterCorrection <- function(
   WhatToCorrect <- match.arg(WhatToCorrect, several.ok = TRUE)
 
   # CorrectionType
-  CorrectionType <- match.arg(CorrectionType, several.ok = TRUE)
+  CorrectionType <- match.arg(CorrectionType)
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
