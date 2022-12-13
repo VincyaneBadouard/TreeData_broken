@@ -3,6 +3,9 @@
 #' @inheritParams GeneralErrorsDetection
 #' @inheritParams BotanicalCorrection
 #' @inheritParams StatusCorrection
+#' @param UseTaperCorrection (logical) TRUE: transform the tree diameter measured at a given height
+#' into the diameter corresponding to the default measurement height (`DefaultHOM`), using an allometry.
+#'   FALSE: do not apply a taper correction
 #' @inheritParams TaperCorrection
 #' @inheritParams DiameterCorrection
 #' @inheritParams RecruitmentCorrection
@@ -12,7 +15,7 @@
 #' - Check botanical identification (*BotanicalCorrection*)
 #' - Check the life status evolution of the trees/stems (*StatusCorrection*)
 #' - Apply a taper allometry on diameters measured at heights different from the
-#'    default(*TaperCorrection*)
+#'    default HOM (*TaperCorrection*)
 #' - Check diameter evolution of the trees (*DiameterCorrection*)
 #' - Check tree/stem recruitment (*RecruitmentCorrection*)
 #'
@@ -59,6 +62,7 @@ FullErrorProcessing <- function(
   RemoveRAfterDeath = FALSE,
 
   # Taper
+  UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
@@ -72,7 +76,7 @@ FullErrorProcessing <- function(
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("taper", "POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
@@ -132,10 +136,10 @@ FullErrorProcessing <- function(
     }
   }
 
-  if("taper" %in% CorrectionType){
+  if(UseTaperCorrection){
     # Check if the HOM column exists
     if(!"HOM" %in% names(Data)){
-      stop("You have chosen to make a 'taper' correction,
+      stop("You have chosen to make a taper correction,
        but you do not have the necessary 'HOM' column in your dataset")
     }
 
@@ -177,9 +181,9 @@ FullErrorProcessing <- function(
   }
 
   # Taper before if 'HOM' and no taper correction asked
-  if(any(!is.na(Data$HOM)) & !"taper" %in% CorrectionType) # HOM exists?
+  if(any(!is.na(Data$HOM)) & !UseTaperCorrection) # HOM exists?
     message("You have the 'HOM' information in your dataset.
-            We advise you to correct your diameters also with the 'taper' correction (CorrectionType = 'taper')")
+            We advise you to correct your diameters also with the taper correction (UseTaperCorrection = TRUE)")
 
   # If 'POM' 'POM change' correction is advised
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
@@ -213,7 +217,7 @@ FullErrorProcessing <- function(
                            RemoveRAfterDeath = RemoveRAfterDeath)
 
   #### Taper ####
-  if("taper" %in% WhatToCorrect & "HOM" %in% names(Data) & any(!is.na(Data$HOM))){
+  if(UseTaperCorrection & "HOM" %in% names(Data) & any(!is.na(Data$HOM))){
 
     Data <- TaperCorrection(Data,
                             DefaultHOM = DefaultHOM,
