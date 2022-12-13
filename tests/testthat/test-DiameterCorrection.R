@@ -79,7 +79,7 @@ test_that("DiameterCorrection", {
     PioneersGrowthThreshold = 7.5,
 
     WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("quadratic", "linear", "phylogenetic hierarchical"),
+    CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,
     MinIndividualNbr = 1,
