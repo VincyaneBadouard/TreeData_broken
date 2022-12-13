@@ -578,7 +578,7 @@ StatusCorrectionByTree <- function(
             DataTree,
             condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
               DataTree[, LifeStatusCor] %in% NA,
-            comment = "When the tree is unseen a number of times >= DeathConfirmation, it is considered dead")
+            comment = paste("When the tree is unseen a number of times >=", DeathConfirmation, ", it is considered dead"))
 
           if(DetectOnly %in% FALSE){
 
