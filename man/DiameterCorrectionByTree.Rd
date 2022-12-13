@@ -135,7 +135,7 @@ Rslt <- DiameterCorrectionByTree(
   WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = "individual"
   )
-setnames(Rslt, "POMCor", "POM_TreeDataCor")
+setnames(Rslt, "POMCor", "POM_TreeDataCor", skip_absent=TRUE)
 DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 
 }

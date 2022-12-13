@@ -101,7 +101,7 @@ Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
                                                     "Species",
                                                     "Family",
                                                     "ScientificName"))
-setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor")
+setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor", skip_absent=TRUE)
 LifeStatusCorrectionPlot(Rslt)
 
 }

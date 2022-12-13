@@ -62,7 +62,7 @@ strongly recommended to correct the Diameter before correcting the recruits
 \examples{
 library(data.table)
 data(TestData)
-setnames(TestData, "Diameter", "Diameter_TreeDataCor")
+setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 
 Rslt <- RecruitmentCorrection(TestData,
                               InvariantColumns = c("Site",
