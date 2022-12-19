@@ -366,9 +366,9 @@ ReversedRequiredFormat <- function(
     if(!any(grepl("_", Variablecolumns))) {
       old = grep(paste0(paste0('(', ValueNames, '_)', collapse = "|"), "|", paste0('(_', ValueNames, ')', collapse = "|")) , names(Data), value = TRUE)
 
-      setnames(Data, old, gsub("_", "", old))
+      setnames(Data, old, gsub("_", "", old), skip_absent=TRUE)
 
-      # setnames(Data, old, Variablecolumns)
+      # setnames(Data, old, Variablecolumns, skip_absent=TRUE)
     }
 
   }

@@ -53,7 +53,7 @@
 #'              links them to the 1st measurements set.
 #'
 #' @param CorrectionType Possible values: "individual", "phylogenetic
-#'   hierarchical" (character).
+#'   hierarchical" (character, 1 value).
 #'   - "individual": replace abnormal growth by interpolation from the
 #'                   individual values.
 #'   - "phylogenetic hierarchical": replace abnormal growth with the average
@@ -118,7 +118,7 @@
 #' Rslt <- DiameterCorrection(
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("linear", "individual"),
+#'     CorrectionType = c("individual"),
 #'     MinIndividualNbr = 1, Digits = 2L)
 #'
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
@@ -186,13 +186,10 @@ DiameterCorrection <- function(
     stop("'Pioneers' argument must be a characters vector, or NULL")
 
   # WhatToCorrect
-  if(!any(c("POM change","punctual", "shift") %in% WhatToCorrect))
-    stop("The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
+  WhatToCorrect <- match.arg(WhatToCorrect, several.ok = TRUE)
 
   # CorrectionType
-  if(!any(c("linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType))
-    stop("The 'CorrectionType' argument value must be among
-         'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
+  CorrectionType <- match.arg(CorrectionType)
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
@@ -334,7 +331,7 @@ DiameterCorrection <- function(
   if(DetectOnly %in% FALSE){
     # Rename correction columns
     setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
-             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"))
+             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
   }
 
 
@@ -443,9 +440,9 @@ DiameterCorrection <- function(
 #' Rslt <- DiameterCorrectionByTree(
 #'   DataTree, TestData,
 #'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'   CorrectionType = c("linear", "individual")
+#'   CorrectionType = "individual"
 #'   )
-#' setnames(Rslt, "POMCor", "POM_TreeDataCor")
+#' setnames(Rslt, "POMCor", "POM_TreeDataCor", skip_absent=TRUE)
 #' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
 #'
 DiameterCorrectionByTree <- function(

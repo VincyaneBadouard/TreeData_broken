@@ -264,7 +264,7 @@ BotanicalCorrection <- function(
           BIOMASS::getTaxonomy(unique(Data$GenusCor), findOrder = FALSE)
         )
 
-      setnames(FamilyData, "family", "FamilyCor") # rename columns
+      setnames(FamilyData, "family", "FamilyCor", skip_absent=TRUE) # rename columns
 
 
       # Join Family table and the dataset
@@ -341,7 +341,7 @@ BotanicalCorrection <- function(
       Data[, BotanicalCorrectionSource := ifelse(is.na(BotanicalCorrectionSource), BotaCorSource, BotanicalCorrectionSource)]
       Data[, c("family", "BotaCorSource") := NULL]
 
-      setnames(Data, "scientificName", "ScientificNameCor") # rename columns
+      setnames(Data, "scientificName", "ScientificNameCor", skip_absent=TRUE) # rename columns
 
       # For Genus not detected by WFO by already corrected the family
       Data[is.na(ScientificNameCor) & !is.na(FamilyCor), ScientificNameCor := paste(GenusCor, SpeciesCor)]
@@ -458,7 +458,7 @@ BotanicalCorrection <- function(
   if(DetectOnly %in% FALSE){
     # Rename correction columns
     Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
-    setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol))
+    setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol), skip_absent=TRUE)
   }
 
   return(Data)

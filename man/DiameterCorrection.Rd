@@ -84,7 +84,7 @@ links them to the 1st measurements set.
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
-hierarchical" (character).
+hierarchical" (character, 1 value).
 \itemize{
 \item "individual": replace abnormal growth by interpolation from the
 individual values.
@@ -154,7 +154,7 @@ data(TestData)
 Rslt <- DiameterCorrection(
  TestData,
   WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("linear", "individual"),
+    CorrectionType = c("individual"),
     MinIndividualNbr = 1, Digits = 2L)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)

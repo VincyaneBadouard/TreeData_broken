@@ -229,7 +229,7 @@ GeneralErrorsDetection <- function(
       IDYear %in% DuplicatedID[, IDYear],
       .(Year, Plot, Subplot, TreeFieldNum, get(ID))
     ]
-    setnames(a, "V5", ID)
+    setnames(a, "V5", ID, skip_absent=TRUE)
     a <- a[order(get(ID), Year)]
     b <- capture.output(a)
     c <- paste(b, "\n", sep = "")

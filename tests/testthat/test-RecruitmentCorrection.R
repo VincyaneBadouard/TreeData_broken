@@ -9,7 +9,7 @@ test_that("RecruitmentCorrection", {
   NoDBHData <- TestData[, !c("Diameter")]
   NoDBHCorData <- TestData
 
-  setnames(TestData, "Diameter", "Diameter_TreeDataCor")
+  setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 
 
   # Check the function argument

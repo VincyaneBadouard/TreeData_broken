@@ -86,6 +86,15 @@ concerning the tree after its death? (logical)</p>
 </tr>
 ","FullErrorProcessingRemoveRAfterDeath","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "FullErrorProcessing","<tr valign=""top"">
+<td><code>UseTaperCorrection</code></td>
+<td>
+<p>(logical) TRUE: transform the tree diameter measured at a given height
+into the diameter corresponding to the default measurement height (<code>DefaultHOM</code>), using an allometry.
+FALSE: do not apply a taper correction</p>
+</td>
+</tr>
+","FullErrorProcessingUseTaperCorrection","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"FullErrorProcessing","<tr valign=""top"">
 <td><code>DefaultHOM</code></td>
 <td>
 <p>Default Height Of Measurement in meter (Default: 1.3 m)
@@ -231,12 +240,12 @@ links them to the 1st measurements set.
 </ul>
 </td>
 </tr>
-","FullErrorProcessingWhatToCorrect","c(""taper"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""taper"", ""POM change"", ""punctual"", ""shift"")",FALSE
+","FullErrorProcessingWhatToCorrect","c(""POM change"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""POM change"", ""punctual"", ""shift"")",FALSE
 "FullErrorProcessing","<tr valign=""top"">
 <td><code>CorrectionType</code></td>
 <td>
 <p>Possible values: ""individual"", ""phylogenetic
-hierarchical"" (character).
+hierarchical"" (character, 1 value).
 </p>
 
 <ul>
@@ -256,7 +265,7 @@ at the specific level, we switch to the genus level etc.
 </ul>
 </td>
 </tr>
-","FullErrorProcessingCorrectionType","c(""individual"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
+","FullErrorProcessingCorrectionType","c(""individual"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
 "FullErrorProcessing","<tr valign=""top"">
 <td><code>DBHRange</code></td>
 <td>
@@ -582,7 +591,7 @@ links them to the 1st measurements set.
 <td><code>CorrectionType</code></td>
 <td>
 <p>Possible values: ""individual"", ""phylogenetic
-hierarchical"" (character).
+hierarchical"" (character, 1 value).
 </p>
 
 <ul>
@@ -602,7 +611,7 @@ at the specific level, we switch to the genus level etc.
 </ul>
 </td>
 </tr>
-","DiameterCorrectionCorrectionType","c(""individual"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
+","DiameterCorrectionCorrectionType","c(""individual"")","pickerInput","FALSE","list( `actions-box` = TRUE)","choices","selected","c(""individual"", ""phylogenetic hierarchical"")",FALSE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>DBHRange</code></td>
 <td>

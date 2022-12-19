@@ -38,11 +38,10 @@ test_that("DiameterCorrection", {
                regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
-               regexp = "The 'WhatToCorrect' argument value must be among 'POM change', 'punctual' and 'shift'")
+               regexp = 'should be one of "POM change", "punctual", "shift"')
 
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
-               regexp = "The 'CorrectionType' argument value must be among
-         'quadratic', 'linear', 'individual' and 'phylogenetic hierarchical'")
+               regexp = 'should be one of "individual", "phylogenetic hierarchical"')
 
   expect_warning(DiameterCorrection(TestData, Digits = 1.2),
                  regexp = "The 'Digits' argument must be an integer")
@@ -50,7 +49,7 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
 
-  expect_message(DiameterCorrection(POMData, CorrectionType = "linear", WhatToCorrect = "punctual"),
+  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual"),
                  regexp = "You have the 'POM' information in your dataset")
 
 
@@ -80,7 +79,7 @@ test_that("DiameterCorrection", {
     PioneersGrowthThreshold = 7.5,
 
     WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("quadratic", "linear", "phylogenetic hierarchical"),
+    CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,
     MinIndividualNbr = 1,

@@ -22,8 +22,8 @@ setDT(PanamaFormated)
 PanamaFormated[, c("IdTree", "IdStem") := list(as.character(IdTree), as.character(IdStem))]
 PanamaFormated[, Species := ScientificName]
 PanamaFormated[, ScientificName := paste(Genus, Species)]
-setnames(PanamaFormated, "SubPlot", "Subplot")
-setnames(PanamaFormated, c("Xutm", "Yutm"), c("XTreeUTM", "YTreeUTM"))
+setnames(PanamaFormated, "SubPlot", "Subplot", skip_absent=TRUE)
+setnames(PanamaFormated, c("Xutm", "Yutm"), c("XTreeUTM", "YTreeUTM"), skip_absent=TRUE)
 
 ```
 

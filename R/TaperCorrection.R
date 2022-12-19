@@ -131,7 +131,7 @@ TaperCorrection <- function(
 
   if(DetectOnly %in% FALSE){
   # Rename correction columns
-  setnames(Data, c("TaperCorDBH", "HOMCor"), c("TaperDBH_TreeDataCor", "HOM_TreeDataCor"))
+  setnames(Data, c("TaperCorDBH", "HOMCor"), c("TaperDBH_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
   }
 
   return(Data)

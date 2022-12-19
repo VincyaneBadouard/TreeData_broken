@@ -45,7 +45,7 @@
 #' @examples
 #' library(data.table)
 #' data(TestData)
-#' setnames(TestData, "Diameter", "Diameter_TreeDataCor")
+#' setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 #'
 #' Rslt <- RecruitmentCorrection(TestData,
 #'                               InvariantColumns = c("Site",
@@ -454,7 +454,7 @@ RecruitmentCorrectionByTree <- function(
                                  stringsAsFactors = FALSE) # do not convert characters into factors
           }
 
-          setnames(NewRow, "ID", ID)
+          setnames(NewRow, "ID", ID, skip_absent=TRUE)
 
           if(length(InvariantColumns) > 0){ # if there are invariant columns
 

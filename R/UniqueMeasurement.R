@@ -113,7 +113,7 @@ UniqueMeasurement <- function(
 
         DuplicatedID <- Data[duplicated(Data[, list(get(ID), Year)]), list(get(ID), Year)]
 
-        setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""))
+        setnames(DuplicatedID, "V1", paste("Duplicated", ID, sep = ""), skip_absent=TRUE)
 
         if(nrow(DuplicatedID) > 0){
 

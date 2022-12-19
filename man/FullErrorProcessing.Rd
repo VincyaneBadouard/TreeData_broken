@@ -15,17 +15,18 @@ FullErrorProcessing(
   UseSize = FALSE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
+  UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(exp(-TaperParameter
-    * (HOM - DefaultHOM))),
+  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
+    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
   KeepMeas = c("MaxHOM", "MaxDate"),
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  WhatToCorrect = c("taper", "POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "punctual", "shift"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -73,6 +74,10 @@ before it was seen alive for the 1st time? (logical)}
 
 \item{RemoveRAfterDeath}{After correction do you want to delete the rows
 concerning the tree after its death? (logical)}
+
+\item{UseTaperCorrection}{(logical) TRUE: transform the tree diameter measured at a given height
+into the diameter corresponding to the default measurement height (\code{DefaultHOM}), using an allometry.
+FALSE: do not apply a taper correction}
 
 \item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
 (numeric, 1 value)}
@@ -137,7 +142,7 @@ links them to the 1st measurements set.
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
-hierarchical" (character).
+hierarchical" (character, 1 value).
 \itemize{
 \item "individual": replace abnormal growth by interpolation from the
 individual values.
@@ -188,7 +193,7 @@ Detect errors or detect and correct errors:
 \item Check botanical identification (\emph{BotanicalCorrection})
 \item Check the life status evolution of the trees/stems (\emph{StatusCorrection})
 \item Apply a taper allometry on diameters measured at heights different from the
-default(\emph{TaperCorrection})
+default HOM (\emph{TaperCorrection})
 \item Check diameter evolution of the trees (\emph{DiameterCorrection})
 \item Check tree/stem recruitment (\emph{RecruitmentCorrection})
 }

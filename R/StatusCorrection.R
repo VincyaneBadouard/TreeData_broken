@@ -205,7 +205,7 @@ StatusCorrection <- function(
 
   if(DetectOnly %in% FALSE){
     # Rename correction columns
-    setnames(Data, "LifeStatusCor", gsub("Cor", "_TreeDataCor", "LifeStatusCor"))
+    setnames(Data, "LifeStatusCor", gsub("Cor", "_TreeDataCor", "LifeStatusCor"), skip_absent=TRUE)
   }
 
 
@@ -302,7 +302,7 @@ StatusCorrection <- function(
 #'                                                     "Species",
 #'                                                     "Family",
 #'                                                     "ScientificName"))
-#' setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor")
+#' setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor", skip_absent=TRUE)
 #' LifeStatusCorrectionPlot(Rslt)
 #'
 StatusCorrectionByTree <- function(
@@ -487,7 +487,7 @@ StatusCorrectionByTree <- function(
                              Subplot = unique(DataTree$Subplot),  # the unique subplot in DataTree
                              stringsAsFactors =  FALSE)      # do not convert characters into factors
 
-        setnames(NewRow, "ID", ID)
+        setnames(NewRow, "ID", ID, skip_absent=TRUE)
 
         if(length(InvariantColumns) > 0){ # if there are invariant columns
 
@@ -578,7 +578,7 @@ StatusCorrectionByTree <- function(
             DataTree,
             condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
               DataTree[, LifeStatusCor] %in% NA,
-            comment = "When the tree is unseen a number of times >= DeathConfirmation, it is considered dead")
+            comment = paste("When the tree is unseen a number of times >=", DeathConfirmation, ", it is considered dead"))
 
           if(DetectOnly %in% FALSE){
 
