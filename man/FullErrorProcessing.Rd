@@ -57,16 +57,10 @@ with the static copy of the \emph{World Flora Online} (WFO) Taxonomic Backbone
 data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
 data.table)}
 
-\item{InvariantColumns}{Vector with the names of the columns that are
-supposed to have always the same value for each measurement of the same
-tree (character). It is recommended to use the columns that have already
-been \strong{corrected}, such as the columns containing the corrected botanical
-information.}
-
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)  (Default = 2 censuses)}
 
-\item{UseSize}{Use the size presence as a witness of the living status of the
+\item{UseSize}{Use the size presence  (> min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
@@ -175,8 +169,8 @@ have corrected the tree life status with the \emph{StatusCorrection()} function.
 
 \item{coef}{description... (numeric)}
 
-\item{MinDBH}{Minimum diameter of trees inventoried according to your
-protocol (in cm) (numeric, 1 value) (Default = 10 cm)}
+\item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
 }
 \value{
 The original dataset (data.table) with a \emph{Comment} column containing
