@@ -162,46 +162,51 @@ if DeathConfirmation =&lt; unseens -&gt; Dead</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">AddR</span> <span class="op">&lt;-</span> <span class="va">DataTree</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># the rows to copy</span></span></span>
 <span class="r-in"><span><span class="va">AddR</span><span class="op">[</span>, <span class="va">Year</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2012</span><span class="op">:</span><span class="fl">2015</span><span class="op">)</span><span class="op">]</span> <span class="co"># the rows to add</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Site Plot Subplot PlotLat PlotLon XPlotUTM YPlotUTM PlotArea</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    PlotElevation SubplotLat SubplotLon XSubplotUTM YSubplotUTM SubplotArea</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    MinDBH IdCensus Year Month  Day       Date TreeFieldNum IdTree StemFieldNum</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  10.03     2020 2012  &lt;NA&gt; &lt;NA&gt; 2020-06-04         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  10.03     2017 2013  &lt;NA&gt; &lt;NA&gt; 2017-07-19         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  10.03     2019 2014  &lt;NA&gt; &lt;NA&gt; 2019-06-07         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  10.03     2018 2015  &lt;NA&gt; &lt;NA&gt; 2018-07-08         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           IdStem LifeStatus Diameter BD Circ BCirc HOM POM BHOM BPOM TreeHeight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 101623_1_auto       TRUE    21.49 NA 67.5    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 101623_1_auto       TRUE    20.69 NA 65.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 101623_1_auto       TRUE    21.33 NA 67.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 101623_1_auto       TRUE    21.01 NA 66.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    TreeLat TreeLon XTreeUTM YTreeUTM XTreePlot YTreePlot XTreeSubplot</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    YTreeSubplot         ScientificName     VernName   Family        Genus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Species Subspecies Variety Voucher IdLevel Authority CommercialSp LifeForm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    LifeStatusOriginal CommercialSpOriginal DateOriginal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:               TRUE                 TRUE   2020-06-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:               TRUE                 TRUE   2017-07-19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:               TRUE                 TRUE   2019-06-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:               TRUE                 TRUE   2018-07-08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    MinDBH IdCensus Year Month Day       Date    Site Cluster Plot PlotViewID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  10.03     2020 2012     6   4 2020-06-04 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  10.03     2017 2013     7  19 2017-07-19 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  10.03     2019 2014     6   7 2019-06-07 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  10.03     2018 2015     7   8 2018-07-08 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Subplot PlotArea PlotElevation SubplotArea PlotLat PlotLon XPlotUTM YPlotUTM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    SubplotLat SubplotLon XSubplotUTM YSubplotUTM         ScientificName</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        VernName   Family        Genus   Species Subspecies Variety Voucher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    IdLevel Authority CommercialSp LifeForm TreeFieldNum IdTree StemFieldNum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           IdStem TreeLat TreeLon XTreeUTM YTreeUTM XTreePlot YTreePlot</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    XTreeSubplot YTreeSubplot LifeStatus Diameter BD Circ BCirc HOM  POM BHOM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           NA           NA       TRUE    21.49 NA 67.5    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           NA           NA       TRUE    20.69 NA 65.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           NA           NA       TRUE    21.33 NA 67.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           NA           NA       TRUE    21.01 NA 66.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    BPOM TreeHeight TreeFieldNumOriginal IdTreeOriginal CommercialSpOriginal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    DateOriginal LifeStatusOriginal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   2020-06-04               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   2017-07-19               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   2019-06-07               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   2018-07-08               TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">DataTree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">DataTree</span>, <span class="va">AddR</span><span class="op">)</span><span class="op">)</span> <span class="co"># add rows</span></span></span>
 <span class="r-in"><span></span></span>
@@ -209,86 +214,96 @@ if DeathConfirmation =&lt; unseens -&gt; Dead</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Write the sequence</span></span></span>
 <span class="r-in"><span><span class="va">DataTree</span><span class="op">[</span>, <span class="va">LifeStatus</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">NA</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">FALSE</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Site Plot Subplot PlotLat PlotLon XPlotUTM YPlotUTM PlotArea</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9: Paracou    6    none      NA      NA       NA       NA     6.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    PlotElevation SubplotLat SubplotLon XSubplotUTM YSubplotUTM SubplotArea</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:            NA         NA         NA          NA          NA          NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    MinDBH IdCensus Year Month  Day       Date TreeFieldNum IdTree StemFieldNum</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  10.03     2020 2012  &lt;NA&gt; &lt;NA&gt; 2020-06-04         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  10.03     2017 2013  &lt;NA&gt; &lt;NA&gt; 2017-07-19         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  10.03     2019 2014  &lt;NA&gt; &lt;NA&gt; 2019-06-07         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  10.03     2018 2015  &lt;NA&gt; &lt;NA&gt; 2018-07-08         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  10.03     2016 2016  &lt;NA&gt; &lt;NA&gt; 2016-09-14         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:  10.03     2017 2017  &lt;NA&gt; &lt;NA&gt; 2017-07-19         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:  10.03     2018 2018  &lt;NA&gt; &lt;NA&gt; 2018-07-08         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:  10.03     2019 2019  &lt;NA&gt; &lt;NA&gt; 2019-06-07         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:  10.03     2020 2020  &lt;NA&gt; &lt;NA&gt; 2020-06-04         2100 101623         &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           IdStem LifeStatus Diameter BD Circ BCirc HOM POM BHOM BPOM TreeHeight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 101623_1_auto      FALSE    21.49 NA 67.5    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 101623_1_auto       TRUE    20.69 NA 65.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 101623_1_auto         NA    21.33 NA 67.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 101623_1_auto      FALSE    21.01 NA 66.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 101623_1_auto       TRUE    20.37 NA 64.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 101623_1_auto         NA    20.69 NA 65.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: 101623_1_auto         NA    21.01 NA 66.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8: 101623_1_auto      FALSE    21.33 NA 67.0    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9: 101623_1_auto         NA    21.49 NA 67.5    NA  NA   0   NA &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    TreeLat TreeLon XTreeUTM YTreeUTM XTreePlot YTreePlot XTreeSubplot</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:      NA      NA       NA       NA        NA        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    YTreeSubplot         ScientificName     VernName   Family        Genus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:           NA Recordoxylon speciosum wakapu gitin Fabaceae Recordoxylon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Species Subspecies Variety Voucher IdLevel Authority CommercialSp LifeForm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9: speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;      &lt;NA&gt;         TRUE     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    LifeStatusOriginal CommercialSpOriginal DateOriginal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:               TRUE                 TRUE   2020-06-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:               TRUE                 TRUE   2017-07-19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:               TRUE                 TRUE   2019-06-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:               TRUE                 TRUE   2018-07-08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:               TRUE                 TRUE   2016-09-14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:               TRUE                 TRUE   2017-07-19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:               TRUE                 TRUE   2018-07-08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:               TRUE                 TRUE   2019-06-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:               TRUE                 TRUE   2020-06-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    MinDBH IdCensus Year Month Day       Date    Site Cluster Plot PlotViewID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  10.03     2020 2012     6   4 2020-06-04 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  10.03     2017 2013     7  19 2017-07-19 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  10.03     2019 2014     6   7 2019-06-07 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  10.03     2018 2015     7   8 2018-07-08 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  10.03     2016 2016     9  14 2016-09-14 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:  10.03     2017 2017     7  19 2017-07-19 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:  10.03     2018 2018     7   8 2018-07-08 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:  10.03     2019 2019     6   7 2019-06-07 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:  10.03     2020 2020     6   4 2020-06-04 Paracou    &lt;NA&gt;    6       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Subplot PlotArea PlotElevation SubplotArea PlotLat PlotLon XPlotUTM YPlotUTM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:       1     6.25            NA           0      NA      NA       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    SubplotLat SubplotLon XSubplotUTM YSubplotUTM         ScientificName</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:         NA         NA          NA          NA Recordoxylon speciosum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        VernName   Family        Genus   Species Subspecies Variety Voucher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9: wakapu gitin Fabaceae Recordoxylon speciosum       &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    IdLevel Authority CommercialSp LifeForm TreeFieldNum IdTree StemFieldNum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:    &lt;NA&gt;      &lt;NA&gt;         TRUE     tree         2100 101623         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           IdStem TreeLat TreeLon XTreeUTM YTreeUTM XTreePlot YTreePlot</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9: 101623_1_auto      NA      NA       NA       NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    XTreeSubplot YTreeSubplot LifeStatus Diameter BD Circ BCirc HOM  POM BHOM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           NA           NA      FALSE    21.49 NA 67.5    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           NA           NA       TRUE    20.69 NA 65.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           NA           NA         NA    21.33 NA 67.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           NA           NA      FALSE    21.01 NA 66.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:           NA           NA       TRUE    20.37 NA 64.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:           NA           NA         NA    20.69 NA 65.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:           NA           NA         NA    21.01 NA 66.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:           NA           NA      FALSE    21.33 NA 67.0    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:           NA           NA         NA    21.49 NA 67.5    NA 1.3 &lt;NA&gt;   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    BPOM TreeHeight TreeFieldNumOriginal IdTreeOriginal CommercialSpOriginal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9: &lt;NA&gt;         NA                 2100         101623                 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    DateOriginal LifeStatusOriginal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   2020-06-04               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   2017-07-19               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   2019-06-07               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   2018-07-08               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   2016-09-14               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:   2017-07-19               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:   2018-07-08               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:   2019-06-07               TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:   2020-06-04               TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">StatusCorrectionByTree</span><span class="op">(</span><span class="va">DataTree</span>, PlotCensuses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2011</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                               InvariantColumns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Site"</span>,</span></span>
