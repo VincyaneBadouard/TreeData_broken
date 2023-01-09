@@ -116,10 +116,11 @@ IndividualDiameterShiftCorrection <- function(
     # Add the column with the correction method  ------------------------------------------------------------------
 
     if(!is.null(DataTree)){
-      DataTree <- GenerateComment(DataTree,
-                                  condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
-                                  comment = "weighted mean",
-                                  column = "DiameterCorrectionMeth")
+      DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "weighted mean")]
+      # DataTree <- GenerateComment(DataTree,
+      #                             condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
+      #                             comment = "weighted mean",
+      #                             column = "DiameterCorrectionMeth")
     } # end DataTree
 
 
@@ -146,10 +147,11 @@ IndividualDiameterShiftCorrection <- function(
           # Add the column with the correction method  ------------------------------------------------------------------------
           # DataTree[i, DiameterCorrectionMeth := "shift realignment"]
 
-          DataTree <- GenerateComment(DataTree,
-                                      condition = as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor),
-                                      comment = "shift realignment",
-                                      column = "DiameterCorrectionMeth")
+          DataTree[as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor), ]$DiameterCorrectionMeth <-  GenerateComment(DiameterCorrectionMeth, "shift realignment")
+          # DataTree <- GenerateComment(DataTree,
+          #                             condition = as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor),
+          #                             comment = "shift realignment",
+          #                             column = "DiameterCorrectionMeth")
 
         } # end DataTree
 
