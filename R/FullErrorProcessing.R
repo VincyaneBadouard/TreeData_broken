@@ -3,10 +3,6 @@
 #' @inheritParams GeneralErrorsDetection
 #' @inheritParams BotanicalCorrection
 #' @inheritParams StatusCorrection
-#' @param UseTaperCorrection (logical) TRUE: transform the tree diameter measured at a given height
-#' into the diameter corresponding to the default measurement height (`DefaultHOM`), using an allometry.
-#'   FALSE: do not apply a taper correction
-#' @inheritParams TaperCorrection
 #' @inheritParams DiameterCorrection
 #' @inheritParams RecruitmentCorrection
 #'
@@ -61,13 +57,15 @@ FullErrorProcessing <- function(
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
 
-  # Taper
+  # Diameter
+
+  ## Taper
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
 
-  # Diameter
+  ## other diameter corrections
   KeepMeas = c("MaxHOM", "MaxDate"),
   MaxDBH = 500,
   PositiveGrowthThreshold = 5,
