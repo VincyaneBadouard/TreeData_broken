@@ -4,33 +4,19 @@
 \alias{GenerateComment}
 \title{GenerateComment}
 \usage{
-GenerateComment(Data, condition, comment, column = "Comment")
+GenerateComment(x, comment)
 }
 \arguments{
-\item{Data}{Dataset (data.table)}
-
-\item{condition}{Vector of logicals}
+\item{x}{a character vector}
 
 \item{comment}{The string to add in the column (character)}
-
-\item{column}{Column name to fill (character)}
 }
 \value{
-The input data.table with the filled column.
+concatenation of x and comment, separated by a semicolon
 }
 \description{
-For all rows concerned by the condition, the function add a
-string in the chosen column of a data.table. If there is already a
-value, the string is pasted after the "/" separator.
+Helper function to concatenate comments, separated by ";"
 }
 \examples{
-\dontrun{
-library(data.table)
-dt <- data.table(A = c(2, 1, 3), B = c(6, 10, 6))
-
-dt[A == 2,
-   "information" := paste0("A = 2")] # 1st comment
-
-GenerateComment(dt, condition = dt[,B] == 6, comment = "B = 6", column = "information")
-}
+GenerateComment(letters, "A")
 }
