@@ -134,7 +134,7 @@ ReversedRequiredFormat <- function(
 
   }))
 
-  StandardUnitTable <- StandardUnitTable[!input[StandardUnitTable$UnitMan] %in% "none" & !is.na(names(input[StandardUnitTable$UnitMan] )), ] # keep only the ones we actually have in the output
+  StandardUnitTable <- StandardUnitTable[!input[StandardUnitTable$UnitMan] %in% "" & !input[StandardUnitTable$UnitMan] %in% "none" & !is.na(names(input[StandardUnitTable$UnitMan] )), ] # keep only the ones we actually have in the output
 
   setDF(Data)
 
