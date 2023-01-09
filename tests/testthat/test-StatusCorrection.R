@@ -6,7 +6,9 @@ test_that("StatusCorrection", {
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
                          ScientificName = "Plant",
+                         IdCensus =  rep(c(2012:2020), 5),
                          Year = rep(c(2012:2020), 5), # 9 census
+
                          Diameter = NA_real_)
   TestData <- TestData[order(IdTree, Year)]
   TestData[,LifeStatus := c(
@@ -20,6 +22,24 @@ test_that("StatusCorrection", {
   TestData[IdTree %in% "e", ("Diameter") := c(13:21)] # "e" Diameter seq
   TestData[IdTree %in% "e" & Year == 2014, ("Diameter") := NA] # a NA in the "e" Diameter seq
 
+  suppressWarnings(TestData <- RequiredFormat(TestData,
+                             input = list(MeasLevel = "Tree",
+                                          Site = "Site",
+                                          Plot = "Plot",
+                                          IdTree = "IdTree",
+                                          ScientificName = "ScientificName",
+                                          IdCensus= "IdCensus",
+                                          Year = "Year",
+                                          Month = "none",
+                                          Day = "none",
+                                          Date = "none",
+                                          Diameter = "Diameter",
+                                          LifeStatus = "LifeStatus",
+                                          DiameterUnitMan = "cm",
+                                          PlotArea = "none",
+                                          SubplotArea = "none",
+                                          IsLiveMan = T))
+  )
 
   # Create test data
   MatrixData <- as.matrix(TestData)
@@ -34,10 +54,8 @@ test_that("StatusCorrection", {
   expect_error(StatusCorrection(NoPlotData),
                regexp = "The column 'Plot' must be present in the dataset")
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = c(1:3)),
-               regexp = "'InvariantColumns' argument must be of character class")
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = c("a","b"), DeathConfirmation = TRUE),
+  expect_error(StatusCorrection(TestData, DeathConfirmation = TRUE),
                regexp = "'DeathConfirmation' argument must be numeric")
 
   expect_error(StatusCorrection(TestData,
@@ -49,19 +67,16 @@ test_that("StatusCorrection", {
          of the 'SatusCorrection' function must be logicals")
 
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = "a"),
-               regexp = "InvariantColumns argument must contain one or several column names")
 
-
-  expect_error(StatusCorrection(Data = NoDBHData, InvariantColumns = "Site",
+  expect_error(StatusCorrection(Data = NoDBHData,
                                 UseSize = TRUE),
                regexp = "the 'Diameter' column must be present in the dataset")
 
   # Check the function work
 
-  expect_warning(StatusCorrection(TestData, InvariantColumns = "ScientificName_TreeDataCor"))
+  expect_warning(StatusCorrection(TestData), "We added rows for missing trees and imputed average census Date")
 
-  Rslt <- suppressWarnings(StatusCorrection(TestData, InvariantColumns = c("Site", "ScientificName_TreeDataCor"), UseSize = TRUE))
+  Rslt <- suppressWarnings(StatusCorrection(TestData, UseSize = TRUE))
 
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
 
@@ -101,18 +116,15 @@ test_that("StatusCorrection", {
 
     }else{ # if death in the seq (Alive NA NA DEAD NA)
       FirstDeath <- min(Deaths_seq)
-          UnseenBfDeath <- sum(Unseen_seq < FirstDeath) # nbr of NA before the death
+      UnseenBfDeath <- sum(Unseen_seq < FirstDeath) # nbr of NA before the death
 
           if(UnseenBfDeath >= DeathConfirmation)
             expect_true(all(SeqCor[Unseen_seq] == FALSE))
     }
 
     ## If UseSize : if Diameter != NA -> Alive
-    Sizes <-!is.na(Rslt[IdTree %in% i, Diameter])
-    DBHprst <- which(Sizes==T)
-    if(length(DBHprst) > 0){
-    expect_true(all(DBHprst %in% which(SeqCor==T)))
-}
+    expect_true(all(SeqCor[!is.na(Rslt[IdTree %in% i, Diameter])] == T))
+
     ## Add a "Comment" value when "LifeStatus" != "LifeStatus_TreeDataCor"
     Comment <- Rslt[IdTree %in% i, Comment] != ""
 
