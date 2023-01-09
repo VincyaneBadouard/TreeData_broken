@@ -50,10 +50,10 @@ With:
 \value{
 Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
-- \emph{TaperDBH_TreeDataCor}: corrected trees diameter at default HOM
+- \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
 - \emph{DiameterCorrectionMeth} = "taper"
 - \emph{HOM_TreeDataCor} (numeric): HOM corresponding to the
-\emph{TaperDBH_TreeDataCor} (= \emph{DefaultHOM})
+\emph{Diameter_TreeDataCor} (= \emph{DefaultHOM})
 }
 \description{
 Transform the tree diameter measured at a given height into the
@@ -70,6 +70,6 @@ Data <- data.table(IdStem = "A",
       HOM = c(1.30, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25))
 
 Rslt <- TaperCorrection(Data)
-DiameterCorrectionPlot(Rslt, CorCol = "TaperDBH_TreeDataCor")
+DiameterCorrectionPlot(Rslt, CorCol = "Diameter_TreeDataCor")
 
 }
