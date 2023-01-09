@@ -10,26 +10,18 @@
 #'     - TRUE = alive,
 #'     - FALSE = dead,
 #'     - NA = unseen
-#'  The *Plot* column is needed to add rows to the census where the plot was
-#'  inventoried, where the tree was alive, but not recorded.
-#'
-#' @param InvariantColumns Vector with the names of the columns that are
-#'   supposed to have always the same value for each measurement of the same
-#'   tree (character). It is recommended to use the columns that have already
-#'   been **corrected**, such as the columns containing the corrected botanical
-#'   information.
 #'
 #' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
 #'   to be considered dead (numeric)  (Default = 2 censuses)
 #'
-#' @param UseSize Use the size presence as a witness of the living status of the
+#' @param UseSize Use the size presence  (> min DBH) as a witness of the living status of the
 #'   tree (logical) (Default = FALSE)
-#'
-#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses
-#'   between 2 'Alive', FALSE: does not add any rows (logical)
 #'
 #' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
+#'
+#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical). Ignored when DetectOnly is TRUE
+#'
 #'
 #' @param RemoveRBeforeAlive Do you want to delete the rows about the tree
 #'   before it was seen alive for the 1st time? (logical)
@@ -67,7 +59,7 @@
 #' selection <- c("101184", "101433","101435","101436")
 #'
 #'# Write the sequence
-#' TestData <- TestData[order(Year)] # arrange years in ascending order
+#' TestData <- TestData[order(IdCensus)] # arrange IdCensus in ascending order
 #' TestData[IdTree == "101184", LifeStatus := c(TRUE, TRUE, TRUE, TRUE, FALSE)]
 #' TestData[IdTree == "101433", LifeStatus := c(FALSE, TRUE, TRUE, TRUE, TRUE)]
 #' TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
@@ -86,19 +78,23 @@
 #'
 StatusCorrection <- function(
     Data,
-    InvariantColumns = c("Site",
-                         "Genus_TreeDataCor",
-                         "Species_TreeDataCor",
-                         "Family_TreeDataCor",
-                         "ScientificName_TreeDataCor"),
     DeathConfirmation = 2,
-    UseSize = FALSE,
-    AddRowsForForgottenCensuses = TRUE,
+    UseSize = TRUE, # ignored if DetectOnly is TRUE
     DetectOnly = FALSE,
-
+    AddRowsForForgottenCensuses = TRUE,
     RemoveRBeforeAlive = FALSE,
-    RemoveRAfterDeath = FALSE
-){
+    RemoveRAfterDeath = FALSE){
+
+
+  InvariantColumns = c("MinDBH", "Site",
+                       "Cluster", "Plot", "PlotViewID", "Subplot", "PlotArea", "PlotElevation",
+                       "SubplotArea", "PlotLat", "PlotLon", "XPlotUTM", "YPlotUTM",
+                       "SubplotLat", "SubplotLon", "XSubplotUTM", "YSubplotUTM", "ScientificName",
+                       "VernName", "Family", "Genus", "Species", "Subspecies", "Variety",
+                       "Voucher", "IdLevel", "Authority", "CommercialSp", "LifeForm",
+                       "TreeFieldNum", "IdTree", "StemFieldNum", "IdStem",
+                       "TreeLat", "TreeLon", "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot",
+                       "XTreeSubplot", "YTreeSubplot")
 
   #### Arguments check ####
   # Data
@@ -122,11 +118,6 @@ StatusCorrection <- function(
     to add rows to the census where the plot was inventoried, where the tree was alive, but not recorded")
   }
 
-  if(DetectOnly %in% FALSE){
-    # InvariantColumns
-    if (!inherits(InvariantColumns, "character"))
-      stop("'InvariantColumns' argument must be of character class")
-  }
 
   # DeathConfirmation
   if (!inherits(DeathConfirmation, "numeric"))
@@ -138,21 +129,10 @@ StatusCorrection <- function(
     stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
-  if(DetectOnly %in% FALSE){
-    # Check if the InvariantColumns name exists in Data
-    for(c in InvariantColumns){
-      if (!c %in% names(Data)){ cc <- gsub("_TreeDataCor", "", c) # remove _TreeDataCor
-
-      if (!cc %in% names(Data)){ # Col without - Cor exists?
-        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                   ,cc,"is apparently not a dataset's column"))
-
-      }else{ InvariantColumns[InvariantColumns == c] <- cc # If yes replace by the col name without cor
-      warning("",c," column does't exist. ",cc," column is therefore considered as InvariantColumns instead of ",c,"")
-
-      }
-      } # if c doest exist
-    } # end c loop
+  # use corrected columns as InvariantColumns if they exist (mostly for Species names that may have been corrected)
+  if(!DetectOnly) {
+    idx_corrected_columns <- paste0(InvariantColumns, "_TreeDataCor") %in% names(Data)
+    InvariantColumns[idx_corrected_columns] <- paste0(InvariantColumns, "_TreeDataCor")[idx_corrected_columns]
   }
 
   # UseSize-Diameter
@@ -168,11 +148,11 @@ StatusCorrection <- function(
   # data.frame to data.table
   setDT(Data)
 
-  Data[, (ID) := as.character(get(ID))]
+  # Data[, (ID) := as.character(get(ID))]
 
 
   # Order IDs and times in ascending order
-  Data <- Data[order(get(ID), Year)]
+  Data <- Data[order(get(ID), IdCensus)]
 
   # IDs vector
   Ids <- as.vector(na.omit(unique(Data[, get(ID)]))) # Tree Ids
@@ -180,576 +160,220 @@ StatusCorrection <- function(
   # Dataset with the rows without ID
   DataIDNa <-  Data[is.na(get(ID))]
 
-  # censuses per plot
-  Data[, all_plot_censuses := paste(unique(na.omit(Year)), collapse = ", "), .(Plot)]
 
-  ## apply status correction per ID (tree or stem)
-  Data <- Data[, StatusCorrectionByTree(
-    DataTree = Data[get(ID) == KeyCol],
-    PlotCensuses = as.numeric(strsplit(unique(all_plot_censuses), ", ")[[1]]),
-    InvariantColumns = InvariantColumns,
-    DeathConfirmation = DeathConfirmation,
-    UseSize = UseSize,
-    AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
-    DetectOnly = DetectOnly,
-    RemoveRBeforeAlive = RemoveRBeforeAlive,
-    RemoveRAfterDeath = RemoveRAfterDeath
-  ),
-  .(KeyCol = get(ID))]
+  # get status history for each ID
+  StatusHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "LifeStatus", drop = FALSE)
+  StatusHistory <- as.matrix(StatusHistory, 1)
 
-  # remove unnecessary column
-  Data$KeyCol <- NULL
+
+  # get measurement history for each ID (so if UseSize we can know that the tree was alive)
+
+  if(UseSize) {
+    MeasHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter", drop = FALSE)
+    MeasHistory <- as.matrix(MeasHistory, 1)
+
+    MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
+    MinDBHHistory <- as.matrix(MinDBHHistory, 1)
+
+
+    MeasHistory[] <- ifelse(!is.na(MeasHistory[]) & MeasHistory >= MinDBHHistory[], 1, 0)
+
+  }
+
+  # get comment History
+  if(!"Comment" %in% names(Data)) Data[, Comment:= ""]
+
+  CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment", drop = FALSE)
+  # rownames(CommentHistory) <- CommentHistory[[1]]
+  # CommentHistory[,1] <- NULL
+  CommentHistory <- as.matrix(CommentHistory, 1)
+
+
+
+  # PlotCensuses
+  # if (!inherits(PlotCensuses, c("numeric", "integer")))
+  #   stop("'PlotCensuses' argument must be numeric or integer")
+  #
+
+
+  if(!all.equal(dim(StatusHistory), dim(MeasHistory), dim(CommentHistory))) stop(" not all matrix are of same dimentions")
+
+
+  # concatenate
+  StatusHistoryC <- StatusHistory
+  StatusHistoryC[] <- as.numeric(StatusHistoryC)
+  StatusHistoryC <- apply(StatusHistoryC, 1, paste, collapse = "")
+  StatusHistoryC <- gsub("NA", "N", StatusHistoryC)
+
+  if(UseSize) {
+    MeasHistoryC <- apply(MeasHistory, 1, paste, collapse = "")
+  }
+
+  NewCommentsC <- rep(strrep("0", ncol(StatusHistory)), nrow(StatusHistory))
+
+
+
+  # detect and correct (if user requested) each scenarios ###
+  scenarios <- c("0" = "", # when nothing was corrected
+                 A = "A measured tree is a living tree", # Use the size presence as a witness of the living status of the tree
+                 B = "Between 2 alive occurrences, the tree was alive", # Alive > *Alive* > Alive
+                 C = paste("When a tree is unseen >=", DeathConfirmation, "times, it is considered dead"), # Enough/not enough occurrences of unseen to validate death
+                 D = "Tree can't be dead before first being alive", # Dead before first alive
+                 E = "A dead tree remains dead" # remains dead after last death
+  )
+
+  # scenario A - Use measurement history ####
+  if(UseSize) {
+    measured <- gregexpr("1", MeasHistoryC)
+
+    NewCommentsC <- mapply(function(x, m, t) {
+      invisible(sapply(m, function(so) if(substring(x, so, so) %in% c("N", "0")) substring(t, so, so) <<- "A"))
+      t
+    }, StatusHistoryC, measured, NewCommentsC, USE.NAMES = F)
+
+    if(!DetectOnly) StatusHistoryC <- mapply(function(x, m) {
+      invisible(sapply(m, function(so) if(so > 0) substring(x, so, so) <<- "1"))
+      x
+    }, StatusHistoryC, measured, USE.NAMES = F)
+
+  }
+
+  # scenario B - Alive > *Alive* > Alive ####
+
+  resucitate <- gregexpr("(?<=1)[^1]*(?=1)", StatusHistoryC, perl = T)
+
+  NewCommentsC <- mapply(function(x, m, t) {
+    invisible(mapply(function(so, ml) if(grepl("N|0", substring(x, so, so + ml - 1L))) substring(t, so, so + ml - 1L) <<- strrep("B", ml), m, attr(m, "match.length")))
+    t
+  }, StatusHistoryC, resucitate, NewCommentsC, USE.NAMES = F)
+
+  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+    invisible(mapply(function(so, ml) if(grepl("N|0", substring(x, so, so + ml - 1L))) substring(x, so, so + ml - 1L) <<- strrep("1", ml), m, attr(m, "match.length")))
+    x
+  }, StatusHistoryC, resucitate, USE.NAMES = F)
+
+
+  # scenario C - Enough/not enough occurrences of death to validate it ####
+
+  unseen <- gregexpr(paste0("(?<=1)N{", DeathConfirmation, ",}$"), StatusHistoryC, perl = T)
+
+  NewCommentsC <- mapply(function(x, m, t) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("C", ml), m, attr(m, "match.length")))
+    t
+  }, StatusHistoryC, unseen, NewCommentsC, USE.NAMES = F)
+
+  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), m, attr(m, "match.length")))
+    x
+  }, StatusHistoryC, unseen, USE.NAMES = F)
+
+
+  # scenario D - Dead before alive ####
+
+  deadfirst <- gregexpr("(?<!1)0*(?=1)", StatusHistoryC, perl = T)
+
+  NewCommentsC <- mapply(function(x, m, t) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("D", ml), m, attr(m, "match.length")))
+    t
+  }, StatusHistoryC, deadfirst, NewCommentsC, USE.NAMES = F)
+
+  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("N", ml), m, attr(m, "match.length")))
+    x
+  }, StatusHistoryC, deadfirst, USE.NAMES = F)
+
+  # scenario E - remains dead ####
+
+  deadNAend <- gregexpr("(?<=10)(N+0*)*$", StatusHistoryC, perl = T)
+
+  NewCommentsC <- mapply(function(x, m, t) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("E", ml), m, attr(m, "match.length")))
+    t
+  }, StatusHistoryC, deadNAend, NewCommentsC, USE.NAMES = F)
+
+  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+    invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), m, attr(m, "match.length")))
+    x
+  }, StatusHistoryC, deadNAend, USE.NAMES = F)
+
+
+
+  # convert the Status and Comments history tables back into the data ###
+
+  NewComments <- do.call(rbind, strsplit(NewCommentsC, ""))
+  NewComments[] <- scenarios[ NewComments[] ]
+
+  if(!all.equal(dim(NewComments), dim(CommentHistory))) stop("NewComments and CommentHistory are not of same dimensions")
+
+  rownames(NewComments) <- rownames(CommentHistory)
+  colnames(NewComments) <- colnames(CommentHistory)
+
+  suppressWarnings(NewComments <- melt(setDT(as.data.frame(NewComments), keep.rownames=TRUE), measure.vars = colnames(NewComments) , variable.name = "IdCensus"))
+
+
+  Data$Comment <- GenerateComment(Data$Comment, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
+
+
+  if(!DetectOnly) {
+
+    NewStatusHistory <- do.call(rbind, strsplit(StatusHistoryC, ""))
+    NewStatusHistory[] <- suppressWarnings(as.logical(as.numeric(NewStatusHistory)))
+    class(NewStatusHistory) <- "logical"
+
+    if(!all.equal(dim(StatusHistory), dim(NewStatusHistory))) stop("StatusHistory and NewStatusHistory are not of same dimensions")
+
+    rownames(NewStatusHistory) <- rownames(StatusHistory)
+    colnames(NewStatusHistory) <- colnames(StatusHistory)
+
+    suppressWarnings(NewStatusHistory <- melt(setDT(as.data.frame(NewStatusHistory), keep.rownames=TRUE), measure.vars = colnames(StatusHistory) , variable.name = "IdCensus"))
+
+    Data <- cbind(Data, LifeStatus_TreeDataCor = NewStatusHistory$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewStatusHistory$rn, NewStatusHistory$IdCensus))])
+
+  }
+
+  # Creating rows for absents ####
+  if(AddRowsForForgottenCensuses & !DetectOnly) { # NEED TO ADD IN RD THAT AddRowsForForgottenCensuses IS IGNORED IF DetectOnly = T.
+
+    # identify cases we need to add
+    idx_new_rows <- which(match(paste(NewStatusHistory$rn, NewStatusHistory$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
+
+    # get what we know about those trees
+    NewRows <- Data[get(ID) %in% NewStatusHistory$rn[idx_new_rows], ]
+    NewRows <- NewRows[!duplicated(get(ID)), ]
+
+    # remove the data that changes at each census
+    NewRows[,setdiff(names(NewRows), InvariantColumns) := NA]
+
+    # fill in info we know about the census and based on the Status we corrected
+    m <- match(NewRows[,get(ID)], NewStatusHistory[idx_new_rows, rn])
+
+    NewRows$IdCensus <- NewStatusHistory[idx_new_rows, IdCensus][m]
+
+    NewRows$LifeStatus_TreeDataCor <- NewStatusHistory[idx_new_rows, value][m]
+
+    NewRows$Comment <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
+
+    # make best guess at other things
+    warning("We added rows for missing trees and imputed average census Date")
+    NewRows$Date <- as.Date(tapply(Data$Date, Data$IdCensus, mean, na.rm = T), origin = "1970-01-01")[NewRows$IdCensus]
+
+    NewRows$Year <- format(NewRows$Date, "%Y")
+    NewRows$Month <- format(NewRows$Date, "%m")
+    NewRows$Day <- format(NewRows$Date, "%d")
+
+    # Add these rows in the dataset
+    Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
+  }
+
 
   # Re-put the the rows without ID
   Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
 
-  if(DetectOnly %in% FALSE){
-    # Rename correction columns
-    setnames(Data, "LifeStatusCor", gsub("Cor", "_TreeDataCor", "LifeStatusCor"), skip_absent=TRUE)
-  }
+  Data <- Data[order(get(ID), IdCensus )] # order by time
 
 
+  # return Data
   return(Data)
 
-}
-
-
-
-#' StatusCorrectionByTree
-#'
-#' @description Detect errors or detect errors and correct the tree life status
-#'   evolution over the censuses.
-#'   Inspired by the code of Nino Page package (ForestData::correct_alive() and
-#'   .correct_alive_tree())
-#'
-#' @param DataTree A dataset corresponding to a single tree's (1 IdTree/IdStem)
-#'   measurements (data.frame or data.table)
-#'   The *LifeStatus* column must be coded as:
-#'     - TRUE = alive,
-#'     - FALSE = dead,
-#'     - NA = unseen
-#'
-#' @param PlotCensuses Census years for the plot in which the tree is (numeric
-#'   or integer)
-#'
-#' @param InvariantColumns Vector with the names of the columns that are
-#'   supposed to have always the same value for each measurement of the same
-#'   tree (character). It is recommended to use the columns that have already
-#'   been **corrected**, such as the columns containing the corrected botanical
-#'   information.
-#'
-#' @param DeathConfirmation Number of times (censuses) needed for an unseen tree
-#'   to be considered dead (numeric)
-#'
-#' @param UseSize Use the size presence as a witness of the living status of the
-#'   tree (logical)
-#'
-#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses
-#'   between 2 'Alive', FALSE: does not add any rows (logical)
-#'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (logical)
-#'
-#' @param RemoveRBeforeAlive Do you want to delete the rows about the tree
-#'   before it was seen alive for the 1st time? (logical)
-#'
-#' @param RemoveRAfterDeath After correction do you want to delete the rows
-#'   concerning the tree after its death? (logical)
-#'
-#' @details
-#' - if UseSize : if Diameter != NA -> Alive
-#' - *Dead* > Alive -> NA
-#' - add rows for the forgotten censuses between 2 'Alive' if chosen
-#' - Alive > *Dead*/*NA* > Alive -> Alive
-#' - Alive > *NA* > Dead -> NA
-#' - Alive > *Dead* > NA -> Dead
-#'
-#' - Alive > *NA* > *NA*:
-#'   if DeathConfirmation > unseens -> NA
-#'   if DeathConfirmation =< unseens -> Dead
-#'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add a *LifeStatusCor* column with the corrected tree
-#'   life status.
-#'
-#' @importFrom stats na.omit
-#' @importFrom data.table data.table rbindlist
-#'
-#' @export
-#'
-#' @examples
-#' library(data.table)
-#' data(TestData)
-#' Data <- TestData
-#'
-#'# Wanted seq: Dead > Alive > NA > Dead > Alive > NA > NA > Dead > NA
-#'
-#' DataTree <- Data[IdTree == "101623"]
-#'
-#' AddR <- DataTree[2:5] # the rows to copy
-#' AddR[, Year := c(2012:2015)] # the rows to add
-#'
-#' DataTree <- rbindlist(list(DataTree, AddR)) # add rows
-#'
-#' DataTree <- DataTree[order(Year)] # arrange years in ascending order
-#'
-#' # Write the sequence
-#' DataTree[, LifeStatus := c(FALSE, TRUE, NA, FALSE, TRUE, NA, NA, FALSE, NA)]
-#'
-#' Rslt <- StatusCorrectionByTree(DataTree, PlotCensuses = c(2011:2021),
-#'                                InvariantColumns = c("Site",
-#'                                                     "Genus",
-#'                                                     "Species",
-#'                                                     "Family",
-#'                                                     "ScientificName"))
-#' setnames(Rslt, "LifeStatusCor", "LifeStatus_TreeDataCor", skip_absent=TRUE)
-#' LifeStatusCorrectionPlot(Rslt)
-#'
-StatusCorrectionByTree <- function(
-    DataTree,
-    PlotCensuses,
-    InvariantColumns = c("Site",
-                         "GenusCor",
-                         "SpeciesCor",
-                         "FamilyCor",
-                         "ScientificNameCor"),
-    DeathConfirmation = 2,
-    UseSize = FALSE,
-    AddRowsForForgottenCensuses = TRUE,
-    DetectOnly = FALSE,
-
-    RemoveRBeforeAlive = FALSE,
-    RemoveRAfterDeath = FALSE
-){
-
-  #### Arguments check ####
-  # DataTree
-  if (!inherits(DataTree, c("data.table", "data.frame")))
-    stop("DataTree must be a data.frame or data.table")
-
-  # IdStem or IdTree? ---------------------------------------------------------------------------------------
-  # If no IdStem take IdTree
-  if((!"IdStem" %in% names(DataTree) | all(is.na(DataTree$IdStem))) &
-     ("IdTree" %in% names(DataTree) & any(!is.na(DataTree$IdTree))) ){ ID <- "IdTree"
-
-  }else{ ID <- "IdStem"}
-
-  if(!any(c("IdStem", "IdTree") %in% names(DataTree)) | (all(is.na(DataTree$IdStem)) &  all(is.na(DataTree$IdTree))) )
-    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
-  # ---------------------------------------------------------------------------------------------------------
-
-
-  # PlotCensuses
-  if (!inherits(PlotCensuses, c("numeric", "integer")))
-    stop("'PlotCensuses' argument must be numeric or integer")
-
-  if(DetectOnly %in% FALSE){
-    # InvariantColumns
-    if (!inherits(InvariantColumns, "character"))
-      stop("'InvariantColumns' argument must be of character class")
-  }
-
-  # DeathConfirmation
-  if (!inherits(DeathConfirmation, "numeric"))
-    stop("'DeathConfirmation' argument must be numeric")
-
-  # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
-  if(!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
-                        inherits, "logical"))))
-    stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
-         of the 'StatusCorrectionByTree' function must be logicals")
-
-  # if there are several IDs
-  if(length(unique(DataTree[,get(ID)])) != 1){
-    stop("DataTree must correspond to only 1 same tree so 1 same ",ID,"
-    (the ",ID,": " ,paste0(unique(DataTree[,get(ID)]), collapse = "/"),")")
-  }
-
-  # if there are several plots for the same ID
-  if(length(as.vector(na.omit(unique(DataTree$Plot)))) != 1){
-    stop(paste0("Tree ",unique(DataTree[,get(ID)])," has multiple plots: " ,paste0(unique(DataTree$Plot), collapse = "/")))
-  }
-
-  if(DetectOnly %in% FALSE){
-    # Check if the InvariantColumns name exists in DataTree
-    for(c in InvariantColumns){
-      if(!c %in% names(DataTree)){
-        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                   ,c,"is apparently not a dataset's column"))
-      }
-    }
-  }
-
-  # UseSize-Diameter column
-  if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
-    if(!"Diameter" %in% names(DataTree)){
-      stop("If you wish to use the size presence (UseSize=TRUE) as a witness of the living status of the tree,
-           the 'Diameter' column must be present in the dataset")
-    }
-  }
-
-
-  #### Function ####
-
-  # print(unique(DataTree[, get(ID)])) # to debug
-
-  # data.frame to data.table
-  setDT(DataTree)
-
-  # Arrange year in ascending order
-  DataTree <- DataTree[order(Year)] # order de dt
-
-  if(DetectOnly %in% FALSE){
-    DataTree[, LifeStatusCor := LifeStatus] # we will work on a new col and keep the original col intact
-  }
-
-  #### Use the size presence as a witness of the living status of the tree ####
-  if(UseSize){
-
-    DataTree <- GenerateComment(DataTree,
-                                condition = !is.na(DataTree[, Diameter]) &
-                                  !DataTree[,LifeStatus] %in% TRUE,
-                                comment = "A measured tree is a living tree")
-
-
-    if(DetectOnly %in% FALSE){
-      DataTree[!is.na(Diameter), LifeStatusCor := TRUE]
-    }
-
-  }
-
-  #### Sequence analyse ####
-  # if tree has ever been recorded alive
-  if(any(DataTree$LifeStatusCor %in% TRUE)){
-    # The first Alive record year
-    FirstAliveYear <- min(DataTree[LifeStatusCor %in% TRUE, Year], na.rm = TRUE)
-  }
-
-  if(AddRowsForForgottenCensuses == TRUE){
-
-    #### Absents (logical vector of the PlotCensuses length) #### En DetectOnly, je renvoie qqchose ? quoi ? ####
-
-    PlotCensuses <- sort(PlotCensuses) # increasing order
-
-    if(any(DataTree$LifeStatusCor %in% TRUE)){
-
-      # if tree has ever been recorded dead
-      if(any(DataTree$LifeStatusCor %in% FALSE)){
-        # The last time where the tree has been recorded dead (in case there are several)
-        LastDeathRecord <- max(DataTree[LifeStatusCor %in% FALSE, Year], na.rm = TRUE)
-
-        After <- which(DataTree$Year > LastDeathRecord) # After the last death record
-
-        # If there is any "Alive" report after last reported death
-        if(any(DataTree$LifeStatusCor[After] %in% TRUE)) {
-          # Absents are the absent record years among the plot censuses from the 1st alive record
-          Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$Year)
-
-        }else{
-          # Absents are the absent record years between first alive record and the last death record
-          Absents <- (PlotCensuses > FirstAliveYear &
-                        PlotCensuses < LastDeathRecord & # death = the end
-                        !PlotCensuses %in% DataTree$Year)
-        }
-
-      }else{ # if tree has not been reported dead yet
-
-        # Absents are the absent record years among the plot censuses from the 1st alive record
-        Absents <- (PlotCensuses > FirstAliveYear & !PlotCensuses %in% DataTree$Year)
-
-      }
-
-      # if no one alive
-    }else{
-
-      # La j'ai choisi de ne rajouter les lignes absentes qu'entre le census min et max de l'arbre
-      # Si tout est FALSE effectivement ça ne sert à rien de rajouter des lignes apres, mais des lignes avant ? il risque d'en avoir beaucoup, et on ne pourra mettre qu'NA
-      # Pour tout est NA, ça aurait un intéret de rajouter des lignes avant-après ?
-      Absents <- (PlotCensuses > min(DataTree$Year, na.rm = TRUE) & # entre les bornes, pas avnt pas après
-                    PlotCensuses < max(DataTree$Year, na.rm = TRUE) &
-                    !PlotCensuses %in% DataTree$Year)
-
-    }
-
-    # En DetectOnly, je renvoie qqchose ? quoi ? ########
-
-    #### Creating rows for absents ####
-    if(DetectOnly %in% FALSE){
-
-      Nabs <- sum(Absents) # absent is a logical vector giving the census times for which trees were not seen.
-
-      if(Nabs > 0){ # if there are absents
-        # if(DataTree$Plot[1] == 1) print(DataTree$Plot[1])
-        NewRow <- data.table(ID = unique(DataTree[,get(ID)]),     # the ID
-                             LifeStatus = NA,                    # not seen
-                             LifeStatusCor = NA,               # no corrected status for now
-                             Plot = unique(DataTree$Plot),  # the unique plot in DataTree
-                             Subplot = unique(DataTree$Subplot),  # the unique subplot in DataTree
-                             stringsAsFactors =  FALSE)      # do not convert characters into factors
-
-        setnames(NewRow, "ID", ID, skip_absent=TRUE)
-
-        if(length(InvariantColumns) > 0){ # if there are invariant columns
-
-          NewRow[,(InvariantColumns) := NA] # empty the invariant columns for the added rows
-
-          # Fill in the invariant columns in the added rows
-          NewRow <- FillinInvariantColumns(NewRow = NewRow,
-                                           InvariantColumns = InvariantColumns,
-                                           DataTree = DataTree,
-                                           IdTree = unique(DataTree[,get(ID)]))
-        }
-
-        # Multiply this new row the number of times as well as the number of absents
-        NewRows <- do.call("rbind", replicate(n = Nabs, NewRow, simplify = FALSE))
-        NewRows[, Year := PlotCensuses[Absents]]
-
-        # Add these rows in the dataset
-        DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
-
-        DataTree <- DataTree[order(Year)] # order by time
-
-      } # end: Nabsents > 0
-    }
-
-  } # end AddRowsForForgottenCensuses
-
-  #### Alive > *Alive* > Alive ####
-  if(any(DataTree$LifeStatusCor %in% TRUE)){
-
-    # First/last alive positions (rows id)
-    FirstAlive <- which(DataTree$LifeStatusCor %in% TRUE)[1] # the 1st seen alive
-    LastAlive <-  max(which(DataTree$LifeStatusCor %in% TRUE)) # the last seen alive
-
-
-    DataTree <- GenerateComment(DataTree,
-                                condition = seq.int(nrow(DataTree)) %in% (FirstAlive:LastAlive) &
-                                  !DataTree[, LifeStatusCor] %in% TRUE,
-                                comment = "Between 2 alive occurrences of the tree, the tree was alive")
-
-    if(DetectOnly %in% FALSE){
-      DataTree[FirstAlive:LastAlive, LifeStatusCor := TRUE] # so all between is alive
-    }
-  }
-
-  #### Enough/not enough occurrences of death to validate it ####
-  # If there are things after the last occurrence of life
-  # if(any(DataTree$LifeStatusCor %in% NA)){
-  if(any(DataTree$LifeStatusCor %in% TRUE)){
-
-
-    # If there are things after the last occurrence of life
-    if(LastAlive != nrow(DataTree)){ # if the last seen alive is not the last row of the database
-
-      #### if the one after the last one seen alive is Dead and it's not the last row ####
-      if((DataTree[LastAlive +1, LifeStatusCor] %in% FALSE) & (LastAlive +1 != nrow(DataTree))){
-        if(DetectOnly %in% FALSE){
-
-          # Remove rows after the death (after correction) (User choice)
-          if(RemoveRAfterDeath %in% TRUE)
-            DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
-
-        }
-      }
-      #### if the one after the last one seen alive is Unseen ####
-      else if(DataTree[LastAlive +1, LifeStatusCor] %in% NA){
-
-        ##### If there is still a "death" occurrence #####
-        if(any(DataTree$LifeStatusCor %in% FALSE)){
-
-          LastDeath <- max(which(DataTree$LifeStatusCor %in% FALSE))
-
-          ###### If the death is not the last record ######
-          if(LastDeath < nrow(DataTree)){
-            unseen <- sum(DataTree[(LastAlive +1):(LastDeath-1), LifeStatusCor] %in% NA) # NA until the death (logicals vector)
-
-          }else{
-            unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
-          }
-          ##### No death record #####
-        }else{
-          unseen <- sum(DataTree[(LastAlive +1):nrow(DataTree), LifeStatusCor] %in% NA) # NA until the dataset end (logicals vector)
-        }
-
-        if(DeathConfirmation <= unseen){
-
-          # The comment
-          DataTree <- GenerateComment(
-            DataTree,
-            condition = seq.int(nrow(DataTree)) %in% ((LastAlive +1):(LastAlive +unseen)) &
-              DataTree[, LifeStatusCor] %in% NA,
-            comment = paste("When the tree is unseen a number of times >=", DeathConfirmation, ", it is considered dead"))
-
-          if(DetectOnly %in% FALSE){
-
-            # The correction
-            DataTree[(LastAlive +1):(LastAlive +unseen), LifeStatusCor := FALSE] # Death validated
-
-            # Remove rows after the death (after correction) (User choice)
-            if(RemoveRAfterDeath %in% TRUE)
-              DataTree <- DataTree[-((LastAlive +2):nrow(DataTree)),]
-
-          } # correction end
-
-        } # else if(DeathConfirmation > unseen) NAs remain NAs
-
-      }
-    } # If there nothing after the last occurrence of life
-  } # if there is any alive
-  # } # any NA ?
-
-
-  #### Before the first alive ####
-  if(any(DataTree$LifeStatusCor %in% TRUE)){
-
-    if(FirstAlive > 1){ # if the first seen alive is not the first row -> NA/dead
-
-      # The comment
-      DataTree <- GenerateComment(DataTree,
-                                  condition = seq.int(nrow(DataTree)) %in% (1:(FirstAlive -1)) &
-                                    DataTree[, LifeStatusCor] %in% NA, # -> unseen
-                                  comment = "Isn't the tree alive?")
-
-      DataTree <- GenerateComment(DataTree,
-                                  condition = seq.int(nrow(DataTree)) %in% (1:(FirstAlive -1)) &
-                                    DataTree[, LifeStatusCor] %in% FALSE, # -> dead
-                                  comment = "Tree cannot be dead before being alive")
-
-
-      if(DetectOnly %in% FALSE){
-
-        # The correction (mettre un ifelse)
-        DataTree[1:(FirstAlive -1), LifeStatusCor := ifelse(LifeStatusCor %in% FALSE, NA, LifeStatusCor)] # Tree cannot be dead before being alive -> NA
-
-        # Remove rows after the death (after correction) (User choice)
-        if(RemoveRBeforeAlive %in% TRUE)
-          DataTree <- DataTree[-(1:(FirstAlive -1)),] # remove from the first to the last row before the first seen alive
-
-      } # correction end
-    }
-  }
-
-  #### After the death ####
-  # If all rows count
-  if(RemoveRAfterDeath %in% FALSE){
-
-    # If there is still a "death" occurrence
-    if(any(DataTree$LifeStatusCor %in% FALSE)){
-
-      LastDeath <- max(which(DataTree$LifeStatusCor %in% FALSE))
-
-      # If the death is not the last record
-      if(LastDeath < nrow(DataTree)){
-
-        # The comment
-        DataTree <- GenerateComment(DataTree,
-                                    condition = seq.int(nrow(DataTree)) %in% ((LastDeath +1):nrow(DataTree)) &
-                                      DataTree[, LifeStatusCor] %in% NA,
-                                    comment = "After its death the tree is still dead")
-
-        if(DetectOnly %in% FALSE){
-
-          # The correction
-          DataTree[(LastDeath +1):nrow(DataTree), LifeStatusCor := FALSE] # After death there is only death
-
-        } # correction end
-      } # the death isn't the last record
-    } # there is still a death
-  } # we want all the deaths!
-
-
-  #### Dead > *Dead* > Dead ####
-
-  if(any(DataTree$LifeStatusCor %in% FALSE)){
-
-    FirstDead <- which(DataTree$LifeStatusCor %in% FALSE)[1] # the 1st seen dead
-    LastDead <-  max(which(DataTree$LifeStatusCor %in% FALSE)) # the last seen dead
-
-    DataTree <- GenerateComment(DataTree,
-                                condition = seq.int(nrow(DataTree)) %in% (FirstDead:LastDead) &
-                                  !DataTree[, LifeStatusCor] %in% FALSE,
-                                comment = "Between 2 dead occurrences of the tree, it is dead")
-
-    if(DetectOnly %in% FALSE){
-      DataTree[FirstDead:LastDead, LifeStatusCor := FALSE] # so all between is dead
-    }
-  }
-
-  return(DataTree)
-
-}
-
-
-#' FillinInvariantColumns
-#'
-#' @description Fill the invariant columns in NewRow with their (unique) value
-#'
-#' @param NewRow The dataset to fill (data.table)
-#'
-#' @param InvariantColumns Vector with the names of the columns that are
-#'   supposed to have always the same value for each measurement of the same
-#'   tree (character)
-#'
-#' @param DataTree A dataset corresponding to a single tree/stem (1
-#'   IdTree/IdStem) measurements, with the invariant columns and their value
-#'   (data.table)
-#'
-#' @param IdTree (character)
-#'
-#' @return The *NewRow* dataset with the invariant columns filled with their
-#'   (unique) value
-#' @export
-#'
-FillinInvariantColumns <- function(NewRow, InvariantColumns, DataTree, IdTree){
-
-  #### Arguments check ####
-  # NewRow
-  if (!inherits(NewRow, "data.table"))
-    stop("'NewRow' argument of the 'FillinInvariantColumns' function must be a data.table")
-
-  # DataTree
-  if (!inherits(DataTree, "data.table"))
-    stop("DataTree must be a data.table")
-
-  # Check if the InvariantColumns name exists in DataTree
-  for(c in InvariantColumns){
-    if(!c %in% names(DataTree)){
-      stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                 ,c,"is apparently not a dataset's column"))
-    }
-  }
-
-  # IdTree
-  if (!inherits(IdTree, "character"))
-    stop("'IdTree' argument must be of character class")
-
-
-  #### Function ####
-
-  # j = "ScientificNameCor"
-  for(j in InvariantColumns){
-
-    if(any(is.na(NewRow[,get(j)]))){ # if the column is empty in the new rows (the "absent" trees)
-
-      uni <- unique(DataTree[, get(j)])
-
-      if(length(uni) > 1){ # if the "invariant column is not invariant
-        stop("The variable ",
-             j,
-             " that you defined as a non-varying column -i.e. supposed to have always the same value for each measurement of the same tree- has multiple values for tree/stem '",
-             IdTree,
-             "' and takes the values ",
-             uni)
-        # }
-        # else if(is.na(uni) | length(uni) == 0){ # no value in the invariant column
-        #   stop("The variable ",j," has no value for individual '",IdTree,"'")
-      }
-      else if(!is.na(uni) | length(uni) != 0){
-        NewRow[is.na(get(j)), (j) := uni] # fill the invariant column in NewRow with their (unique) value
-      }
-    }
-  }
-
-  return(NewRow)
 }
 
