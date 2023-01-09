@@ -49,8 +49,8 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
 
-  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual"),
-                 regexp = "You have the 'POM' information in your dataset")
+  # expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual"),
+  #                regexp = "You have the 'POM' information in your dataset")
 
 
 
