@@ -91,7 +91,7 @@ UniqueMeasurement <- function(
 
     } # end "MaxDate"
 
-    if(any(duplicated(NowUniqueData[, ..ByCols]))) stop(paste0("There are still several measurements per census despite the choice of ", paste(KeepMeas, collapse = " and "), ".", ifelse(length(KeepMeas) <2, paste("you may want to try to add 'KeepMeas=", setdiff(formals(sys.function(sysP <- sys.parent()))$KeepMeas, KeepMeas), "'"), "")))
+    if(any(duplicated(NowUniqueData[, ..ByCols]))) stop(paste0("There are still several measurements per census despite the choice of ", paste(KeepMeas, collapse = " and "), ".", ifelse(length(KeepMeas) <2, paste("you may want to try to add 'KeepMeas=", setdiff(eval(formals(sys.function(sysP <- sys.parent()))$KeepMeas), KeepMeas), "'"), "")))
 
 
     Data <-  rbind(UniqueData, NowUniqueData)
