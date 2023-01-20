@@ -1,6 +1,6 @@
 Order,Group,GroupSecondColumn,ItemType,Argument,Default,AppDefaultProfile,ItemID,Label,helpText,if_X1_is_none,if_X2_is_none,if_X2_isnot_none,argValue,Options,Multiple,Activate,RequiredColumn,SaveCopy,DataType,Unit,EvalUnit,Description
 1,Census information,NA,pickerInput,choices,none,MinDBH,MinDBH,Minimum DBH, minimum diameter of trees included in your inventory,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,FALSE,FALSE,numeric,cm,TRUE,The minimum diameter of trees included in the inventory
-1,Census information,NA,pickerInput,choices,none,IdCensus,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,FALSE,Census identifier
+1,Census information,NA,pickerInput,choices,none,IdCensus,IdCensus,Census ID,,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,factor,-,FALSE,Census identifier
 1,Census information,NA,pickerInput,choices,none,Year,Year,Year of measurement,"if your Year is decimal, leave as ""none"" and match it to ""Date of measurement""",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,numeric,year,FALSE,Year of measurement
 1,Census information,NA,pickerInput,choices,none,Month,Month,Month of measurement,numeric from 1 to 12,none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,FALSE,Month of measurement
 1,Census information,NA,pickerInput,choices,none,Day,Day,Day of measurement,"numeric from 1 to 31, different than date, see Date",none,none,none,ColumnOptions,list(`live-search` = TRUE),FALSE,TRUE,TRUE,FALSE,character,-,FALSE,Day of measurement
@@ -139,7 +139,6 @@ correction"
 ,NA,NA,,,,,VernName_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE," completed if information available at IdTree
 level."
 ,NA,NA,,,,,LifeStatus_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,logical,,TRUE,corrected stem life status.
-,NA,NA,,,,,TaperDBH_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,numeric,,TRUE,corrected trees diameter at default HOM
 ,NA,NA,,,,,Diameter_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,numeric,,TRUE,corrected trees diameter at default HOM
 ,NA,NA,,,,,DiameterCorrectionMeth,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,"diameter correction methode = ""taper""/""local linear regression""/""weighted mean""
 /phylogenetic hierarchical(""species""/""genus""/""family""/""stand"")/""shift realignment""/""Same value""."
