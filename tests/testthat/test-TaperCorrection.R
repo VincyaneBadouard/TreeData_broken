@@ -1,7 +1,6 @@
 test_that("TaperCorrection", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
-  library(data.table)
   DataTree <- data.table(IdTree = "c",
                          Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
                          Diameter = c(13:16, 16-4, NA, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
@@ -34,16 +33,16 @@ test_that("TaperCorrection", {
 
 
   ## Detect Only --------------------------------------------------------------------------------------------------------------------
-  Rslt <- TaperCorrection(DataTree, DetectOnly = T)
+  Rslt <- TaperCorrection(DataTree, DetectOnly = TRUE)
 
   # No correction, only comments
-  expect_true(all(!c("TaperDBH_TreeDataCor", "DiameterCorrectionMeth") %in% names(Rslt)) & "Comment" %in% names(Rslt))
+  expect_true(all(!c("Diameter_TreeDataCor", "DiameterCorrectionMeth") %in% names(Rslt)) & "Comment" %in% names(Rslt))
   expect_true(all(Rslt$Diameter %in% DataTree$Diameter)) # no change in the original column
 
   ## Correction ---------------------------------------------------------------------------------------------------------------------
   Rslt <- TaperCorrection(DataTree)
 
-  expect_true(all(c("TaperDBH_TreeDataCor", "DiameterCorrectionMeth", "Comment") %in% names(Rslt)))
+  expect_true(all(c("Diameter_TreeDataCor", "DiameterCorrectionMeth", "Comment") %in% names(Rslt)))
 
   # Add a "Comment" and "DiameterCorrectionMeth" value when "Diameter" != "TaperDBH_TreeDataCor"
   Comment <- Rslt[, Comment] != ""
