@@ -112,9 +112,10 @@ TwoValDiameterCor <- function(
     if(length(cresc_abn) != 0) {
 
 
-      DataTree <- GenerateComment(DataTree,
-                                  condition = as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]),
-                                  comment = "Abnormal diameter value")
+      DataTree[as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]), Comment := GenerateComment(Comment, "Abnormal diameter value")]
+      # DataTree <- GenerateComment(DataTree,
+      #                             condition = as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]),
+      #                             comment = "Abnormal diameter value")
 
 
       #### Punctual correction ####
@@ -125,10 +126,11 @@ TwoValDiameterCor <- function(
 
         DBHCor[!is.na(DBHCor)][2] <- DBHCor[!is.na(DBHCor)][1] # trust the 1st value
 
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]),
-                                    comment = "Same value",
-                                    column = "DiameterCorrectionMeth")
+        DataTree[as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]), DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "Same value")]
+        # DataTree <- GenerateComment(DataTree,
+        #                             condition = as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]),
+        #                             comment = "Same value",
+        #                             column = "DiameterCorrectionMeth")
 
       } # end punctual correction
 
