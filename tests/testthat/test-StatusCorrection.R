@@ -1,7 +1,7 @@
 test_that("StatusCorrection", {
 
   # Import data
-  library(data.table)
+  # library(data.table)
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
@@ -30,6 +30,7 @@ test_that("StatusCorrection", {
                                           ScientificName = "ScientificName",
                                           IdCensus= "IdCensus",
                                           Year = "Year",
+                                          YearMan = -999,
                                           Month = "none",
                                           Day = "none",
                                           Date = "none",
