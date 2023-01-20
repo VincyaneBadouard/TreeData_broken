@@ -44,7 +44,7 @@ test_that("TaperCorrection", {
 
   expect_true(all(c("Diameter_TreeDataCor", "DiameterCorrectionMeth", "Comment") %in% names(Rslt)))
 
-  # Add a "Comment" and "DiameterCorrectionMeth" value when "Diameter" != "TaperDBH_TreeDataCor"
+  # Add a "Comment" and "DiameterCorrectionMeth" value when "Diameter" != "Diameter_TreeDataCor"
   Comment <- Rslt[, Comment] != ""
   Methode <- Rslt[, DiameterCorrectionMeth] != ""
 
@@ -59,10 +59,10 @@ test_that("TaperCorrection", {
   expect_true(all(na.omit((Rslt$HOM != 1.3) == Comment)))
 
   # If correction -> methode
-  expect_true(all(!compareNA(Rslt$Diameter, Rslt$TaperDBH_TreeDataCor) == Methode))
+  expect_true(all(!compareNA(Rslt$Diameter, Rslt$Diameter_TreeDataCor) == Methode))
 
   # If initial value is NA, output value is NA too
-  expect_true(all(is.na(Rslt$Diameter) == is.na(Rslt$TaperDBH_TreeDataCor)))
+  expect_true(all(is.na(Rslt$Diameter) == is.na(Rslt$Diameter_TreeDataCor)))
 
   # Check the value of the "DiameterCorrectionMeth" column
   expect_true(all(Rslt$DiameterCorrectionMeth[Methode] == "taper"))
