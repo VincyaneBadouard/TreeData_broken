@@ -61,6 +61,10 @@ GeneralErrorsDetection <- function(
 
   # In data.table
   setDT(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
+
+  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+
 
   # Check duplicate rows ------------------------------------------------------------------------------------
   # if there are duplicate rows, delete them
@@ -83,9 +87,10 @@ GeneralErrorsDetection <- function(
     if (Vars[v] %in% names(Data)){ # If the column exists
       if(!all(is.na(Data[,get(Vars[v])]))){ # if the column is not completely empty
 
-        Data <- GenerateComment(Data,
-                                condition = is.na(Data[,get(Vars[v])]),
-                                comment = paste0("Missing value in ", Vars[v]))
+        Data[is.na(get(Vars[v])), Comment := GenerateComment(Comment, paste0("Missing value in ", Vars[v]))]
+        # Data <- GenerateComment(Data,
+        #                         condition = is.na(Data[,get(Vars[v])]),
+        #                         comment = paste0("Missing value in ", Vars[v]))
 
         # warning(paste0("Missing value in ", Vars[v]))
 
@@ -103,13 +108,14 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data <-
-        GenerateComment(
-          Data,
-          condition = (Data[, get(Vars[v])] == 0) &
-            !is.na(Data[, get(Vars[v])]),
-          comment = paste0(Vars[v], " cannot be 0")
-        )
+      Data[get(Vars[v]), Comment := GenerateComment(Comment, paste0(Vars[v], " cannot be 0"))]
+      # Data <-
+      #   GenerateComment(
+      #     Data,
+      #     condition = (Data[, get(Vars[v])] == 0) &
+      #       !is.na(Data[, get(Vars[v])]),
+      #     comment = paste0(Vars[v], " cannot be 0")
+      #   )
 
       # warning(paste0(Vars[v]," cannot be 0"))
     }
@@ -187,11 +193,13 @@ GeneralErrorsDetection <- function(
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data <-
-        GenerateComment(Data,
-                        condition = (Data[, Site] == s) &
-                          (Data[, IdTree] %in% duplicated_ID),
-                        comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
+      Data[site %in% s, Comment := GenerateComment(Comment, "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")]
+
+      # Data <-
+      #   GenerateComment(Data,
+      #                   condition = (Data[, Site] == s) &
+      #                     (Data[, IdTree] %in% duplicated_ID),
+      #                   comment = "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")
 
       DuplicatedID <- unique(Data[IdTree %in% duplicated_ID,
                                   .(IdTree, Plot, Subplot, TreeFieldNum)])
@@ -219,11 +227,14 @@ GeneralErrorsDetection <- function(
 
     Data[, IDYear := paste(get(ID), Year, sep = "/")] # code to detect
 
-    Data <- GenerateComment(
-      Data,
-      condition = Data$IDYear %in% DuplicatedID[, IDYear],
-      comment = paste0("Duplicated '", ID, "' in the census")
-    )
+
+    Data[IDYear %in% DuplicatedID[, IDYear], Comment := GenerateComment(Comment, paste0("Duplicated '", ID, "' in the census"))]
+
+    # Data <- GenerateComment(
+    #   Data,
+    #   condition = Data$IDYear %in% DuplicatedID[, IDYear],
+    #   comment = paste0("Duplicated '", ID, "' in the census")
+    # )
 
     a <- Data[
       IDYear %in% DuplicatedID[, IDYear],
@@ -271,17 +282,24 @@ GeneralErrorsDetection <- function(
       duplicated_ID <-
         unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data <- GenerateComment(
-        Data,
-        condition =
-          Data[, Site] == s
-        & Data[, get(ID)] %in% duplicated_ID,
-        comment = paste0(
-          "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
-          ID,
-          "'"
-        )
-      )
+      Data[Site %in% s & get(ID) %in% duplicated_ID, Comment := GenerateComment(Comment, paste0(
+        "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
+        ID,
+        "'"
+      ))]
+
+
+      # Data <- GenerateComment(
+      #   Data,
+      #   condition =
+      #     Data[, Site] == s
+      #   & Data[, get(ID)] %in% duplicated_ID,
+      #   comment = paste0(
+      #     "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
+      #     ID,
+      #     "'"
+      #   )
+      # )
 
       warning(
         paste0(
