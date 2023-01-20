@@ -9,24 +9,24 @@ UniqueMeasurement(Data, KeepMeas = c("MaxHOM", "MaxDate"), ID = "IdStem")
 \arguments{
 \item{Data}{Dataset (data.table)}
 
-\item{KeepMeas}{In case of \strong{multiple measurements} in the same census year:
+\item{KeepMeas}{In case of \strong{multiple measurements} in the same census:
 Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
 \item "MaxHOM": keep the measurement taken at the \strong{highest HOM/POM}
 \item "MaxDate": keep the \strong{most recent measurement} (same
-year but more recent date)
+census but more recent date)
 }}
 
 \item{ID}{Column name indicating the identifier of the individual (character)}
 }
 \value{
-Dataset (data.table) with 1 measurement (1 row) per Year.
+Dataset (data.table) with 1 measurement (1 row) per IdCensus
 }
 \description{
-Of the repeated measurements of an individual in the same census
-year, keep only the measurements (rows)
+Of the repeated measurements of an individual in the same census,
+keep only the measurements (rows)
 taken at the \strong{highest POM} (\emph{KeepMeas = "MaxHOM"}),
-and/or the \strong{most recent measurement} (same year but more recent date)
+and/or the \strong{most recent measurement} (same census but more recent date)
 (\emph{KeepMeas = "MaxDate"})
 }
 \examples{
@@ -35,7 +35,7 @@ library(data.table)
 
 Data <- data.table( # 7 rows
 IdStem = c(rep("a", 4), rep("b", 2), "c"),
-Year = c(rep(2000, 3), 2001, rep(2000, 3)),
+IdCensus = c(rep(2000, 3), 2001, rep(2000, 3)),
 Date = as.Date(c("2000-01-10", "2000-01-20", "2000-01-30", "2001-01-10",
                  rep("2000-01-10", 3))),
 HOM = c(rep(1, 3), 2, 1, 2, 1)
