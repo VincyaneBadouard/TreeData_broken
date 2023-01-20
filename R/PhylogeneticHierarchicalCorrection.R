@@ -288,10 +288,11 @@ PhylogeneticHierarchicalCorrection <- function(
 
     # Add the column with the correction method  ------------------------------------------------------------------------
 
-    DataTree <- GenerateComment(DataTree,
-                                condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
-                                comment = Method,
-                                column = "DiameterCorrectionMeth")
+    # DataTree[as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1), DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, Method)]
+    # DataTree <- GenerateComment(DataTree,
+    #                             condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
+    #                             comment = Method,
+    #                             column = "DiameterCorrectionMeth")
 
     if(length(DBHCor) > (cresc_abn[rs]+1)){ # if the init shift is not the last diameter value
 
@@ -313,10 +314,16 @@ PhylogeneticHierarchicalCorrection <- function(
 
         # Add the column with the correction method  ------------------------------------------------------------------------
 
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (i)  & !is.na(DBHCor),
-                                    comment = "shift realignment",
-                                    column = "DiameterCorrectionMeth")
+        if(DetectOnly %in% FALSE){
+          if(!"DiameterCorrectionMeth" %in% names(Data)) DataTree[, DiameterCorrectionMeth := ""]
+        }
+
+        DataTree[as.numeric(rownames(DataTree)) %in% (i)  & !is.na(DBHCor),
+                 DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "shift realignment")]
+        # DataTree <- GenerateComment(DataTree,
+        #                             condition = as.numeric(rownames(DataTree)) %in% (i)  & !is.na(DBHCor),
+        #                             comment = "shift realignment",
+        #                             column = "DiameterCorrectionMeth")
 
       } # end i loop
 
