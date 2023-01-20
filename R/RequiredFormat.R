@@ -75,7 +75,8 @@ RequiredFormat <- function(
 
   CharacVar <- x$ItemID[x$DataType %in% "character"]
   NumVar <- x$ItemID[x$DataType %in% "numeric"]
-  LogicVarm <- x$ItemID[x$DataType %in% "logical"]
+  LogicVar <- x$ItemID[x$DataType %in% "logical"]
+  FactorVar <- x$ItemID[x$DataType %in% "factor"]
 
   # standardize column names ####
 
@@ -147,6 +148,12 @@ RequiredFormat <- function(
   Data[, (NumVar) := lapply(.SD, as.character), .SDcols = NumVar] # first as character when the variable is in factor, to preserve information
   suppressWarnings(Data[, (NumVar) := lapply(.SD, as.numeric), .SDcols = NumVar]) # () to say that these are existing columns and not new ones to create
 
+  #### as.factor
+
+  FactorVar <- FactorVar[FactorVar %in% colnames(Data)]
+
+  Data[, (FactorVar) := lapply(.SD, as.factor), .SDcols = FactorVar] # (FactorVar) to say that these are existing columns and not new ones to create
+
   ### as.logical
   ## Here we have to use user input to know what is TRUE and what is not
 
@@ -170,19 +177,29 @@ RequiredFormat <- function(
   # Data[, (LogicVar) := lapply(.SD, as.logical), .SDcols = LogicVar] # () to say that these are existing columns and not new ones to create
 
 
-  ## Date of measurement ####
+  # Deal with Date of measurement before anything else ####
+
+  # add Year if given manually
+  if(input$Year %in% "none" & !input$YearMan %in% -999) {
+    Data[, Year := as.numeric(as.character(input$YearMan))]
+
+    # overwrite input
+    input$Year = "Year"
+  }
 
   # concatenate if in 3 different columns
   if(!input$Month %in% "none" & !input$Day %in% "none" & input$Date %in% "none") {
     if(!input$Year %in% "none") {
       Data[, Date := paste(trimws(Year), trimws(Month), trimws(Day), sep = "-")]
+
+      # overwrite input
+      input$Date = "Date"
+      input$DateFormatMan = "yyyy-mm-dd"
     } else {
-      if(!input$YearMan %in% -999) Data[, Date := paste(input$YearMan, trimws(Month), trimws(Day), sep = "-")] else warning("You did not provide a Year so we can't recreate a date using your Month and Day columns.")
+     warning("You did not provide a Year so we can't recreate a date using your Month and Day columns.")
     }
 
-    # overwrite input
-    input$Date = "Date"
-    input$DateFormatMan = "yyyy-mm-dd"
+
   }
 
   # consider date as June 15th if not Date is given
@@ -195,12 +212,8 @@ RequiredFormat <- function(
       input$Date = "Date"
       input$DateFormatMan = "yyyy-mm-dd"
 
-      } else {
-      if(!input$YearMan %in% -999) Data[, Date := paste0(input$YearMan, "-06-15")]
-        warning("You did not provided a Date of measurement but provided a Year. We consider the date as 15th June of the year so as to prevent NA.")
-        # overwrite input
-        input$Date = "Date"
-        input$DateFormatMan = "yyyy-mm-dd"
+    } else {
+      warning("You did not provide a Year so we can't recreate a date.")
     }
 
   }
@@ -244,7 +257,7 @@ RequiredFormat <- function(
   # make input complete ####
 
   ## enter all itemID in input as "none" so we can refer to them - make sure this happens after standardizing column names otherwise that won't work...
-  input[setdiff(x$ItemID, names(input))] <- "none"
+  input[setdiff(x$ItemID, names(input))] <- x$Default[match(setdiff(x$ItemID, names(input)), x$ItemID)]
 
 
 
@@ -252,7 +265,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else if(!input$YearMan %in% -999) Data[, Year := input$YearMan] else warning("You did not provide Date nor Year")
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else warning("You did not provide Date nor Year")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
@@ -274,11 +287,17 @@ RequiredFormat <- function(
 
   ## IdCensus
 
+  ### if Date, use that to order the IdCensus
+  if(!input$IdCensus %in% "none") {
+    if(!input$Date %in% "none") Data[, IdCensus := factor(IdCensus, levels = unique(IdCensus)[order(Date)], ordered = T)]
+  }
+
+  ### if not IdCensus, use Year instead
   if(input$IdCensus %in% "none") {
 
     warning("You did not provide a Census ID column. We will use year as census ID")
 
-    Data$IdCensus <- as.character(Data$Year)
+    Data$IdCensus <- factor(Data$Year, ordered = T)
   }
 
   ## Site, Plot, subplot
@@ -432,7 +451,7 @@ RequiredFormat <- function(
     if(input$MinDBHMan %in% -999) {
 
       if(input$MeasLevel %in% c("Tree", "Stem")) {
-        Data[, MinDBH := min(Diameter)]
+        Data[, MinDBH := min(Diameter, na.rm = T)]
         input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
         warning("MinDBH was calculated.")
       } else {
