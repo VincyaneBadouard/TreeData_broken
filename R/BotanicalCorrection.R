@@ -131,6 +131,7 @@ BotanicalCorrection <- function(
   #### Function ####
 
   setDT(Data) # data.frame to data.table
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
   Data[, IdTree := as.character(IdTree)]
 

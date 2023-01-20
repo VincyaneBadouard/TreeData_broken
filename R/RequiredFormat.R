@@ -530,7 +530,7 @@ RequiredFormat <- function(
   }
 
   setDT(Data)
-  Data <- copy(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
   # # Units changing ####
   #
   # unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")

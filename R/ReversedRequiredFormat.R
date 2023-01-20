@@ -154,7 +154,7 @@ ReversedRequiredFormat <- function(
   }
 
   setDT(Data)
-  Data <- copy(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
   # recalculate Circ if needed
   if(!input$Circ %in% "none") Data[, Circ := round(Diameter*pi, 2)]
@@ -389,6 +389,7 @@ ReversedRequiredFormat <- function(
 
 
   setDT(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
 
   # return output ####
