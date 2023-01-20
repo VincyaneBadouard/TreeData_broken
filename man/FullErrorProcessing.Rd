@@ -9,8 +9,6 @@ FullErrorProcessing(
   DetectOnly = FALSE,
   Source = NULL,
   WFOData = NULL,
-  InvariantColumns = c("Site", "Genus_TreeDataCor", "Species_TreeDataCor",
-    "Family_TreeDataCor", "ScientificName_TreeDataCor"),
   DeathConfirmation = 2,
   UseSize = FALSE,
   RemoveRBeforeAlive = FALSE,
@@ -21,7 +19,6 @@ FullErrorProcessing(
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
     DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
   KeepMeas = c("MaxHOM", "MaxDate"),
-  MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
@@ -105,9 +102,6 @@ Possible values: "MaxHOM", "MaxDate" (character).
 \item "MaxDate": apply the correction to the \strong{most recent measurement} (same
 year but more recent date)
 }}
-
-\item{MaxDBH}{Maximum possible DBH (Diameter at the default HOM) of your
-stand in cm (numeric, 1 value)}
 
 \item{PositiveGrowthThreshold}{in cm/year: a tree
 widening by more than this value is considered abnormal (numeric, 1 value)}

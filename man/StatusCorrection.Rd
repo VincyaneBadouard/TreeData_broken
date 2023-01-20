@@ -78,12 +78,7 @@ TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
 TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 
 
-Rslt <- StatusCorrection(TestData[IdTree \%in\% selection],
-                         InvariantColumns = c("Site",
-                                              "Genus",
-                                              "Species",
-                                              "Family",
-                                              "ScientificName"))
+Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
 
 
 LifeStatusCorrectionPlot(Rslt)

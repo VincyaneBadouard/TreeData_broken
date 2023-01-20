@@ -66,12 +66,7 @@
 #' TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 #'
 #'
-#' Rslt <- StatusCorrection(TestData[IdTree %in% selection],
-#'                          InvariantColumns = c("Site",
-#'                                               "Genus",
-#'                                               "Species",
-#'                                               "Family",
-#'                                               "ScientificName"))
+#' Rslt <- StatusCorrection(TestData[IdTree %in% selection])
 #'
 #'
 #' LifeStatusCorrectionPlot(Rslt)
@@ -147,6 +142,7 @@ StatusCorrection <- function(
 
   # data.frame to data.table
   setDT(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
   # Data[, (ID) := as.character(get(ID))]
 

@@ -47,11 +47,7 @@ FullErrorProcessing <- function(
   WFOData = NULL,
 
   # Life status
-  InvariantColumns = c("Site",
-                       "Genus_TreeDataCor",
-                       "Species_TreeDataCor",
-                       "Family_TreeDataCor",
-                       "ScientificName_TreeDataCor"),
+
   DeathConfirmation = 2,
   UseSize = FALSE,
   RemoveRBeforeAlive = FALSE,
@@ -67,7 +63,7 @@ FullErrorProcessing <- function(
 
   ## other diameter corrections
   KeepMeas = c("MaxHOM", "MaxDate"),
-  MaxDBH = 500,
+  # MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
 
@@ -113,8 +109,8 @@ FullErrorProcessing <- function(
   }
 
   # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  # if (!inherits(InvariantColumns, "character"))
+  #   stop("'InvariantColumns' argument must be of character class")
 
   # DeathConfirmation
   if (!inherits(DeathConfirmation, "numeric"))
@@ -207,7 +203,7 @@ FullErrorProcessing <- function(
   #### Life status ####
 
   Data <- StatusCorrection(Data,
-                           InvariantColumns = InvariantColumns,
+                           # InvariantColumns = InvariantColumns,
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
                            DetectOnly = DetectOnly,
