@@ -64,20 +64,18 @@ UniqueMeasurement <- function(
 
 
       # POM or HOM? ---------------------------------------------------------------------------------------------------
-      # If no POM take HOM
-      if((!"POM" %in% names(Data) | all(is.na(Data$POM))) &
-         ("HOM" %in% names(Data) & any(!is.na(Data$HOM))) ){ POMv <- "HOM"
+      # If no HOM take POM
+      if((!"HOM" %in% names(Data) | all(is.na(Data$HOM))) &
+         ("POM" %in% names(Data) & any(!is.na(Data$POM))) ){ POMv <- "POM"
 
-      }else{ POMv <- "POM"}
+      }else{ POMv <- "HOM"}
 
       if(!any(c("POM", "HOM") %in% names(Data)) | (all(is.na(Data$POM)) &  all(is.na(Data$HOM))) )
         message("You have chosen to make corrections to the measurements taken at the highest POM,
         but 'POM' and HOM' columns are empty for ", IdStem,".
              The 'MaxHOM' criterion can therefore not be taken into account.")
 
-      NowUniqueData <- DuplicatedRows[, .SD[get(POMv) == max(get(POMv))], by = ByCols] # keep only the row with max HOM
-
-      if(any(duplicated(NowUniqueData[, list(get(ID), IdCensus)]))) DuplicatedRows <- NowUniqueData # if there are still duplicates
+      DuplicatedRows <- DuplicatedRows[, .SD[get(POMv) == max(get(POMv))], by = ByCols] # keep only the row with max HOM
 
 
     } # end "MaxHOM"
@@ -87,14 +85,14 @@ UniqueMeasurement <- function(
 
     if("MaxDate" %in% KeepMeas & nrow(DuplicatedRows) > 1){
 
-      NowUniqueData <- DuplicatedRows[, .SD[ Date == max(Date)],  by = ByCols] # keep only the row with max HOM
+      DuplicatedRows <- DuplicatedRows[, .SD[ Date == max(Date)],  by = ByCols] # keep only the row with max HOM
 
     } # end "MaxDate"
 
-    if(any(duplicated(NowUniqueData[, ..ByCols]))) stop(paste0("There are still several measurements per census despite the choice of ", paste(KeepMeas, collapse = " and "), ".", ifelse(length(KeepMeas) <2, paste("you may want to try to add 'KeepMeas=", setdiff(eval(formals(sys.function(sysP <- sys.parent()))$KeepMeas), KeepMeas), "'"), "")))
+    if(any(duplicated(DuplicatedRows[, ..ByCols]))) stop(paste0("There are still several measurements per census despite the choice of ", paste(KeepMeas, collapse = " and "), ".", ifelse(length(KeepMeas) <2, paste("you may want to try to add 'KeepMeas=", setdiff(eval(formals(sys.function(sysP <- sys.parent()))$KeepMeas), KeepMeas), "'"), "")))
 
 
-    Data <-  rbind(UniqueData, NowUniqueData)
+    Data <-  rbind(UniqueData, DuplicatedRows)
 
   } # end if duplicated
 
