@@ -193,7 +193,7 @@ GeneralErrorsDetection <- function(
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data[site %in% s, Comment := GenerateComment(Comment, "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")]
+      Data[Site %in% s, Comment := GenerateComment(Comment, "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")]
 
       # Data <-
       #   GenerateComment(Data,
