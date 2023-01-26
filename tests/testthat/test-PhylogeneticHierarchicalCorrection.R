@@ -1,7 +1,7 @@
 test_that("PhylogeneticHierarchicalCorrection", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
-  library(data.table)
+  suppressWarnings(library(data.table))
   data(TestData)
   DataTree <- TestData[IdStem %in% "100621_1_auto"]
 
