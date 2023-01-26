@@ -132,7 +132,7 @@ TaperCorrection <- function(
 
     # if there is a POM column, also bring that to the first value so no risk to readjust that again
 
-    if("POM" %in% names(Data))  Data[, POM_TreeDataCor := .SD[1, POM], by = IdStem]
+    if("POM" %in% names(Data))  Data[, POM_TreeDataCor := .SD[1, POM], by = get(ID)]
 
 
   }
