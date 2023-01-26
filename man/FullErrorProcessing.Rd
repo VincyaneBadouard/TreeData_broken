@@ -122,7 +122,7 @@ widens by more than this value is considered abnormal (numeric, 1 value)}
 (character)
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
-Diameter values from it.
+Diameter values from it. (Ignored if taper correction is applied)
 \item "punctual": detect if the error is punctual and correct it by
 interpolation.
 \item "shift": detect if there is a shift of several Diameter values and
