@@ -149,7 +149,7 @@ FullErrorProcessing <- function(
     stop("The 'Diameter' column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
-  if(!all(unlist(lapply(list(DefaultHOM, MaxDBH,
+  if(!all(unlist(lapply(list(DefaultHOM, # MaxDBH,
                              PositiveGrowthThreshold, NegativeGrowthThreshold, PioneersGrowthThreshold,
                              DBHRange, MinIndividualNbr),
                         length)) %in% 1) |
@@ -232,7 +232,7 @@ FullErrorProcessing <- function(
                                KeepMeas = KeepMeas,
 
                                DefaultHOM = DefaultHOM,
-                               MaxDBH = MaxDBH,
+                               # MaxDBH = MaxDBH,
                                PositiveGrowthThreshold = PositiveGrowthThreshold,
                                NegativeGrowthThreshold = NegativeGrowthThreshold,
 
