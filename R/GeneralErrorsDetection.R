@@ -108,7 +108,7 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data[get(Vars[v]), Comment := GenerateComment(Comment, paste0(Vars[v], " cannot be 0"))]
+      Data[(Data[, get(Vars[v])] == 0) & !is.na(Data[, get(Vars[v])]), Comment := GenerateComment(Comment, paste0(Vars[v], " cannot be 0"))]
       # Data <-
       #   GenerateComment(
       #     Data,
