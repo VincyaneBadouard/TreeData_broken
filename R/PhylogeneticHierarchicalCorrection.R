@@ -134,6 +134,9 @@ PhylogeneticHierarchicalCorrection <- function(
     stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
   # ---------------------------------------------------------------------------------------------------------
 
+  # if(DetectOnly %in% FALSE){
+  if(!"DiameterCorrectionMeth" %in% names(DataTree)) DataTree[, DiameterCorrectionMeth := ""]
+  # }
 
   # Secondary columns
   BotaCol <- c("ScientificName", "Genus", "Family")
@@ -288,7 +291,7 @@ PhylogeneticHierarchicalCorrection <- function(
 
     # Add the column with the correction method  ------------------------------------------------------------------------
 
-    # DataTree[as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1), DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, Method)]
+    DataTree[as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1), DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, Method)]
     # DataTree <- GenerateComment(DataTree,
     #                             condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
     #                             comment = Method,
@@ -314,9 +317,7 @@ PhylogeneticHierarchicalCorrection <- function(
 
         # Add the column with the correction method  ------------------------------------------------------------------------
 
-        if(DetectOnly %in% FALSE){
-          if(!"DiameterCorrectionMeth" %in% names(Data)) DataTree[, DiameterCorrectionMeth := ""]
-        }
+
 
         DataTree[as.numeric(rownames(DataTree)) %in% (i)  & !is.na(DBHCor),
                  DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "shift realignment")]
