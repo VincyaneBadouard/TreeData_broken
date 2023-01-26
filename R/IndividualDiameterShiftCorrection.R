@@ -44,7 +44,7 @@
 #' @export
 #'
 #' @examples
-#' DBHCor = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2)
+#' DBHCor = c(13, 13.5, 14.3, 15.8, 16-4, (17.1-4)+2, (18.1-4)+3, 15-4, (15.5-4)+2)
 #' Time = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020)
 #' plot(Time, DBHCor)
 #' cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
@@ -72,7 +72,7 @@
 #'   labs(x = "Year", y = "Diameter (cm)")
 #'
 IndividualDiameterShiftCorrection <- function(
-  DataTree = NULL, # to comment
+  # DataTree = NULL, # to comment
   DBHCor,
   Time,
   cresc,
@@ -110,54 +110,21 @@ IndividualDiameterShiftCorrection <- function(
 
     crescMean <- weighted.mean(cresc_ok, Weights)
 
-    # Apply the weighted mean to correct the abnormal DBH
+    # Apply the weighted mean to correct the abnormal DBH (keeping track of old and new value to be able to add the difference to next values)
+
+    oldDBH <- DBHCor[cresc_abn[rs]+1]
     DBHCor[cresc_abn[rs]+1] <- DBHCor[cresc_abn[rs]] + crescMean*diff(Time)[cresc_abn[rs]]
+    DiameterCorrectionMeth[cresc_abn[rs]+1] <- GenerateComment( DiameterCorrectionMeth[cresc_abn[rs]+1], "weighted mean")
+    newDBH <- DBHCor[cresc_abn[rs]+1]
 
-    # Add the column with the correction method  ------------------------------------------------------------------
+    # apply switch to other values (until next abnormal value if exist, other wise until the end)
+    idx <- ifelse(is.na(cresc_abn[rs+1]), length(DBHCor), cresc_abn[rs+1])
+    DBHCor[(cresc_abn[rs]+2):idx] <-  DBHCor[(cresc_abn[rs]+2):idx] + newDBH - oldDBH
 
-    if(!is.null(DataTree)){
-      DataTree[cresc_abn[rs]+1, DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "weighted mean")]
-      # DataTree <- GenerateComment(DataTree,
-      #                             condition = as.numeric(rownames(DataTree)) %in% (cresc_abn[rs]+1),
-      #                             comment = "weighted mean",
-      #                             column = "DiameterCorrectionMeth")
-    } # end DataTree
-
-
-    ## 2. DBH[shift] ----------------------------------------------------------------------------------------------
-
-    if(cresc_abn[rs]+1 < length(DBHCor)){ # if it's not the last value
-
-      for(i in (cresc_abn[rs]+2): min(cresc_abn[rs+1], length(DBHCor), na.rm = TRUE)){ # i = each value in a shift
-        # DBH[shift] = previous value + their original cresc_abs
-
-        for(p in (i-1):1){ # if previous DBH value is NA, take the takes the one before etc
-
-          if(!is.na(DBHCor[p])){ # when previous value is not NA
-
-            DBHCor[i] <- # the new DBH
-              DBHCor[p] + # Non-NA previous value
-              cresc_abs[i-1] #  cresc_abs was calculated with the non-NA. We take the original cresc_abs
-
-            break # stop the loop
-          }
-        }
-
-        if(!is.null(DataTree)){
-          # Add the column with the correction method  ------------------------------------------------------------------------
-          # DataTree[i, DiameterCorrectionMeth := "shift realignment"]
-
-          DataTree[as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor), ]$DiameterCorrectionMeth <-  GenerateComment(DiameterCorrectionMeth, "shift realignment")
-          # DataTree <- GenerateComment(DataTree,
-          #                             condition = as.numeric(rownames(DataTree)) %in% (i) & !is.na(DBHCor),
-          #                             comment = "shift realignment",
-          #                             column = "DiameterCorrectionMeth")
-
-        } # end DataTree
+    # add method
+    DiameterCorrectionMeth[(cresc_abn[rs]+2):idx] <- GenerateComment( DiameterCorrectionMeth[(cresc_abn[rs]+2):idx], "shift realignment")
 
 
-      } # end i loop
-    } # if it's not the last value
 
   } # end rs loop
 
