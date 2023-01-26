@@ -5,7 +5,6 @@
 \title{Individual Diameter Shift Correction}
 \usage{
 IndividualDiameterShiftCorrection(
-  DataTree = NULL,
   DBHCor,
   Time,
   cresc,
@@ -15,12 +14,6 @@ IndividualDiameterShiftCorrection(
 )
 }
 \arguments{
-\item{DataTree}{A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
-measurements (data.frame or data.table)
-To be filled in if you want the column "DiameterCorrectionMeth" (correction
-method) to be filled in the corresponding row.
-Otherwise leave DataTree = NULL}
-
 \item{DBHCor}{Diameter vector (numeric)}
 
 \item{Time}{Time vector (numeric)}
@@ -34,6 +27,12 @@ values) with NA instead of abnormal values (numeric)}
 \item{cresc_abn}{Abnormal diameter increment positions (numeric)}
 
 \item{coef}{description... (numeric)}
+
+\item{DataTree}{A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
+measurements (data.frame or data.table)
+To be filled in if you want the column "DiameterCorrectionMeth" (correction
+method) to be filled in the corresponding row.
+Otherwise leave DataTree = NULL}
 }
 \value{
 List of 2 objects:
@@ -68,7 +67,7 @@ Each value = the previous value + initial growth
 }
 }
 \examples{
-DBHCor = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2)
+DBHCor = c(13, 13.5, 14.3, 15.8, 16-4, (17.1-4)+2, (18.1-4)+3, 15-4, (15.5-4)+2)
 Time = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020)
 plot(Time, DBHCor)
 cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
