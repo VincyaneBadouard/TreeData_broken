@@ -14,6 +14,29 @@
 #'   - `Genus_TreeDataCor` (character)
 #'   - `Family_TreeDataCor` (character)
 #'
+#' @param UseTaperCorrection (logical) TRUE: transform the tree diameter measured at a given height
+#' into the diameter corresponding to the default measurement height (`DefaultHOM`), using an allometry.
+#'   FALSE: do not apply a taper correction
+#'
+#' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
+#'   (numeric, 1 value)
+#'
+#' @param TaperParameter Taper parameter (unitless) formula (function)
+#' Default: *TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)*
+#' of Cushman et al.2021.
+#' With:
+#'   - *DAB*: Diameter Above Buttress (in cm)
+#'   - *HOM*: Height Of Measurement (in m)
+#'
+#' @param TaperFormula Taper formula (function)
+#' Default: *DAB / (e^(- TaperParameter (HOM - DefaultHOM)))*
+#' of Cushman et al.2021.
+#' With:
+#'   - *DAB*: Diameter Above Buttress (in cm)
+#'   - *HOM*: Height Of Measurement (in m)
+#'   - *DefaultHOM*:  Default Height Of Measurement (in m)
+#'   - *TaperParameter*: Taper parameter (unitless)
+#'
 #' @param KeepMeas In case of **multiple diameter measurements** in the same
 #'   census year:
 #' Possible values: "MaxHOM", "MaxDate" (character).
@@ -22,11 +45,8 @@
 #'   - "MaxDate": apply the correction to the **most recent measurement** (same
 #'                year but more recent date)
 #'
-#' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
-#'   (numeric, 1 value)
-#'
-#' @param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
-#'   stand in cm (numeric, 1 value)
+ # param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
+ # stand in cm (numeric, 1 value)
 #'
 #' @param PositiveGrowthThreshold in cm/year: a tree
 #'   widening by more than this value is considered abnormal (numeric, 1 value)
@@ -46,7 +66,7 @@
 #' @param WhatToCorrect Possible values: "POM change", "punctual", "shift"
 #'   (character)
 #'   - "POM change": detect POM change in the column `POM` and correct the
-#'                   Diameter values from it.
+#'                   Diameter values from it. (Ignored if taper correction is applied)
 #'   - "punctual": detect if the error is punctual and correct it by
 #'                 interpolation.
 #'   - "shift": detect if there is a shift of several Diameter values and
@@ -112,8 +132,11 @@
 #' @export
 #'
 #' @examples
-#' library(data.table)
+#' # library(data.table)
 #' data(TestData)
+#'
+#' TestData$HOM <- 1.3
+#' TestData$HOM[1:3] <- c(0.5,1.5,NA)
 #'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
@@ -126,10 +149,15 @@
 DiameterCorrection <- function(
     Data,
 
+    UseTaperCorrection = TRUE,
+    DefaultHOM = 1.3,
+    TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
+    TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
+
+
     KeepMeas = c("MaxHOM", "MaxDate"),
 
-    DefaultHOM = 1.3,
-    MaxDBH = 500,
+    # MaxDBH = 500,
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
 
@@ -172,7 +200,7 @@ DiameterCorrection <- function(
     stop("The 'Diameter' column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
-  if(!all(unlist(lapply(list(DefaultHOM, MaxDBH,
+  if(!all(unlist(lapply(list(DefaultHOM,
                              PositiveGrowthThreshold, NegativeGrowthThreshold, PioneersGrowthThreshold,
                              DBHRange, MinIndividualNbr),
                         length)) %in% 1) |
@@ -201,10 +229,10 @@ DiameterCorrection <- function(
   if(!inherits(DetectOnly, "logical"))
     stop("The 'DetectOnly' argument must be a logical")
 
-  # Taper before if 'HOM' in the dataset and not 'TaperDBH_TreeDataCor'
-  if(any(!is.na(Data$HOM)) & !"TaperDBH_TreeDataCor" %in% names(Data)) # HOM exists?
-    message("You have the 'HOM' information in your dataset.
-            We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)")
+  # Taper before if 'HOM' in the dataset and 'UseTaperCorrection' = F
+  if(any(!is.na(Data$HOM)) %in% names(Data) & !UseTaperCorrection) # HOM exist and UseTaperCorrection FALSE
+    if(length(unique(na.omit((Data$HOM)))) > 1) message("You have the 'HOM' information in your dataset.
+            We advise you to correct your diameters also with UseTaperCorrection = TRUE") # only show if there are varying HOM
 
   # If 'POM' 'POM change' correction is advised
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
@@ -219,6 +247,8 @@ DiameterCorrection <- function(
 
   # In data.table
   setDT(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
+
 
   Data <- unique(Data)   # if there are duplicate rows, delete them
 
@@ -238,12 +268,13 @@ DiameterCorrection <- function(
 
   # Remove duplicated measurements per Year because different POM or Date -----------------------------------
   CompleteData <- copy(Data)
+
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
 
   DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
 
   # Remove duplicated measurements (randomly)
-  # Data <- Data[!duplicated(Data[, list((get(ID), Year)], fromLast = TRUE)] # keep the last measurement
+  # Data <- Data[!duplicated(Data[, list((get(ID), IdCensus)], fromLast = TRUE)] # keep the last measurement
 
 
   if(!"Comment" %in% names(Data)) Data[, Comment := ""]
@@ -252,14 +283,24 @@ DiameterCorrection <- function(
   }
 
   # If no diameter value, write a comment
-  Data <- GenerateComment(Data,
-                          condition = is.na(Data[, Diameter]),
-                          comment = "Missing value in 'Diameter'")
+  Data[is.na(Diameter), Comment := GenerateComment(Comment, comment = "Missing value in 'Diameter'")]
+
 
   #### Function ####
 
+  # Taper correction ------------------------------------------------------------------------------------------------------
+  if(UseTaperCorrection) {
+    Data <- TaperCorrection(Data,
+                            DefaultHOM = DefaultHOM,
+                            TaperParameter = TaperParameter, TaperFormula = TaperFormula,
+                            DetectOnly = DetectOnly)
+
+    # if there is a POM column, also bring that to the first value so no risk to readjust that again
+    if("POM" %in% names(Data))  Data[, POM_TreeDataCor := .SD[1, POM], by = c(ID)]
+  }
+
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
-  Data <- Data[order(get(ID), Year)]
+  Data <- Data[order(get(ID), IdCensus)]
 
   # IDs vector --------------------------------------------------------------------------------------------------------
   Ids <- as.vector(na.omit(unique(Data[, get(ID)]))) # Tree Ids
@@ -267,568 +308,581 @@ DiameterCorrection <- function(
   # Dataset with the rows without IDS ----------------------------------------------------------------------------------
   DataIDNa <- Data[is.na(get(ID))]
 
-  # Dataset with the rows without Year ----------------------------------------------------------------------------------
-  DataYearNa <- Data[is.na(Year)]
+  # Dataset with the rows without IdCensus ----------------------------------------------------------------------------------
+  DataIdCensusNa <- Data[is.na(IdCensus)]
 
-  # Taper correction ------------------------------------------------------------------------------------------------------
-  # if("taper" %in% CorrectionType) {
-  #   Data <- TaperCorrection(Data,
-  #                           DefaultHOM = DefaultHOM,
-  #                           TaperParameter = TaperParameter, TaperFormula = TaperFormula,
-  #                           DetectOnly = DetectOnly)
-  # }
+  # Apply Corrections -----------------------------------------------------------------------------------------------
 
 
-
-  # Apply to all the trees -----------------------------------------------------------------------------------------------
-
-
-  ## TODO apply function only on trees with previously detected problems > this
-  ## could save a lot of computing time
-
-  Data <- Data[, DiameterCorrectionByTree(
-    DataTree = Data[get(ID) == KeyCol & !is.na(Year)],
-    Data = Data,
-
-    DefaultHOM = DefaultHOM,
-    MaxDBH = MaxDBH,
-    PositiveGrowthThreshold = PositiveGrowthThreshold,
-    NegativeGrowthThreshold = NegativeGrowthThreshold,
-
-    Pioneers = Pioneers,
-    PioneersGrowthThreshold = PioneersGrowthThreshold,
-
-    WhatToCorrect = WhatToCorrect,
-    CorrectionType = CorrectionType,
-
-    DBHRange = DBHRange,
-    MinIndividualNbr = MinIndividualNbr,
-    OtherCrit =  OtherCrit,
-
-    Digits = Digits,
-
-    coef = coef,
-
-    DetectOnly = DetectOnly
-  ),
-  .(KeyCol = get(ID))]
-
-  # remove unnecessary column
-  Data$KeyCol <- NULL
-
-
-  # Re-put the rows duplicated, or without ID or Year -----------------------------------------------------------------
-  Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
-
-  # Re-put the dead trees in the dataset (if there are not corrected by choice)
-  if(DBHCorForDeadTrees == FALSE){
-    Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
+  if(!"Diameter_TreeDataCor" %in% names(Data)) {
+    Data[, Diameter_TreeDataCor := Diameter]
   }
-
-  # Order IDs and times in ascending order ----------------------------------------------------------------------------
-  Data <- Data[order(get(ID), Year)]
-
-  if(DetectOnly %in% FALSE){
-    # Rename correction columns
-    setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
-             c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
+  if(!"HOM_TreeDataCor" %in% names(Data)) {
+    Data[, HOM_TreeDataCor := HOM]
+  }
+  if(!"POM_TreeDataCor" %in% names(Data)){
+    Data[, POM_TreeDataCor := POM]
+  }
+  if(!"LifeStatus_TreeDataCor" %in% names(Data)) {
+    Data[, LifeStatus_TreeDataCor := LifeStatus]
   }
 
 
-  return(Data)
 
-}
-
-#' DiameterCorrectionByTree
-#'
-#' @param DataTree A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
-#'   measurements (data.frame or data.table).
-#'
-#' @param Data Complete dataset (data.table) used if the "phylogenetic
-#'   hierarchical" correction (*CorrectionType* argument) is chosen.
-#'   The dataset must contain the columns:
-#'   - `IdStem` or `IdTree` (character)
-#'   - `ScientificNameCor` (character)
-#'   - `GenusCor` (character)
-#'   - `FamilyCor` (character)
-#'   - `Diameter` (numeric)
-#'   - `Year` (numeric)
-#'
-#' @param DefaultHOM Default Height Of Measurement in meter (Default: 1.3 m)
-#'   (numeric, 1 value)
-#'
-#' @param MaxDBH Maximum possible DBH of your stand in cm (numeric, 1 value)
-#'
-#' @param PositiveGrowthThreshold in cm/year: a tree
-#'   widening by more than x cm/year is considered abnormal (numeric, 1 value)
-#'
-#' @param NegativeGrowthThreshold in cm/census: the possible
-#'   positive measurement error (+n) cannot be corrected until the growth
-#'   appears abnormal, but a negative measurement error can be allowed until -n
-#'   (a tree does not decrease). Thus the positive measurement error (+n) is
-#'   "compensated". (numeric, 1 value)
-#'
-#' @param Pioneers Scientific names of the pioneer species of the site, as in
-#'   the 'ScientificNameCor' column (characters vector)
-#'
-#' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
-#'   widens by more than x cm/year is considered abnormal (numeric, 1 value)
-#'
-#' @param WhatToCorrect  c("POM change", "punctual", "shift") (character)
-#'   - "POM change": detect POM change in the column 'POM' and correct
-#'                   the Diameter values from it.
-#'   - "punctual": detect if the error is punctual and correct it by
-#'                 interpolation.
-#'   - "shift": detect if there is a shift of several 'Diameter' values and
-#'              links them to the trust measurements set.
-#'
-#' @param CorrectionType Possible values: "individual", "phylogenetic
-#'   hierarchical" (character).
-#'   - "individual": replace abnormal growth by interpolation from the
-#'                   individual values.
-#'   - "phylogenetic hierarchical": replace abnormal growth with the average
-#'          growth of other trees in the dataset, at the specific, genus, family
-#'          or stand level, within a DBH range of x cm (*DBHRange* argument).
-#'          If the number of these trees < n (*MinIndividualNbr* argument)
-#'          at the specific level, we switch to the genus level etc.
-#'
-#' @param DBHRange DBH range in cm to take into account to select other trees in
-#'   the dataset to apply "phylogenetic hierarchical" correction (Default: 10
-#'   cm) (numeric, 1 value)
-#' @param MinIndividualNbr Minimum number of individuals to take into account in
-#'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
-#'
-#' @param OtherCrit Other criteria to select the individuals used for the
-#'   calculation of the mean growth in the "phylogenetic hierarchical"
-#'   correction. Give the name of the column(s) for which the individuals must
-#'   have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-#'   (character)
-#'
-#' @param Digits Number of decimal places to be used in the 'DBHCor' column
-#'   (Default: 1L) (integer)
-#'
-#' @param coef description... (numeric)
-#'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (Default: FALSE) (logical)
-#'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns:
-#'   - *DBHCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "local linear regression"/"weighted
-#'   mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/"shift
-#'   realignment"/"Same value".
-#'
-#' @details When there is only 1 `Diameter` value for a tree/stem, `DBHCor`
-#'   takes the original `Diameter` value. If this value is 0 or > MaxDBH,
-#'   `DBHCor` takes NA.
-#'
-#' @importFrom stats na.omit
-#'
-#' @export
-#'
-#' @examples
-#' library(data.table)
-#' data(TestData)
-#'
-#'  DataTree <- data.table(IdStem = "c",
-#'       ScientificName = "A",
-#'       Year = c(seq(2000,2008, by = 2), 2012, 2014,2016, 2020), # 9 Diameter values
-#'       Diameter = c(13:16, 16-4, (16-4)+2, (16-4)+3, 15-4, (15-4)+2), # 0.5 cm/year
-#'       POM = as.factor(c(0, 0, 0, 0, 1, 1, 1, 2, 2)))
-#'
-#' Rslt <- DiameterCorrectionByTree(
-#'   DataTree, TestData,
-#'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'   CorrectionType = "individual"
-#'   )
-#' setnames(Rslt, "POMCor", "POM_TreeDataCor", skip_absent=TRUE)
-#' DiameterCorrectionPlot(Rslt, CorCol = "DBHCor")
-#'
-DiameterCorrectionByTree <- function(
-    DataTree,
-    Data,
-
-    DefaultHOM = 1.3,
-    MaxDBH = 500,
-    PositiveGrowthThreshold = 5,
-    NegativeGrowthThreshold = -2,
-
-    Pioneers = NULL,
-    PioneersGrowthThreshold = 7.5,
-
-    WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = "individual",
-
-    DBHRange = 10,
-    MinIndividualNbr = 5,
-    OtherCrit = NULL,
-    Digits = 1L,
-
-    coef = 0.9,
-
-    DetectOnly = FALSE
-){
-
-  #### Arguments check ####
-  # DataTree
-  if (!inherits(DataTree, c("data.table", "data.frame")))
-    stop("DataTree must be a data.frame or data.table")
-
-  # IdStem or IdTree? ---------------------------------------------------------------------------------------
-  # If no IdStem take IdTree
-  if((!"IdStem" %in% names(DataTree) | all(is.na(DataTree$IdStem))) &
-     ("IdTree" %in% names(DataTree) & any(!is.na(DataTree$IdTree))) ){ ID <- "IdTree"
-
-  }else{ ID <- "IdStem"}
-
-  if(!any(c("IdStem", "IdTree") %in% names(DataTree)) | (all(is.na(DataTree$IdStem)) &  all(is.na(DataTree$IdTree))) )
-    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
-  # ---------------------------------------------------------------------------------------------------------
+  # get a DiameterHistory
+  DiameterHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter_TreeDataCor", drop = FALSE)
+  DiameterHistory <- as.matrix(DiameterHistory, 1)
 
 
-  # if there are several IdTrees
-  if(length(unique(DataTree[, get(ID)])) != 1){
-    stop("DataTree must correspond to only 1 same tree/stem so 1 same ",ID,"
-    (the ",ID,"s: " ,paste0(unique(DataTree[, get(ID)]), collapse = "/"),"")
-  }
+  # get HOMHistory
+  HOMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "HOM_TreeDataCor", drop = FALSE)
+  HOMHistory <- as.matrix(HOMHistory, 1)
 
-  # In data.table
-  setDT(DataTree)
+  # get HOMChange History
+  HOMChangeHistory <- cbind(NA, t(apply(HOMHistory, 1, diff)))
+  colnames(HOMChangeHistory) <- colnames(HOMHistory)
 
-  # print(unique(DataTree[, get(ID)])) # to debug
+  # get POMHistory
+  POMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "POM_TreeDataCor", drop = FALSE)
+  POMHistory <- as.matrix(POMHistory, 1)
 
-  # Arrange year in ascending order
-  DataTree <- DataTree[order(Year)] # data.table::order
+  # get POMChange History
+  POMChangeHistory <-  t(apply(POMHistory, 1, function(x) x != shift(x, type = "lag")))
 
-  if(!"TaperDBH_TreeDataCor" %in% names(DataTree)){
-    if(DetectOnly %in% FALSE){
-      if("POM" %in% names(DataTree)) DataTree[, POMCor := POM[!is.na(POM)][1]] # Corrected diameter is at the 1st POM
-      if("HOM" %in% names(DataTree)) DataTree[, HOMCor := HOM[!is.na(HOM)][1]] # Corrected diameter is at the 1st  HOM
+  # get DateHistory (to be able to calculate growth)
+  DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
+  DateHistory <- as.matrix(DateHistory, 1)
+
+  # get DateDiff
+  DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
+  DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - shift(as.Date(x)))/365))
+
+
+  # get a MinDBHHistory (this is useful if not same threshold accross plots)
+  MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
+  MinDBHHistory <- as.matrix(MinDBHHistory, 1)
+  MinDBHHistory[] <- apply(MinDBHHistory, 1, function(x) x[is.na(x)] <- as.numeric(names(which.max(table(x))))) # fill NA with most common MinDBH in the row . this could be a problem if MinDBH changes accross censuses but should be rare enough that it does not matter
+
+  # get LifeStatusHistory
+  LifeStatusHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "LifeStatus_TreeDataCor", drop = FALSE)
+  LifeStatusHistory <- as.matrix(LifeStatusHistory, 1)
+
+  # create Comment History
+  CommentHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
+
+  DiameterCorrectionMethHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
+
+  # small correction affecting next histories
+  # DBH = 0 is impossible
+  DiameterHistory[DiameterHistory %in% 0] <- NA
+  # DBH > MaxDBH -> DBH = NA
+  # DiameterHistory[DiameterHistory > MaxDBH] <- NA
+
+
+
+  # fill in the Diameter when the tree was missed
+  mapply(function(d, t) {
+    t <- as.Date(t)
+    d[is.na(d)] <- predict(lm(d~t))[is.na(d)]
+    return(d)
+  }, d = DiameterHistory, t = DateHistory)
+
+
+  MissedDiametetFilled <- t(mapply(function(d, t, c, l) {
+
+    t <- as.Date(t)
+    m <- lm(d~t)
+
+    if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
+      p <- predict(lm(d~t), newdata = t) # if some t are NA, still i twil
+      # p <- p[match(names(d), names(p))] # this is to account for when the date is NA
+      c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "initial linear interpolation")
+      d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
     }
+
+    return(list(d, c))
+
+  },
+  d = split(DiameterHistory, row(DiameterHistory)),
+  t = split(DateHistory, row(DateHistory)),
+  c = split(CommentHistory, row(CommentHistory)),
+  l = split(LifeStatusHistory, row(LifeStatusHistory))))
+
+  DiameterHistory[] <- do.call(rbind, MissedDiametetFilled[,1])
+  CommentHistory[] <-  do.call(rbind, MissedDiametetFilled[,2])
+
+
+
+  # create a function that will allow to get diameter difference and growth history (because we will need to recalculate those a few times, as we make corrections)
+  CalcGrowthHist <- function(DiameterHistory, DateHistory) {
+    x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
+    x[,-1] <- t(round(apply(DiameterHistory, 1, diff) / apply(DateHistory, 1, function(x) diff(as.Date(x))/365), 2))
+    return(x[])
   }
 
+  CalcDiameterDiffHist <- function(DiameterHistory = DiameterHistory) {
+    x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
+    x[,-1] <- t(round(apply(DiameterHistory, 1, diff),2))
+    return(x[])
+  }
 
-  # If not enough Diameter values
-  if(sum(!is.na(DataTree$Diameter)) > 1){
+  # get growth History (for annual growth incrementation)
+  GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
 
-    #### Function ####
+  # get Growth difference (for absolute growth incrementation)
+  DiameterDiffHistory <- CalcDiameterDiffHist(DiameterHistory)
 
-    # Pioneers species case
+  # get Plot, Family, Genus and Specie in an array
+  UniqueInfo <- Data[, .(Plot = unique(Plot),
+          Family = unique(Family),
+          Genus = unique(Genus),
+          Species = unique(ScientificName)), by = .(IdStem =get(ID))]
+  UniqueInfo <- UniqueInfo[complete.cases(UniqueInfo),] # removing when for some reason one of these info is not specified (which deals with most duplicated)
 
-    if(!is.null(Pioneers) & PioneersGrowthThreshold != PositiveGrowthThreshold){
+  if(any(duplicated(UniqueInfo$get))) stop("Some individuals don't have a unique Plot, Family, Genus or species")
 
-      ## ScientificName_TreeDataCor or ScientificName?
-      if("ScientificName_TreeDataCor" %in% names(DataTree)){
-        SfcName <- "ScientificName_TreeDataCor"
+  for(w in c("Plot", "Family", "Genus", "Species")) {
+    x <- UniqueInfo[, get(w)]
+    names(x) <- UniqueInfo$IdStem
+    x <- x[rownames(DiameterHistory)] # make sure same order as other objecys
+    assign(w, x)
+  } # make one object for each info (will help later)
 
-      }else if(!"ScientificName_TreeDataCor" %in% names(DataTree) & "ScientificName" %in% names(DataTree)){
-        SfcName <- "ScientificName"
 
-      }else if(!any(c("ScientificName_TreeDataCor", "ScientificName") %in% names(DataTree)))
 
-        stop("There are no 'ScientificName_TreeDataCor' or 'ScientificName' column.
+  # Corrections ####
+  Idx_enough_DBH <- rowSums(!is.na(DiameterHistory)) > 1
+  Idx_one_DBH <- rowSums(!is.na(DiameterHistory)) %in% 1
+
+  # Pioneers species case
+
+  if(!is.null(Pioneers) & PioneersGrowthThreshold != PositiveGrowthThreshold){
+
+    ## ScientificName_TreeDataCor or ScientificName?
+    if("ScientificName_TreeDataCor" %in% names(Data)){
+      SfcName <- "ScientificName_TreeDataCor"
+
+    }else if(!"ScientificName_TreeDataCor" %in% names(DataTree) & "ScientificName" %in% names(Data)){
+      SfcName <- "ScientificName"
+
+    }else if(!any(c("ScientificName_TreeDataCor", "ScientificName") %in% names(DataTree)))
+
+      stop("There are no 'ScientificName_TreeDataCor' nor 'ScientificName' column.
            It is not possible to take into account the pioneer character of species in the diameter correction.
              If you do not want to take into account the pioneer character in the diameter correction,
              leave the argument Pioneers = NULL.")
 
-      if(any(na.omit(unique(DataTree[, get(SfcName)]) == Pioneers))){ # if it's a pioneer species
+    if(any(na.omit(unique(Data[, get(SfcName)]) == Pioneers))){ # if it's a pioneer species
 
-        PositiveGrowthThreshold <- PioneersGrowthThreshold # take the Pioneers growth threshold
-      }
-
-    } # end Pioneers criteria
-
-    # If the taper correction has been made, start from it
-    if("TaperDBH_TreeDataCor" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, TaperDBH_TreeDataCor]
-    if(!"TaperDBH_TreeDataCor" %in% names(DataTree)) DBHCor <- Diameter <- DataTree[, Diameter]
-
-    Time <- DataTree[, Year]
-
-    # DBH = 0 is impossible
-    DBHCor[DBHCor == 0] <- NA
-
-    # DBH > MaxDBH -> DBH = NA
-    DBHCor[DBHCor > MaxDBH] <- NA
-
-    # Correction with POM ---------------------------------------------------------------------------------------------------
-    if("POM change" %in% WhatToCorrect){
-
-      # POM or HOM?
-      # If no POM take HOM
-      if((!"POM" %in% names(DataTree) | all(is.na(DataTree$POM))) &
-         ("HOM" %in% names(DataTree) & any(!is.na(DataTree$HOM))) ){ POMv <- "HOM"
-
-      }else{ POMv <- "POM"}
-
-      if(!any(c("POM", "HOM") %in% names(DataTree)) | (all(is.na(DataTree$POM)) &  all(is.na(DataTree$HOM))) )
-        message("You have chosen to make a 'POM change' correction,
-        but 'POM' and HOM' columns are empty for ", unique(DataTree[, get(ID)]),".
-             This correction will therefore not be applied to this stem.")
-
-
-      ## POM change detection -----------------------------------------------------------------------------------------------
-      if(any(!is.na(DataTree[, get(POMv)]))) { # POM exists?
-
-        # Check the POM value over the time
-        # If POM decreases comment it
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in%
-                                      (which(diff(as.numeric(DataTree[, get(POMv)])) < 0) +1),
-                                    comment = "POM decrease")
-
-        # POM change detection
-        POMChange <- NA  # 1st val = NA because it's the default POM
-        for( n in (2:(length(DataTree[, get(POMv)]))) ){
-          POMChange <- c(POMChange, DataTree[, get(POMv)][n-1] != DataTree[, get(POMv)][n]) # (TRUE = POM change)
-        }
-
-        raised = which(POMChange)-1 # which are TRUE (-1 to be in cresc indice and not DBH indice)
-
-
-        if(length(raised) != 0){ # if there are POM changes
-
-          DataTree <- GenerateComment(DataTree,
-                                      condition = as.numeric(rownames(DataTree)) %in% (raised+1), # +1 to be in DBH indice
-                                      comment = paste0("POM change"))
-
-          if(DetectOnly %in% FALSE){
-
-            # Compute diameter incrementation without the inits shift
-            cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-            cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
-            # Remove incr between 2 shifts (take growth only intra seq)
-            cresc[raised]  <- NA
-            cresc_abs[raised] <- NA
-
-            # Put NA if other abnormal incrementation
-            AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
-            cresc[AbnormalCrescs]  <- NA
-            cresc_abs[AbnormalCrescs]  <- NA
-
-            if(length(cresc[!is.na(cresc)]) > 0){ # if cresc != NA
-
-              if("individual" %in% CorrectionType) {
-
-                IndCorRslt <- IndividualDiameterShiftCorrection(DataTree = DataTree,
-                                                                DBHCor = DBHCor, Time = Time,
-                                                                cresc = cresc, cresc_abs = cresc_abs,
-                                                                cresc_abn = raised,
-                                                                coef = coef)
-
-                DataTree <- IndCorRslt$DataTree
-                DBHCor <- IndCorRslt$DBHCor
-
-
-              } # end individual correction
-
-            } # end if cresc != NA
-
-            if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
-
-              DataTree <- PhylogeneticHierarchicalCorrection(
-                DataTree = DataTree,
-                Data = Data,
-                cresc = cresc, cresc_abs = cresc_abs, cresc_abn = raised,
-                DBHCor = DBHCor, Time = Time,
-                PositiveGrowthThreshold = PositiveGrowthThreshold,
-                NegativeGrowthThreshold = NegativeGrowthThreshold,
-                DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit, coef = coef)
-
-              DBHCor <- DataTree[,DBHCor]
-            }
-
-            ## 3. + trunk width reduction factor (if POM change (only?)) ------------------------------------------------------
-
-          } # End correction "POM change"
-
-        }# if there are POM changes
-      }# if there are POMs
-    }# Correction with POM
-
-
-
-    # Punctual/shift error detection  + replace with NA if punctual ---------------------------------------------------------
-    if(any("punctual" %in% WhatToCorrect | "shift" %in% WhatToCorrect)){
-
-      if(length(DBHCor[!is.na(DBHCor)]) == 2){ # if only 2 non-NA values
-
-        TwoValCorRslt <- TwoValDiameterCor(DataTree = DataTree,
-                                           Data = Data,
-                                           DBHCor = DBHCor, Time = Time,
-                                           CorrectionType = CorrectionType,
-                                           PositiveGrowthThreshold = PositiveGrowthThreshold,
-                                           NegativeGrowthThreshold = NegativeGrowthThreshold,
-                                           DBHRange = DBHRange,
-                                           MinIndividualNbr = MinIndividualNbr,
-                                           OtherCrit = OtherCrit,
-                                           DetectOnly = DetectOnly)
-
-        DataTree <- TwoValCorRslt$DataTree
-        DBHCor <- TwoValCorRslt$DBHCor
-
-      }else{
-
-        DBHCor <- PunctualErrorDetection(
-          DBHCor = DBHCor, Time = Time,
-          PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
-          DetectOnly = DetectOnly)
-        # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
-
-        if("DBHCor" %in% names(DataTree)){
-          DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
-        }
-
-        suppressWarnings(DataTree[, DBHCor := DBHCor])
-
-        DataTree <- GenerateComment(DataTree,
-                                    condition = (is.na(DataTree[,DBHCor]) & !is.na(DataTree[,Diameter])),
-                                    comment = paste0("Abnormal diameter value (punctual error)"))
-
-        if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
-      }
+      PositiveGrowthThreshold <- PioneersGrowthThreshold # take the Pioneers growth threshold
     }
 
-    # Shift Correction ------------------------------------------------------------------------------------------------------
-    if("shift" %in% WhatToCorrect){
-      ## Init shift detection si PunctualErrorDetection() ne s'en est pas chargé --------------------------------------------
-      ### Compute diameter incrementation without the inits shift
-      cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-      cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
-
-      ### Detect abnormal growth --------------------------------------------------------------------------------------------
-      cresc_abn <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # abnormal values indices
-      # le retour à la normale est considéré comme une erreur (perte excessive)
-
-      if(length(cresc_abn) != 0) { # if there are abnormal values
-
-        if("DBHCor" %in% names(DataTree)){
-          DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
-        }
-
-        suppressWarnings(DataTree[,DBHCor := DBHCor])
-
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (cresc_abn+1),
-                                    comment = paste0("Abnormal diameter value (shift error)"))
-
-        if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
+  } # end Pioneers criteria
 
 
-        if(DetectOnly %in% FALSE){
+  # detect and change to NA the growth of cases of abnormal increment
 
-          # Remove abnormal growths
-          cresc[cresc_abn] <- NA
-          cresc_abs[cresc_abn] <- NA
+  ## positive
+  idx = !is.na(GrowthHistory) & GrowthHistory >= PositiveGrowthThreshold
 
-          if(length(cresc[!is.na(cresc)]) > 0){ # if cresc != NA
-
-            if("individual" %in% CorrectionType) {
-
-              IndCorRslt <- IndividualDiameterShiftCorrection(DataTree = DataTree,
-                                                              DBHCor = DBHCor, Time = Time,
-                                                              cresc = cresc, cresc_abs = cresc_abs,
-                                                              cresc_abn = cresc_abn,
-                                                              coef = coef)
-
-              DataTree <- IndCorRslt$DataTree
-              DBHCor <- IndCorRslt$DBHCor
+  CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
+  GrowthHistory[idx]  <- NA
+  DiameterDiffHistory[idx] <- NA
 
 
-            } # end individual correction
+  ## negative
+  idx = !is.na(DiameterDiffHistory) & DiameterDiffHistory < NegativeGrowthThreshold
 
-          } # end if cresc != NA
+  CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth smaller than threshold of", NegativeGrowthThreshold))
+  GrowthHistory[idx]  <- NA
+  DiameterDiffHistory[idx] <- NA
 
-          if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
-            DataTree <- PhylogeneticHierarchicalCorrection(
-              DataTree = DataTree,
-              Data = Data,
-              cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
-              DBHCor = DBHCor, Time = Time,
-              PositiveGrowthThreshold = PositiveGrowthThreshold,
-              NegativeGrowthThreshold = NegativeGrowthThreshold,
-              DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit, coef = coef)
 
-            DBHCor <- DataTree[,DBHCor]
+  # Correction with POM ---------------------------------------------------------------------------------------------------
+  if("POM change" %in% WhatToCorrect){
+
+    if(all(is.na(HOMHistory)) & all(is.na(POMHistory)))  stop("You have chosen to make a 'POM change' correction,
+        but 'POM' and HOM' columns are empty for all trees so we can't apply corrections.")
+
+    # # POM or HOM?
+    #
+    # # take HOM over POM but fill HOM with POM if all row is NA in HOM
+    # HOMHistory[apply(HOMHistory, 1, function(x) all(is.na(x))),] <- POMHistory[apply(HOMHistory, 1, function(x) all(is.na(x))),] # this also means that if we only have POM, using HOM onward means using POM
+
+
+
+    # TODO give warning with n trees for which we have dbh but no hom and so for which no correction can be applied
+
+
+    ## POM change detection -----------------------------------------------------------------------------------------------
+
+    # Check the HOM value over the time
+
+    idx = !is.na(HOMChangeHistory) & HOMChangeHistory < 0
+    CommentHistory[idx] <- GenerateComment(CommentHistory[idx], "HOM decreased")
+
+    idx = !is.na(HOMChangeHistory) & HOMChangeHistory > 0
+    CommentHistory[idx] <- GenerateComment(CommentHistory[idx], "HOM increased")
+
+
+    # Check the POM value over the time
+    CommentHistory[POMChangeHistory %in% TRUE] <- GenerateComment(CommentHistory[idx], "POM changed")
+
+    # detect any change in HOM or POM
+    idxPOMChange = !is.na(HOMChangeHistory) & !HOMChangeHistory %in% 0 | POMChangeHistory %in% TRUE
+
+    # Remove growth between shifts (take growth only intra seq)
+    GrowthHistory[idxPOMChange]  <- NA
+    DiameterDiffHistory[idxPOMChange] <- NA
+
+    # get indexes to replace
+    idxToReplace <- which(is.na(GrowthHistory) & idxPOMChange, arr.ind = T)
+    idxToReplace <- idxToReplace[idxToReplace[, 2]> 1, ] # remove cases where Na is in first column since that is fake data (can't calculate growth between census -1 and census 1)
+
+    if(CorrectionType %in% "individual") {
+
+      # calculate weights
+      ## For each Census, compute the absolute time difference and use coefs to calculate weight of the growths by temporal proximity
+
+      Weights <- lapply(1:ncol(DateHistory), function(j) matrix(exp(as.numeric(abs(as.Date(DateHistory) - as.Date(DateHistory[,j])))/365*-coef), nrow = nrow(DiameterHistory), ncol = ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))) # list of length equal to number of censuses
+
+
+      # replace Diameters that need it
+
+
+      if(nrow(idxToReplace) > 0) {
+        for(l in 1:nrow(idxToReplace)) {
+
+          t = rownames(idxToReplace)[l]
+          i = idxToReplace[l, 1]
+          j = idxToReplace[l, 2]
+
+          w = Weights[[j]][t, ] # weight for a NA in that census, for that tree
+
+          g = GrowthHistory[i,] # growth history of that tree
+
+          wg <- weighted.mean(g, w, na.rm = T) # weighted mean of growth for that tree at that census
+
+          do = DiameterHistory[i,j] # original DBH of that year
+
+          DiameterHistory[i,j] <- DiameterHistory[i,j-1] + wg * DateDiff[i, j]
+
+          dn = DiameterHistory[i,j] # new DBH of that year
+
+          DiameterCorrectionMethHistory[i, j] <- GenerateComment( DiameterCorrectionMethHistory[i, j], "weighted mean")
+
+
+          # apply switch to other values if j is not last column
+          if(j < ncol(DiameterHistory)) {
+            DiameterHistory[i,(j+1):ncol(DiameterHistory)] <- DiameterHistory[i,(j+1):ncol(DiameterHistory)] + dn - do
+            DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)]  <- GenerateComment( DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)] , "shift realignment")
           }
 
-          ## 3. + trunk width reduction factor (if POM change (only?)) ----------------------------------------------------------
-        } # End shift correction
+
+        }
       }
+
+    } # end individual correction
+
+    if(CorrectionType %in% "phylogenetic hierarchical"){
+
+      # replace Diameters that need it
+      if(nrow(idxToReplace) > 0) {
+        for(l in 1:nrow(idxToReplace)) {
+
+          t = rownames(idxToReplace)[l]
+          i = idxToReplace[l, 1]
+          j = idxToReplace[l, 2]
+
+          pd = DiameterHistory[i,j-1] # previous dbh
+
+          # find potential Colleagues
+
+          idxSamePlot <- Plot %in% Plot[t]
+          idxSameFamily <- Family %in% Family[t]
+          idxSameGenus <- Genus %in% Genus[t]
+          idxSameSpecies <- Species %in% Species[t]
+
+          idxDBHWithinRange <- !is.na(DiameterHistory) & (DiameterHistory > (pd - DBHRange/2) & DiameterHistory < (pd + DBHRange/2))
+
+          idxGrowthExists <- !is.na(GrowthHistory)
+
+          # figure out set of colleague (need at least MinIndividualNbr, with actual growth measures)
+
+          idxColleagues <- list(species = idxSameSpecies & idxDBHWithinRange & idxGrowthExists,
+                                genus = idxSameGenus & idxDBHWithinRange & idxGrowthExists,
+                                family = idxSameFamily & idxDBHWithinRange & idxGrowthExists,
+                                plot = idxSamePlot & idxDBHWithinRange & idxGrowthExists)
+
+
+          Method <- names(which(lapply(idxColleagues, sum, na.rm = T) > MinIndividualNbr))[1] # take the first set that meets the min requirement
+
+          if(length(Method) >0) { # if we can use phylo correction
+            idxColleagues <- idxColleagues[[Method]]
+
+            # compute Colleagues growth mean
+            g <- mean(GrowthHistory[idxColleagues])
+
+            # correct DBH
+
+            do = DiameterHistory[i,j] # original DBH of that year
+
+            DiameterHistory[i,j] <- pd + g * DateDiff[i, j]
+
+            dn = DiameterHistory[i,j] # new DBH of that year
+
+            DiameterCorrectionMethHistory[i, j] <- GenerateComment( DiameterCorrectionMethHistory[i, j], Method)
+
+
+            # apply switch to other values if j is not last column
+            if(j < ncol(DiameterHistory)) {
+              DiameterHistory[i,(j+1):ncol(DiameterHistory)] <- DiameterHistory[i,(j+1):ncol(DiameterHistory)] + dn - do
+              DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)]  <- GenerateComment( DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)] , "shift realignment")
+            }
+
+          } else {
+            stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
+                       You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument).
+                        The 'individual' correction is applied in this case.")
+          }
+        }
+      }
+
+
     }
 
+      ## 3. + trunk width reduction factor (if POM change (only?)) ------------------------------------------------------
 
-    if(DetectOnly %in% FALSE & "punctual" %in% WhatToCorrect & any(is.na(DBHCor))){ # Na to be replaced
-
-      # Compute diameter incrementation without the abnormal values
-      cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-      cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
-
-      # Put NA if other abnormal incrementation
-      AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
-      AbnormalCrescs <- which(AbnormalCrescs)
-      cresc[AbnormalCrescs]  <- NA
-      cresc_abs[AbnormalCrescs]  <- NA
-      DBHCor[AbnormalCrescs +1] <- NA
-
-      i <- which(is.na(DBHCor)) # id of all the NA to interpolate
-
-      # Check that only non-abnormal growths are kept
-      if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
-
-        # Replace NA by the correction ------------------------------------------------------------------------------------------
-        # Regression only with 2 values around the NA (local)
-        DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType, Local = TRUE) # Compute the corrected cresc
-
-        # Add the column with the correction method  ------------------------------------------------------------------------
-        # Punctual error correction only with linear regression and not quadratic,
-        # because punctual errors are corrected from a local regression with the 2 framing values.
-
-        DataTree <- GenerateComment(DataTree,
-                                    condition = as.numeric(rownames(DataTree)) %in% (i),
-                                    comment = "local linear regression",
-                                    column = "DiameterCorrectionMeth")
+} # End correction "POM change"
 
 
-      }else{warning("There are still abnormal growths. Either the selected methods are insufficient
+# Punctual/shift error detection  + replace with NA if punctual ---------------------------------------------------------
+if(any("punctual" %in% WhatToCorrect | "shift" %in% WhatToCorrect)){
+
+  # compute growth again
+
+  # detect abnormal values
+
+  DataTree[as.numeric(rownames(DataTree)) %in% (which(!is.na(DBHCor))[2]), Comment := GenerateComment(Comment, "Abnormal diameter value")]
+
+  # correct with phylo or same value as previous(1?)
+
+  if(length(DBHCor[!is.na(DBHCor)]) == 2){ # if only 2 non-NA values
+
+    TwoValCorRslt <- TwoValDiameterCor(DataTree = DataTree,
+                                       Data = Data,
+                                       DBHCor = DBHCor, Time = Time,
+                                       CorrectionType = CorrectionType,
+                                       PositiveGrowthThreshold = PositiveGrowthThreshold,
+                                       NegativeGrowthThreshold = NegativeGrowthThreshold,
+                                       DBHRange = DBHRange,
+                                       MinIndividualNbr = MinIndividualNbr,
+                                       OtherCrit = OtherCrit,
+                                       DetectOnly = DetectOnly)
+
+    DataTree <- TwoValCorRslt$DataTree
+    DBHCor <- TwoValCorRslt$DBHCor
+
+  }else{
+
+    DBHCor <- PunctualErrorDetection(
+      DBHCor = DBHCor, Time = Time,
+      PositiveGrowthThreshold = PositiveGrowthThreshold, NegativeGrowthThreshold = NegativeGrowthThreshold,
+      DetectOnly = DetectOnly)
+    # ça serait bien de renvoyer qqchose si un shift est detecté pour être plus secure (y refléchir)
+
+    if("DBHCor" %in% names(DataTree)){
+      DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+    }
+
+    suppressWarnings(DataTree[, DBHCor := DBHCor])
+
+    DataTree[is.na(DBHCor) & !is.na(Diameter), Comment := GenerateComment(Comment, "Abnormal diameter value (punctual error)")]
+
+    if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
+  }
+}
+
+# Shift Correction ------------------------------------------------------------------------------------------------------
+if("shift" %in% WhatToCorrect){
+  ## Init shift detection si PunctualErrorDetection() ne s'en est pas chargé --------------------------------------------
+  ### Compute diameter incrementation without the inits shift
+  cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+  cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
+  ### Detect abnormal growth --------------------------------------------------------------------------------------------
+  cresc_abn <- which(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold) # abnormal values indices
+  # le retour à la normale est considéré comme une erreur (perte excessive)
+
+  if(length(cresc_abn) != 0) { # if there are abnormal values
+
+    if("DBHCor" %in% names(DataTree)){
+      DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
+    }
+
+    suppressWarnings(DataTree[,DBHCor := DBHCor])
+
+    DataTree[cresc_abn+1, Comment := GenerateComment(Comment, "Abnormal diameter value (shift error)")]
+    # DataTree <- GenerateComment(DataTree,
+    #                             condition = as.numeric(rownames(DataTree)) %in% (cresc_abn+1),
+    #                             comment = paste0("Abnormal diameter value (shift error)"))
+
+    if(DetectOnly %in% TRUE) DataTree[,DBHCor := NULL] # remove the DBHCor col if we detect only
+
+
+    if(DetectOnly %in% FALSE){
+
+      # Remove abnormal growths
+      cresc[cresc_abn] <- NA
+      cresc_abs[cresc_abn] <- NA
+
+      if(length(cresc[!is.na(cresc)]) > 0){ # if cresc != NA
+
+        if("individual" %in% CorrectionType) {
+
+          IndCorRslt <- IndividualDiameterShiftCorrection(DataTree = DataTree,
+                                                          DBHCor = DBHCor, Time = Time,
+                                                          cresc = cresc, cresc_abs = cresc_abs,
+                                                          cresc_abn = cresc_abn,
+                                                          coef = coef)
+
+          DataTree <- IndCorRslt$DataTree
+          DBHCor <- IndCorRslt$DBHCor
+
+
+        } # end individual correction
+
+      } # end if cresc != NA
+
+      if(!"individual"%in% CorrectionType & "phylogenetic hierarchical" %in% CorrectionType){
+        DataTree <- PhylogeneticHierarchicalCorrection(
+          DataTree = DataTree,
+          Data = Data,
+          cresc = cresc, cresc_abs = cresc_abs, cresc_abn = cresc_abn,
+          DBHCor = DBHCor, Time = Time,
+          PositiveGrowthThreshold = PositiveGrowthThreshold,
+          NegativeGrowthThreshold = NegativeGrowthThreshold,
+          DBHRange = DBHRange, MinIndividualNbr = MinIndividualNbr, OtherCrit = OtherCrit, coef = coef)
+
+        DBHCor <- DataTree[,DBHCor]
+      }
+
+      ## 3. + trunk width reduction factor (if POM change (only?)) ----------------------------------------------------------
+    } # End shift correction
+  }
+}
+
+
+if(DetectOnly %in% FALSE & "punctual" %in% WhatToCorrect & any(is.na(DBHCor))){ # Na to be replaced
+
+  # Compute diameter incrementation without the abnormal values
+  cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+  cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+
+  # Put NA if other abnormal incrementation
+  AbnormalCrescs <- (cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold)
+  AbnormalCrescs <- which(AbnormalCrescs)
+  cresc[AbnormalCrescs]  <- NA
+  cresc_abs[AbnormalCrescs]  <- NA
+  DBHCor[AbnormalCrescs +1] <- NA
+
+  i <- which(is.na(DBHCor)) # id of all the NA to interpolate
+
+  # Check that only non-abnormal growths are kept
+  if(length(which(cresc[!is.na(cresc)] >= PositiveGrowthThreshold | cresc_abs[!is.na(cresc_abs)] < NegativeGrowthThreshold))==0){
+
+    # Replace NA by the correction ------------------------------------------------------------------------------------------
+    # Regression only with 2 values around the NA (local)
+    DBHCor <- RegressionInterpolation(Y = DBHCor, X = Time, CorrectionType = CorrectionType, Local = TRUE) # Compute the corrected cresc
+
+    # Add the column with the correction method  ------------------------------------------------------------------------
+    # Punctual error correction only with linear regression and not quadratic,
+    # because punctual errors are corrected from a local regression with the 2 framing values.
+
+    DataTree[i, DiameterCorrectionMeth := GenerateComment(DiameterCorrectionMeth, "local linear regression")]
+    # DataTree <- GenerateComment(DataTree,
+    #                             condition = as.numeric(rownames(DataTree)) %in% (i),
+    #                             comment = "local linear regression",
+    #                             column = "DiameterCorrectionMeth")
+
+
+  }else{warning("There are still abnormal growths. Either the selected methods are insufficient
                     or the method needs to be improved")}
 
-    }
+}
 
-    if(DetectOnly %in% FALSE){
-      # Check that there are no more abnormal growths -----------------------------------------------------------------------------
-      cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
-      cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
+if(DetectOnly %in% FALSE){
+  # Check that there are no more abnormal growths -----------------------------------------------------------------------------
+  cresc <- ComputeIncrementation(Var = DBHCor, Type = "annual", Time = Time)
+  cresc_abs <- ComputeIncrementation(Var = DBHCor, Type = "absolute", Time = Time)
 
-      if(any(na.omit(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold))){
+  if(any(na.omit(cresc >= PositiveGrowthThreshold | cresc_abs < NegativeGrowthThreshold))){
 
-        warning("There are still abnormal growths for the tree/stem ", unique(DataTree[, get(ID)]),". Either the selected methods are insufficient
+    warning("There are still abnormal growths for the tree/stem ", unique(DataTree[, get(ID)]),". Either the selected methods are insufficient
                     or the method needs to be improved")
-      }
-    }
+  }
+}
 
 
-    # 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
-    if(DetectOnly %in% FALSE){
+# 'DBHCor' vector in DataTree -------------------------------------------------------------------------------------------
+if(DetectOnly %in% FALSE){
 
-      if("DBHCor" %in% names(DataTree)){
-        DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
-      }
-
-      suppressWarnings(DataTree[, DBHCor := round(DBHCor, digits = Digits)])
-    }
-
-  }else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
-
-    if("TaperDBH_TreeDataCor" %in% names(DataTree)) DataTree[, DBHCor := TaperDBH_TreeDataCor] # keep taper Diameter
-    if(!"TaperDBH_TreeDataCor" %in% names(DataTree))  DataTree[, DBHCor := Diameter] # keep original Diameter
-
-
-    # DBH = 0 or > MaxDBH is impossible
-    DataTree[DBHCor == 0 | DBHCor > MaxDBH, DBHCor := NA]
-
+  if("DBHCor" %in% names(DataTree)){
+    DataTree[, DBHCor := NULL] # remove the DBHCor col to avoid conflict
   }
 
-  return(DataTree)
+  suppressWarnings(DataTree[, DBHCor := round(DBHCor, digits = Digits)])
 }
+
+
+
+# If not enough Diameter
+else if (sum(!is.na(DataTree$Diameter)) < 2 & DetectOnly %in% FALSE){ # if only 1 DBH value
+
+  if("Diameter_TreeDataCor" %in% names(DataTree)) DataTree[, DBHCor := Diameter_TreeDataCor] # keep taper Diameter
+  if(!"Diameter_TreeDataCor" %in% names(DataTree))  DataTree[, DBHCor := Diameter] # keep original Diameter
+
+
+  # DBH = 0 or > MaxDBH is impossible
+  DataTree[DBHCor == 0 | DBHCor > MaxDBH, DBHCor := NA]
+
+}
+
+return(DataTree)
+
+
+
+
+
+
+
+
+
+
+
+# Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
+Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
+
+# Re-put the dead trees in the dataset (if there are not corrected by choice)
+if(DBHCorForDeadTrees == FALSE){
+  Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
+}
+
+# Order IDs and times in ascending order ----------------------------------------------------------------------------
+Data <- Data[order(get(ID), IdCensus)]
+
+if(DetectOnly %in% FALSE){
+  # Rename correction columns
+  setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
+           c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
+} else {
+  Data[, Diameter_TreeDataCor := NULL]
+  Data[, HOM_TreeDataCor := NULL]
+}
+
+
+return(Data)
+
+}
+
 
