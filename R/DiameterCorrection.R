@@ -109,7 +109,7 @@
 #' @return Fill the *Comment* column with error type informations. If
 #'   *DetectOnly* = FALSE, add columns:
 #'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
-#'   - *DiameterCorrectionMeth* = "local linear regression","weighted
+#'   - *DiameterCorrectionMeth_TreeData* = "local linear regression","weighted
 #'       mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 #'       "shift realignment"/"Same value".
 #'   - *POM_TreeDataCor* (factor): POM value at which the corrected diameters are proposed.
@@ -234,6 +234,12 @@ DiameterCorrection <- function(
     if(length(unique(na.omit((Data$HOM)))) > 1) message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with UseTaperCorrection = TRUE") # only show if there are varying HOM
 
+  # can't do taper if all HOM are NA
+  if(all(is.na(Data$HOM)) & UseTaperCorrection) {
+    warning("All your HOM are NA, so we can't do taper corrections")
+    UseTaperCorrection = FALSE
+  }
+
   # If 'POM' 'POM change' correction is advised
   if((all(is.na(Data$HOM)) | !"HOM" %in% names(Data)) &
      any(!is.na(Data$POM)) & !"POM change" %in% WhatToCorrect) # POM exists?
@@ -274,6 +280,13 @@ DiameterCorrection <- function(
 
   Data <- unique(Data)   # if there are duplicate rows, delete them
 
+  # Create new columns we need (if not already there)
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
+
+  if(DetectOnly %in% FALSE){
+    if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) Data[, DiameterCorrectionMeth_TreeData := ""]
+  }
+
   # Dataset with the dead trees if no correction wanted for them --------------------------------------------
   if("LifeStatus_TreeDataCor" %in% names(Data)){ Status <- "LifeStatus_TreeDataCor"
   }else if ("LifeStatusCor" %in% names(Data)){ Status <- "LifeStatusCor"
@@ -299,19 +312,17 @@ DiameterCorrection <- function(
   # Data <- Data[!duplicated(Data[, list((get(ID), IdCensus)], fromLast = TRUE)] # keep the last measurement
 
 
-  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
-  if(DetectOnly %in% FALSE){
-    if(!"DiameterCorrectionMeth" %in% names(Data)) Data[, DiameterCorrectionMeth := ""]
-  }
+
 
   # If no diameter value, write a comment
-  Data[is.na(Diameter), Comment := GenerateComment(Comment, comment = "Missing value in 'Diameter'")]
+  Data[is.na(Diameter), Comment_TreeData := GenerateComment(Comment_TreeData, comment = "Missing value in 'Diameter'")]
 
 
   #### Function ####
 
   # Taper correction ------------------------------------------------------------------------------------------------------
   if(UseTaperCorrection) {
+
     Data <- TaperCorrection(Data,
                             DefaultHOM = DefaultHOM,
                             TaperParameter = TaperParameter, TaperFormula = TaperFormula,
@@ -369,7 +380,7 @@ DiameterCorrection <- function(
   POMHistory <- as.matrix(POMHistory, 1)
 
   # get POMChange History
-  POMChangeHistory <-  t(apply(POMHistory, 1, function(x) x != shift(x, type = "lag")))
+  POMChangeHistory <-  t(apply(POMHistory, 1, function(x) x != data.table::shift(x, type = "lag")))
 
   # get DateHistory (to be able to calculate growth)
   DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
@@ -404,28 +415,31 @@ DiameterCorrection <- function(
 
   # fill in the Diameter when the tree was missed
 
-  MissedDiametetFilled <- t(mapply(function(d, t, c, l) {
+  MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l) {
 
     t <- as.Date(t)
     m <- lm(d~t)
 
     if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
-      p <- predict(lm(d~t), newdata = t) # if some t are NA, still i twil
+      p <- stats::predict(lm(d~t), newdata = t) # if some t are NA, still i twil
       # p <- p[match(names(d), names(p))] # this is to account for when the date is NA
-      c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "Initial linear interpolation for missed tree")
+      c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "Missed tree")
+      cm[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(cm[is.na(d) & !is.na(p)], "Initial linear interpolation")
       d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
     }
 
-    return(list(d, c))
+    return(list(d, c, cm))
 
   },
   d = split(DiameterHistory, row(DiameterHistory)),
   t = split(DateHistory, row(DateHistory)),
   c = split(CommentHistory, row(CommentHistory)),
+  cm = split(DiameterCorrectionMethHistory, row(DiameterCorrectionMethHistory)),
   l = split(LifeStatusHistory, row(LifeStatusHistory))))
 
   DiameterHistory[] <- do.call(rbind, MissedDiametetFilled[,1])
   CommentHistory[] <-  do.call(rbind, MissedDiametetFilled[,2])
+  DiameterCorrectionMethHistory[] <-  do.call(rbind, MissedDiametetFilled[,3])
 
   # create a function that will allow to get diameter difference and growth history (because we will need to recalculate those a few times, as we make corrections)
   CalcGrowthHist <- function(DiameterHistory, DateHistory) {
@@ -548,7 +562,6 @@ DiameterCorrection <- function(
     # get indexes to replace
     idxPOMChange <- is.na(GrowthHistory) & idxPOMChange
     idxToReplace <- suppressWarnings(cbind(which(idxPOMChange, arr.ind = T), what = 1)) # 1 is for POM Change, 2 is for abnormal growth
-    idxToReplace <- cbind(idxToReplace, sign = sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])) # get the sign of the shift
 
 
 
@@ -558,8 +571,18 @@ DiameterCorrection <- function(
     idxAbnormal <- idxPOMChange # this is to help maintaining the structure
     idxAbnormal[] <- grepl(paste("Growth greated than threshold", "Growth smaller than threshold", sep = "|"), CommentHistory) & !grepl(paste("HOM decreased", "HOM increased", "POM changed", sep = "|"), CommentHistory)
 
-    idxToReplace <-  rbind(idxToReplace, suppressWarnings(cbind(which(idxAbnormal, arr.ind = T), what = 2, # 1 is for POM Change, 2 is for shift or punctual
-                                                                sign = sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxAbnormal])))) # get the sign of the shift
+    idxToReplace <-  rbind(idxToReplace, suppressWarnings(cbind(which(idxAbnormal, arr.ind = T), what = 2))) # 1 is for POM Change, 2 is for shift or punctual
+
+
+
+
+    ## get the sign of the shift ---------------------------------------------
+if(nrow(idxToReplace) > 0) {
+  idxToReplace <- cbind(idxToReplace, sign = NA)
+  idxToReplace[idxToReplace[, 3] %in% 1, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])
+  idxToReplace[idxToReplace[, 3] %in% 2, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxAbnormal])
+
+}
 
 
 
@@ -728,15 +751,39 @@ DiameterCorrection <- function(
                     or the method needs to be improved)" )
 
 # Write changes in Data -------------------------------------------------------------------------------------------
-if(!DetectOnly){
 
-}
+    # write comments
+    DiameterHistoryCorrected <- melt(setDT(as.data.frame(CommentHistory), keep.rownames=TRUE), measure.vars = colnames(CommentHistory) , variable.name = "IdCensus")
+    DiameterHistoryCorrected <- DiameterHistoryCorrected[!value %in% "", ]
+
+    idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus))
+
+    Data$Comment_TreeData <- DiameterHistoryCorrected$value[idx]
+
+
+    # write methods
+    DiameterCorrectionMethHistoryCorrected <- melt(setDT(as.data.frame(DiameterCorrectionMethHistory), keep.rownames=TRUE), measure.vars = colnames(DiameterCorrectionMethHistory) , variable.name = "IdCensus")
+    DiameterCorrectionMethHistoryCorrected <- DiameterCorrectionMethHistoryCorrected[!value %in% "", ]
+
+    idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterCorrectionMethHistoryCorrected$rn, DiameterCorrectionMethHistoryCorrected$IdCensus))
+
+    Data$DiameterCorrectionMeth_TreeData <- DiameterCorrectionMethHistoryCorrected$value[idx]
+
+
+    # write DBH corrected
+    DiameterCorrected <- melt(setDT(as.data.frame(DiameterHistory), keep.rownames=TRUE), measure.vars = colnames(DiameterHistory) , variable.name = "IdCensus")
+
+    idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterCorrected$rn, DiameterCorrected$IdCensus))
+
+    Data$Diameter_TreeDataCor <- round(DiameterCorrected$value[idx], Digits)
 
 
 
 
 # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
-Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
+    DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by DiameterCorrections.")]
+
+    Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
 
 # Re-put the dead trees in the dataset (if there are not corrected by choice)
 if(DBHCorForDeadTrees == FALSE){
@@ -745,15 +792,6 @@ if(DBHCorForDeadTrees == FALSE){
 
 # Order IDs and times in ascending order ----------------------------------------------------------------------------
 Data <- Data[order(get(ID), IdCensus)]
-
-if(DetectOnly %in% FALSE){
-  # Rename correction columns
-  setnames(Data, c("DBHCor", "POMCor", "HOMCor"),
-           c("Diameter_TreeDataCor", "POM_TreeDataCor", "HOM_TreeDataCor"), skip_absent=TRUE)
-} else {
-  Data[, Diameter_TreeDataCor := NULL]
-  Data[, HOM_TreeDataCor := NULL]
-}
 
 
 return(Data)
