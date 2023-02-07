@@ -149,7 +149,7 @@ Fill the \emph{Comment} column with error type informations. If
 \emph{DetectOnly} = FALSE, add columns:
 \itemize{
 \item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "local linear regression","weighted
+\item \emph{DiameterCorrectionMeth_TreeData} = "local linear regression","weighted
 mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 "shift realignment"/"Same value".
 \item \emph{POM_TreeDataCor} (factor): POM value at which the corrected diameters are proposed.
