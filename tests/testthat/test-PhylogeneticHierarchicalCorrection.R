@@ -35,7 +35,7 @@ test_that("PhylogeneticHierarchicalCorrection", {
                                              DBHRange = 10, MinIndividualNbr = 5)
 
 
-  expect_true(all(c("DBHCor", "DiameterCorrectionMeth") %in% names(Rslt)))
+  expect_true(all(c("DBHCor", "DiameterCorrectionMeth_TreeData") %in% names(Rslt)))
 
   # Add a "DiameterCorrectionMeth" value when "Diameter" != "DBHCor"
   Methode <- Rslt[, DiameterCorrectionMeth] != ""

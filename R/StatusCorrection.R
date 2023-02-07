@@ -177,9 +177,9 @@ StatusCorrection <- function(
   }
 
   # get comment History
-  if(!"Comment" %in% names(Data)) Data[, Comment:= ""]
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData:= ""]
 
-  CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment", drop = FALSE)
+  CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment_TreeData", drop = FALSE)
   # rownames(CommentHistory) <- CommentHistory[[1]]
   # CommentHistory[,1] <- NULL
   CommentHistory <- as.matrix(CommentHistory, 1)
@@ -312,7 +312,7 @@ StatusCorrection <- function(
   suppressWarnings(NewComments <- melt(setDT(as.data.frame(NewComments), keep.rownames=TRUE), measure.vars = colnames(NewComments) , variable.name = "IdCensus"))
 
 
-  Data$Comment <- GenerateComment(Data$Comment, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
+  Data$Comment_TreeData <- GenerateComment(Data$Comment_TreeData, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
 
 
   if(!DetectOnly) {
@@ -352,7 +352,7 @@ StatusCorrection <- function(
 
     NewRows$LifeStatus_TreeDataCor <- NewStatusHistory[idx_new_rows, value][m]
 
-    NewRows$Comment <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
+    NewRows$Comment_TreeData <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
 
     # make best guess at other things
     warning("We added rows for missing trees and imputed average census Date")

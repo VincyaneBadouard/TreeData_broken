@@ -8,7 +8,7 @@
 #'
 #' @param DataTree  A dataset corresponding to a single tree/stem's (1 IdTree/IdStem)
 #'   measurements (data.frame or data.table)
-#'   To be filled in if you want the column "DiameterCorrectionMeth" (correction
+#'   To be filled in if you want the column "DiameterCorrectionMeth_TreeData" (correction
 #'   method) to be filled in the corresponding row.
 #'   Otherwise leave DataTree = NULL
 #'

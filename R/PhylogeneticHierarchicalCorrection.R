@@ -135,7 +135,7 @@ PhylogeneticHierarchicalCorrection <- function(
   # ---------------------------------------------------------------------------------------------------------
 
   # if(DetectOnly %in% FALSE){
-  if(!"DiameterCorrectionMeth" %in% names(DataTree)) DataTree[, DiameterCorrectionMeth := ""]
+  if(!"DiameterCorrectionMeth_TreeData" %in% names(DataTree)) DataTree[, DiameterCorrectionMeth_TreeData := ""]
   # }
 
   # Secondary columns

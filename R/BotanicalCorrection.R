@@ -135,7 +135,7 @@ BotanicalCorrection <- function(
 
   Data[, IdTree := as.character(IdTree)]
 
-  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
   # Missing value ---------------------------------------------------------------------------------------------------------
   # Family, ScientificName/Genus, species, VernName
@@ -146,7 +146,7 @@ BotanicalCorrection <- function(
 
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data[is.na(get(Vars[v])), Comment := GenerateComment(Comment, paste0("Missing value in ", Vars[v]))] # Data <- GenerateComment(Data, condition = is.na(Data[,get(Vars[v])]), comment = paste0("Missing value in ", Vars[v]))
+      Data[is.na(get(Vars[v])), Comment_TreeData := GenerateComment(Comment_TreeData, paste0("Missing value in ", Vars[v]))] # Data <- GenerateComment(Data, condition = is.na(Data[,get(Vars[v])]), comment = paste0("Missing value in ", Vars[v]))
     }
   }
 
@@ -201,11 +201,11 @@ BotanicalCorrection <- function(
 
 
   # Comment :
-  Data[grepl("aceae", Genus) | grepl("aceae", Species), Comment := GenerateComment(Comment, "Names ending in 'aceae' cannot be genus or species names")] #  Data <- GenerateComment(Data, condition = grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), comment = "Names ending in 'aceae' cannot be genus or species names")
+  Data[grepl("aceae", Genus) | grepl("aceae", Species), Comment_TreeData := GenerateComment(Comment_TreeData, "Names ending in 'aceae' cannot be genus or species names")] #  Data <- GenerateComment(Data, condition = grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), comment = "Names ending in 'aceae' cannot be genus or species names")
 
-  Data[grepl('[[:punct:]]', Genus), Comment := GenerateComment(Comment, "Special characters in the 'Genus'")] # Data <- GenerateComment(Data, condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character comment = "Special characters in the 'Genus'")
+  Data[grepl('[[:punct:]]', Genus), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Genus'")] # Data <- GenerateComment(Data, condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character comment = "Special characters in the 'Genus'")
 
-  Data[grepl('[[:punct:]]', Family), Comment := GenerateComment(Comment, "Special characters in the 'Family'")]
+  Data[grepl('[[:punct:]]', Family), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Family'")]
 
   if (DetectOnly %in% FALSE){
 
@@ -238,11 +238,11 @@ BotanicalCorrection <- function(
       # Comment:
       ## if "Synonym" :
 
-      Data[Taxonomic.status == "Synonym" & !is.na(Taxonomic.status), Comment := GenerateComment(Comment, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Taxonomic.status == "Synonym" & !is.na(Data$Taxonomic.status), comment = "'ScientificName' is a synonym of the accepted botanical name")
+      Data[Taxonomic.status == "Synonym" & !is.na(Taxonomic.status), Comment_TreeData := GenerateComment(Comment_TreeData, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Taxonomic.status == "Synonym" & !is.na(Data$Taxonomic.status), comment = "'ScientificName' is a synonym of the accepted botanical name")
 
       ## if Typo == TRUE :
 
-      Data[Typo %in% TRUE, Comment := GenerateComment(Comment, "Spelling error in the 'ScientificName'")] # Data <- GenerateComment(Data, condition = (Data$Typo == TRUE) & !is.na(Data$Typo), comment = "Spelling error in the 'ScientificName'")
+      Data[Typo %in% TRUE, Comment_TreeData := GenerateComment(Comment_TreeData, "Spelling error in the 'ScientificName'")] # Data <- GenerateComment(Data, condition = (Data$Typo == TRUE) & !is.na(Data$Typo), comment = "Spelling error in the 'ScientificName'")
 
       # Remove columns that have become useless
       Data[, c("Taxonomic.status", "Typo", "New.Genus", "New.Species") := NULL]
@@ -278,7 +278,7 @@ BotanicalCorrection <- function(
 
       # "Plants of the World Online" correction (more actual than WFO): ---------------------------------------------------
 
-      Data[ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), Comment := GenerateComment(Comment, "ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), comment = "'ScientificName' is a synonym of the accepted botanical name")
+      Data[ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), Comment_TreeData := GenerateComment(Comment_TreeData, "ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), comment = "'ScientificName' is a synonym of the accepted botanical name")
 
       Data[ScientificNameCor %in% c("Tetragastris panamensis",
                                     "Protium picramnioides",
@@ -346,7 +346,7 @@ BotanicalCorrection <- function(
 
 
       # if "Synonym" :
-      Data[ Old.status %in% "SYNONYM" , Comment := GenerateComment(Comment, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Old.status %in% "SYNONYM", comment = "'ScientificName' is a synonym of the accepted botanical name")
+      Data[ Old.status %in% "SYNONYM" , Comment_TreeData := GenerateComment(Comment_TreeData, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Old.status %in% "SYNONYM", comment = "'ScientificName' is a synonym of the accepted botanical name")
 
       Data[, Old.status := NULL] # remove the column
 
@@ -359,7 +359,7 @@ BotanicalCorrection <- function(
 
     # Generate a comment if the family name is incorrect --------------------------------------------------------------------
 
-    Data[!Family %in% Data$FamilyCor, Comment := GenerateComment(Comment, "The 'Family' name is incorrect")] # Data <- GenerateComment(Data, condition = !Data$Family %in% Data$FamilyCor, comment = "The 'Family' name is incorrect")
+    Data[!Family %in% Data$FamilyCor, Comment_TreeData := GenerateComment(Comment_TreeData, "The 'Family' name is incorrect")] # Data <- GenerateComment(Data, condition = !Data$Family %in% Data$FamilyCor, comment = "The 'Family' name is incorrect")
 
     if(Source == "TPL") FamCorSource <- "APG III family"
     if(Source == "WFO") FamCorSource <- "World Flora Online"
@@ -432,7 +432,7 @@ BotanicalCorrection <- function(
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data[Site %in% s & IdTree %in% duplicated_ID, Comment := GenerateComment(Comment, "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")] # Data <- GenerateComment(Data, condition = Data[,Site] == s & Data[,IdTree] %in% duplicated_ID, comment = "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")
+      Data[Site %in% s & IdTree %in% duplicated_ID, Comment_TreeData := GenerateComment(Comment_TreeData, "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")] # Data <- GenerateComment(Data, condition = Data[,Site] == s & Data[,IdTree] %in% duplicated_ID, comment = "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")
     }
   } # end site loop
 

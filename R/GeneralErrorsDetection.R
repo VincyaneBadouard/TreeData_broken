@@ -63,7 +63,7 @@ GeneralErrorsDetection <- function(
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
-  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
 
   # Check duplicate rows ------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ GeneralErrorsDetection <- function(
     if (Vars[v] %in% names(Data)){ # If the column exists
       if(!all(is.na(Data[,get(Vars[v])]))){ # if the column is not completely empty
 
-        Data[is.na(get(Vars[v])), Comment := GenerateComment(Comment, paste0("Missing value in ", Vars[v]))]
+        Data[is.na(get(Vars[v])), Comment_TreeData := GenerateComment(Comment_TreeData, paste0("Missing value in ", Vars[v]))]
         # Data <- GenerateComment(Data,
         #                         condition = is.na(Data[,get(Vars[v])]),
         #                         comment = paste0("Missing value in ", Vars[v]))
@@ -98,7 +98,7 @@ GeneralErrorsDetection <- function(
     } # column exists
   } # Vars loop
 
-  # Data[grepl("Missing value", Comment)] # to check
+  # Data[grepl("Missing value", Comment_TreeData)] # to check
 
 
   # Measurement variables = 0 -----------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data[(Data[, get(Vars[v])] == 0) & !is.na(Data[, get(Vars[v])]), Comment := GenerateComment(Comment, paste0(Vars[v], " cannot be 0"))]
+      Data[(Data[, get(Vars[v])] == 0) & !is.na(Data[, get(Vars[v])]), Comment_TreeData := GenerateComment(Comment_TreeData, paste0(Vars[v], " cannot be 0"))]
       # Data <-
       #   GenerateComment(
       #     Data,
@@ -193,7 +193,7 @@ GeneralErrorsDetection <- function(
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data[Site %in% s, Comment := GenerateComment(Comment, "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")]
+      Data[Site %in% s, Comment_TreeData := GenerateComment(Comment_TreeData, "Non-unique association of the IdTree with Plot, Subplot and TreeFieldNum")]
 
       # Data <-
       #   GenerateComment(Data,
@@ -228,7 +228,7 @@ GeneralErrorsDetection <- function(
     Data[, IDYear := paste(get(ID), Year, sep = "/")] # code to detect
 
 
-    Data[IDYear %in% DuplicatedID[, IDYear], Comment := GenerateComment(Comment, paste0("Duplicated '", ID, "' in the census"))]
+    Data[IDYear %in% DuplicatedID[, IDYear], Comment_TreeData := GenerateComment(Comment_TreeData, paste0("Duplicated '", ID, "' in the census"))]
 
     # Data <- GenerateComment(
     #   Data,
@@ -282,7 +282,7 @@ GeneralErrorsDetection <- function(
       duplicated_ID <-
         unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      Data[Site %in% s & get(ID) %in% duplicated_ID, Comment := GenerateComment(Comment, paste0(
+      Data[Site %in% s & get(ID) %in% duplicated_ID, Comment_TreeData := GenerateComment(Comment_TreeData, paste0(
         "Different coordinates (XTreeUTM, YTreeUTM) for a same '",
         ID,
         "'"

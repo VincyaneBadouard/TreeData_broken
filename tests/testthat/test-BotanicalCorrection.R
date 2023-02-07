@@ -95,7 +95,7 @@ test_that("BotanicalCorrection", {
   for(r in 1:length(Rslt)){
 
     # No correction, only comments
-    expect_true(all(!(grepl("_TreeDataCor", names(Rslt[[r]])))) & "Comment" %in% names(Rslt[[r]]))
+    expect_true(all(!(grepl("_TreeDataCor", names(Rslt[[r]])))) & "Comment_TreeData" %in% names(Rslt[[r]]))
 
     # Missing value
     Rslt[[r]][is.na(Subspecies), Subspecies := ""] # Subspecies = NA is ok

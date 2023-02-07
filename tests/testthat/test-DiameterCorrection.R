@@ -63,7 +63,7 @@ test_that("DiameterCorrection", {
     DetectOnly = TRUE)
 
   # No correction, only comments
-  expect_true(!"Diameter_TreeDataCor" %in% names(Rslt) & "Comment" %in% names(Rslt))
+  expect_true(!"Diameter_TreeDataCor" %in% names(Rslt) & "Comment_TreeData" %in% names(Rslt))
 
   ## Correction --------------------------------------------------------------------------------------------------------------------
   # options(warn = 2) # trace warning
