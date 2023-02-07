@@ -128,7 +128,7 @@ Order,Group,GroupSecondColumn,ItemType,Argument,Default,AppDefaultProfile,ItemID
 ,NA,NA,,,,,XXXOriginal,,,,,,,,NA,FALSE,NA,FALSE,-,-,FALSE,"Column coming straight from the input data, without any correction or transformation"
 ,NA,NA,,,,,Original_XXX,,,,,,,,NA,FALSE,NA,FALSE,-,-,FALSE,"One of the column(s) indicated as tree codes, as it is in the input data. The name of it is Original_[colomn name in the input data]. See tree_codes_metadata.csv for the definition of each value. If the output profile you selected also had tree codes, and you applied the translation, you should also have a tree_codes_translation.csv file in the zipfile. That file explains the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into."
 ,NA,NA,,,,,TreeCodesOutput,,,,,,,,NA,FALSE,NA,FALSE,,-,FALSE,One of the column(s) storing tree code information. See tree_codes_translation.csv file to understand the relationsip beetween the tree codes in your data and the tree codes in the output profile you turned your data into.
-,NA,NA,,,,,Comment,,,,,,,,NA,FALSE,NA,FALSE,-,-,FALSE,error type informations
+,NA,NA,,,,,Comment_TreeData,,,,,,,,NA,FALSE,NA,FALSE,-,-,FALSE,error type informations
 ,NA,NA,,,,,Family_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,corrected Family name
 ,NA,NA,,,,,FamilyCorSource,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,source of the Family correction
 ,NA,NA,,,,,Genus_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,corrected Genus name
@@ -140,7 +140,7 @@ correction"
 level."
 ,NA,NA,,,,,LifeStatus_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,logical,,TRUE,corrected stem life status.
 ,NA,NA,,,,,Diameter_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,numeric,,TRUE,corrected trees diameter at default HOM
-,NA,NA,,,,,DiameterCorrectionMeth,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,"diameter correction methode = ""taper""/""local linear regression""/""weighted mean""
+,NA,NA,,,,,DiameterCorrectionMeth_TreeData,,,,,,,,NA,FALSE,NA,FALSE,character,,TRUE,"diameter correction methode = ""taper""/""local linear regression""/""weighted mean""
 /phylogenetic hierarchical(""species""/""genus""/""family""/""stand"")/""shift realignment""/""Same value""."
 ,NA,NA,,,,,POM_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,factor,,TRUE,POM value at which the corrected diameters are proposed. Corresponds to the 1st POM value at which the stem was measured
 ,NA,NA,,,,,HOM_TreeDataCor,,,,,,,,NA,FALSE,NA,FALSE,numeric,,TRUE,"HOM value at which the corrected diameters are proposed. Corresponds to the DefaultHOM if Taper correction applied. If not, corresponds to the 1st HOM value at which the stem was measured"
