@@ -142,8 +142,8 @@ DiameterCorrectionPlot <- function(
                                              (!is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter))),
                                aes(y = get(CorCol), label = get(POMcorv), colour = "HOM"),
                                point.size = 3.9, size = 3, direction = "y") +
-      ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(get(CorCol)) & DiameterCorrectionMeth != "")),
-                               aes(y = get(CorCol), label = DiameterCorrectionMeth, colour = "Methode"),
+      ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(get(CorCol)) & DiameterCorrectionMeth_TreeData != "")),
+                               aes(y = get(CorCol), label = DiameterCorrectionMeth_TreeData, colour = "Methode"),
                                point.size = 10, size = 3) +
 
       # Colours

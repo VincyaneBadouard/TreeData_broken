@@ -127,7 +127,7 @@ test_that("StatusCorrection", {
     expect_true(all(SeqCor[!is.na(Rslt[IdTree %in% i, Diameter])] == T))
 
     ## Add a "Comment" value when "LifeStatus" != "LifeStatus_TreeDataCor"
-    Comment <- Rslt[IdTree %in% i, Comment] != ""
+    Comment <- Rslt[IdTree %in% i, Comment_TreeData] != ""
 
     compareNA <- function(v1,v2) {
       same <- (v1 == v2) | (is.na(v1) & is.na(v2))

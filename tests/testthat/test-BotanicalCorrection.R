@@ -99,21 +99,21 @@ test_that("BotanicalCorrection", {
 
     # Missing value
     Rslt[[r]][is.na(Subspecies), Subspecies := ""] # Subspecies = NA is ok
-    expect_true(all(grepl("Missing value", Rslt[[r]][rowSums(is.na(Rslt[[r]])) > 0, Comment])))
+    expect_true(all(grepl("Missing value", Rslt[[r]][rowSums(is.na(Rslt[[r]])) > 0, Comment_TreeData])))
 
     # -aceae in Genus or Species
     expect_true(all(grepl("'aceae' cannot be genus or species names",
-                          Rslt[[r]][grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), Comment])))
+                          Rslt[[r]][grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), Comment_TreeData])))
 
     # Special character in Genus, Family
     expect_true(all(grepl("Special characters",
-                          Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment])))
+                          Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment_TreeData])))
 
     # Variant botanical info per IdTree (A FAIRE)
     VarIdTree <- unique(Rslt[[r]][rowSums(is.na(Rslt[[r]])) == 0, .(IdTree, Family, Genus, Species, Subspecies, VernName)])[duplicated(IdTree), IdTree]
 
     expect_true(all(grepl("Different botanical informations",
-                          Rslt[[r]][IdTree %in% VarIdTree, Comment])))
+                          Rslt[[r]][IdTree %in% VarIdTree, Comment_TreeData])))
 
 
   }

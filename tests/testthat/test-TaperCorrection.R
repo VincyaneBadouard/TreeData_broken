@@ -45,8 +45,8 @@ test_that("TaperCorrection", {
   expect_true(all(c("Diameter_TreeDataCor", "DiameterCorrectionMeth_TreeData", "Comment_TreeData") %in% names(Rslt)))
 
   # Add a "Comment" and "Methode" value when "Diameter" != "Diameter_TreeDataCor"
-  Comment <- Rslt[, Comment] != ""
-  Methode <- Rslt[, DiameterCorrectionMeth] != ""
+  Comment <- Rslt[, Comment_TreeData] != ""
+  Methode <- Rslt[, DiameterCorrectionMeth_TreeData] != ""
 
   compareNA <- function(v1,v2) { # function to compare values, including NA
     same <- (v1 == v2) | (is.na(v1) & is.na(v2))

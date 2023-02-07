@@ -34,7 +34,7 @@ test_that("GeneralErrorsDetection", {
 
         MissingVal <- is.na(Rslt[,get(Vars[v])]) # any(MissingVal)
 
-        expect_true(all(grepl("Missing value", Rslt[MissingVal, Comment])))
+        expect_true(all(grepl("Missing value", Rslt[MissingVal, Comment_TreeData])))
 
       } # not empty column
     } # column exists
@@ -50,7 +50,7 @@ test_that("GeneralErrorsDetection", {
 
       NullVal <- Rslt[,get(Vars[v])] %in% 0 # any(NullVal) # which(is.na(NullVal))
 
-      expect_true(all(grepl("cannot be 0", Rslt[NullVal, Comment])))
+      expect_true(all(grepl("cannot be 0", Rslt[NullVal, Comment_TreeData])))
 
     }
   }
@@ -108,7 +108,7 @@ test_that("GeneralErrorsDetection", {
       NnUniqdIdTree <- (Rslt[,Site] == s
                         & Rslt[,IdTree] %in% duplicated_ID)
 
-      expect_true(all(grepl("Non-unique association", Rslt[NnUniqdIdTree, Comment]))) # Rslt[NnUniqdIdTree]
+      expect_true(all(grepl("Non-unique association", Rslt[NnUniqdIdTree, Comment_TreeData]))) # Rslt[NnUniqdIdTree]
 
     }
   } # end site loop
@@ -126,7 +126,7 @@ test_that("GeneralErrorsDetection", {
     DuplIdTree <- Rslt$IDYear %in% DuplicatedID[, IDYear] # any(DuplIdTree)
 
 
-    expect_true(all(grepl("Duplicated", Rslt[DuplIdTree, Comment])))
+    expect_true(all(grepl("Duplicated", Rslt[DuplIdTree, Comment_TreeData])))
     # Rslt[DuplIdTree]
 
   }
@@ -148,7 +148,7 @@ test_that("GeneralErrorsDetection", {
 
       duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
 
-      expect_true(all(grepl("Different coordinates", Rslt[IdTree %in% duplicated_ID, Comment])))
+      expect_true(all(grepl("Different coordinates", Rslt[IdTree %in% duplicated_ID, Comment_TreeData])))
 
     }
   } # end site loop

@@ -262,7 +262,7 @@ RecruitmentCorrection <- function(
 
 
   # add comment if detection only
-  if(DetectOnly)    Data$Comment[idx_CommentOnly] <- GenerateComment( Data$Comment[idx_CommentOnly], "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)"
+  if(DetectOnly)    Data$Comment_TreeData[idx_CommentOnly] <- GenerateComment( Data$Comment_TreeData[idx_CommentOnly], "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)"
     )
 
 
