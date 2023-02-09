@@ -138,11 +138,11 @@
 #' TestData$HOM <- 1.3
 #' TestData$HOM[1:3] <- c(0.5,1.5,NA)
 #'
-#' Rslt <- DiameterCorrection(
-#'  TestData,
-#'   WhatToCorrect = c("POM change", "punctual", "shift"),
-#'     CorrectionType = c("individual"),
-#'     MinIndividualNbr = 1, Digits = 2L)
+# Rslt <- DiameterCorrection(
+#  TestData,
+#   WhatToCorrect = c("POM change", "Abnormal growth"),
+#     CorrectionType = c("phylo"),
+#     MinIndividualNbr = 1, Digits = 2L)
 #'
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 #'
@@ -164,7 +164,7 @@ DiameterCorrection <- function(
     Pioneers = NULL,
     PioneersGrowthThreshold = 7.5,
 
-    WhatToCorrect = c("POM change", "punctual", "shift"),
+    WhatToCorrect = c("POM change", "Abnormal growth"),
     CorrectionType = c("individual", "phylogenetic hierarchical"),
 
     DBHRange = 10,
@@ -602,7 +602,7 @@ if(nrow(idxToReplace) > 0) {
 
     # remove cases where NA is in first column since that is fake data
 
-    idxToReplace <- idxToReplace[idxToReplace[, 2]> 1, ]
+    idxToReplace <- idxToReplace[idxToReplace[, 2]> 1, , drop = F]
 
     # remove cases that were not selected
     if(!"POM change" %in% WhatToCorrect) idxToReplace <- idxToReplace[!idxToReplace[,3] %in% 1, ]
@@ -653,7 +653,7 @@ if(nrow(idxToReplace) > 0) {
             # compute Colleagues growth mean
             wg <- mean(GrowthHistory[idxColleagues])
 
-            DiameterCorrectionMethHistory[i, j] <- GenerateComment( DiameterCorrectionMethHistory[i, j], paste(Method, "phylogenetic gowth mean"))
+            DiameterCorrectionMethHistory[i, j] <- GenerateComment( DiameterCorrectionMethHistory[i, j], paste(Method, "phylogenetic growth mean"))
 
             SwitchToIndividual = FALSE
           } else {
@@ -689,12 +689,12 @@ if(nrow(idxToReplace) > 0) {
 
 
         # apply switch to other values if j is not last column and l+1 in idxToReplace is not of same tree with opposite sign (which would indicated a punctual errro measurement)
-        shift = FALSE # initialize with no shit
+        shift = FALSE # initialize with no shift
         if(j < ncol(DiameterHistory)) {
           if(l == nrow(idxToReplace))  {
             shift = TRUE # if this is the last abnormal growth, we know we need to shift because we already skipped it if it was a return to normwl
           } else {
-            if((idxToReplace[l, 3] %in% 1 | (idxToReplace[l, 3] %in% 2 & idxToReplace[l+1, 3] %in% 2 & t %in% rownames(idxToReplace)[l+1] & (j+1) %in% idxToReplace[l+1, 2] & idxToReplace[l,4] + idxToReplace[l+1,4] != 0))) shit = TRUE
+            if((idxToReplace[l, 3] %in% 1 | (idxToReplace[l, 3] %in% 2 & idxToReplace[l+1, 3] %in% 2 & t %in% rownames(idxToReplace)[l+1] & (j+1) %in% idxToReplace[l+1, 2] & idxToReplace[l,4] + idxToReplace[l+1,4] != 0))) shift = TRUE
           }
         }
 
