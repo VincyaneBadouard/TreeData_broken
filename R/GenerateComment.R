@@ -12,8 +12,9 @@
 
 GenerateComment <- function(x, comment){
 
+  pattern = "(.*)(?=;\\1)"
+  gsub("^;|;;+", "", gsub(pattern,  "", paste(x, comment, sep = ";"), perl = T))
 
-  gsub("^;", "", paste(x, comment, sep = ";"))
 
 }
 
