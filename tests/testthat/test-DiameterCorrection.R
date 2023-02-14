@@ -38,18 +38,18 @@ test_that("DiameterCorrection", {
                regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
-               regexp = 'should be one of "POM change", "punctual", "shift"')
+               regexp = "'arg' should be one of “POM change”, “punctual”, “shift”")
 
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
-               regexp = 'should be one of "individual", "phylogenetic hierarchical"')
+               regexp = "'arg' should be one of “individual”, “phylogenetic hierarchical”")
 
-  expect_warning(DiameterCorrection(TestData, Digits = 1.2),
-                 regexp = "The 'Digits' argument must be an integer")
+  expect_warning(expect_warning(DiameterCorrection(TestData, Digits = 1.2),
+                 regexp = "The 'Digits' argument must be an integer"), "All your HOM are NA, so we can't do taper corrections")
 
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
 
-  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual"),
+  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual", UseTaperCorrection = F),
                  regexp = "You have the 'POM' information in your dataset")
 
 
@@ -72,6 +72,8 @@ test_that("DiameterCorrection", {
   Rslt <- DiameterCorrection(
     TestData,
 
+    UseTaperCorrection = F,
+
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
 
@@ -90,7 +92,7 @@ test_that("DiameterCorrection", {
   # Growth > 5 cm DBH/year & < -2 cm DBH/census
 
   # Comment and Methode if correction
-  expect_true(all(!is.na(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), DiameterCorrectionMeth]))) # method when the DBH has been corrected
+  expect_true(all(!is.na(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), DiameterCorrectionMeth_TreeData]))) # method when the DBH has been corrected
 
   # expect_true(all(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), Comment] != "")) # comment when the DBH has been corrected
 
