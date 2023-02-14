@@ -11,6 +11,7 @@ FullErrorProcessing(
   WFOData = NULL,
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
   UseTaperCorrection = TRUE,
@@ -23,7 +24,7 @@ FullErrorProcessing(
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -59,6 +60,8 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 
 \item{UseSize}{Use the size presence  (> min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)}
+
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical). Ignored when DetectOnly is TRUE}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
 before it was seen alive for the 1st time? (logical)}
