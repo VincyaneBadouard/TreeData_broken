@@ -16,7 +16,7 @@ DiameterCorrection(
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
@@ -178,11 +178,6 @@ data(TestData)
 TestData$HOM <- 1.3
 TestData$HOM[1:3] <- c(0.5,1.5,NA)
 
-Rslt <- DiameterCorrection(
- TestData,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("individual"),
-    MinIndividualNbr = 1, Digits = 2L)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 
