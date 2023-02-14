@@ -50,6 +50,7 @@ FullErrorProcessing <- function(
 
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
 
@@ -63,14 +64,13 @@ FullErrorProcessing <- function(
 
   ## other diameter corrections
   KeepMeas = c("MaxHOM", "MaxDate"),
-  # MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
 
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
@@ -203,36 +203,26 @@ FullErrorProcessing <- function(
   #### Life status ####
 
   Data <- StatusCorrection(Data,
-                           # InvariantColumns = InvariantColumns,
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
                            DetectOnly = DetectOnly,
                            RemoveRBeforeAlive = RemoveRBeforeAlive,
                            RemoveRAfterDeath = RemoveRAfterDeath)
 
-  #### Taper ####
-  if(UseTaperCorrection & "HOM" %in% names(Data) & any(!is.na(Data$HOM))){
-
-    Data <- TaperCorrection(Data,
-                            DefaultHOM = DefaultHOM,
-
-                            TaperParameter = TaperParameter,
-                            TaperFormula = TaperFormula,
-
-                            DetectOnly = DetectOnly)
-  }
-
   #### Diameter ####
 
-  if(any(c("linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType) |
+  if(any(c("individual", 'phylogenetic hierarchical') %in% CorrectionType) |
      any(c("POM change", "punctual", "shift") %in% WhatToCorrect)){
 
     Data <- DiameterCorrection(Data,
+                               UseTaperCorrection = UseTaperCorrection,
+                               DefaultHOM = DefaultHOM,
+
+                               TaperParameter = TaperParameter,
+                               TaperFormula = TaperFormula,
 
                                KeepMeas = KeepMeas,
 
-                               DefaultHOM = DefaultHOM,
-                               # MaxDBH = MaxDBH,
                                PositiveGrowthThreshold = PositiveGrowthThreshold,
                                NegativeGrowthThreshold = NegativeGrowthThreshold,
 
