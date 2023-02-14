@@ -1,7 +1,7 @@
 test_that("DiameterCorrection", {
 
   # Import data ---------------------------------------------------------------------------------------------------------------------
-  library(data.table)
+  suppressWarnings(library(data.table))
   data(TestData)
 
   # Remove other errors types (non-unique idTree, missing Year)
@@ -38,10 +38,10 @@ test_that("DiameterCorrection", {
                regexp = "'Pioneers' argument must be a characters vector, or NULL")
 
   expect_error(DiameterCorrection(TestData, WhatToCorrect = "diameter"),
-               regexp = "'arg' should be one of “POM change”, “punctual”, “shift”")
+               regexp = "'arg' should be one of \"POM change\", \"Abnormal growth\"")
 
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
-               regexp = "'arg' should be one of “individual”, “phylogenetic hierarchical”")
+               regexp = "'arg' should be one of \"individual\", \"phylogenetic hierarchical\"")
 
   expect_warning(expect_warning(DiameterCorrection(TestData, Digits = 1.2),
                  regexp = "The 'Digits' argument must be an integer"), "All your HOM are NA, so we can't do taper corrections")
@@ -49,7 +49,7 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
                regexp = "The 'DetectOnly' argument must be a logical")
 
-  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "punctual", UseTaperCorrection = F),
+  expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "Abnormal growth", UseTaperCorrection = F),
                  regexp = "You have the 'POM' information in your dataset")
 
 
@@ -60,7 +60,8 @@ test_that("DiameterCorrection", {
   Rslt <- DiameterCorrection(
     TestData,
     CorrectionType = "phylogenetic hierarchical",
-    DetectOnly = TRUE)
+    DetectOnly = TRUE,
+    UseTaperCorrection = F)
 
   # No correction, only comments
   expect_true(!"Diameter_TreeDataCor" %in% names(Rslt) & "Comment_TreeData" %in% names(Rslt))
@@ -80,7 +81,7 @@ test_that("DiameterCorrection", {
     Pioneers = c("Cecropia","Pourouma"),
     PioneersGrowthThreshold = 7.5,
 
-    WhatToCorrect = c("POM change", "punctual", "shift"),
+    WhatToCorrect = c("POM change", "Abnormal growth"),
     CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,
