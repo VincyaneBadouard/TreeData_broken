@@ -146,3 +146,39 @@ test_that("StatusCorrection", {
 # after the death always the death (no "NA")
 # if no "dead" but "NA" nbr >= DeathConfirmation -> "dead" in "DBHCor"
 # if UseSize : if Diameter != NA -> Alive
+
+
+
+# check SCBI subset -------------------------------------------------------
+
+data(SCBISubsetFormated)
+
+expect_warning(SCBICorrected <- StatusCorrection(SCBISubsetFormated), "We added rows for missing trees and imputed average census Date")
+
+expect_identical(unique(SCBICorrected$Comment_TreeData), c("", "A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive", "Tree can't be dead before first being alive"))
+
+
+expect_identical(SCBICorrected[IdStem %in% "10012",LifeStatus_TreeDataCor], SCBICorrected[IdStem %in% "10012",LifeStatus]) # this IdStem should not have any corrections
+
+expect_true(all(SCBICorrected[IdStem %in% "11012", LifeStatus_TreeDataCor])) # first measurement had a DBH so should be alive, then second should be Alive because inbetwen two alive
+
+expect_identical(SCBICorrected[IdStem %in% "11012", Comment_TreeData ], c("A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
+                                                                          ""))
+
+SCBISubsetFormated[IdStem %in% "66114",]
+expect_identical(SCBICorrected[IdStem %in% "66114", Comment_TreeData], c("Tree can't be dead before first being alive", "Tree can't be dead before first being alive",  "")) # this should turn into an error once we fix the interractive part that let's us put NA for things like prior
+
+SCBISubsetFormated[IdStem %in% "31258",]
+SCBICorrected[IdStem %in% "31258",]
+
+SCBISubsetFormated[IdStem %in% "10032",]
+expect_identical(SCBICorrected[IdStem %in% "10032",.(LifeStatus_TreeDataCor, Comment_TreeData)],
+                 structure(list(LifeStatus_TreeDataCor = c(TRUE, FALSE, FALSE),
+                                Comment_TreeData = c("A measured tree is a living tree","", "")),
+                           row.names = c(NA, -3L), class = c("data.table","data.frame")))
+
+
+expect_equal(nrow(SCBICorrected[Comment_TreeData %in% "A measured tree is a living tree",]), 4)
+
+
+
