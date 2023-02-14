@@ -108,7 +108,7 @@ GeneralErrorsDetection <- function(
   for (v in 1:length(Vars)) {
     if(Vars[v] %in% names(Data)){ # If the column exists
 
-      Data[(Data[, get(Vars[v])] == 0) & !is.na(Data[, get(Vars[v])]), Comment_TreeData := GenerateComment(Comment_TreeData, paste0(Vars[v], " cannot be 0"))]
+      Data[get(Vars[v]) %in% 0, Comment_TreeData := GenerateComment(Comment_TreeData," cannot be 0")]
       # Data <-
       #   GenerateComment(
       #     Data,
@@ -184,7 +184,7 @@ GeneralErrorsDetection <- function(
   for (s in unique(na.omit(Data$Site))) {
 
     correspondances <- na.omit(unique(
-      Data[Data$Site == s, .(IdTree, Plot, Subplot, TreeFieldNum)]
+      Data[Site == s, .(IdTree, Plot, Subplot, TreeFieldNum)]
     ))
 
     CorresIDs <- correspondances[, IdTree] # .(IdTree) all the Idtree's having a unique P-SubP-TreeFieldNum combination
@@ -271,7 +271,7 @@ GeneralErrorsDetection <- function(
 
   # For each site
   for (s in unique(na.omit(Data$Site))) {
-    CoordIDCombination <- na.omit(unique(Data[Data$Site == s, c(ID, "XTreeUTM", "YTreeUTM"), with = FALSE]))
+    CoordIDCombination <- na.omit(unique(Data[Site == s, c(ID, "XTreeUTM", "YTreeUTM"), with = FALSE]))
 
     CorresIDs <-
       CoordIDCombination[, get(ID)] # .(IdTree) all the Idtree's having a unique X-YTreeUTM) combination
