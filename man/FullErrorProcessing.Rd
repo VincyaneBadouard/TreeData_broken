@@ -187,12 +187,13 @@ default HOM (\emph{TaperCorrection})
 }
 }
 \examples{
+
+\dontrun{
 data(TestData)
 Rslt <- FullErrorProcessing(TestData,
  OnlyDetectMissedRecruits = TRUE,
   AddRowsForForgottenCensuses = FALSE)
 
-\dontrun{
 WFO_Backbone <- file.choose()
 load(WFO_Backbone)
 Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)

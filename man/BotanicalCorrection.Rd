@@ -4,7 +4,7 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, Source = NULL, WFOData = NULL)
+BotanicalCorrection(Data, Source = c("TPL", "WFO"), WFOData = NULL)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
