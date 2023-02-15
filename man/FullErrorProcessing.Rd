@@ -6,7 +6,6 @@
 \usage{
 FullErrorProcessing(
   Data,
-  DetectOnly = FALSE,
   Source = NULL,
   WFOData = NULL,
   DeathConfirmation = 2,
@@ -32,14 +31,12 @@ FullErrorProcessing(
   Digits = 1L,
   DBHCorForDeadTrees = TRUE,
   coef = 0.9,
+  OnlyDetectMissedRecruits = FALSE,
   MinDBH = 10
 )
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)}
 
 \item{Source}{(character) To correct and standardise, you can choose between:
 \itemize{
@@ -47,7 +44,6 @@ FullErrorProcessing(
 on the 2013 taxonomy)
 \item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
 but based on the 2022 taxonomy)
-\item NULL: if only error detection (DetectOnly = TRUE)
 }}
 
 \item{WFOData}{To be filled in if the argument \code{Source} = "WFO". Data set
@@ -61,7 +57,7 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 \item{UseSize}{Use the size presence  (> min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)}
 
-\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical). Ignored when DetectOnly is TRUE}
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
 before it was seen alive for the 1st time? (logical)}
@@ -121,15 +117,13 @@ the \code{ScientificName_TreeDataCor} column (characters vector)}
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
 
-\item{WhatToCorrect}{Possible values: "POM change", "punctual", "shift"
+\item{WhatToCorrect}{Possible values: "POM change", "Abnormal growth"
 (character)
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
 Diameter values from it. (Ignored if taper correction is applied)
-\item "punctual": detect if the error is punctual and correct it by
-interpolation.
-\item "shift": detect if there is a shift of several Diameter values and
-links them to the 1st measurements set.
+\item "Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
+or smaller than NegativeGrowthThreshold and correct it by \code{CorrectionType}
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
@@ -166,6 +160,9 @@ have corrected the tree life status with the \emph{StatusCorrection()} function.
 
 \item{coef}{description... (numeric)}
 
+\item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
+(logical)}
+
 \item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
 NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
 }
@@ -191,7 +188,9 @@ default HOM (\emph{TaperCorrection})
 }
 \examples{
 data(TestData)
-Rslt <- FullErrorProcessing(TestData, DetectOnly = TRUE)
+Rslt <- FullErrorProcessing(TestData,
+ OnlyDetectMissedRecruits = TRUE,
+  AddRowsForForgottenCensuses = FALSE)
 
 \dontrun{
 WFO_Backbone <- file.choose()

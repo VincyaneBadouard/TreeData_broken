@@ -17,10 +17,7 @@
 #' @param UseSize Use the size presence  (> min DBH) as a witness of the living status of the
 #'   tree (logical) (Default = FALSE)
 #'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (logical)
-#'
-#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical). Ignored when DetectOnly is TRUE
+#' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).
 #'
 #'
 #' @param RemoveRBeforeAlive Do you want to delete the rows about the tree
@@ -43,9 +40,8 @@
 #'   if DeathConfirmation > unseens -> NA
 #'   if DeathConfirmation =< unseens -> Dead
 #'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add a *LifeStatus_TreeDataCor* column with the
-#'   corrected trees life status.
+#' @return Fill the *Comment_TreeData* column with error type informations and add
+#'  a *LifeStatus_TreeDataCor* column with corrected trees life status.
 #'
 #' @importFrom data.table data.table rbindlist
 #' @importFrom stats na.omit
@@ -74,8 +70,7 @@
 StatusCorrection <- function(
     Data,
     DeathConfirmation = 2,
-    UseSize = TRUE, # ignored if DetectOnly is TRUE
-    DetectOnly = FALSE,
+    UseSize = TRUE,
     AddRowsForForgottenCensuses = TRUE,
     RemoveRBeforeAlive = FALSE,
     RemoveRAfterDeath = FALSE){
@@ -118,17 +113,17 @@ StatusCorrection <- function(
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
-  if (!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
+  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath
+  if (!all(unlist(lapply(list(UseSize, RemoveRBeforeAlive, RemoveRAfterDeath, AddRowsForForgottenCensuses),
                          inherits, "logical"))))
-    stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
+    stop("The 'UseSize', 'RemoveRBeforeAlive', 'AddRowsForForgottenCensuses' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # use corrected columns as InvariantColumns if they exist (mostly for Species names that may have been corrected)
-  if(!DetectOnly) {
+
     idx_corrected_columns <- paste0(InvariantColumns, "_TreeDataCor") %in% names(Data)
     InvariantColumns[idx_corrected_columns] <- paste0(InvariantColumns, "_TreeDataCor")[idx_corrected_columns]
-  }
+
 
   # UseSize-Diameter
   if(UseSize %in% TRUE){ # if it is desired (TRUE) to use the presence of measurement to consider the tree alive
@@ -232,7 +227,7 @@ StatusCorrection <- function(
       t
     }, StatusHistoryC, measured, NewCommentsC, USE.NAMES = F)
 
-    if(!DetectOnly) StatusHistoryC <- mapply(function(x, m) {
+  StatusHistoryC <- mapply(function(x, m) {
       invisible(sapply(m, function(so) if(so > 0) substring(x, so, so) <<- "1"))
       x
     }, StatusHistoryC, measured, USE.NAMES = F)
@@ -248,7 +243,7 @@ StatusCorrection <- function(
     t
   }, StatusHistoryC, resucitate, NewCommentsC, USE.NAMES = F)
 
-  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+StatusHistoryC <- mapply(function(x, m) {
     invisible(mapply(function(so, ml) if(grepl("N|0", substring(x, so, so + ml - 1L))) substring(x, so, so + ml - 1L) <<- strrep("1", ml), m, attr(m, "match.length")))
     x
   }, StatusHistoryC, resucitate, USE.NAMES = F)
@@ -263,7 +258,7 @@ StatusCorrection <- function(
     t
   }, StatusHistoryC, unseen, NewCommentsC, USE.NAMES = F)
 
-  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+StatusHistoryC <- mapply(function(x, m) {
     invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), m, attr(m, "match.length")))
     x
   }, StatusHistoryC, unseen, USE.NAMES = F)
@@ -278,7 +273,7 @@ StatusCorrection <- function(
     t
   }, StatusHistoryC, deadfirst, NewCommentsC, USE.NAMES = F)
 
-  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+StatusHistoryC <- mapply(function(x, m) {
     invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("N", ml), m, attr(m, "match.length")))
     x
   }, StatusHistoryC, deadfirst, USE.NAMES = F)
@@ -292,7 +287,7 @@ StatusCorrection <- function(
     t
   }, StatusHistoryC, deadNAend, NewCommentsC, USE.NAMES = F)
 
-  if(!DetectOnly)  StatusHistoryC <- mapply(function(x, m) {
+StatusHistoryC <- mapply(function(x, m) {
     invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), m, attr(m, "match.length")))
     x
   }, StatusHistoryC, deadNAend, USE.NAMES = F)
@@ -315,7 +310,7 @@ StatusCorrection <- function(
   Data$Comment_TreeData <- GenerateComment(Data$Comment_TreeData, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
 
 
-  if(!DetectOnly) {
+
 
     NewStatusHistory <- do.call(rbind, strsplit(StatusHistoryC, ""))
     NewStatusHistory[] <- suppressWarnings(as.logical(as.numeric(NewStatusHistory)))
@@ -330,10 +325,10 @@ StatusCorrection <- function(
 
     Data <- cbind(Data, LifeStatus_TreeDataCor = NewStatusHistory$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewStatusHistory$rn, NewStatusHistory$IdCensus))])
 
-  }
+
 
   # Creating rows for absents ####
-  if(AddRowsForForgottenCensuses & !DetectOnly) { # NEED TO ADD IN RD THAT AddRowsForForgottenCensuses IS IGNORED IF DetectOnly = T.
+  if(AddRowsForForgottenCensuses) {
 
     # identify cases we need to add
     idx_new_rows <- which(match(paste(NewStatusHistory$rn, NewStatusHistory$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)

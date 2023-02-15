@@ -21,7 +21,7 @@
 #' @return The plots of the initial diameter values and proposed corrections, by
 #'   IdStem.
 #'
-#' @importFrom ggplot2 ggplot geom_point geom_line aes theme_minimal
+#' @importFrom ggplot2 ggplot geom_point geom_line aes theme_minimal guides theme guide_legend
 #'   position_nudge scale_colour_manual labs vars
 #' @importFrom ggforce facet_wrap_paginate
 #' @importFrom ggrepel geom_text_repel
@@ -32,9 +32,21 @@
 #' @examples
 #'
 #'\dontrun{
-#' pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
+#' # pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
+#'
+#'  data(TestData)
+#'
+#' TestData$HOM <- 1.3
+#' TestData$HOM[1:3] <- c(0.5,1.5,NA)
+#'
+#' Rslt <- DiameterCorrection(
+#'  TestData,
+#'   WhatToCorrect = c("POM change", "Abnormal growth"),
+#'    CorrectionType = c("phylo"),
+#'     MinIndividualNbr = 1, Digits = 2L)
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
-#' dev.off()
+#'
+#' # dev.off()
 #'}
 #'
 DiameterCorrectionPlot <- function(

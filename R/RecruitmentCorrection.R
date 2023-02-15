@@ -18,7 +18,7 @@
 #' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
 #'   considered abnormal (numeric, 1 value) (Default = 5 cm)
 #'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
+#' @param OnlyDetectMissedRecruits TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
 #'
 #' @details If the size of the tree has never changed, or if there is only one
@@ -27,10 +27,10 @@
 #'   exist), the function will create it for the forgotten recruits. It is
 #'   strongly recommended to correct the Diameter before correcting the recruits
 #'
-#' @return  When non in DetectOnly mode, add rows for forgotten recruits with their estimated DBH in the
+#' @return  When non in OnlyDetectMissedRecruits mode, add rows for forgotten recruits with their estimated DBH in the
 #'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical) to indicate
 #'    the rows that were added.
-#'   In DetectOnly mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+#'   In OnlyDetectMissedRecruits mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
 #'   tree, according to its annual growth and the census done for this plot, it
 #'   should have been recruited earlier according to your protocol (MinDBH)."
 #'
@@ -63,7 +63,7 @@ RecruitmentCorrection <- function(
 
     MinDBH = NULL,
     PositiveGrowthThreshold = 5,
-    DetectOnly = FALSE
+    OnlyDetectMissedRecruits = FALSE
 ){
 
   InvariantColumns = c("MinDBH", "Site",
@@ -107,10 +107,10 @@ RecruitmentCorrection <- function(
 
 
 
-  # DetectOnly (logical)
-  if(!all(unlist(lapply(list(DetectOnly),
+  # OnlyDetectMissedRecruits (logical)
+  if(!all(unlist(lapply(list(OnlyDetectMissedRecruits),
                         inherits, "logical"))))
-    stop("The 'DetectOnly' argument
+    stop("The 'OnlyDetectMissedRecruits' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
   # Diameter_TreeDataCor column exists
@@ -119,7 +119,7 @@ RecruitmentCorrection <- function(
            column does't exist in the dataset.")
 
   # Diameter_TreeDataCor column exists
-  if(!DetectOnly){
+  if(!OnlyDetectMissedRecruits){
     if(!"Diameter_TreeDataCor" %in% names(Data))
       warning("The 'Diameter_TreeDataCor' (corrected Diameter) column does't exist in the dataset.
          We advise to first correct the diameter measurements before correcting the recruitment")
@@ -127,7 +127,7 @@ RecruitmentCorrection <- function(
 
 
   # use corrected columns as InvariantColumns if they exist (mostly for Species names that may have been corrected)
-  if(!DetectOnly) {
+  if(!OnlyDetectMissedRecruits) {
     idx_corrected_columns <- paste0(InvariantColumns, "_TreeDataCor") %in% names(Data)
     InvariantColumns[idx_corrected_columns] <- paste0(InvariantColumns, "_TreeDataCor")[idx_corrected_columns]
   }
@@ -149,7 +149,7 @@ RecruitmentCorrection <- function(
 
   if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
-  if(!DetectOnly){
+  if(!OnlyDetectMissedRecruits){
     Data[, CorrectedRecruit := FALSE] # The initial rows are not corrected recruits
   }
 
@@ -255,20 +255,20 @@ RecruitmentCorrection <- function(
 
   idx_new_rows  <- which(match(paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
 
-  # find out which rows in Data should get a comment to indicate the previous census should have recruited this tree already (adding this comment only when DetectOnly)
-  idx_CommentOnly <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus)[!is.na(DiameterHistoryCorrected$value)])
+  # find out which rows in Data should get a comment to indicate the previous census should have recruited this tree already (adding this comment only when OnlyDetectMissedRecruits)
+  idx_CommentOnly <- match(paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus)[!is.na(DiameterHistoryCorrected$value)], paste(Data[,get(ID)], Data[,IdCensus]))
   idx_CommentOnly <- idx_CommentOnly[!duplicated(Data[,get(ID)][idx_CommentOnly])]
   idx_CommentOnly <- idx_CommentOnly[!is.na(idx_CommentOnly)]
 
 
   # add comment if detection only
-  if(DetectOnly)    Data$Comment_TreeData[idx_CommentOnly] <- GenerateComment( Data$Comment_TreeData[idx_CommentOnly], "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)"
-    )
+  if(OnlyDetectMissedRecruits)
+    Data[idx_CommentOnly, Comment_TreeData := GenerateComment(Comment_TreeData, "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)")]
 
 
   # add rows with the corrected DBH if not detection only + indicate TRUE in the recruit column
 
-  if(!DetectOnly) {
+  if(!OnlyDetectMissedRecruits) {
 
     # get what we know about those trees
     NewRows <- Data[get(ID) %in% DiameterHistoryCorrected$rn[idx_new_rows], ]

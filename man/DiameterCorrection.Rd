@@ -23,8 +23,7 @@ DiameterCorrection(
   OtherCrit = NULL,
   Digits = 1L,
   DBHCorForDeadTrees = TRUE,
-  coef = 0.9,
-  DetectOnly = FALSE
+  coef = 0.9
 )
 }
 \arguments{
@@ -96,15 +95,13 @@ the \code{ScientificName_TreeDataCor} column (characters vector)}
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
 
-\item{WhatToCorrect}{Possible values: "POM change", "punctual", "shift"
+\item{WhatToCorrect}{Possible values: "POM change", "Abnormal growth"
 (character)
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
 Diameter values from it. (Ignored if taper correction is applied)
-\item "punctual": detect if the error is punctual and correct it by
-interpolation.
-\item "shift": detect if there is a shift of several Diameter values and
-links them to the 1st measurements set.
+\item "Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
+or smaller than NegativeGrowthThreshold and correct it by \code{CorrectionType}
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
@@ -140,13 +137,9 @@ FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
 
 \item{coef}{description... (numeric)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add columns:
+Fill the \emph{Comment_TreeData} column with error type informations and add columns:
 \itemize{
 \item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
 \item \emph{DiameterCorrectionMeth_TreeData} = "local linear regression","weighted
@@ -178,6 +171,11 @@ data(TestData)
 TestData$HOM <- 1.3
 TestData$HOM[1:3] <- c(0.5,1.5,NA)
 
+Rslt <- DiameterCorrection(
+ TestData,
+  WhatToCorrect = c("POM change", "Abnormal growth"),
+    CorrectionType = c("phylo"),
+    MinIndividualNbr = 1, Digits = 2L)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 

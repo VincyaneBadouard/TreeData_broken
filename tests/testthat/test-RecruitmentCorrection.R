@@ -1,7 +1,7 @@
 test_that("RecruitmentCorrection", {
 
   # Import data
-  library(data.table)
+  suppressWarnings(library(data.table))
   data(TestData)
 
   # Create test data
@@ -19,8 +19,8 @@ test_that("RecruitmentCorrection", {
   expect_error(RecruitmentCorrection(TestData, MinDBH = c(5, 10, 20), PositiveGrowthThreshold = TRUE),
                regexp = "MinDBH must be numeric value of length 1")
 
-  expect_error(RecruitmentCorrection(TestData, DetectOnly = "no"),
-               regexp = "The 'DetectOnly' argument
+  expect_error(RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = "no"),
+               regexp = "The 'OnlyDetectMissedRecruits' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
   expect_error(RecruitmentCorrection(NoDBHData),
@@ -31,6 +31,6 @@ test_that("RecruitmentCorrection", {
   expect_warning(RecruitmentCorrection(TestData), regexp = "We added rows for trees that were supposed to be recruited earlier based on growth pattern and MinDBH")
 
   # Check the function works
-  Rslt <- RecruitmentCorrection(TestData, DetectOnly = T)
+  Rslt <- RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = T)
 
 })

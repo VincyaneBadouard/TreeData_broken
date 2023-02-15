@@ -27,7 +27,9 @@
 #'
 #' @examples
 #' data(TestData)
-#' Rslt <- FullErrorProcessing(TestData, DetectOnly = TRUE)
+#' Rslt <- FullErrorProcessing(TestData,
+#'  OnlyDetectMissedRecruits = TRUE,
+#'   AddRowsForForgottenCensuses = FALSE)
 #'
 #'\dontrun{
 #' WFO_Backbone <- file.choose()
@@ -40,7 +42,6 @@ FullErrorProcessing <- function(
 
   Data,
 
-  DetectOnly = FALSE,
 
   # Botanical informations
   Source = NULL,
@@ -83,6 +84,7 @@ FullErrorProcessing <- function(
   coef = 0.9,
 
   # Recruitment
+  OnlyDetectMissedRecruits = FALSE,
   MinDBH = 10
 ){
 
@@ -116,10 +118,10 @@ FullErrorProcessing <- function(
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
-  if (!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
+  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath/OnlyDetectMissedRecruits
+  if (!all(unlist(lapply(list(UseSize, RemoveRBeforeAlive, RemoveRAfterDeath, OnlyDetectMissedRecruits),
                          inherits, "logical"))))
-    stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
+    stop("The 'UseSize', 'RemoveRBeforeAlive', 'OnlyDetectMissedRecruits', and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # UseSize-Diameter
@@ -197,22 +199,21 @@ FullErrorProcessing <- function(
 
   Data <- BotanicalCorrection(Data = Data,
                               Source = Source,
-                              WFOData = WFOData,
-                              DetectOnly = DetectOnly)
+                              WFOData = WFOData)
 
   #### Life status ####
 
   Data <- StatusCorrection(Data,
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
-                           DetectOnly = DetectOnly,
+                           AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
                            RemoveRBeforeAlive = RemoveRBeforeAlive,
                            RemoveRAfterDeath = RemoveRAfterDeath)
 
   #### Diameter ####
 
   if(any(c("individual", 'phylogenetic hierarchical') %in% CorrectionType) |
-     any(c("POM change", "punctual", "shift") %in% WhatToCorrect)){
+     any(c("POM change", "Abnormal growth") %in% WhatToCorrect)){
 
     Data <- DiameterCorrection(Data,
                                UseTaperCorrection = UseTaperCorrection,
@@ -239,9 +240,7 @@ FullErrorProcessing <- function(
 
                                DBHCorForDeadTrees = DBHCorForDeadTrees,
 
-                               coef = coef,
-
-                               DetectOnly = DetectOnly)
+                               coef = coef)
   }
 
   #### Recruitment ####
@@ -250,7 +249,7 @@ FullErrorProcessing <- function(
                                 KeepMeas = KeepMeas,
                                 MinDBH = MinDBH,
                                 PositiveGrowthThreshold = PositiveGrowthThreshold,
-                                DetectOnly = DetectOnly
+                                OnlyDetectMissedRecruits = OnlyDetectMissedRecruits
   )
 
   return(Data)

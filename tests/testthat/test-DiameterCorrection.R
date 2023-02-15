@@ -46,8 +46,6 @@ test_that("DiameterCorrection", {
   expect_warning(expect_warning(DiameterCorrection(TestData, Digits = 1.2),
                  regexp = "The 'Digits' argument must be an integer"), "All your HOM are NA, so we can't do taper corrections")
 
-  expect_error(DiameterCorrection(TestData, DetectOnly = "TRUE"),
-               regexp = "The 'DetectOnly' argument must be a logical")
 
   expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "Abnormal growth", UseTaperCorrection = F),
                  regexp = "You have the 'POM' information in your dataset")
@@ -56,15 +54,6 @@ test_that("DiameterCorrection", {
 
   # Check the function work ---------------------------------------------------------------------------------------------------------
 
-  ## Detect Only --------------------------------------------------------------------------------------------------------------------
-  Rslt <- DiameterCorrection(
-    TestData,
-    CorrectionType = "phylogenetic hierarchical",
-    DetectOnly = TRUE,
-    UseTaperCorrection = F)
-
-  # No correction, only comments
-  expect_true(!"Diameter_TreeDataCor" %in% names(Rslt) & "Comment_TreeData" %in% names(Rslt))
 
   ## Correction --------------------------------------------------------------------------------------------------------------------
   # options(warn = 2) # trace warning
@@ -86,9 +75,7 @@ test_that("DiameterCorrection", {
 
     DBHRange = 10,
     MinIndividualNbr = 1,
-    Digits = 2L,
-
-    DetectOnly = FALSE)
+    Digits = 2L)
 
   # Growth > 5 cm DBH/year & < -2 cm DBH/census
 

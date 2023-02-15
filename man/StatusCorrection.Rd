@@ -8,7 +8,6 @@ StatusCorrection(
   Data,
   DeathConfirmation = 2,
   UseSize = TRUE,
-  DetectOnly = FALSE,
   AddRowsForForgottenCensuses = TRUE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE
@@ -27,10 +26,7 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 \item{UseSize}{Use the size presence  (> min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)}
 
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(logical)}
-
-\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical). Ignored when DetectOnly is TRUE}
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
 before it was seen alive for the 1st time? (logical)}
@@ -39,9 +35,8 @@ before it was seen alive for the 1st time? (logical)}
 concerning the tree after its death? (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add a \emph{LifeStatus_TreeDataCor} column with the
-corrected trees life status.
+Fill the \emph{Comment_TreeData} column with error type informations and add
+a \emph{LifeStatus_TreeDataCor} column with corrected trees life status.
 }
 \description{
 Detect errors, or detect errors and correct, the tree life

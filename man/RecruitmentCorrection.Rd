@@ -9,7 +9,7 @@ RecruitmentCorrection(
   KeepMeas = c("MaxHOM", "MaxDate"),
   MinDBH = NULL,
   PositiveGrowthThreshold = 5,
-  DetectOnly = FALSE
+  OnlyDetectMissedRecruits = FALSE
 )
 }
 \arguments{
@@ -33,14 +33,14 @@ NULL (Default) if you wish to use the MinDBH indicated in your data, which may v
 \item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
 considered abnormal (numeric, 1 value) (Default = 5 cm)}
 
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
+\item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
 }
 \value{
-When non in DetectOnly mode, add rows for forgotten recruits with their estimated DBH in the
+When non in OnlyDetectMissedRecruits mode, add rows for forgotten recruits with their estimated DBH in the
 'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical) to indicate
 the rows that were added.
-In DetectOnly mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+In OnlyDetectMissedRecruits mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
 tree, according to its annual growth and the census done for this plot, it
 should have been recruited earlier according to your protocol (MinDBH)."
 }

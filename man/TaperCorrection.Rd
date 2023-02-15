@@ -9,8 +9,7 @@ TaperCorrection(
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
-    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
-  DetectOnly = FALSE
+    DAB/(exp(-TaperParameter * (HOM - DefaultHOM)))
 )
 }
 \arguments{
@@ -43,13 +42,9 @@ With:
 \item \emph{DefaultHOM}:  Default Height Of Measurement (in m)
 \item \emph{TaperParameter}: Taper parameter (unitless)
 }}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add columns:
+Fill the \emph{Comment_TreeData} column with error type informations and add columns:
 - \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
 - \emph{DiameterCorrectionMeth} = "taper"
 - \emph{HOM_TreeDataCor} (numeric): HOM corresponding to the

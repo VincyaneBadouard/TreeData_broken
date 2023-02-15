@@ -28,11 +28,8 @@
 #'   - *DefaultHOM*:  Default Height Of Measurement (in m)
 #'   - *TaperParameter*: Taper parameter (unitless)
 #'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (Default: FALSE) (logical)
 #'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns:
+#' @return Fill the *Comment_TreeData* column with error type informations and add columns:
 #'      - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
 #'      - *DiameterCorrectionMeth* = "taper"
 #'      - *HOM_TreeDataCor* (numeric): HOM corresponding to the
@@ -57,9 +54,7 @@ TaperCorrection <- function(
     DefaultHOM = 1.3,
 
     TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-    TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
-
-    DetectOnly = FALSE
+    TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM)))
 ){
 
   #### Arguments check ####
@@ -82,9 +77,6 @@ TaperCorrection <- function(
                         inherits, "function"))))
     stop("The 'TaperParameter' and 'TaperFormula' arguments must be functions")
 
-  # DetectOnly (logical)
-  if(!inherits(DetectOnly, "logical"))
-    stop("The 'DetectOnly' argument must be a logical")
 
   # In data.table
   setDT(Data)
@@ -97,7 +89,7 @@ TaperCorrection <- function(
 
   Data[!HOM %in% DefaultHOM, Comment_TreeData := GenerateComment(Comment_TreeData, "HOM different from the default HOM")]
 
-  if(!DetectOnly){
+
 
     if(!"Diameter_TreeDataCor" %in% names(Data)) Data[, Diameter_TreeDataCor := Diameter ]
     if(!"DiameterCorrectionMeth_TreeData" %in% names(Data))  Data[,DiameterCorrectionMeth_TreeData := ""]
@@ -130,7 +122,7 @@ TaperCorrection <- function(
 
     Data[, HOM_TreeDataCor := DefaultHOM]
 
-  }
+
 
   return(Data[])
 

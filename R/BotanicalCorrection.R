@@ -15,18 +15,14 @@
 #'           on the 2013 taxonomy)
 #'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
 #'           but based on the 2022 taxonomy)
-#'  - NULL: if only error detection (DetectOnly = TRUE)
 #'
 #' @param WFOData To be filled in if the argument `Source` = "WFO". Data set
 #'   with the static copy of the *World Flora Online* (WFO) Taxonomic Backbone
 #'   data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
 #'   data.table)
 #'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (Default: FALSE) (logical)
 #'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns:
+#' @return Fill the *Comment_TreeData* column with error type informations and add columns:
 #'   - `Family_TreeDataCor` (character): corrected Family name
 #'   - `FamilyCorSource` (character): source of the Family correction
 #'   - `Genus_TreeDataCor` (character): corrected Genus name
@@ -105,8 +101,7 @@
 BotanicalCorrection <- function(
   Data,
   Source = NULL,
-  WFOData = NULL,
-  DetectOnly = FALSE
+  WFOData = NULL
 ){
 
   #### Arguments check ####
@@ -121,11 +116,6 @@ BotanicalCorrection <- function(
   if(Source == "WFO" & is.null(WFOData))
     stop("You must provide the 'WFOData' argument,  a database as a static copy of the
          World Flora Online (WFO) Taxonomic Backbone, when you choose Source = 'WFO'.")
-
-
-  # DetectOnly (logical)
-  if(!inherits(DetectOnly, "logical"))
-    stop("The 'DetectOnly' argument must be a logical")
 
 
   #### Function ####
@@ -152,7 +142,6 @@ BotanicalCorrection <- function(
 
   # Data[Comment != ""] # to check
 
-  if (DetectOnly %in% FALSE){
 
     # Corrected columns initialisation --------------------------------------------------------------------------------------
     Data[, GenusCor := Genus]
@@ -197,7 +186,7 @@ BotanicalCorrection <- function(
 
     Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
 
-  } # end DetectOnly = FALSE
+
 
 
   # Comment :
@@ -207,7 +196,7 @@ BotanicalCorrection <- function(
 
   Data[grepl('[[:punct:]]', Family), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Family'")]
 
-  if (DetectOnly %in% FALSE){
+
 
     if(Source == "TPL"){
 
@@ -405,7 +394,7 @@ BotanicalCorrection <- function(
     Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)] # remove NA after Genus in ScientificNameCor
 
 
-  } # end DetectOnly = FALSE
+
 
 
   # Check invariant botanical informations per IdTree -------------------------------------------------------------------
@@ -415,15 +404,14 @@ BotanicalCorrection <- function(
 
   duplicated_ID <- CorresIDs <- vector("character")
 
-  if(DetectOnly %in% FALSE) vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNameCor")
-  if(DetectOnly %in% TRUE) vars <- c("IdTree", "Family", "Genus", "Species", "Subspecies", "VernName")
+vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNameCor")
 
 
   # For each site
   for (s in unique(na.omit(Data$Site))) {
 
     BotaIDCombination <- unique(
-      Data[Data$Site == s, vars, with = FALSE]
+      Data[Site == s, vars, with = FALSE]
     )
 
     CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree)
@@ -439,11 +427,11 @@ BotanicalCorrection <- function(
   # unique(Data[IdTree %in% duplicated_ID,
   #             .(IdTree = sort(IdTree), Family, Genus, Species, Subspecies, VernName)]) # to check
 
-  if(DetectOnly %in% FALSE){
+
     # Rename correction columns
     Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
     setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol), skip_absent=TRUE)
-  }
+
 
   return(Data)
 

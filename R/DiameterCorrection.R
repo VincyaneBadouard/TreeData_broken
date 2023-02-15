@@ -63,14 +63,12 @@
 #' @param PioneersGrowthThreshold in cm/year: a tree of a pioneer species that
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
 #'
-#' @param WhatToCorrect Possible values: "POM change", "punctual", "shift"
+#' @param WhatToCorrect Possible values: "POM change", "Abnormal growth"
 #'   (character)
 #'   - "POM change": detect POM change in the column `POM` and correct the
 #'                   Diameter values from it. (Ignored if taper correction is applied)
-#'   - "punctual": detect if the error is punctual and correct it by
-#'                 interpolation.
-#'   - "shift": detect if there is a shift of several Diameter values and
-#'              links them to the 1st measurements set.
+#'   - "Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
+#'    or smaller than NegativeGrowthThreshold and correct it by `CorrectionType`
 #'
 #' @param CorrectionType Possible values: "individual", "phylogenetic
 #'   hierarchical" (character, 1 value).
@@ -103,11 +101,7 @@
 #'
 #' @param coef description... (numeric)
 #'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (Default: FALSE) (logical)
-#'
-#' @return Fill the *Comment* column with error type informations. If
-#'   *DetectOnly* = FALSE, add columns:
+#' @return Fill the *Comment_TreeData* column with error type informations and add columns:
 #'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
 #'   - *DiameterCorrectionMeth_TreeData* = "local linear regression","weighted
 #'       mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
@@ -127,7 +121,7 @@
 #'   framing values.
 #'
 #' @importFrom utils capture.output
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit complete.cases weighted.mean
 #'
 #' @export
 #'
@@ -138,11 +132,11 @@
 #' TestData$HOM <- 1.3
 #' TestData$HOM[1:3] <- c(0.5,1.5,NA)
 #'
-# Rslt <- DiameterCorrection(
-#  TestData,
-#   WhatToCorrect = c("POM change", "Abnormal growth"),
-#     CorrectionType = c("phylo"),
-#     MinIndividualNbr = 1, Digits = 2L)
+#' Rslt <- DiameterCorrection(
+#'  TestData,
+#'   WhatToCorrect = c("POM change", "Abnormal growth"),
+#'     CorrectionType = c("phylo"),
+#'     MinIndividualNbr = 1, Digits = 2L)
 #'
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 #'
@@ -174,9 +168,7 @@ DiameterCorrection <- function(
 
     DBHCorForDeadTrees = TRUE,
 
-    coef = 0.9,
-
-    DetectOnly = FALSE
+    coef = 0.9
 ){
 
   #### Arguments check ####
@@ -225,9 +217,6 @@ DiameterCorrection <- function(
     Digits <- as.integer(Digits)
   }
 
-  # DetectOnly (logical)
-  if(!inherits(DetectOnly, "logical"))
-    stop("The 'DetectOnly' argument must be a logical")
 
   # Taper before if 'HOM' in the dataset and 'UseTaperCorrection' = F
   if(any(!is.na(Data$HOM)) %in% names(Data) & !UseTaperCorrection) # HOM exist and UseTaperCorrection FALSE
@@ -283,9 +272,8 @@ DiameterCorrection <- function(
   # Create new columns we need (if not already there)
   if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
-  if(DetectOnly %in% FALSE){
     if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) Data[, DiameterCorrectionMeth_TreeData := ""]
-  }
+
 
   # Dataset with the dead trees if no correction wanted for them --------------------------------------------
   if("LifeStatus_TreeDataCor" %in% names(Data)){ Status <- "LifeStatus_TreeDataCor"
@@ -325,8 +313,7 @@ DiameterCorrection <- function(
 
     Data <- TaperCorrection(Data,
                             DefaultHOM = DefaultHOM,
-                            TaperParameter = TaperParameter, TaperFormula = TaperFormula,
-                            DetectOnly = DetectOnly)
+                            TaperParameter = TaperParameter, TaperFormula = TaperFormula)
 
     # if there is a POM column, also bring that to the first value so no risk to readjust that again
     if("POM" %in% names(Data))  Data[, POM_TreeDataCor := .SD[1, POM], by = c(ID)]
@@ -388,7 +375,7 @@ DiameterCorrection <- function(
 
   # get DateDiff
   DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
-  DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - shift(as.Date(x)))/365))
+  DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - data.table::shift(as.Date(x)))/365))
 
 
   # get a MinDBHHistory (this is useful if not same threshold accross plots)
@@ -576,7 +563,7 @@ DiameterCorrection <- function(
 
 
 
-    ## get the sign of the shift ---------------------------------------------
+    ## get the sign of the growth ---------------------------------------------
 if(nrow(idxToReplace) > 0) {
   idxToReplace <- cbind(idxToReplace, sign = NA)
   idxToReplace[idxToReplace[, 3] %in% 1, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])
