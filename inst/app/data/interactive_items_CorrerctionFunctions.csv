@@ -303,7 +303,7 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 <p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
 NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p>
 </td>
-</tr>","FullErrorProcessingMinDBH","10","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
+</tr>","FullErrorProcessingMinDBH","NULL","numericInput","FALSE","FALSE","value","FALSE","NULL",FALSE
 "BotanicalCorrection","<tr valign=""top"">
 <td><code>Source</code></td>
 <td>
@@ -674,7 +674,7 @@ year but more recent date)
 NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p>
 </td>
 </tr>
-","RecruitmentCorrectionMinDBH","NULL","TBD","FALSE","TBD","TBD","TBD","FormatedColumnOptions",TRUE
+","RecruitmentCorrectionMinDBH","NULL","numericInput","FALSE","FALSE","value","FALSE","NULL",FALSE
 "RecruitmentCorrection","<tr valign=""top"">
 <td><code>PositiveGrowthThreshold</code></td>
 <td>

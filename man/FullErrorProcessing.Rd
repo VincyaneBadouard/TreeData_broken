@@ -32,7 +32,7 @@ FullErrorProcessing(
   DBHCorForDeadTrees = TRUE,
   coef = 0.9,
   OnlyDetectMissedRecruits = FALSE,
-  MinDBH = 10
+  MinDBH = NULL
 )
 }
 \arguments{

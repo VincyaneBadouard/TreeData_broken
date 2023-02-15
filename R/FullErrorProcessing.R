@@ -85,7 +85,7 @@ FullErrorProcessing <- function(
 
   # Recruitment
   OnlyDetectMissedRecruits = FALSE,
-  MinDBH = 10
+  MinDBH = NULL
 ){
 
   #### Arguments check ####
