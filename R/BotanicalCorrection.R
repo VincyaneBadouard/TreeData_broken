@@ -100,7 +100,7 @@
 #'
 BotanicalCorrection <- function(
   Data,
-  Source = NULL,
+  Source = c("TPL", "WFO"),
   WFOData = NULL
 ){
 
@@ -110,7 +110,7 @@ BotanicalCorrection <- function(
     stop("Data must be a data.frame or data.table")
 
   # Source
-  Source <- match.arg(Source, choices = c("TPL", "WFO", NULL))
+  Source <- match.arg(Source)
 
   # WFOData
   if(Source == "WFO" & is.null(WFOData))
