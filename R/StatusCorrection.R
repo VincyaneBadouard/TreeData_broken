@@ -189,7 +189,7 @@ StatusCorrection <- function(
 
 
   if(UseSize) {
-    if(!all.equal(dim(StatusHistory), dim(MeasHistory), dim(CommentHistory))) stop(" not all matrix are of same dimentions")
+    if(!all(dim(StatusHistory) == dim(MeasHistory) &  dim(StatusHistory) == dim(CommentHistory))) stop(" not all matrix are of same dimentions")
   } else {
       if(!all.equal(dim(StatusHistory), dim(CommentHistory))) stop(" not all matrix are of same dimentions")
     }
