@@ -6,10 +6,11 @@ test_that("RequiredFormat", {
   Data <- ParacouSubset
   input <- ParacouProfile
 
-  expect_warning(expect_warning(
+  expect_warning(
     DataFormated <- RequiredFormat(Data, input ),
-    "MinDBH was calculated"),
-    "You did not provide a Census ID column")
+    "You did not provide a Census ID column. We will use year as census ID.
+MinDBH was calculated.
+You did not specify a subplot area.")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
@@ -39,6 +40,7 @@ test_that("RequiredFormat", {
 
   # cAREFULL, EDITING DATA OR INPUT AFTER THIS LINE #
   input$MinDBHMan = 1 # adding this so we don't get warnings
+  input$SubplotAreaMan = 0.04 # adding this so we don't get warnings
   input$IdStem = input$IdTree # adding this so we don't get warnings
   input$IdCensus = input$Year # adding this so we don't get warnings
 
@@ -50,7 +52,7 @@ test_that("RequiredFormat", {
   input$DiameterUnitMan <- ParacouProfile$DiameterUnitMan
   input$CircUnitMan <- ParacouProfile$CircUnitMan
 
-  expect_error(expect_error(RequiredFormat(Data, input ))) # don't expect the error anymore, but still warning
+  expect_error(expect_error(RequiredFormat(Data, input))) # don't expect the error anymore, but still warning
 
   # expect warning if no IdTree and no Tree Tag
   input$IdTree = input$TreeFieldNum = "none"
@@ -93,10 +95,10 @@ test_that("RequiredFormat", {
   input$Subplot <- "none"
   input$SubplotMan = ""
 
-  expect_warning(expect_warning(expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
+  expect_true(all(apply(suppressWarnings(RequiredFormat(Data, input )), 1, function(x) {all(
     grepl("SiteA" , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
-      grepl("SubplotA" , x["IdTree"]))}))), "SiteA"), "SubplotA"), "You are missing treeIDs")
+      grepl("SubplotA" , x["IdTree"]))})))
 
   # RequiredFormat(Data, input )$IdTree
 
@@ -382,7 +384,9 @@ test_that("RequiredFormat", {
   Data <- ForestGeoSubset
   input <- ForestGeoProfile
 
-  expect_warning(expect_warning(expect_warning(RequiredFormat(Data, input), "did not specify a Site column or name"), "did not specify a plot area"), "did not specify a subplot area")
+  expect_warning(RequiredFormat(Data, input), "You did not specify a Site column or name, we will consider you have only one site called 'SiteA'.
+You did not specify a plot area.
+You did not specify a subplot area.")
 
 
 

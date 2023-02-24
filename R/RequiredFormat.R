@@ -48,6 +48,9 @@ RequiredFormat <- function(
   # Data <- ParacouSubset
   # input <- ParacouProfile
 
+  # prepare a place to hold all warnings so we get only one pop up window
+  AllWarnings <- NULL
+
   # Arguments check
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
@@ -64,7 +67,7 @@ RequiredFormat <- function(
     x <- try(expr = read.csv(system.file("/app/data/", "interactive_items.csv", package = "TreeData", mustWork = TRUE)), silent = T)
 
     if (class(x) %in% "try-error"){
-      warning("TreeData package not loaded. Assuming you are in the root of the package instead.")
+      AllWarnings <- c(AllWarnings, "TreeData package not loaded. Assuming you are in the root of the package instead.")
       x <- read.csv("inst/app/data/interactive_items.csv")
     }
 
@@ -196,7 +199,7 @@ RequiredFormat <- function(
       input$Date = "Date"
       input$DateFormatMan = "yyyy-mm-dd"
     } else {
-     warning("You did not provide a Year so we can't recreate a date using your Month and Day columns.")
+      AllWarnings <- c(AllWarnings, "You did not provide a Year so we can't recreate a date using your Month and Day columns.")
     }
 
 
@@ -207,13 +210,13 @@ RequiredFormat <- function(
   if(input$Date %in% "none") {
     if(!input$Year %in% "none") {
       Data[, Date := paste0(Year, "-06-15")]
-      warning("You did not provided a Date of measurement but provided a Year. We consider the date as 15th June of the year so as to prevent NA.")
+      AllWarnings <- c(AllWarnings, "You did not provided a Date of measurement but provided a Year. We consider the date as 15th June of the year so as to prevent NA.")
       # overwrite input
       input$Date = "Date"
       input$DateFormatMan = "yyyy-mm-dd"
 
     } else {
-      warning("You did not provide a Year so we can't recreate a date.")
+      AllWarnings <- c(AllWarnings, "You did not provide a Year so we can't recreate a date.")
     }
 
   }
@@ -246,7 +249,7 @@ RequiredFormat <- function(
     }
 
     # send warning if some dates translated as NA
-    if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) warning("Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates")
+    if(any(!is.na(Data$DateOriginal) & is.na(Data$Date))) AllWarnings <- c(AllWarnings, "Some dates were translated as NA... Either your data format does not corresponf to the format of your date column, or you do not have a consistent format across all your dates.")
 
   }
 
@@ -265,7 +268,7 @@ RequiredFormat <- function(
 
   ## Year
   if(input$Year %in% "none") {
-    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else warning("You did not provide Date nor Year")
+    if(!input$Date %in% "none") Data[, Year := format(Date, "%Y")] else AllWarnings <- c(AllWarnings, "You did not provide Date nor Year.")
 
     Data$Year <- as.numeric(as.character(Data$Year))
 
@@ -295,28 +298,28 @@ RequiredFormat <- function(
   ### if not IdCensus, use Year instead
   if(input$IdCensus %in% "none") {
 
-    warning("You did not provide a Census ID column. We will use year as census ID")
+    AllWarnings <- c(AllWarnings, "You did not provide a Census ID column. We will use year as census ID.")
 
     Data$IdCensus <- factor(Data$Year, ordered = T)
   }
 
   ## Site, Plot, subplot
   if (input$Site %in% "none") {
-    if(input$SiteMan %in% "")  warning("You did not specify a Site column or name, we will consider you have only one site called 'SiteA'")
+    if(input$SiteMan %in% "")  AllWarnings <- c(AllWarnings, "You did not specify a Site column or name, we will consider you have only one site called 'SiteA'.")
 
     SiteMan <- ifelse(input$SiteMan %in% "", "SiteA", input$SiteMan)
     Data[, Site :=  SiteMan]
 
   }
   if (input$Plot %in% "none") {
-    if(input$PlotMan %in% "")  warning("You did not specify a Plot column or name, we will consider you have only one plot called 'PlotA'")
+    if(input$PlotMan %in% "")  AllWarnings <- c(AllWarnings, "You did not specify a Plot column or name, we will consider you have only one plot called 'PlotA'.")
 
     PlotMan <- ifelse(input$PlotMan %in% "", "PlotA", input$PlotMan)
     Data[, Plot :=  PlotMan]
   }
 
   if (input$Subplot %in% "none"){
-    if(input$SubplotMan %in% "")  warning("You did not specify a subplot column or name, we will consider you have only one subplot called 'SubplotA'")
+    if(input$SubplotMan %in% "")  AllWarnings <- c(AllWarnings, "You did not specify a subplot column or name, we will consider you have only one subplot called 'SubplotA'.")
 
     SubplotMan <- ifelse(input$SubplotMan %in% "", "SubplotA", input$SubplotMan)
     Data[, Subplot := SubplotMan]
@@ -333,7 +336,7 @@ RequiredFormat <- function(
 
     if (!input$TreeFieldNum %in% "none") {
 
-      warning(paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
+      AllWarnings <- c(AllWarnings, paste("You are missing treeIDs (either you are missing some tree IDs or you  did not specify a column for tree IDs). But you did specified a column for tree tag, so we are considering that each tree tag within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one tree, and we are using your tree field tag to construct the tree ID.", ifelse(any(is.na(Data$TreeFieldNum)), "And since some of your  tree field tag are NAs, we will automatically generating those assuming each NA represents one single-stem tree and that the order of those trees is consistent accross censuses.", "")))
 
       if(any(is.na(Data$TreeFieldNum))) {
         Data[is.na(TreeFieldNum), TreeFieldNum := paste0(seq(1, .N), "_auto") , by = .(Site, Plot, Subplot, IdCensus)]
@@ -350,14 +353,14 @@ RequiredFormat <- function(
     if (input$TreeFieldNum %in% "none") {
 
       if (input$IdStem %in% "none") {
-        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
+        AllWarnings <- c(AllWarnings, paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, so we are considering that each row within a Site, plot, subplot and census ID", ifelse(input$IdCensus %in% "none", "(taken as your Year, since you did not specify a census ID column)", ""), "refers to one unique (single-stem) tree. This is assuming the order of your trees is consistent accross censuses."))
 
 
         Data[is.na(IdTree), IdTree := paste0(seq(1, .N), "_auto")  , by = .(IdCensus)]
       }
 
       if (!input$IdStem %in% "none") {
-        warning(paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, BUT you did specify a column for Stem tags, so we are using IdStem to replace missing IdTree. WARNING: This was created to deal with ForestPlots data, where only  only multiple stems have an IdTree, so, in that particular case, it is safe to use IdStem as IdTree."))
+        AllWarnings <- c(AllWarnings, paste("You are missing treeIDs (either you are missing some tree IDs or you did not specify a column for tree IDs). You also did not specify a column for Tree Tags, BUT you did specify a column for Stem tags, so we are using IdStem to replace missing IdTree. WARNING: This was created to deal with ForestPlots data, where only  only multiple stems have an IdTree, so, in that particular case, it is safe to use IdStem as IdTree."))
 
 
         Data[is.na(IdTree), IdTree := paste0(IdStem, "_auto")]
@@ -377,7 +380,7 @@ RequiredFormat <- function(
 
     if (input$StemFieldNum %in% "none") {
 
-      if (input$MeasLevel %in% "Stem") warning("You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses. ")
+      if (input$MeasLevel %in% "Stem") AllWarnings <- c(AllWarnings, "You are missing stemIDs (either you are missing some stem IDs or you  did not specify a column for stem IDs). You also did not specify a column for stem Tags, so we are considering that each row without a stem ID refers to one unique stem within its tree ID. This is assuming that the order of each stem within a tree is consistent across censuses.")
       Data[is.na(IdStem), IdStem := paste0(.(IdTree), "_", seq(1, .N), "_auto"), by = .(IdCensus, IdTree)]
 
     }
@@ -386,7 +389,7 @@ RequiredFormat <- function(
 
     if (!input$StemFieldNum %in% "none") {
 
-      if (input$MeasLevel %in% "Stem")  warning("You are missing stemIDs (either you are missing some tree IDs or you  did not specify a column for stem IDs). But you did specify a column for stem tags, so we are considering that each stem field number within a tree refers to a unique stem and are using your stem field number to construct the stem ID.", ifelse(any(is.na(Data$StemFieldNum)), "And since some of your stem field tags are NAs, we will automatically generating those assuming assuming that the order of each stem within a tree is consistent across censuse.", ""))
+      if (input$MeasLevel %in% "Stem")  AllWarnings <- c(AllWarnings, "You are missing stemIDs (either you are missing some tree IDs or you  did not specify a column for stem IDs). But you did specify a column for stem tags, so we are considering that each stem field number within a tree refers to a unique stem and are using your stem field number to construct the stem ID.", ifelse(any(is.na(Data$StemFieldNum)), "And since some of your stem field tags are NAs, we will automatically generating those assuming assuming that the order of each stem within a tree is consistent across censuse.", ""))
 
       if(any(is.na(Data$StemFieldNum))) {
         Data[is.na(StemFieldNum), StemFieldNum := paste0(seq(1, .N), "_auto") , by = .(IdCensus, IdTree)]
@@ -420,7 +423,7 @@ RequiredFormat <- function(
 
   ## Diameter if we have circumference ####
   if(input$MeasLevel %in% c("Tree", "Stem")) {
-    if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") warning("You did not specify what column represents tree size (Diameter, Circonference, BD or basal circonference) in your data.")
+    if(input$Diameter %in% "none" & input$Circ %in% "none" & input$BD %in% "none" & input$BCirc %in% "none") AllWarnings <- c(AllWarnings, "You did not specify what column represents tree size (Diameter, Circonference, BD or basal circonference) in your data.")
 
     if(input$Diameter %in% "none" & !input$Circ %in% "none") {
       Data[, Diameter := round(Circ/pi, 2)]
@@ -453,9 +456,9 @@ RequiredFormat <- function(
       if(input$MeasLevel %in% c("Tree", "Stem")) {
         Data[, MinDBH := min(Diameter, na.rm = T)]
         input$MinDBHUnitMan <- grep("[^none]", c(input$DiameterUnitMan, input$CircUnitMan), value = T)[1] # take Diameter in priority, otherwise CircUnit
-        warning("MinDBH was calculated.")
+        AllWarnings <- c(AllWarnings, "MinDBH was calculated.")
       } else {
-        warning("You did not specify a MinDBH.")
+        AllWarnings <- c(AllWarnings, "You did not specify a MinDBH.")
 
       }
     }
@@ -469,7 +472,7 @@ RequiredFormat <- function(
       input$PlotAreaUnitMan <- "ha"
     }
 
-    if(input$PlotAreaMan %in% -999) warning("You did not specify a plot area")
+    if(input$PlotAreaMan %in% -999) AllWarnings <- c(AllWarnings, "You did not specify a plot area.")
   }
 
   # SubplotArea (if area is entered manually, it is supposed to be in ha already)
@@ -480,7 +483,7 @@ RequiredFormat <- function(
       input$SubplotAreaUnitMan <- "ha"
     }
 
-    if(input$SubplotAreaMan %in% -999) warning("You did not specify a subplot area")
+    if(input$SubplotAreaMan %in% -999) AllWarnings <- c(AllWarnings, "You did not specify a subplot area.")
 
   }
 
@@ -530,7 +533,7 @@ RequiredFormat <- function(
   }
 
   setDT(Data)
-  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
+  Data <- copy(Data)
   # # Units changing ####
   #
   # unitOptions <- c("mm", "cm", "dm", "m") # c("mm", "millimetre", "millimeter", "milimetro", "milimetrica", "cm", "centimetre", "centimeter", "centimetro", "dm", "decimetre", "decimeter", "decimetro", "m", "metre", "meter", "metro")
@@ -781,11 +784,13 @@ RequiredFormat <- function(
   #   }
   # }
 
+  # show warnings
+  if(!is.null(AllWarnings)) warning(paste(AllWarnings, collapse = "\n"))
+
   # return output ####
   ColumnsToReturn <- intersect(c(x$ItemID, grep("Original", colnames(Data), value = T)), colnames(Data))
   # ColumnsToReturn <- ColumnsToReturn[unlist(Data[, lapply(.SD, function(x) !all(is.na(x))), .SDcols = ColumnsToReturn] )]
   return(Data[, ..ColumnsToReturn])
 
 }
-
 

@@ -14,6 +14,7 @@ test_that("DiameterCorrection", {
   HOMData[, HOM := 1.3] # data with HOM
   POMData <- copy(TestData[IdTree == "100658"])
   POMData[, POM := as.factor(1)] # data with POM
+  POMData[, HOM := NA]
 
 
   # Check the function argument -----------------------------------------------------------------------------------------------------
@@ -43,8 +44,8 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
                regexp = "'arg' should be one of \"individual\", \"phylogenetic hierarchical\"")
 
-  expect_warning(expect_warning(DiameterCorrection(TestData, Digits = 1.2),
-                 regexp = "The 'Digits' argument must be an integer"), "All your HOM are NA, so we can't do taper corrections")
+  expect_warning(DiameterCorrection(TestData, Digits = 1.2),
+                 regexp = "The 'Digits' argument must be an integer")
 
 
   expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "Abnormal growth", UseTaperCorrection = F),
@@ -69,6 +70,7 @@ test_that("DiameterCorrection", {
 
     Pioneers = c("Cecropia","Pourouma"),
     PioneersGrowthThreshold = 7.5,
+
 
     WhatToCorrect = c("POM change", "Abnormal growth"),
     CorrectionType = c("phylogenetic hierarchical"),

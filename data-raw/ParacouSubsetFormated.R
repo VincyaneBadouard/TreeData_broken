@@ -2,6 +2,12 @@
 data("ParacouSubset")
 data("ParacouProfile")
 
+# add a column for HOM
+ParacouSubset[, HOM := 1.3]
+ParacouProfile$HOM <- "HOM"
+ParacouProfile$HOMUnitMan <- "m"
+
+# format to App's standards
 ParacouSubsetFormated <- RequiredFormat(
   ParacouSubset,
   input = ParacouProfile)
