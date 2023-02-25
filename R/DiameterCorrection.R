@@ -337,6 +337,7 @@ DiameterCorrection <- function(
   if(!"Diameter_TreeDataCor" %in% names(Data)) {
     Data[, Diameter_TreeDataCor := Diameter]
   }
+
   if(!"HOM_TreeDataCor" %in% names(Data)) {
     Data[, HOM_TreeDataCor := HOM]
   }
@@ -345,6 +346,7 @@ DiameterCorrection <- function(
   }
   if(!"LifeStatus_TreeDataCor" %in% names(Data)) {
     Data[, LifeStatus_TreeDataCor := LifeStatus]
+
   }
 
 
@@ -570,6 +572,7 @@ if(nrow(idxToReplace) > 0) {
   idxToReplace[idxToReplace[, 3] %in% 2, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxAbnormal])
 
 }
+
 
 
 

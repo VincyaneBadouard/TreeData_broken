@@ -85,8 +85,8 @@ UniqueMeasurement <- function(
 
     if("MaxDate" %in% KeepMeas & nrow(DuplicatedRows) > 1){
 
-      DuplicatedRows <- DuplicatedRows[, .SD[ Date == max(Date)],  by = ByCols] # keep only the row with max HOM
 
+      DuplicatedRows <- DuplicatedRows[, .SD[ Date == max(Date)],  by = ByCols] # keep only the row with max HOM
     } # end "MaxDate"
 
     if(any(duplicated(DuplicatedRows[, ..ByCols]))) stop(paste0("There are still several measurements per census despite the choice of ", paste(KeepMeas, collapse = " and "), ".", ifelse(length(KeepMeas) <2, paste("you may want to try to add 'KeepMeas=", setdiff(eval(formals(sys.function(sysP <- sys.parent()))$KeepMeas), KeepMeas), "'"), "")))

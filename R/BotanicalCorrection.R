@@ -432,7 +432,6 @@ vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNa
     Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
     setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol), skip_absent=TRUE)
 
-
   return(Data)
 
 }

@@ -48,9 +48,9 @@ test_that("DiameterCorrection", {
                  regexp = "The 'Digits' argument must be an integer")
 
 
+
   expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "Abnormal growth", UseTaperCorrection = F),
                  regexp = "You have the 'POM' information in your dataset")
-
 
 
   # Check the function work ---------------------------------------------------------------------------------------------------------
@@ -71,8 +71,8 @@ test_that("DiameterCorrection", {
     Pioneers = c("Cecropia","Pourouma"),
     PioneersGrowthThreshold = 7.5,
 
-
     WhatToCorrect = c("POM change", "Abnormal growth"),
+
     CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,

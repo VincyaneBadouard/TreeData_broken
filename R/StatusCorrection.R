@@ -365,6 +365,7 @@ StatusHistoryC <- mapply(function(x, m) {
   # Re-put the the rows without ID
   Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
 
+
   Data <- Data[order(get(ID), IdCensus )] # order by time
 
 

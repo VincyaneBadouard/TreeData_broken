@@ -56,9 +56,11 @@ FullErrorProcessing <- function(
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
 
+
   # Diameter
 
   ## Taper
+
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
@@ -210,6 +212,7 @@ FullErrorProcessing <- function(
                            AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
                            RemoveRBeforeAlive = RemoveRBeforeAlive,
                            RemoveRAfterDeath = RemoveRAfterDeath)
+
 
   #### Diameter ####
 
