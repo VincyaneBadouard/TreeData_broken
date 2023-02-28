@@ -918,9 +918,16 @@ server <- function(input, output, session) { # server ####
   })
 
   observe({
-    if(!input$Date %in% "none")
-      shinyjs::show("AttentionDates")
-    output$sampleDates <- renderText(head(as.character(TidyTable()[[input$Date]])))
+    if(!input$Date %in% "none") {
+           shinyjs::show("AttentionDates")
+
+    useful_dates_idx <- sapply(strsplit(as.character(TidyTable()[[input$Date]]), "\\W"), function(x) any(as.numeric(x) > 12 & as.numeric(x) < 32))
+
+    if(sum(useful_dates_idx, na.rm = T) > 0) sampleDates <- sample(TidyTable()[[input$Date]][which(useful_dates_idx)], 6) else sampleDates <- sample(TidyTable()[[input$Date]], 6)
+
+    output$sampleDates <- renderText(as.character(sampleDates))
+    }
+
   })
 
   # format data
