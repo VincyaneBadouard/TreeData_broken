@@ -148,7 +148,7 @@ body <- dashboardBody(
                    ),
                    prettyCheckbox(
                      inputId = makeUniqueID("ChckLst"),
-                     label = "If tables need to be merged, assure the key column(s) are present in both.",
+                     label = "If tables need to be merged, assure you have the list of all key column(s) that are present in both tables.",
                      # value = TRUE,
                      status = "warning"
                    ),
@@ -313,10 +313,10 @@ body <- dashboardBody(
 
                            br(),
                            br(),
-                           p("1. In 'Merge this table', select the main measurement table (the one onto which you want to merge extra information from other tables)."),
-                           p("2. In 'And this table', Select the table that you want to bring info from."),
-                           p("3. click on both blue arrows", style = "color:blue"),
-                           p("4. In the two dropdown menus about the 'KEY column(s)', select the column(s) that allow to connect the to tables together."),
+                           p("1. In ",  strong("Merge this table"), ", select the main measurement table (the one onto which you want to merge extra information from other tables)."),
+                           p("2. In ",  strong("And this table"), ", Select the table that you want to bring info from."),
+                           p("3. click on both blue arrows", style = "color:#00c0ef"),
+                           p("4. In the two dropdown menus about the 'KEY column(s)', select the column(s) that allow to connect the to tables together.", strong("Select all columns that are common between tables, otherwise columns will be repeated in the output, with extension '.y' in the name of the second table.")),
                            p("5. click on 'Merge tables'"),
                            p("6. If you are still not down to one table, another box will appear. repeat 1-5 in that box."),
                            br(),
@@ -331,22 +331,12 @@ body <- dashboardBody(
                            box(width = 12,
 
                                fluidRow(column(3, pickerInput("leftTable", "Merge this table", choices = "")),
-                                        column(1, br(),actionBttn("selectLeft", "", icon = icon("arrow-right"), size = "sm")),
-                                        column(8,  shinyWidgets::virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                        column(2, br(), actionButton("selectLeft", "", icon = icon("arrow-right"),class = "btn-info", style = "color: #fff")),
+                                        column(7,  hidden(shinyWidgets::virtualSelectInput("leftKey", div("Using this/these KEY column(s)", br(), em("Please, select all columns common to both tables. The order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6)))),
 
                                fluidRow(column(3, pickerInput("rightTable", "And this table", choices = "")),
-                                        column(1, br(),actionBttn("selectRight", "", icon = icon("arrow-right"), size = "sm")),
-                                        column(8,  shinyWidgets::virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
-
-
-                               #   hidden(div(id = "SelectColumns",
-                               #       box(width = 12,
-                               #           # fluidRow(
-                               #
-                               #             pickerInput("SelectedMergedColumns", div("Select only the columns you want to keep moving forward", br(), em("By default (recommended), columns that are repeats in your second table are unselected.")), choices = "", multiple = T)
-                               #       ))
-                               #
-                               # ),
+                                        column(2, br(), actionButton("selectRight", "", icon = icon("arrow-right"),class = "btn-info", style = "color: #fff")),
+                                        column(7,  hidden(shinyWidgets::virtualSelectInput("rightKey", div("Using this/these KEY column(s)", br(), em("Please, select all columns common to both tables. The order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6)))),
 
                                actionBttn(
                                  inputId = "Merge",
@@ -355,19 +345,19 @@ body <- dashboardBody(
                                  color = "success")
                            ),
                            fluidRow(
-                             hidden(actionBttn(inputId = "addMerge",  label =  span(icon("plus"), em("Add a Merging relationship", strong("(You need to end up with only one table)"))),
+                             hidden(actionBttn(inputId = "addMerge",  label =  span(em("Add a Merging relationship", strong("(You need to end up with only one table)"))),
                                                style = "material-flat",
                                                color = "danger")),
                            ),
                            hidden(div(id ="Merge2Div", box(width = 12,
 
                                                            fluidRow(column(3, pickerInput("leftTable2", "Merge this table", choices = "")),
-                                                                    column(1, br(),actionBttn("selectLeft2", "", icon = icon("arrow-right"), size = "sm")),
-                                                                    column(8,  shinyWidgets::virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                                                    column(2, br(),actionButton("selectLeft2", "", icon = icon("arrow-right"),class = "btn-info", style = "color: #fff")),
+                                                                    column(7,  hidden(shinyWidgets::virtualSelectInput("leftKey2", div("Using this/these KEY column(s)", br(), em("Please, select all columns common to both tables. The order you select them matters.")), choices = "", multiple = T, search = T, optionsCount = 6)))),
 
                                                            fluidRow(column(3, pickerInput("rightTable2", "And this table", choices = "")),
-                                                                    column(1, br(),actionBttn("selectRight2", "", icon = icon("arrow-right"), size = "sm")),
-                                                                    column(8,  shinyWidgets::virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("if you need multiple columns for the merge, the order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6))),
+                                                                    column(2, br(),actionButton("selectRight2", "", icon = icon("arrow-right"),class = "btn-info", style = "color: #fff")),
+                                                                    column(7,  hidden(shinyWidgets::virtualSelectInput("rightKey2", div("Using this/these KEY column(s)", br(), em("Please, select all columns common to both tables. The order you select them matters")), choices = "", multiple = T, search = T, optionsCount = 6)))),
                                                            actionBttn(
                                                              inputId = "Merge2",
                                                              label = "Merge tables",

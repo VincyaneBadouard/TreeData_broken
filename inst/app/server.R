@@ -295,6 +295,7 @@ server <- function(input, output, session) { # server ####
       column_options_list <- c(column_options_list, StackedTables = list(colnames(StackedTables())))
 
     }
+
     updatePickerInput(session, "leftTable", choices = options_to_merge, selected =  "")
     updatePickerInput(session, "rightTable", choices = options_to_merge, selected =  "")
 
@@ -310,6 +311,39 @@ server <- function(input, output, session) { # server ####
     n_tables_after_stack(length(options_to_merge))
 
   }, ignoreInit = T)
+
+  observeEvent(input$leftTable, {
+    if(!input$leftTable %in% "") updateActionButton(session, "selectLeft", label = "click me!")
+  })
+  observeEvent(input$selectLeft, {
+    shinyjs::show("leftKey")
+    updateActionButton(session, "selectLeft", label = "")
+  })
+
+  observeEvent(input$rightTable, {
+    if(!input$rightTable %in% "") updateActionButton(session, "selectRight", label = "click me!")
+  })
+  observeEvent(input$selectRight, {
+    shinyjs::show("rightKey")
+    updateActionButton(session, "selectRight", label = "")
+  })
+
+  observeEvent(input$leftTable2, {
+    if(!input$leftTable2 %in% "") updateActionButton(session, "selectLeft2", label = "click me!")
+  })
+  observeEvent(input$selectLeft2, {
+    shinyjs::show("leftKey2")
+    updateActionButton(session, "selectLeft2", label = "")
+  })
+
+
+  observeEvent(input$rightTable2, {
+    if(!input$rightTable2 %in% "") updateActionButton(session, "selectRight2", label = "click me!")
+  })
+  observeEvent(input$selectRight2, {
+    shinyjs::show("rightKey2")
+    updateActionButton(session, "selectRight2", label = "")
+  })
 
   # merge tab ####
   n_tables_after_stack <- reactiveVal()
