@@ -120,6 +120,15 @@ ItemType_lookup <- list(
     Argument2 = "selected",
     argValue = "ColumnOptions",
     ReactiveArgValue = TRUE
+  ),
+  MinDBH = list(
+    ItemType = "numericInput",
+    Multiple = FALSE,
+    Options = FALSE,
+    Argument = "value",
+    Argument2 = FALSE,
+    argValue = "NULL",
+    ReactiveArgValue = FALSE
   )
 )
 

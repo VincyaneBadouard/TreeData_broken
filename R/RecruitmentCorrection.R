@@ -12,17 +12,13 @@
 #'   - "MaxDate": apply the correction to the **most recent measurement** (same
 #'                year but more recent date)
 #'
-#' @param MinDBH Minimum diameter of trees inventoried according to your
-#'   protocol (in cm) (numeric, 1 value) (Default = 10 cm)
+#' @param MinDBH Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+#'   NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot
 #'
 #' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
 #'   considered abnormal (numeric, 1 value) (Default = 5 cm)
 #'
-#' @param InvariantColumns Vector with the names of the columns that are
-#'   supposed to have always the same value for each measurement of the same
-#'   tree (character)
-#'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
+#' @param OnlyDetectMissedRecruits TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
 #'
 #' @details If the size of the tree has never changed, or if there is only one
@@ -31,9 +27,10 @@
 #'   exist), the function will create it for the forgotten recruits. It is
 #'   strongly recommended to correct the Diameter before correcting the recruits
 #'
-#' @return  Add rows for forgotten recruits with them estimated DBH in the
-#'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical)
-#'   and fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+#' @return  When non in OnlyDetectMissedRecruits mode, add rows for forgotten recruits with their estimated DBH in the
+#'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical) to indicate
+#'    the rows that were added.
+#'   In OnlyDetectMissedRecruits mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
 #'   tree, according to its annual growth and the census done for this plot, it
 #'   should have been recruited earlier according to your protocol (MinDBH)."
 #'
@@ -47,12 +44,7 @@
 #' data(TestData)
 #' setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 #'
-#' Rslt <- RecruitmentCorrection(TestData,
-#'                               InvariantColumns = c("Site",
-#'                                                    "Genus",
-#'                                                    "Species",
-#'                                                    "Family",
-#'                                                    "ScientificName"))
+#' Rslt <- RecruitmentCorrection(TestData)
 #' IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
 #' TreesCorr <- Rslt[IdTree %in% IdCorr]
 #'
@@ -69,15 +61,20 @@ RecruitmentCorrection <- function(
 
     KeepMeas = c("MaxHOM", "MaxDate"),
 
-    MinDBH = 10,
+    MinDBH = NULL,
     PositiveGrowthThreshold = 5,
-    InvariantColumns = c("Site",
-                         "Genus_TreeDataCor",
-                         "Species_TreeDataCor",
-                         "Family_TreeDataCor",
-                         "ScientificName_TreeDataCor"),
-    DetectOnly = FALSE
+    OnlyDetectMissedRecruits = FALSE
 ){
+
+  InvariantColumns = c("MinDBH", "Site",
+                       "Cluster", "Plot", "PlotViewID", "Subplot", "PlotArea", "PlotElevation",
+                       "SubplotArea", "PlotLat", "PlotLon", "XPlotUTM", "YPlotUTM",
+                       "SubplotLat", "SubplotLon", "XSubplotUTM", "YSubplotUTM", "ScientificName",
+                       "VernName", "Family", "Genus", "Species", "Subspecies", "Variety",
+                       "Voucher", "IdLevel", "Authority", "CommercialSp", "LifeForm",
+                       "TreeFieldNum", "IdTree", "StemFieldNum", "IdStem",
+                       "TreeLat", "TreeLon", "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot",
+                       "XTreeSubplot", "YTreeSubplot")
 
   #### Arguments check ####
   # Data
@@ -95,24 +92,25 @@ RecruitmentCorrection <- function(
     stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
   # ---------------------------------------------------------------------------------------------------------
 
+  # If MinDBH is provided, overwrite the one in the data
+  if(!is.null(MinDBH)) {
+    if(!inherits(MinDBH, c("numeric", "integer"))) stop("MinDBH must be numeric")
+    if(length(MinDBH) > 1) stop("MinDBH must be numeric value of length 1")
 
-  # MinDBH/PositiveGrowthThreshold (numeric, 1 value)
-  if(!all(unlist(lapply(list(MinDBH, PositiveGrowthThreshold), length)) %in% 1) |
-     !all(unlist(lapply(list(MinDBH, PositiveGrowthThreshold),
-                        inherits, c("numeric", "integer")))))
-    stop("The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
-         of the 'RecruitmentCorrection' function must be 1 numeric value each")
-
-  if(DetectOnly %in% FALSE){
-    # InvariantColumns
-    if (!inherits(InvariantColumns, "character"))
-      stop("'InvariantColumns' argument must be of character class")
+    Data$MinDBH <- MinDBH
   }
 
-  # DetectOnly (logical)
-  if(!all(unlist(lapply(list(DetectOnly),
+  # PositiveGrowthThreshold (numeric, 1 value)
+  if(!length(PositiveGrowthThreshold) %in% 1 |
+     !inherits(PositiveGrowthThreshold, c("numeric", "integer")))
+     stop("'RecruitmentCorrection' must be 1 numeric value")
+
+
+
+  # OnlyDetectMissedRecruits (logical)
+  if(!all(unlist(lapply(list(OnlyDetectMissedRecruits),
                         inherits, "logical"))))
-    stop("The 'DetectOnly' argument
+    stop("The 'OnlyDetectMissedRecruits' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
   # Diameter_TreeDataCor column exists
@@ -121,52 +119,25 @@ RecruitmentCorrection <- function(
            column does't exist in the dataset.")
 
   # Diameter_TreeDataCor column exists
-  if(DetectOnly %in% FALSE){
+  if(!OnlyDetectMissedRecruits){
     if(!"Diameter_TreeDataCor" %in% names(Data))
       warning("The 'Diameter_TreeDataCor' (corrected Diameter) column does't exist in the dataset.
          We advise to first correct the diameter measurements before correcting the recruitment")
   }
 
 
-  if(!DetectOnly) {
-    # Check if the InvariantColumns name exists in Data
-    for (c in InvariantColumns) {
-      if (!c %in% names(Data)) {
-        cc <- gsub("_TreeDataCor", "", c) # remove - Cor
-
-        if (!cc %in% names(Data)) {
-          # Col without - Cor exists?
-          stop(
-            paste(
-              "InvariantColumns argument must contain one or several column names (see help)."
-              ,
-              cc,
-              "is apparently not a dataset's column"
-            )
-          )
-
-        } else{
-          InvariantColumns[InvariantColumns == c] <-
-            cc # If yes replace by the col name without cor
-          warning(
-            "",
-            c,
-            " column does't exist. ",
-            cc,
-            " column is therefore considered as InvariantColumns instead of ",
-            c,
-            ""
-          )
-
-        }
-      } # if c doest exist
-    } # end c loop
+  # use corrected columns as InvariantColumns if they exist (mostly for Species names that may have been corrected)
+  if(!OnlyDetectMissedRecruits) {
+    idx_corrected_columns <- paste0(InvariantColumns, "_TreeDataCor") %in% names(Data)
+    InvariantColumns[idx_corrected_columns] <- paste0(InvariantColumns, "_TreeDataCor")[idx_corrected_columns]
   }
 
   #### Function ####
 
   # data.frame to data.table
   setDT(Data)
+  Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
+
 
   # Remove duplicated measurements per Year because different POM or Date ------
   CompleteData <- copy(Data)
@@ -176,9 +147,9 @@ RecruitmentCorrection <- function(
 
 
 
-  if(!"Comment" %in% names(Data)) Data[, Comment := ""]
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
-  if(DetectOnly %in% FALSE){
+  if(!OnlyDetectMissedRecruits){
     Data[, CorrectedRecruit := FALSE] # The initial rows are not corrected recruits
   }
 
@@ -197,323 +168,148 @@ RecruitmentCorrection <- function(
 
   # Apply for all the trees ------------------------------------
 
-  # if there are no 'Diameter_TreeDataCor' col, create it from the Diameter col
-  # (removes Diameter_TreeDataCor values that are not of order
-  # RecruitmentCorrection at the end)
   if(!"Diameter_TreeDataCor" %in% names(Data)) {
     Data[, Diameter_TreeDataCor := Diameter]
-    initial_DiameterCor <- FALSE
-  } else initial_DiameterCor <- TRUE
+}
 
-  ## TODO apply function only on trees with previously detected problems > this
-  ## could save a lot of computing time
 
-  # censuses per plot
-  Data[, all_plot_censuses := paste(unique(na.omit(Year)), collapse = ", "), .(Plot)]
+  # get a DiameterHistory
+  DiameterHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter_TreeDataCor", drop = FALSE)
+  DiameterHistory <- as.matrix(DiameterHistory, 1)
 
-  MDBH  <- MinDBH
-  Data <- Data[, RecruitmentCorrectionByTree(
-    Data[get(ID) == KeyCol & !is.na(Year)],
-    MinDBH = MDBH,
-    PositiveGrowthThreshold = PositiveGrowthThreshold,
-    InvariantColumns = InvariantColumns,
-    PlotCensuses = as.numeric(strsplit(unique(all_plot_censuses), ", ")[[1]]),
-    DetectOnly = DetectOnly
-  ),
-  .(KeyCol = get(ID))]
+  # get DateHistory (to be able to calculate growth)
+  DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
+  DateHistory <- as.matrix(DateHistory, 1)
 
-  # remove unnecessary column
-  Data$KeyCol <- NULL
+  # get a MinDBHHistory (this is useful if not same threshold accross plots)
 
-  # If no 'Diameter_TreeDataCor' initially in the dataset: replace uncorrected
-  # values with NA
-  if(!initial_DiameterCor){
+  MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
+  MinDBHHistory <- as.matrix(MinDBHHistory, 1)
+  MinDBHHistory[] <- apply(MinDBHHistory, 1, function(x) x[is.na(x)] <- as.numeric(names(which.max(table(x))))) # fill NA with most common MinDBH in the row . this could be a problem if MinDBH changes accross censuses but should be rare enough that it does not matter
 
-    if (DetectOnly)
-      Data[, Diameter_TreeDataCor := NULL] # if detect only, remove Diameter_TreeDataCor if it didn't exist before
 
-    if (!DetectOnly)
-      Data[, Diameter_TreeDataCor := ifelse(CorrectedRecruit %in% FALSE, NA, Diameter_TreeDataCor)] # keep only recruitment correction
+  # get growth History
+  GrowthHistory <- matrix(NA, ncol = ncol(DiameterHistory)-1, nrow = nrow(DiameterHistory), dimnames = list(rownames(DiameterHistory), NULL))
+  GrowthHistory[] <- t(round(apply(DiameterHistory, 1, diff) / apply(DateHistory, 1, function(x) diff(as.Date(x))/365), 2))
+
+  # find out leading NAs and first growth
+  LeadingNAHistory <- DiameterHistory
+  LeadingNAHistory [] <- t(apply(DiameterHistory, 1, function(x) {
+    y <- x
+    ina <- which(is.na(x))
+    diffina <- diff(ina)
+
+    y[] <- 0
+    if(1 %in% ina) {
+      ilna <- 1
+      if(diffina[1] %in% 1)  ilna <- 1:(attr(regexpr("^1+", paste(diffina, collapse = "")), "match.length")+1)
+      y[ilna] <- 1
+    }
+    y
+  }))
+
+  FirstDiameter <- apply(DiameterHistory, 1, function(x) {x[which(!is.na(x))[1]] })
+
+  FirstGrowth <- apply(GrowthHistory, 1, function(x) {x[which(!is.na(x))[1]]})
+  FirstGrowth[is.na(FirstGrowth)] <- PositiveGrowthThreshold
+
+  # DiameterHistory["380189_1_auto", ]
+  # LeadingNAHistory["380189_1_auto", ]
+  # FirstDiameterHistory["380189_1_auto", ]
+  # GrowthHistory["380189_1_auto", ]
+  # FirstGrowth["380189_1_auto"]
+
+  # DiameterHistory["391764_1_auto", ]
+  # LeadingNAHistory["391764_1_auto", ]
+  # # FirstDiameterHistory["391764_1_auto", ]
+  # FirstDiameter["391764_1_auto"]
+  # GrowthHistory["391764_1_auto", ]
+  # FirstGrowth["391764_1_auto"]
+
+
+
+  # fill in the leading NA with calculated DBH by recursively removing first growth
+
+  IdsToFix <- names(which(LeadingNAHistory == 1, arr.ind = T)[,1])
+  # MatrixFirstGrowth <- matrix(rep(FirstGrowth, each = ncol(DiameterHistory)-1), ncol =  ncol(DiameterHistory)-1, byrow = T, dimnames = list(rownames(DiameterHistory), NULL))
+
+  DiameterHistoryCorrected <- DiameterHistory
+
+  for(id in IdsToFix) {
+    x <- DiameterHistory[id, ]
+    y <- LeadingNAHistory[id,]
+    g <- FirstGrowth[id]
+
+    while(any(is.na(x[y %in% 1]))) x[rev(which(is.na(x)))[1]] <- x[which(!is.na(x))[1]] -g
+
+    DiameterHistoryCorrected[id, ] <- x
+
   }
+
+  # keep only the ones that are > MinDBH
+  DiameterHistoryCorrected[LeadingNAHistory%in%1] <- ifelse(DiameterHistoryCorrected[LeadingNAHistory%in%1] <  MinDBHHistory[LeadingNAHistory%in%1], NA, DiameterHistoryCorrected[LeadingNAHistory%in%1])
+
+
+  # melt the corrected diameters and find out the ones that would lead to new rows in the data
+  DiameterHistoryCorrected <- melt(setDT(as.data.frame(DiameterHistoryCorrected), keep.rownames=TRUE), measure.vars = colnames(DiameterHistoryCorrected) , variable.name = "IdCensus")
+
+  idx_new_rows  <- which(match(paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
+
+  # find out which rows in Data should get a comment to indicate the previous census should have recruited this tree already (adding this comment only when OnlyDetectMissedRecruits)
+  idx_CommentOnly <- match(paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus)[!is.na(DiameterHistoryCorrected$value)], paste(Data[,get(ID)], Data[,IdCensus]))
+  idx_CommentOnly <- idx_CommentOnly[!duplicated(Data[,get(ID)][idx_CommentOnly])]
+  idx_CommentOnly <- idx_CommentOnly[!is.na(idx_CommentOnly)]
+
+
+  # add comment if detection only
+  if(OnlyDetectMissedRecruits)
+    Data[idx_CommentOnly, Comment_TreeData := GenerateComment(Comment_TreeData, "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)")]
+
+
+  # add rows with the corrected DBH if not detection only + indicate TRUE in the recruit column
+
+  if(!OnlyDetectMissedRecruits) {
+
+    # get what we know about those trees
+    NewRows <- Data[get(ID) %in% DiameterHistoryCorrected$rn[idx_new_rows], ]
+    NewRows <- NewRows[!duplicated(get(ID)), ]
+
+    # remove the data that changes at each census
+    NewRows[,setdiff(names(NewRows), InvariantColumns) := NA]
+
+    # fill in info we know about the census and based on the Status we corrected
+    m <- match(NewRows[,get(ID)], DiameterHistoryCorrected[idx_new_rows, rn])
+
+    NewRows$IdCensus <- DiameterHistoryCorrected[idx_new_rows, IdCensus][m]
+
+    NewRows$Diameter_TreeDataCor <- DiameterHistoryCorrected[idx_new_rows, value][m]
+
+    NewRows$CorrectedRecruit <- TRUE
+
+    # make best guess at other things
+    warning("We added rows for trees that were supposed to be recruited earlier based on growth pattern and MinDBH")
+
+    NewRows$Date <- as.Date(tapply(Data$Date, Data$IdCensus, mean, na.rm = T), origin = "1970-01-01")[NewRows$IdCensus]
+
+    NewRows$Year <- format(NewRows$Date, "%Y")
+    NewRows$Month <- format(NewRows$Date, "%m")
+    NewRows$Day <- format(NewRows$Date, "%d")
+
+    # Add these rows in the dataset
+    Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
+  }
+
+ # add rows for those that have been missed
+
+
 
   # Put back duplicated rows, or rows without ID or Year -----------------------
   Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
 
 
   # Order IDs and times in ascending order -------------------------------------
-  Data <- Data[order(get(ID), Year)]
+  Data <- Data[order(get(ID), IdCensus)]
 
   return(Data)
-
-}
-
-
-#' RecruitmentCorrectionByTree
-#'
-#' @param DataTree A dataset corresponding to a single tree's (1 IdTree/Idstem)
-#'   measurements (data.frame or data.table). The dataset should preferably
-#'   contain the column of corrected diameters: 'Diameter_TreeDataCor', otherwise the function
-#'   will take the column "Diameter"
-#'
-#' @param MinDBH Minimum diameter of trees inventoried according to your
-#'   protocol (in cm) (numeric, 1 value)
-#'
-#' @param PositiveGrowthThreshold A tree widening by more than x
-#'   cm/year is considered abnormal (numeric, 1 value)
-#'
-#' @param InvariantColumns Vector with the names of the columns that are
-#'   supposed to have always the same value for each measurement of the same
-#'   tree (character)
-#'
-#' @param PlotCensuses Census years for the plot in which the tree is (integer)
-#'
-#' @param DetectOnly TRUE: Only detect errors, FALSE: detect and correct errors
-#'   (logical)
-#'
-#' @details If the size of the tree has never changed, or if there is only one
-#'   value the same value is kept for the added forgotten recruits.
-#'   If the Diameter has not been corrected (Diameter_TreeDataCor column does
-#'   not exist), the function will create it for the forgotten recruits. It is
-#'   strongly recommended to correct the Diameter before correcting the
-#'   recruits.
-#'
-#' @return  Add rows for forgotten recruits with them estimated DBH in the
-#'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' column (logical)
-#'    and fill the 'Comment' column : "This DBH is/was the 1st recorded for this
-#'    tree, according to its annual growth and the census done for this plot, it
-#'    should have been recruited earlier according to your protocol (MinDBH)."
-#'
-#' @importFrom data.table data.table rbindlist copy
-#' @importFrom stats na.omit lm
-#'
-#' @export
-#'
-#' @examples
-#' library(data.table)
-#' DataTree <- data.table(IdTree = "a",
-#'                        Year = seq(2000,2008, by = 2), # 2 years/census
-#'                        Diameter_TreeDataCor  = as.numeric(c(13:17)), # 1cm/census(0.5 cm/year)
-#'                        Site = "Imaginary forest"
-#' )
-#' # 1st DBH = 13 > MinDBH. In 1998 the tree was 12cm, 11cm in 1996 and 10cm in
-#' 1994.
-#' Rslt <- RecruitmentCorrectionByTree(DataTree,
-#'                                     InvariantColumns = "Site",
-#'                                     PlotCensuses = seq(1996,2016, by = 2))
-#'
-RecruitmentCorrectionByTree <- function(
-    DataTree,
-    MinDBH = 10,
-    PositiveGrowthThreshold = 5, # je garde ?
-    InvariantColumns = c("Site",
-                         "GenusCor",
-                         "SpeciesCor",
-                         "FamilyCor",
-                         "ScientificNameCor"),
-    PlotCensuses,
-    DetectOnly = FALSE
-){
-
-  #### Arguments check ####
-  # DataTree
-  if (!inherits(DataTree, c("data.table", "data.frame")))
-    stop("DataTree must be a data.frame or data.table")
-
-  # IdStem or IdTree? ---------------------------------------------------------------------------------------
-  # If no IdStem take IdTree
-  if((!"IdStem" %in% names(DataTree) | all(is.na(DataTree$IdStem))) &
-     ("IdTree" %in% names(DataTree) & any(!is.na(DataTree$IdTree))) ){ ID <- "IdTree"
-
-  }else{ ID <- "IdStem"}
-
-  if(!any(c("IdStem", "IdTree") %in% names(DataTree)) | (all(is.na(DataTree$IdStem)) &  all(is.na(DataTree$IdTree))) )
-    stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
-  # ---------------------------------------------------------------------------------------------------------
-
-
-  # MinDBH/PositiveGrowthThreshold (numeric, 1 value)
-  if(!all(unlist(lapply(list(MinDBH, PositiveGrowthThreshold), length)) %in% 1) |
-     !all(unlist(lapply(list(MinDBH, PositiveGrowthThreshold),
-                        inherits, c("numeric", "integer")))))
-    stop("The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
-         of the 'RecruitmentCorrectionByTree' function must be 1 numeric value each")
-
-  if(DetectOnly == FALSE){
-    # InvariantColumns
-    if (!inherits(InvariantColumns, "character"))
-      stop("'InvariantColumns' argument must be of character class")
-  }
-
-  # PlotCensuses
-  if (!inherits(PlotCensuses, c("numeric", "integer")))
-    stop("'PlotCensuses' argument must be numeric or integer")
-
-  # DetectOnly (logical)
-  if(!all(unlist(lapply(list(DetectOnly),
-                        inherits, "logical"))))
-    stop("The 'DetectOnly' argument
-         of the 'RecruitmentCorrectionByTree' function must be logicals")
-
-  if(!"Diameter" %in% names(DataTree) & !"Diameter_TreeDataCor" %in% names(DataTree))
-    stop("The 'Diameter' or the 'Diameter_TreeDataCor' (corrected Diameter)
-           column does't exist in the dataset.")
-
-
-  # if there are several IdTrees
-  if(length(unique(DataTree[, get(ID)])) != 1){
-    stop("DataTree must correspond to only 1 same tree/stem so 1 same ",ID,"
-    (the ",ID,"s: " ,paste0(unique(DataTree[, get(ID)]), collapse = "/"),"")
-  }
-
-  # if there are several plots for the same IdTree
-  # if(length(as.vector(na.omit(unique(DataTree$Plot)))) != 1){
-  #   stop(paste0("Tree ",unique(DataTree$IdTree)," has multiple plots: " ,paste0(unique(DataTree$Plot), collapse = "/")))
-  # }
-
-  if(DetectOnly %in% FALSE){
-    # Check if the InvariantColumns name exists in DataTree
-    for(c in InvariantColumns){
-      if(!c %in% names(DataTree)){
-        stop(paste("InvariantColumns argument must contain one or several column names (see help)."
-                   ,c,"is apparently not a dataset's column"))
-      }
-    }
-  }
-
-  #### Function ####
-
-  # print(unique(DataTree[, get(ID)])) # to debug
-
-  # data.frame to data.table
-  setDT(DataTree)
-
-  # Arrange year in ascending order
-  PlotCensuses <- sort(PlotCensuses, decreasing = FALSE) # order plot census years
-  DataTree <- DataTree[order(Year)] # order years in the data
-
-  #### Compute annual diameter incrementation ####
-  DBHCor <- DataTree[,Diameter_TreeDataCor]
-  Year <- DataTree[,Year]
-
-  # Initialisation
-  cresc <- rep(0, length(DBHCor) - 1) # (cresc[1] corresponds to the 2nd DBH)
-
-  if (sum(!is.na(DBHCor)) > 1) { # if there is at least 1 measurement
-
-    cresc[which(!is.na(DBHCor))[-1] - 1] <- # 8 cresc for 9 dbh values ([-1]), shift all indices by 1 to the left (-1)
-      diff(DBHCor[!is.na(DBHCor)]) / diff(Year[!is.na(DBHCor)]) # DBH difference between pairwise censuses / time difference between pairwise censuses
-
-  }
-
-  #### Detect the overgrown recruits ####
-
-  RecruitYear <- min(DataTree[, Year], na.rm = TRUE) # recruitment year
-
-  if(RecruitYear > min(PlotCensuses, na.rm = TRUE) & sum(!is.na(DataTree$Diameter_TreeDataCor)) > 0){ # if the 1st census of the plot is smaller than the 1st census of the tree, and there are measured DBH
-
-    PrevCens <- PlotCensuses[which(PlotCensuses == RecruitYear)-1] # 1 census before the recruit year among the plot censuses
-
-    FirstDBH <- DataTree[!is.na(Diameter_TreeDataCor), Diameter_TreeDataCor][1] # 1st measured DBH
-
-    # if(DataTree$Diameter_TreeDataCor[1] > (MinDBH + (RecruitYear - PrevCens) * PositiveGrowthThreshold)){ # ah ben il detecte pas mes oublis pcq il considère l'erreur que si l'écart est superieur à la limite de croissance
-
-    # Growth criteria
-    if(length(cresc) > 0){ # if there are a growth
-      Growth <- cresc[1] # 1st growth value
-    }else{Growth <- PositiveGrowthThreshold} # if only 1 DBH value (no cresc)
-
-    # Maybe here we should round up the Growth, or propose a limit.
-
-    # Detection
-    #### If the 1st DBH is larger than it would have been if at the previous census it was at the minimum DBH
-    if (FirstDBH > (MinDBH + (RecruitYear - PrevCens) * Growth)){ # ma proposition
-
-      DataTree <- GenerateComment(DataTree,
-                                  condition = DataTree[, Year]  %in% RecruitYear,
-                                  comment = "This DBH is/was the 1st recorded for this tree,
-                                  according to its annual growth and the census done for this plot,
-                                  it should have been recruited earlier according to your protocol (MinDBH).")
-
-      if(DetectOnly %in% FALSE){
-
-        MissingCens <- PlotCensuses[which(PlotCensuses < RecruitYear)] # the previous missing censuses
-
-        #### Create new rows for the forgotten recruits ####
-        if(length(MissingCens) > 0){
-          if("Plot" %in% names(DataTree)){ # if we have the plot info
-            NewRow <- data.table(ID = unique(DataTree[,get(ID)]), # the IdTree
-                                 Year = NA, # the censuses to add
-                                 Plot = unique(DataTree$Plot), # the unique plot of the tree
-                                 CorrectedRecruit = TRUE, # there are corrected recruits
-                                 stringsAsFactors = FALSE) # do not convert characters into factors
-          }
-          else{
-            NewRow <- data.table(ID = unique(DataTree[,get(ID)]), # the IdTree
-                                 Year = NA, # the censuses to add
-                                 CorrectedRecruit = TRUE, # there are corrected recruits
-                                 stringsAsFactors = FALSE) # do not convert characters into factors
-          }
-
-          setnames(NewRow, "ID", ID, skip_absent=TRUE)
-
-          if(length(InvariantColumns) > 0){ # if there are invariant columns
-
-            NewRow[,(InvariantColumns) := NA] # empty the invariant columns for the added rows
-
-            # Fill in the invariant columns in the added rows
-            NewRow <- FillinInvariantColumns(NewRow = NewRow,
-                                             InvariantColumns = InvariantColumns,
-                                             DataTree = DataTree,
-                                             IdTree = unique(DataTree[,get(ID)]))
-          }
-
-          # Multiply this new row the number of times as well as the number of absents
-          NewRows <- do.call("rbind", replicate(n = length(MissingCens), NewRow, simplify = FALSE))
-          NewRows[, Year := MissingCens]
-
-          # Add these rows in the dataset
-          DataTree <- rbindlist(list(DataTree, NewRows), use.names=TRUE, fill=TRUE)
-          DataTree[, CorrectedRecruit := ifelse(is.na(CorrectedRecruit), FALSE, CorrectedRecruit)] # FALSE for the other rows
-
-          DataTree <- DataTree[order(Year)] # order by Year
-
-          #### Linear regression (DBH ~ Year) #### with all the DBH values
-          coef <- stats::lm(
-            DataTree[!is.na(Diameter_TreeDataCor), Diameter_TreeDataCor] ~ DataTree[!is.na(Diameter_TreeDataCor), Year])$coefficients
-
-          if(is.na(coef[2]) | coef[2] %in% 0) { # if no slope
-            ### if only 1 DBH value: replace all non-recruited DBH by this value (pas sure que ce soit une bonne idée)
-            DataTree[Year < RecruitYear, ("Diameter_TreeDataCor") := unique(DataTree[!is.na(Diameter_TreeDataCor), Diameter_TreeDataCor])] # DBHCor := coef[1] (ça donne des pptés à la valeur)
-
-          }else{
-
-            # Estimate the recruits DBHCor with linear extrapolation
-            RecruitsDBH <- coef[1] + DataTree[Year < RecruitYear, Year]*coef[2] # y = b + ax. Min entre ces DBH inférés et le 1er DBH
-
-            # If estimated DBHCors are higher than the first measured DBHCors, (comment c possible ?)
-            # these are replaced by first measured DBHCors.
-            for(y in 1: length(RecruitsDBH)){
-              RecruitsDBH[y] <- min(RecruitsDBH[y], FirstDBH)
-            }
-            DataTree[Year < RecruitYear, ("Diameter_TreeDataCor") := RecruitsDBH]
-          }
-
-          # UselessRows: added trees under the MinDBH
-          UselessRows <- ((DataTree[, Diameter_TreeDataCor] < MinDBH) & (DataTree[, Year] %in% MissingCens))
-
-          if(any(UselessRows)){
-            DataTree <- DataTree[-which(UselessRows)] # remove them
-          }
-
-
-        } # end: missing censuses to add
-      } # end: DetectOnly == FALSE
-    } # end: overgrown recruit
-  } # end: if the plot have previous censuses
-
-
-  DataTree[is.na(Comment), ("Comment") := ""] # NAs come from NewRow
-
-  return(DataTree)
 
 }

@@ -2,7 +2,7 @@ test_that("BotanicalCorrection", {
 
   # options(warn = 2) # trace warning
 
-  library(data.table)
+  suppressWarnings(library(data.table))
 
   # WFO Dataset -----------------------------------------------------------------------------------------------------------
   # load("D:/VSC TmFO/Data/WFO_Backbone.rda")
@@ -80,47 +80,43 @@ test_that("BotanicalCorrection", {
   expect_error(BotanicalCorrection(Data, Source = "WFO", WFOData = NULL),
                regexp = "You must provide the 'WFOData' argument")
 
-  expect_error(BotanicalCorrection(Data, Source = "TPL", DetectOnly = "TRUE"),
-               regexp = "The 'DetectOnly' argument must be a logical")
-
   # Check the function work -----------------------------------------------------------------------------------------------
 
   ## Detect Only: no correction, only comments ----------------------------------------------------------------------------
-  RsltTPL <- BotanicalCorrection(Data, Source = "TPL", DetectOnly = TRUE)
-  RsltWFO <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset, DetectOnly = TRUE)
+  RsltTPL <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)) # "TPL" (doest' work during the github actions)
+  RsltWFO <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset))
 
   Rslt <- list(RsltTPL, RsltWFO)
+
+  OriginalColumns <- names(Data)
 
   # r = 1
   for(r in 1:length(Rslt)){
 
-    # No correction, only comments
-    expect_true(all(!(grepl("_TreeDataCor", names(Rslt[[r]])))) & "Comment" %in% names(Rslt[[r]]))
-
     # Missing value
     Rslt[[r]][is.na(Subspecies), Subspecies := ""] # Subspecies = NA is ok
-    expect_true(all(grepl("Missing value", Rslt[[r]][rowSums(is.na(Rslt[[r]])) > 0, Comment])))
+    expect_true(all(grepl("Missing value", Rslt[[r]][rowSums(is.na(Rslt[[r]][, OriginalColumns, with = F])) > 0, Comment_TreeData])))
 
     # -aceae in Genus or Species
     expect_true(all(grepl("'aceae' cannot be genus or species names",
-                          Rslt[[r]][grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), Comment])))
+                          Rslt[[r]][grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), Comment_TreeData])))
 
     # Special character in Genus, Family
     expect_true(all(grepl("Special characters",
-                          Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment])))
+                          Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment_TreeData])))
 
     # Variant botanical info per IdTree (A FAIRE)
-    VarIdTree <- unique(Rslt[[r]][rowSums(is.na(Rslt[[r]])) == 0, .(IdTree, Family, Genus, Species, Subspecies, VernName)])[duplicated(IdTree), IdTree]
+    VarIdTree <- unique(Rslt[[r]][, .(IdTree, Family_TreeDataCor, Genus_TreeDataCor, Species_TreeDataCor, Subspecies, VernName_TreeDataCor)])[duplicated(IdTree), IdTree]
 
     expect_true(all(grepl("Different botanical informations",
-                          Rslt[[r]][IdTree %in% VarIdTree, Comment])))
+                          Rslt[[r]][IdTree %in% VarIdTree, Comment_TreeData])))
 
 
   }
 
   # Correction
-  RsltTPL <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset) # "TPL" (doest' work during the github actions)
-  RsltWFO <- BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)
+  RsltTPL <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)) # "TPL" (doest' work during the github actions)
+  RsltWFO <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset))
 
   Rslt <- list(RsltTPL, RsltWFO)
 

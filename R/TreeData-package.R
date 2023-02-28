@@ -32,22 +32,23 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
 
 
 
-                         "BD", "BCirc", "BPOM", "BHOM",
+                         "BD", "BCirc", "BPOM", "BHOM", "site",
 
-                         ".", ".N", ".SD", ".NATURAL", "..ColumnsToReturn",
+                         ".", ".N", ".SD", ".NATURAL", "..ColumnsToReturn", "..ByCols",
+                         "rn", "value", "LifeForm",
 
-                         "IDYear", "V1", "MaxHOM", "MaxDate", "POMChange",
+                         "IDYear", "V1", "V2", "MaxHOM", "MaxDBH", "MaxDate", "POMChange",
 
-                         "LifeStatusCor", 'LifeStatus_TreeDataCor', "Comment",
-                         "TaperCorDBH", "TaperDBH_TreeDataCor",
+                         "LifeStatusCor", 'LifeStatus_TreeDataCor', "Comment_TreeData",
                          "CorrectedRecruit",
-                         "DBHCor", "Diameter_TreeDataCor", "DiameterCorrectionMeth", "Cresc",
-                         "HOMCor", "POMCor",
+                         "DBHCor", "Diameter_TreeDataCor", "DiameterCorrectionMeth_TreeData", "Cresc",
+                         "HOM_TreeDataCor", "POM_TreeDataCor",
                          "GenusCor", "SpeciesCor", "ScientificNameCor", "FamilyCor", "VernNameCor",
                          "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
                          "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",
                          "Old.status", "spec.name.ORIG", "BotaCorSource",
-                         "BotanicalCorrectionSource", "FamilyCorSource"
+                         "BotanicalCorrectionSource", "FamilyCorSource",
+                         "raised", "InvariantColumns"
 ))
 
 ## usethis namespace: end

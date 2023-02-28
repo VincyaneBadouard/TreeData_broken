@@ -1,12 +1,14 @@
 test_that("StatusCorrection", {
 
   # Import data
-  library(data.table)
+  # library(data.table)
   TestData <- data.table(Site = "Nowhere",
                          Plot = "1",
                          IdTree = c("a", "b", "c", "d", "e"), # 5 ind
                          ScientificName = "Plant",
+                         IdCensus =  rep(c(2012:2020), 5),
                          Year = rep(c(2012:2020), 5), # 9 census
+
                          Diameter = NA_real_)
   TestData <- TestData[order(IdTree, Year)]
   TestData[,LifeStatus := c(
@@ -20,6 +22,25 @@ test_that("StatusCorrection", {
   TestData[IdTree %in% "e", ("Diameter") := c(13:21)] # "e" Diameter seq
   TestData[IdTree %in% "e" & Year == 2014, ("Diameter") := NA] # a NA in the "e" Diameter seq
 
+  suppressWarnings(TestData <- RequiredFormat(TestData,
+                             input = list(MeasLevel = "Tree",
+                                          Site = "Site",
+                                          Plot = "Plot",
+                                          IdTree = "IdTree",
+                                          ScientificName = "ScientificName",
+                                          IdCensus= "IdCensus",
+                                          Year = "Year",
+                                          YearMan = -999,
+                                          Month = "none",
+                                          Day = "none",
+                                          Date = "none",
+                                          Diameter = "Diameter",
+                                          LifeStatus = "LifeStatus",
+                                          DiameterUnitMan = "cm",
+                                          PlotArea = "none",
+                                          SubplotArea = "none",
+                                          IsLiveMan = T))
+  )
 
   # Create test data
   MatrixData <- as.matrix(TestData)
@@ -34,34 +55,29 @@ test_that("StatusCorrection", {
   expect_error(StatusCorrection(NoPlotData),
                regexp = "The column 'Plot' must be present in the dataset")
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = c(1:3)),
-               regexp = "'InvariantColumns' argument must be of character class")
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = c("a","b"), DeathConfirmation = TRUE),
+  expect_error(StatusCorrection(TestData, DeathConfirmation = TRUE),
                regexp = "'DeathConfirmation' argument must be numeric")
 
   expect_error(StatusCorrection(TestData,
                                 UseSize = "yes",
-                                DetectOnly = "no",
+                                AddRowsForForgottenCensuses = "no",
                                 RemoveRBeforeAlive = 1,
                                 RemoveRAfterDeath = "FALSE"),
-               regexp = "The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
+               regexp = "The 'UseSize', 'RemoveRBeforeAlive', 'AddRowsForForgottenCensuses' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
 
-  expect_error(StatusCorrection(TestData, InvariantColumns = "a"),
-               regexp = "InvariantColumns argument must contain one or several column names")
 
-
-  expect_error(StatusCorrection(Data = NoDBHData, InvariantColumns = "Site",
+  expect_error(StatusCorrection(Data = NoDBHData,
                                 UseSize = TRUE),
                regexp = "the 'Diameter' column must be present in the dataset")
 
   # Check the function work
 
-  expect_warning(StatusCorrection(TestData, InvariantColumns = "ScientificName_TreeDataCor"))
+  expect_warning(StatusCorrection(TestData), "We added rows for missing trees and imputed average census Date")
 
-  Rslt <- suppressWarnings(StatusCorrection(TestData, InvariantColumns = c("Site", "ScientificName_TreeDataCor"), UseSize = TRUE))
+  Rslt <- suppressWarnings(StatusCorrection(TestData, UseSize = TRUE))
 
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
 
@@ -101,20 +117,17 @@ test_that("StatusCorrection", {
 
     }else{ # if death in the seq (Alive NA NA DEAD NA)
       FirstDeath <- min(Deaths_seq)
-          UnseenBfDeath <- sum(Unseen_seq < FirstDeath) # nbr of NA before the death
+      UnseenBfDeath <- sum(Unseen_seq < FirstDeath) # nbr of NA before the death
 
           if(UnseenBfDeath >= DeathConfirmation)
             expect_true(all(SeqCor[Unseen_seq] == FALSE))
     }
 
     ## If UseSize : if Diameter != NA -> Alive
-    Sizes <-!is.na(Rslt[IdTree %in% i, Diameter])
-    DBHprst <- which(Sizes==T)
-    if(length(DBHprst) > 0){
-    expect_true(all(DBHprst %in% which(SeqCor==T)))
-}
+    expect_true(all(SeqCor[!is.na(Rslt[IdTree %in% i, Diameter])] == T))
+
     ## Add a "Comment" value when "LifeStatus" != "LifeStatus_TreeDataCor"
-    Comment <- Rslt[IdTree %in% i, Comment] != ""
+    Comment <- Rslt[IdTree %in% i, Comment_TreeData] != ""
 
     compareNA <- function(v1,v2) {
       same <- (v1 == v2) | (is.na(v1) & is.na(v2))
@@ -133,3 +146,39 @@ test_that("StatusCorrection", {
 # after the death always the death (no "NA")
 # if no "dead" but "NA" nbr >= DeathConfirmation -> "dead" in "DBHCor"
 # if UseSize : if Diameter != NA -> Alive
+
+
+
+# check SCBI subset -------------------------------------------------------
+
+data(SCBISubsetFormated)
+
+expect_warning(SCBICorrected <- StatusCorrection(SCBISubsetFormated), "We added rows for missing trees and imputed average census Date")
+
+expect_identical(unique(SCBICorrected$Comment_TreeData), c("", "A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive", "Tree can't be dead before first being alive"))
+
+
+expect_identical(SCBICorrected[IdStem %in% "10012",LifeStatus_TreeDataCor], SCBICorrected[IdStem %in% "10012",LifeStatus]) # this IdStem should not have any corrections
+
+expect_true(all(SCBICorrected[IdStem %in% "11012", LifeStatus_TreeDataCor])) # first measurement had a DBH so should be alive, then second should be Alive because inbetwen two alive
+
+expect_identical(SCBICorrected[IdStem %in% "11012", Comment_TreeData ], c("A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
+                                                                          ""))
+
+SCBISubsetFormated[IdStem %in% "66114",]
+expect_identical(SCBICorrected[IdStem %in% "66114", Comment_TreeData], c("Tree can't be dead before first being alive", "Tree can't be dead before first being alive",  "")) # this should turn into an error once we fix the interractive part that let's us put NA for things like prior
+
+SCBISubsetFormated[IdStem %in% "31258",]
+SCBICorrected[IdStem %in% "31258",]
+
+SCBISubsetFormated[IdStem %in% "10032",]
+expect_identical(SCBICorrected[IdStem %in% "10032",.(LifeStatus_TreeDataCor, Comment_TreeData)],
+                 structure(list(LifeStatus_TreeDataCor = c(TRUE, FALSE, FALSE),
+                                Comment_TreeData = c("A measured tree is a living tree","", "")),
+                           row.names = c(NA, -3L), class = c("data.table","data.frame")))
+
+
+expect_equal(nrow(SCBICorrected[Comment_TreeData %in% "A measured tree is a living tree",]), 4)
+
+
+

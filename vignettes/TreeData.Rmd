@@ -63,9 +63,6 @@ level.
 **Life Status**  
 - *LifeStatus_TreeDataCor* (logical): corrected stem life status.  
 
-**Taper**  
-- *TaperDBH_TreeDataCor* (numeric): corrected trees diameter at default *HOM*  
-
 **Diameter**  
 - *Diameter_TreeDataCor* (numeric): corrected trees diameter at default *HOM*  
 - *DiameterCorrectionMeth* (character): diameter correction methode = "*taper*"/"*local linear regression*"/"*weighted mean*"

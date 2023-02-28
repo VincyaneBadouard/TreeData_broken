@@ -6,12 +6,9 @@
 \usage{
 StatusCorrection(
   Data,
-  InvariantColumns = c("Site", "Genus_TreeDataCor", "Species_TreeDataCor",
-    "Family_TreeDataCor", "ScientificName_TreeDataCor"),
   DeathConfirmation = 2,
-  UseSize = FALSE,
+  UseSize = TRUE,
   AddRowsForForgottenCensuses = TRUE,
-  DetectOnly = FALSE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE
 )
@@ -21,27 +18,15 @@ StatusCorrection(
 The \emph{LifeStatus} column must be coded as:
 - TRUE = alive,
 - FALSE = dead,
-- NA = unseen
-The \emph{Plot} column is needed to add rows to the census where the plot was
-inventoried, where the tree was alive, but not recorded.}
-
-\item{InvariantColumns}{Vector with the names of the columns that are
-supposed to have always the same value for each measurement of the same
-tree (character). It is recommended to use the columns that have already
-been \strong{corrected}, such as the columns containing the corrected botanical
-information.}
+- NA = unseen}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)  (Default = 2 censuses)}
 
-\item{UseSize}{Use the size presence as a witness of the living status of the
+\item{UseSize}{Use the size presence  (> min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)}
 
-\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses
-between 2 'Alive', FALSE: does not add any rows (logical)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(logical)}
+\item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
 before it was seen alive for the 1st time? (logical)}
@@ -50,9 +35,8 @@ before it was seen alive for the 1st time? (logical)}
 concerning the tree after its death? (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add a \emph{LifeStatus_TreeDataCor} column with the
-corrected trees life status.
+Fill the \emph{Comment_TreeData} column with error type informations and add
+a \emph{LifeStatus_TreeDataCor} column with corrected trees life status.
 }
 \description{
 Detect errors, or detect errors and correct, the tree life
@@ -82,19 +66,14 @@ data(TestData)
 selection <- c("101184", "101433","101435","101436")
 
 # Write the sequence
-TestData <- TestData[order(Year)] # arrange years in ascending order
+TestData <- TestData[order(IdCensus)] # arrange IdCensus in ascending order
 TestData[IdTree == "101184", LifeStatus := c(TRUE, TRUE, TRUE, TRUE, FALSE)]
 TestData[IdTree == "101433", LifeStatus := c(FALSE, TRUE, TRUE, TRUE, TRUE)]
 TestData[IdTree == "101435", LifeStatus := c(TRUE, TRUE, NA, FALSE, TRUE)]
 TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 
 
-Rslt <- StatusCorrection(TestData[IdTree \%in\% selection],
-                         InvariantColumns = c("Site",
-                                              "Genus",
-                                              "Species",
-                                              "Family",
-                                              "ScientificName"))
+Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
 
 
 LifeStatusCorrectionPlot(Rslt)

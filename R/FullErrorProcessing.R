@@ -3,10 +3,6 @@
 #' @inheritParams GeneralErrorsDetection
 #' @inheritParams BotanicalCorrection
 #' @inheritParams StatusCorrection
-#' @param UseTaperCorrection (logical) TRUE: transform the tree diameter measured at a given height
-#' into the diameter corresponding to the default measurement height (`DefaultHOM`), using an allometry.
-#'   FALSE: do not apply a taper correction
-#' @inheritParams TaperCorrection
 #' @inheritParams DiameterCorrection
 #' @inheritParams RecruitmentCorrection
 #'
@@ -30,10 +26,13 @@
 #' @export
 #'
 #' @examples
-#' data(TestData)
-#' Rslt <- FullErrorProcessing(TestData, DetectOnly = TRUE)
 #'
 #'\dontrun{
+#' data(TestData)
+#' Rslt <- FullErrorProcessing(TestData,
+#'  OnlyDetectMissedRecruits = TRUE,
+#'   AddRowsForForgottenCensuses = FALSE)
+#'
 #' WFO_Backbone <- file.choose()
 #' load(WFO_Backbone)
 #' Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)
@@ -44,39 +43,38 @@ FullErrorProcessing <- function(
 
   Data,
 
-  DetectOnly = FALSE,
 
   # Botanical informations
   Source = NULL,
   WFOData = NULL,
 
   # Life status
-  InvariantColumns = c("Site",
-                       "Genus_TreeDataCor",
-                       "Species_TreeDataCor",
-                       "Family_TreeDataCor",
-                       "ScientificName_TreeDataCor"),
+
   DeathConfirmation = 2,
   UseSize = FALSE,
+  AddRowsForForgottenCensuses = TRUE,
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE,
 
-  # Taper
+
+  # Diameter
+
+  ## Taper
+
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB / (exp(- TaperParameter*(HOM - DefaultHOM))),
 
-  # Diameter
+  ## other diameter corrections
   KeepMeas = c("MaxHOM", "MaxDate"),
-  MaxDBH = 500,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
 
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
 
-  WhatToCorrect = c("POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
 
   DBHRange = 10,
@@ -89,7 +87,8 @@ FullErrorProcessing <- function(
   coef = 0.9,
 
   # Recruitment
-  MinDBH = 10
+  OnlyDetectMissedRecruits = FALSE,
+  MinDBH = NULL
 ){
 
   #### Arguments check ####
@@ -115,17 +114,17 @@ FullErrorProcessing <- function(
   }
 
   # InvariantColumns
-  if (!inherits(InvariantColumns, "character"))
-    stop("'InvariantColumns' argument must be of character class")
+  # if (!inherits(InvariantColumns, "character"))
+  #   stop("'InvariantColumns' argument must be of character class")
 
   # DeathConfirmation
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/DetectOnly/RemoveRBeforeAlive/RemoveRAfterDeath
-  if (!all(unlist(lapply(list(UseSize, DetectOnly, RemoveRBeforeAlive, RemoveRAfterDeath),
+  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath/OnlyDetectMissedRecruits
+  if (!all(unlist(lapply(list(UseSize, RemoveRBeforeAlive, RemoveRAfterDeath, OnlyDetectMissedRecruits),
                          inherits, "logical"))))
-    stop("The 'UseSize', 'DetectOnly', 'RemoveRBeforeAlive' and 'RemoveRAfterDeath' arguments
+    stop("The 'UseSize', 'RemoveRBeforeAlive', 'OnlyDetectMissedRecruits', and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # UseSize-Diameter
@@ -155,7 +154,7 @@ FullErrorProcessing <- function(
     stop("The 'Diameter' column does't exist in the dataset")
 
   # DefaultHOM/Min-MaxDBH/Positive-Negative-PioneersGrowthThreshold/DBHRange/MinIndividualNbr (numeric, 1 value)
-  if(!all(unlist(lapply(list(DefaultHOM, MaxDBH,
+  if(!all(unlist(lapply(list(DefaultHOM, # MaxDBH,
                              PositiveGrowthThreshold, NegativeGrowthThreshold, PioneersGrowthThreshold,
                              DBHRange, MinIndividualNbr),
                         length)) %in% 1) |
@@ -203,42 +202,32 @@ FullErrorProcessing <- function(
 
   Data <- BotanicalCorrection(Data = Data,
                               Source = Source,
-                              WFOData = WFOData,
-                              DetectOnly = DetectOnly)
+                              WFOData = WFOData)
 
   #### Life status ####
 
   Data <- StatusCorrection(Data,
-                           InvariantColumns = InvariantColumns,
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
-                           DetectOnly = DetectOnly,
+                           AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
                            RemoveRBeforeAlive = RemoveRBeforeAlive,
                            RemoveRAfterDeath = RemoveRAfterDeath)
 
-  #### Taper ####
-  if(UseTaperCorrection & "HOM" %in% names(Data) & any(!is.na(Data$HOM))){
-
-    Data <- TaperCorrection(Data,
-                            DefaultHOM = DefaultHOM,
-
-                            TaperParameter = TaperParameter,
-                            TaperFormula = TaperFormula,
-
-                            DetectOnly = DetectOnly)
-  }
 
   #### Diameter ####
 
-  if(any(c("linear", "quadratic", "individual", 'phylogenetic hierarchical') %in% CorrectionType) |
-     any(c("POM change", "punctual", "shift") %in% WhatToCorrect)){
+  if(any(c("individual", 'phylogenetic hierarchical') %in% CorrectionType) |
+     any(c("POM change", "Abnormal growth") %in% WhatToCorrect)){
 
     Data <- DiameterCorrection(Data,
+                               UseTaperCorrection = UseTaperCorrection,
+                               DefaultHOM = DefaultHOM,
+
+                               TaperParameter = TaperParameter,
+                               TaperFormula = TaperFormula,
 
                                KeepMeas = KeepMeas,
 
-                               DefaultHOM = DefaultHOM,
-                               MaxDBH = MaxDBH,
                                PositiveGrowthThreshold = PositiveGrowthThreshold,
                                NegativeGrowthThreshold = NegativeGrowthThreshold,
 
@@ -255,9 +244,7 @@ FullErrorProcessing <- function(
 
                                DBHCorForDeadTrees = DBHCorForDeadTrees,
 
-                               coef = coef,
-
-                               DetectOnly = DetectOnly)
+                               coef = coef)
   }
 
   #### Recruitment ####
@@ -266,7 +253,7 @@ FullErrorProcessing <- function(
                                 KeepMeas = KeepMeas,
                                 MinDBH = MinDBH,
                                 PositiveGrowthThreshold = PositiveGrowthThreshold,
-                                DetectOnly = DetectOnly
+                                OnlyDetectMissedRecruits = OnlyDetectMissedRecruits
   )
 
   return(Data)

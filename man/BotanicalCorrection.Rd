@@ -4,7 +4,7 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, Source = NULL, WFOData = NULL, DetectOnly = FALSE)
+BotanicalCorrection(Data, Source = c("TPL", "WFO"), WFOData = NULL)
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)
@@ -24,20 +24,15 @@ The dataset must contain the columns:
 on the 2013 taxonomy)
 \item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
 but based on the 2022 taxonomy)
-\item NULL: if only error detection (DetectOnly = TRUE)
 }}
 
 \item{WFOData}{To be filled in if the argument \code{Source} = "WFO". Data set
 with the static copy of the \emph{World Flora Online} (WFO) Taxonomic Backbone
 data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
 data.table)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add columns:
+Fill the \emph{Comment_TreeData} column with error type informations and add columns:
 \itemize{
 \item \code{Family_TreeDataCor} (character): corrected Family name
 \item \code{FamilyCorSource} (character): source of the Family correction

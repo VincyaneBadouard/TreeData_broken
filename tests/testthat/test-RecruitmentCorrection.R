@@ -1,7 +1,7 @@
 test_that("RecruitmentCorrection", {
 
   # Import data
-  library(data.table)
+  suppressWarnings(library(data.table))
   data(TestData)
 
   # Create test data
@@ -17,32 +17,20 @@ test_that("RecruitmentCorrection", {
                regexp = "Data must be a data.frame or data.table")
 
   expect_error(RecruitmentCorrection(TestData, MinDBH = c(5, 10, 20), PositiveGrowthThreshold = TRUE),
-               regexp = "The 'MinDBH' and 'PositiveGrowthThreshold'' arguments
-         of the 'RecruitmentCorrection' function must be 1 numeric value each")
+               regexp = "MinDBH must be numeric value of length 1")
 
-  expect_error(RecruitmentCorrection(TestData, InvariantColumns = c(1:3)),
-               regexp = "'InvariantColumns' argument must be of character class")
-
-  expect_error(RecruitmentCorrection(TestData, DetectOnly = "no"),
-               regexp = "The 'DetectOnly' argument
+  expect_error(RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = "no"),
+               regexp = "The 'OnlyDetectMissedRecruits' argument
          of the 'RecruitmentCorrection' function must be logicals")
 
   expect_error(RecruitmentCorrection(NoDBHData),
                regexp = "column does't exist in the dataset.")
 
 
-  expect_error(RecruitmentCorrection(TestData, InvariantColumns = "a"),
-               regexp = "InvariantColumns argument must contain one or several column names")
 
-
-  expect_warning(RecruitmentCorrection(TestData), regexp = "column does't exist.")
+  expect_warning(RecruitmentCorrection(TestData), regexp = "We added rows for trees that were supposed to be recruited earlier based on growth pattern and MinDBH")
 
   # Check the function works
-  Rslt <- RecruitmentCorrection(TestData,
-                                InvariantColumns = c("Site",
-                                                     "Genus",
-                                                     "Species",
-                                                     "Family",
-                                                     "ScientificName"))
+  Rslt <- RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = T)
 
 })

@@ -2,9 +2,9 @@ test_that("FullErrorProcessing", {
 
   data(TestData)
 
-  Rslt_Test <- suppressWarnings(FullErrorProcessing(TestData, DetectOnly = TRUE))
+  Rslt_Test <- suppressWarnings(FullErrorProcessing(TestData, OnlyDetectMissedRecruits = TRUE))
   # Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)
-  # Rslt_Panama <- FullErrorProcessing(PanamaFormated, DetectOnly = TRUE)
+  # Rslt_Panama <- FullErrorProcessing(PanamaFormated)
 
 
   # Check general errors detection

@@ -6,22 +6,24 @@
 \usage{
 DiameterCorrection(
   Data,
-  KeepMeas = c("MaxHOM", "MaxDate"),
+  UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
-  MaxDBH = 500,
+  TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
+  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
+    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
+  KeepMeas = c("MaxHOM", "MaxDate"),
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
   PioneersGrowthThreshold = 7.5,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
   Digits = 1L,
   DBHCorForDeadTrees = TRUE,
-  coef = 0.9,
-  DetectOnly = FALSE
+  coef = 0.9
 )
 }
 \arguments{
@@ -41,6 +43,33 @@ dataset must also contain the columns:
 \item \code{Family_TreeDataCor} (character)
 }}
 
+\item{UseTaperCorrection}{(logical) TRUE: transform the tree diameter measured at a given height
+into the diameter corresponding to the default measurement height (\code{DefaultHOM}), using an allometry.
+FALSE: do not apply a taper correction}
+
+\item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
+(numeric, 1 value)}
+
+\item{TaperParameter}{Taper parameter (unitless) formula (function)
+Default: \emph{TaperParameter = 0.156 - 0.023 log(DAB) - 0.021 log(HOM)}
+of Cushman et al.2021.
+With:
+\itemize{
+\item \emph{DAB}: Diameter Above Buttress (in cm)
+\item \emph{HOM}: Height Of Measurement (in m)
+}}
+
+\item{TaperFormula}{Taper formula (function)
+Default: \emph{DAB / (e^(- TaperParameter (HOM - DefaultHOM)))}
+of Cushman et al.2021.
+With:
+\itemize{
+\item \emph{DAB}: Diameter Above Buttress (in cm)
+\item \emph{HOM}: Height Of Measurement (in m)
+\item \emph{DefaultHOM}:  Default Height Of Measurement (in m)
+\item \emph{TaperParameter}: Taper parameter (unitless)
+}}
+
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
 census year:
 Possible values: "MaxHOM", "MaxDate" (character).
@@ -50,12 +79,6 @@ Possible values: "MaxHOM", "MaxDate" (character).
 \item "MaxDate": apply the correction to the \strong{most recent measurement} (same
 year but more recent date)
 }}
-
-\item{DefaultHOM}{Default Height Of Measurement in meter (Default: 1.3 m)
-(numeric, 1 value)}
-
-\item{MaxDBH}{Maximum possible DBH (Diameter at the default HOM) of your
-stand in cm (numeric, 1 value)}
 
 \item{PositiveGrowthThreshold}{in cm/year: a tree
 widening by more than this value is considered abnormal (numeric, 1 value)}
@@ -72,15 +95,13 @@ the \code{ScientificName_TreeDataCor} column (characters vector)}
 \item{PioneersGrowthThreshold}{in cm/year: a tree of a pioneer species that
 widens by more than this value is considered abnormal (numeric, 1 value)}
 
-\item{WhatToCorrect}{Possible values: "POM change", "punctual", "shift"
+\item{WhatToCorrect}{Possible values: "POM change", "Abnormal growth"
 (character)
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
-Diameter values from it.
-\item "punctual": detect if the error is punctual and correct it by
-interpolation.
-\item "shift": detect if there is a shift of several Diameter values and
-links them to the 1st measurements set.
+Diameter values from it. (Ignored if taper correction is applied)
+\item "Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
+or smaller than NegativeGrowthThreshold and correct it by \code{CorrectionType}
 }}
 
 \item{CorrectionType}{Possible values: "individual", "phylogenetic
@@ -116,16 +137,12 @@ FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
 
 \item{coef}{description... (numeric)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)}
 }
 \value{
-Fill the \emph{Comment} column with error type informations. If
-\emph{DetectOnly} = FALSE, add columns:
+Fill the \emph{Comment_TreeData} column with error type informations and add columns:
 \itemize{
 \item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
-\item \emph{DiameterCorrectionMeth} = "local linear regression","weighted
+\item \emph{DiameterCorrectionMeth_TreeData} = "local linear regression","weighted
 mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 "shift realignment"/"Same value".
 \item \emph{POM_TreeDataCor} (factor): POM value at which the corrected diameters are proposed.
@@ -148,13 +165,16 @@ because punctual errors are corrected from a local regression with the 2
 framing values.
 }
 \examples{
-library(data.table)
+# library(data.table)
 data(TestData)
+
+TestData$HOM <- 1.3
+TestData$HOM[1:3] <- c(0.5,1.5,NA)
 
 Rslt <- DiameterCorrection(
  TestData,
-  WhatToCorrect = c("POM change", "punctual", "shift"),
-    CorrectionType = c("individual"),
+  WhatToCorrect = c("POM change", "Abnormal growth"),
+    CorrectionType = c("phylo"),
     MinIndividualNbr = 1, Digits = 2L)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)

@@ -7,11 +7,9 @@
 RecruitmentCorrection(
   Data,
   KeepMeas = c("MaxHOM", "MaxDate"),
-  MinDBH = 10,
+  MinDBH = NULL,
   PositiveGrowthThreshold = 5,
-  InvariantColumns = c("Site", "Genus_TreeDataCor", "Species_TreeDataCor",
-    "Family_TreeDataCor", "ScientificName_TreeDataCor"),
-  DetectOnly = FALSE
+  OnlyDetectMissedRecruits = FALSE
 )
 }
 \arguments{
@@ -29,23 +27,20 @@ Possible values: "MaxHOM", "MaxDate" (character).
 year but more recent date)
 }}
 
-\item{MinDBH}{Minimum diameter of trees inventoried according to your
-protocol (in cm) (numeric, 1 value) (Default = 10 cm)}
+\item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
 
 \item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
 considered abnormal (numeric, 1 value) (Default = 5 cm)}
 
-\item{InvariantColumns}{Vector with the names of the columns that are
-supposed to have always the same value for each measurement of the same
-tree (character)}
-
-\item{DetectOnly}{TRUE: Only detect errors, FALSE: detect and correct errors
+\item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
 }
 \value{
-Add rows for forgotten recruits with them estimated DBH in the
-'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical)
-and fill the 'Comment' column : "This DBH is/was the 1st recorded for this
+When non in OnlyDetectMissedRecruits mode, add rows for forgotten recruits with their estimated DBH in the
+'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical) to indicate
+the rows that were added.
+In OnlyDetectMissedRecruits mode, fill the 'Comment' column : "This DBH is/was the 1st recorded for this
 tree, according to its annual growth and the census done for this plot, it
 should have been recruited earlier according to your protocol (MinDBH)."
 }
@@ -64,12 +59,7 @@ library(data.table)
 data(TestData)
 setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 
-Rslt <- RecruitmentCorrection(TestData,
-                              InvariantColumns = c("Site",
-                                                   "Genus",
-                                                   "Species",
-                                                   "Family",
-                                                   "ScientificName"))
+Rslt <- RecruitmentCorrection(TestData)
 IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
 TreesCorr <- Rslt[IdTree \%in\% IdCorr]
 

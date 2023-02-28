@@ -42,9 +42,21 @@ Plot diameter correction result
 \examples{
 
 \dontrun{
-pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
+# pdf("DiameterCorrectionPlots_TestData.pdf", width = 25, height = 10)
+
+ data(TestData)
+
+TestData$HOM <- 1.3
+TestData$HOM[1:3] <- c(0.5,1.5,NA)
+
+Rslt <- DiameterCorrection(
+ TestData,
+  WhatToCorrect = c("POM change", "Abnormal growth"),
+   CorrectionType = c("phylo"),
+    MinIndividualNbr = 1, Digits = 2L)
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
-dev.off()
+
+# dev.off()
 }
 
 }

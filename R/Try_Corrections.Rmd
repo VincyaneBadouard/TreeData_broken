@@ -15,7 +15,7 @@ library(ggrepel)
 ```
 # Data
 ```{r}
-PanamaFormated <- read_csv("D:/VSC TmFO/Data/StandardisedData/panama-plots_formated.csv")
+PanamaFormated <- read_csv("C:/Users/herrmannV/Dropbox (Smithsonian)/GitHub/VincyaneBadouard/demo/panama-plots_formated.csv")
 setDT(PanamaFormated)
 
 # Mal formaté :
@@ -40,7 +40,7 @@ ScfcCor <- unique(Rslt_bota[ScientificNameCor != ScientificName,
                                  Family, FamilyCor,
                                  Genus, GenusCor,
                                  Species, SpeciesCor, Subspecies,
-                                 BotanicalCorrectionSource, Comment)
+                                 BotanicalCorrectionSource, Comment_TreeData)
 ])
 ```
 

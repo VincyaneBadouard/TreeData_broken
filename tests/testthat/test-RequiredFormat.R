@@ -346,6 +346,7 @@ You did not specify a subplot area.")
 
   # expect year to be filled
   input$Year = "none"
+  input$YearMan = -999
   expect_equal(RequiredFormat(Data, input )$Year, DataFormated$Year)
 
   input$Year <- ParacouProfile$Year
