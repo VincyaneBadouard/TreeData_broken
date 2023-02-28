@@ -369,7 +369,7 @@ server <- function(input, output, session) { # server ####
     # MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
 
     withCallingHandlers({
-      MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, suffixes = c("", ".y")))
+      MergedTables(merge(x, y, by.x=input$leftKey2, by.y=input$rightKey2, all.x=TRUE, all.y = FALSE, suffixes = c("", ".y")))
     },
     warning = function(warn){
       showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
@@ -393,7 +393,7 @@ server <- function(input, output, session) { # server ####
     # MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
 
     withCallingHandlers({
-      MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, suffixes = c("", ".y")))
+      MergedTables(merge(x, y, by.x=input$leftKey, by.y=input$rightKey, all.x=TRUE, all.y = FALSE, suffixes = c("", ".y")))
     },
     warning = function(warn){
       showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
