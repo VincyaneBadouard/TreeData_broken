@@ -19,28 +19,10 @@
     <loc>/reference/BotanicalCorrection.html</loc>
   </url>
   <url>
-    <loc>/reference/CommentByRow.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ComputeColleaguesGrowthMean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ComputeIncrementation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ComputeMeasuredValues.html</loc>
-  </url>
-  <url>
     <loc>/reference/DiameterCorrection.html</loc>
   </url>
   <url>
-    <loc>/reference/DiameterCorrectionByTree.html</loc>
-  </url>
-  <url>
     <loc>/reference/DiameterCorrectionPlot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FillinInvariantColumns.html</loc>
   </url>
   <url>
     <loc>/reference/ForestGeoProfile.html</loc>
@@ -61,9 +43,6 @@
     <loc>/reference/GenerateComment.html</loc>
   </url>
   <url>
-    <loc>/reference/IndividualDiameterShiftCorrection.html</loc>
-  </url>
-  <url>
     <loc>/reference/LifeStatusCorrectionPlot.html</loc>
   </url>
   <url>
@@ -79,19 +58,7 @@
     <loc>/reference/ParacouSubsetWide.html</loc>
   </url>
   <url>
-    <loc>/reference/PhylogeneticHierarchicalCorrection.html</loc>
-  </url>
-  <url>
-    <loc>/reference/PunctualErrorDetection.html</loc>
-  </url>
-  <url>
     <loc>/reference/RecruitmentCorrection.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RecruitmentCorrectionByTree.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RegressionInterpolation.html</loc>
   </url>
   <url>
     <loc>/reference/RequiredFormat.html</loc>
@@ -100,13 +67,10 @@
     <loc>/reference/ReversedRequiredFormat.html</loc>
   </url>
   <url>
-    <loc>/reference/Select2FramingValues.html</loc>
+    <loc>/reference/SCBISubsetFormated.html</loc>
   </url>
   <url>
     <loc>/reference/StatusCorrection.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatusCorrectionByTree.html</loc>
   </url>
   <url>
     <loc>/reference/TaperCorrection.html</loc>
@@ -116,9 +80,6 @@
   </url>
   <url>
     <loc>/reference/TreeData.html</loc>
-  </url>
-  <url>
-    <loc>/reference/TwoValDiameterCor.html</loc>
   </url>
   <url>
     <loc>/reference/UniqueMeasurement.html</loc>

@@ -53,13 +53,11 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">FullErrorProcessing</span><span class="op">(</span></span>
 <span>  <span class="va">Data</span>,</span>
-<span>  DetectOnly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  Source <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  WFOData <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  InvariantColumns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Site"</span>, <span class="st">"Genus_TreeDataCor"</span>, <span class="st">"Species_TreeDataCor"</span>,</span>
-<span>    <span class="st">"Family_TreeDataCor"</span>, <span class="st">"ScientificName_TreeDataCor"</span><span class="op">)</span>,</span>
 <span>  DeathConfirmation <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  UseSize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  AddRowsForForgottenCensuses <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  RemoveRBeforeAlive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  RemoveRAfterDeath <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  UseTaperCorrection <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -68,12 +66,11 @@
 <span>  TaperFormula <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">DAB</span>, <span class="va">HOM</span>, <span class="va">TaperParameter</span>, <span class="va">DefaultHOM</span><span class="op">)</span></span>
 <span>    <span class="va">DAB</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">TaperParameter</span> <span class="op">*</span> <span class="op">(</span><span class="va">HOM</span> <span class="op">-</span> <span class="va">DefaultHOM</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span>,</span>
-<span>  MaxDBH <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  PositiveGrowthThreshold <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  NegativeGrowthThreshold <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>,</span>
 <span>  Pioneers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  PioneersGrowthThreshold <span class="op">=</span> <span class="fl">7.5</span>,</span>
-<span>  WhatToCorrect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POM change"</span>, <span class="st">"punctual"</span>, <span class="st">"shift"</span><span class="op">)</span>,</span>
+<span>  WhatToCorrect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POM change"</span>, <span class="st">"Abnormal growth"</span><span class="op">)</span>,</span>
 <span>  CorrectionType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"individual"</span>, <span class="st">"phylogenetic hierarchical"</span><span class="op">)</span>,</span>
 <span>  DBHRange <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  MinIndividualNbr <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -81,7 +78,8 @@
 <span>  Digits <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  DBHCorForDeadTrees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coef <span class="op">=</span> <span class="fl">0.9</span>,</span>
-<span>  MinDBH <span class="op">=</span> <span class="fl">10</span></span>
+<span>  OnlyDetectMissedRecruits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  MinDBH <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -91,17 +89,11 @@
 <dd><p>Dataset (data.frame or data.table)</p></dd>
 
 
-<dt>DetectOnly</dt>
-<dd><p>TRUE: Only detect errors, FALSE: detect and correct errors
-(Default: FALSE) (logical)</p></dd>
-
-
 <dt>Source</dt>
 <dd><p>(character) To correct and standardise, you can choose between:</p><ul><li><p>"TPL": <em>The Plant List</em> (http://www.theplantlist.org/) (faster but based
 on the 2013 taxonomy)</p></li>
 <li><p>"WFO": <em>World Flora Online</em> (http://www.worldfloraonline.org/) (long time
 but based on the 2022 taxonomy)</p></li>
-<li><p>NULL: if only error detection (DetectOnly = TRUE)</p></li>
 </ul></dd>
 
 
@@ -112,22 +104,18 @@ data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
 data.table)</p></dd>
 
 
-<dt>InvariantColumns</dt>
-<dd><p>Vector with the names of the columns that are
-supposed to have always the same value for each measurement of the same
-tree (character). It is recommended to use the columns that have already
-been <strong>corrected</strong>, such as the columns containing the corrected botanical
-information.</p></dd>
-
-
 <dt>DeathConfirmation</dt>
 <dd><p>Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)  (Default = 2 censuses)</p></dd>
 
 
 <dt>UseSize</dt>
-<dd><p>Use the size presence as a witness of the living status of the
+<dd><p>Use the size presence  (&gt; min DBH) as a witness of the living status of the
 tree (logical) (Default = FALSE)</p></dd>
+
+
+<dt>AddRowsForForgottenCensuses</dt>
+<dd><p>TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).</p></dd>
 
 
 <dt>RemoveRBeforeAlive</dt>
@@ -181,11 +169,6 @@ year but more recent date)</p></li>
 </ul></dd>
 
 
-<dt>MaxDBH</dt>
-<dd><p>Maximum possible DBH (Diameter at the default HOM) of your
-stand in cm (numeric, 1 value)</p></dd>
-
-
 <dt>PositiveGrowthThreshold</dt>
 <dd><p>in cm/year: a tree
 widening by more than this value is considered abnormal (numeric, 1 value)</p></dd>
@@ -210,13 +193,11 @@ widens by more than this value is considered abnormal (numeric, 1 value)</p></dd
 
 
 <dt>WhatToCorrect</dt>
-<dd><p>Possible values: "POM change", "punctual", "shift"
+<dd><p>Possible values: "POM change", "Abnormal growth"
 (character)</p><ul><li><p>"POM change": detect POM change in the column <code>POM</code> and correct the
-Diameter values from it.</p></li>
-<li><p>"punctual": detect if the error is punctual and correct it by
-interpolation.</p></li>
-<li><p>"shift": detect if there is a shift of several Diameter values and
-links them to the 1st measurements set.</p></li>
+Diameter values from it. (Ignored if taper correction is applied)</p></li>
+<li><p>"Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
+or smaller than NegativeGrowthThreshold and correct it by <code>CorrectionType</code></p></li>
 </ul></dd>
 
 
@@ -266,9 +247,14 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 <dd><p>description... (numeric)</p></dd>
 
 
+<dt>OnlyDetectMissedRecruits</dt>
+<dd><p>TRUE: Only detect errors, FALSE: detect and correct errors
+(logical)</p></dd>
+
+
 <dt>MinDBH</dt>
-<dd><p>Minimum diameter of trees inventoried according to your
-protocol (in cm) (numeric, 1 value) (Default = 10 cm)</p></dd>
+<dd><p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -298,19 +284,13 @@ default HOM (<em>TaperCorrection</em>)</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">TestData</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">FullErrorProcessing</span><span class="op">(</span><span class="va">TestData</span>, DetectOnly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Non-unique association of IdTree(s) with Plot, Subplot and TreeFieldNum:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>    IdTree Plot Subplot TreeFieldNum</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 1: 100816    6       1          199</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 2: 100816    6       1          671</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 3: 101612    6       1          145</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 4: 101612    6       1         2066</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> You have the 'HOM' information in your dataset.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>             We advise you to correct your diameters also with the 'taper' correction (TaperCorrection() function)</span>
-<span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">TestData</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">FullErrorProcessing</span><span class="op">(</span><span class="va">TestData</span>,</span></span>
+<span class="r-in"><span> OnlyDetectMissedRecruits <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  AddRowsForForgottenCensuses <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">WFO_Backbone</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.choose.html" class="external-link">file.choose</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">WFO_Backbone</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">Rslt_Test</span> <span class="op">&lt;-</span> <span class="fu">FullErrorProcessing</span><span class="op">(</span><span class="va">TestData</span>, Source <span class="op">=</span> <span class="st">"WFO"</span>, WFOData <span class="op">=</span> <span class="va">WFO_Backbone</span><span class="op">)</span></span></span>
