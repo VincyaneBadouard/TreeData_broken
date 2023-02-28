@@ -123,22 +123,32 @@ body <- dashboardBody(
               box(title = "checklist",
                   width = 12,
 
+                  strong("You don't actually need to check the boxes here. This is just a guide to help you get prepared before you start using the app."),
+                  br(),
+                  br(),
+
                  # dropdownButton(width = NULL,
                  prettyCheckbox(
                    inputId = makeUniqueID("ChckLst"),
-                   label = "Inputs are prepared as CSV files.",
+                   label = "All relevant data is gathered in one of more tables (measurements, species info, plot info...)",
+                   # value = TRUE,
+                   status = "warning"
+                 ),
+                 prettyCheckbox(
+                   inputId = makeUniqueID("ChckLst"),
+                   label = "Input table(s) are prepared as CSV file(s).",
                    # value = TRUE,
                    status = "warning"
                  ),
                    prettyCheckbox(
                      inputId = makeUniqueID("ChckLst"),
-                     label = "Tables that will need to be stacked have the exact same columns, in same order and with same names.",
+                     label = "If tables will need to be stacked, assure they have the exact same columns and in same order.",
                      # value = TRUE,
                      status = "warning"
                    ),
                    prettyCheckbox(
                      inputId = makeUniqueID("ChckLst"),
-                     label = "The key columns of tables that will be merged have information that is correctly spelled and capitalized.",
+                     label = "If tables need to be merged, assure the key column(s) are present in both.",
                      # value = TRUE,
                      status = "warning"
                    ),
@@ -166,7 +176,7 @@ body <- dashboardBody(
                        label = "1",
                        style = "pill",
                        color = "warning"),
-                     strong("How many tables do you wish to upload?"),
+                     strong("How many tables do you need to upload?"),
                      numericInput(inputId = "nTable",
                                   label = "",
                                   value = 1,
@@ -181,6 +191,9 @@ body <- dashboardBody(
                        style = "pill",
                        color = "warning"),
                      strong("What is your deepest level of measurements?"),
+                     br(),
+                     br(),
+                     p("You may still upload higher level table(s) along."),
                      radioButtons(
                        inputId = "MeasLevel",
                        label = "",
@@ -197,6 +210,8 @@ body <- dashboardBody(
                        style = "pill",
                        color = "warning"),
                      strong("Upload your tables"),
+
+                     p("To keep track of your tables in the next steps, you can rename them at the top of each box."),
 
                      uiOutput("uiUploadTables"),
 
