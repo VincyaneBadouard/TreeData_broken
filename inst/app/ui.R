@@ -19,9 +19,9 @@ header <- dashboardHeader(title = "Data harmonisation",
                                                # icon = fontawesome::fa("info-circle"),
                                                headerText = "App Information"
                                   )
-                                  # ,
-                                  #
-                                  # tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
+                                  ,
+
+                                  tags$li(class = "dropdown", actionButton("browser", "browser", icon  =  icon("r-project")))
                           )
                           # tags$li(class = "dropdown",
                           #
@@ -568,15 +568,15 @@ body <- dashboardBody(
 
                            )
                            })
-                       ),
-
-                       actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
-                     ),
+                       ,
                      box(title = "Save your profile",
                          width = NULL,
                          status = "primary",
                          solidHeader = TRUE,
-                         downloadButton(outputId = "dbProfile", label = "Save profile")),
+                         downloadButton(outputId = "dbProfile", label = "Save profile"))),
+
+                       actionBttn("LaunchFormating", label = "Apply changes!", style = "material-flat", color = "success") #style = "color: #fff; background-color: #009e60; border-color: #317256")
+                     ),
                      hidden( actionBttn(
                        inputId = "GoToCodes",
                        label = "Next",
