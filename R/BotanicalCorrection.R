@@ -10,16 +10,19 @@
 #'   - `ScientificName` (character)
 #'
 #'
-#'@param Source (character) To correct and standardise, you can choose between:
+#'@param Source (character, 1 value) To correct and standardise, you can choose between:
 #'  - "TPL": *The Plant List* (http://www.theplantlist.org/) (faster but based
 #'           on the 2013 taxonomy)
 #'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
 #'           but based on the 2022 taxonomy)
 #'
-#' @param WFOData To be filled in if the argument `Source` = "WFO". Data set
-#'   with the static copy of the *World Flora Online* (WFO) Taxonomic Backbone
-#'   data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
-#'   data.table)
+#' @param WFOData If `Source` = "WFO".
+#'   Data setwith the static copy of the *World Flora Online* (WFO) Taxonomic Backbone
+#'   data (from http://www.worldfloraonline.org/downloadData).
+#'   data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
+#'   Note that the classification.csv file downloaded from the website it too large to be uploaded
+#'   in the App, so it needs to be opened in R first, trimmed to the set of species
+#'   relevant to you, and saved to an .rds file using function saveRDS().
 #'
 #'
 #' @return Fill the *Comment_TreeData* column with error type informations and add columns:
