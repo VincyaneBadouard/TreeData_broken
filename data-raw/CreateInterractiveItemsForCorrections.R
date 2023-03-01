@@ -13,12 +13,10 @@ Fct_args <- NULL
 # 1. R/GeneralErrorsDetection.R
 # 2. R/BotanicalCorrection.R
 # 3. R/StatusCorrection.R
-# 4. R/TaperCorrection.R
-# 5. R/DiameterCorrection.R
-# 6. R/RecruitmentCorrection.R
+# 4. R/DiameterCorrection.R
+# 5. R/RecruitmentCorrection.R
 
-for(rd in c("FullErrorProcessing.Rd",
-            "GeneralErrorsDetection.Rd",
+for(rd in c("GeneralErrorsDetection.Rd",
             "BotanicalCorrection.Rd",
             "StatusCorrection.Rd",
             "DiameterCorrection.Rd",
