@@ -68,7 +68,7 @@ The dataset must contain the columns:</p><ul><li><p><code>IdTree</code> (charact
 
 
 <dt>Source</dt>
-<dd><p>(character) To correct and standardise, you can choose between:</p><ul><li><p>"TPL": <em>The Plant List</em> (http://www.theplantlist.org/) (faster but based
+<dd><p>(character, 1 value) To correct and standardise, you can choose between:</p><ul><li><p>"TPL": <em>The Plant List</em> (http://www.theplantlist.org/) (faster but based
 on the 2013 taxonomy)</p></li>
 <li><p>"WFO": <em>World Flora Online</em> (http://www.worldfloraonline.org/) (long time
 but based on the 2022 taxonomy)</p></li>
@@ -76,10 +76,13 @@ but based on the 2022 taxonomy)</p></li>
 
 
 <dt>WFOData</dt>
-<dd><p>To be filled in if the argument <code>Source</code> = "WFO". Data set
-with the static copy of the <em>World Flora Online</em> (WFO) Taxonomic Backbone
-data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
-data.table)</p></dd>
+<dd><p>If <code>Source</code> = "WFO".
+Data setwith the static copy of the <em>World Flora Online</em> (WFO) Taxonomic Backbone
+data (from http://www.worldfloraonline.org/downloadData).
+data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
+Note that the classification.csv file downloaded from the website it too large to be uploaded
+in the App, so it needs to be opened in R first, trimmed to the set of species
+relevant to you, and saved to an .rds file using function saveRDS().</p></dd>
 
 </dl></div>
     <div class="section level2">
