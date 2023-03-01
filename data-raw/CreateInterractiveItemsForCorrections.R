@@ -21,7 +21,6 @@ for(rd in c("FullErrorProcessing.Rd",
             "GeneralErrorsDetection.Rd",
             "BotanicalCorrection.Rd",
             "StatusCorrection.Rd",
-            "TaperCorrection.Rd",
             "DiameterCorrection.Rd",
             "RecruitmentCorrection.Rd")) {
 
