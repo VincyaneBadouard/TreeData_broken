@@ -138,6 +138,7 @@ RecruitmentCorrection <- function(
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
+  if(length(na.omit(unique(Data$IdCensus))) > 1) { # only possible if more than one census
 
   # Remove duplicated measurements per Year because different POM or Date ------
   CompleteData <- copy(Data)
@@ -310,6 +311,12 @@ RecruitmentCorrection <- function(
   # Order IDs and times in ascending order -------------------------------------
   Data <- Data[order(get(ID), IdCensus)]
 
+  } else {
+    warning("You only have one census so we can't only apply recruitment corrections.")
+  }
+
+
+  # return Data
   return(Data)
 
 }

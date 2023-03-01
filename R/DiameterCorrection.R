@@ -171,6 +171,9 @@ DiameterCorrection <- function(
     coef = 0.9
 ){
 
+  # prepare a place to hold all warnings so we get only one pop up window
+  AllWarnings <- NULL
+
   #### Arguments check ####
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
@@ -213,19 +216,20 @@ DiameterCorrection <- function(
 
   # Digits
   if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
-    warning(paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
+    AllWarnings <- c(AllWarnings, paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
     Digits <- as.integer(Digits)
   }
 
 
   # Taper before if 'HOM' in the dataset and 'UseTaperCorrection' = F
-  if(any(!is.na(Data$HOM)) %in% names(Data) & !UseTaperCorrection) # HOM exist and UseTaperCorrection FALSE
-    if(length(unique(na.omit((Data$HOM)))) > 1) message("You have the 'HOM' information in your dataset.
+  if(!UseTaperCorrection & length(unique(na.omit((Data$HOM)))) > 1) {# HOM exist and UseTaperCorrection FALSE
+   message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with UseTaperCorrection = TRUE") # only show if there are varying HOM
+  }
 
   # can't do taper if all HOM are NA
   if(all(is.na(Data$HOM)) & UseTaperCorrection) {
-    warning("All your HOM are NA, so we can't do taper corrections")
+    AllWarnings <- c(AllWarnings, "All your HOM are NA, so we can't do taper corrections")
     UseTaperCorrection = FALSE
   }
 
@@ -334,7 +338,8 @@ DiameterCorrection <- function(
   # Apply Corrections -----------------------------------------------------------------------------------------------
 
 
-  if(!"Diameter_TreeDataCor" %in% names(Data)) {
+  if(length(na.omit(unique(Data$IdCensus))) > 1) { # only possible if more than one census
+    if(!"Diameter_TreeDataCor" %in% names(Data)) {
     Data[, Diameter_TreeDataCor := Diameter]
   }
 
@@ -406,7 +411,8 @@ DiameterCorrection <- function(
 
   MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l) {
 
-    t <- as.Date(t)
+    if(any(!is.na(d))) { # only run if we have diameters to work with
+          t <- as.Date(t)
     m <- lm(d~t)
 
     if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
@@ -416,6 +422,8 @@ DiameterCorrection <- function(
       cm[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(cm[is.na(d) & !is.na(p)], "Initial linear interpolation")
       d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
     }
+    }
+
 
     return(list(d, c, cm))
 
@@ -717,27 +725,27 @@ if(nrow(idxToReplace) > 0) {
       idx_sp <- Species %in% Pioneers
       idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PioneersGrowthThreshold
 
-      if(sum(idx)>1)  warning("There are still pioneers with abnormal positive growth (the selected methods are insufficient
+      if(sum(idx)>1)        AllWarnings <- c(AllWarnings, "There are still pioneers with abnormal positive growth (the selected methods are insufficient
                     or the method needs to be improved)")
 
       ### non-pioneers
       idx_sp <- !Species %in% Pioneers
       idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PositiveGrowthThreshold
 
-      if(sum(idx)>1)  warning("There are still non-pioneers with abnormal positive growth (the selected methods are insufficient
+      if(sum(idx)>1)   AllWarnings <- c(AllWarnings, "There are still non-pioneers with abnormal positive growth (the selected methods are insufficient
                     or the method needs to be improved)")
 
     } else {
 
       idx = !is.na(GrowthHistory) & GrowthHistory >= PositiveGrowthThreshold
-      if(sum(idx)>1)  warning("There are still individuals with abnormal positive growth (the selected methods are insufficient
+      if(sum(idx)>1)   AllWarnings <- c(AllWarnings, "There are still individuals with abnormal positive growth (the selected methods are insufficient
                     or the method needs to be improved)")
 
     }
 
     ## negative
     idx = !is.na(GrowthHistory) & GrowthHistory < NegativeGrowthThreshold # Valentine decided to use GrowthHistory instead of DiameterDiffHistory
-    if(sum(idx)>1)  warning("There are still individuals with abnormal negative growth (the selected methods are insufficient
+    if(sum(idx)>1)   AllWarnings <- c(AllWarnings, "There are still individuals with abnormal negative growth (the selected methods are insufficient
                     or the method needs to be improved)" )
 
 # Write changes in Data -------------------------------------------------------------------------------------------
@@ -782,9 +790,16 @@ if(DBHCorForDeadTrees == FALSE){
 
 # Order IDs and times in ascending order ----------------------------------------------------------------------------
 Data <- Data[order(get(ID), IdCensus)]
+  } else {
+    AllWarnings <- c(AllWarnings, "You only have one census so we can only apply Taper Corrections (if you have HOM).")
+}
 
 
-return(Data)
+  # show warnings
+  if(!is.null(AllWarnings)) warning(paste(AllWarnings, collapse = "\n"))
+
+  # return Data
+  return(Data)
 
 }
 
