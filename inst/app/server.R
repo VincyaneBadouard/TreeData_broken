@@ -83,7 +83,7 @@ server <- function(input, output, session) { # server ####
   # open browser #
 
   observeEvent(input$browser,{
-    # browser()
+    browser()
   })
 
   # upload tab ####
@@ -1150,7 +1150,12 @@ server <- function(input, output, session) { # server ####
     lapply(
       unique(xCorr$Function),
       FUN = function(f){
+
+
         if(input[[f]] %in% "Yes") {
+
+          print(f)
+
           # cl <- str2lang(paste0(f, "(", paste("Data = Rslt,", paste(paste(gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]), "=",reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]]), collapse = ", ")),")"))
           cl <- paste0(f, "(", paste("Data = Rslt,", gsub("list\\(", "", paste(deparse(setNames(reactiveValuesToList(input)[xCorr$ItemID[xCorr$Function %in% f]], gsub(f, "", xCorr$ItemID[xCorr$Function %in% f]))), collapse = ""))))
           cl <- gsub('"FALSE"', "FALSE", cl)
@@ -1159,9 +1164,38 @@ server <- function(input, output, session) { # server ####
           cl <- gsub(')\"', ")", cl)
           cl <- gsub(' (\\d*)L', " \\1", cl)
 
+          if(grepl("WFOData", cl)) {
+            ext <- tools::file_ext(input$BotanicalCorrectionWFOData$datapath)
+
+            if(ext %in% "rds") WFOData = setDT(readRDS(input$BotanicalCorrectionWFOData$datapath))
+            if(ext %in% "csv") WFOData = fread(input$BotanicalCorrectionWFOData$datapath)
+            if(!ext %in% c("rds", "csv")) sendSweetAlert(
+              session = session,
+              title = "Oups !",
+              text = "The is not a .rds file!",
+              type = "error")
+
+          }
+
+          cl <- gsub("WFOData = .*)", "WFOData =WFOData)", cl) # this is to deal with the upload of world flora
+
+
+
           cl <- str2lang(str2lang(deparse(cl)))
 
-          Rslt <<- eval(cl)
+
+          withCallingHandlers({
+            withProgress(message = paste("running", f),
+                         detail = 'This may take a while...', value = 0, {
+                           Rslt <<- eval(cl)
+                         })
+          },
+          warning = function(warn){
+            showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
+          },
+          error = function(err){
+            shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
+          })
 
 
           # tryCatch({

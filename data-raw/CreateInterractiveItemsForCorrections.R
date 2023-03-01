@@ -101,11 +101,11 @@ ItemType_lookup <- list(
     ReactiveArgValue = FALSE
   ),
   WFOData = list(
-    ItemType = "pickerInput",
+    ItemType = "fileInput",
     Multiple = F,
-    Options = "list( `actions-box` = TRUE)",
-    Argument = "choices",
-    Argument2 = "selected",
+    Options = F,
+    Argument = "accept",
+    Argument2 = F,
     argValue = NA,
     ReactiveArgValue = FALSE
   ),
