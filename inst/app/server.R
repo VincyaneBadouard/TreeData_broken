@@ -912,17 +912,6 @@ server <- function(input, output, session) { # server ####
     }
 
 
-    MissingItemIDProfile <- setdiff(x$ItemID, names(profile))
-    MissingItemIDProfile <- setdiff(MissingItemIDProfile, itemsToResetAndHide())
-
-#
-#     MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not doing a good job for items other than those in x4...
-#     MissingItemIDProfile <- MissingItemIDProfile[!x$Multiple[match(MissingItemIDProfile, x$ItemID)]] # remove cases where Multiple - TRUE because in those cases, there is no default so it will always be NULL... Bummer because it could be missing for real, but I don't know how else to do it
-
-    if(length(MissingItemIDProfile) > 0 ){ #& gimme_value() == 1) {
-      showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
-    }
-
     ValidItemID <- names(profile)[sapply(profile, function(p) all(p %in% c(names(TidyTable()), "none"))) | grepl("Man", names(profile))] # this is to avoid the app from crashing if we have new items in x, that do not exist in data
 
     InValidItemID <- setdiff(names(profile), ValidItemID)
@@ -952,6 +941,21 @@ server <- function(input, output, session) { # server ####
     # }
 
     UserProfile(profile)
+  })
+
+
+  observe({
+    req(length(UserProfile()) > 0 & length(itemsToResetAndHide()) <27 ) # itemsToResetAndHide starts at 27
+    MissingItemIDProfile <- setdiff(x$ItemID, names(UserProfile()))
+    MissingItemIDProfile <- setdiff(MissingItemIDProfile, itemsToResetAndHide())
+
+    #
+    #     MissingItemIDProfile <- MissingItemIDProfile[!profile[x$if_X2_isnot_none[match(MissingItemIDProfile, x$ItemID)]] %in% "none"] # this is to avoid flagging something that does not need too be filled out... but it is not doing a good job for items other than those in x4...
+    #     MissingItemIDProfile <- MissingItemIDProfile[!x$Multiple[match(MissingItemIDProfile, x$ItemID)]] # remove cases where Multiple - TRUE because in those cases, there is no default so it will always be NULL... Bummer because it could be missing for real, but I don't know how else to do it
+
+    if(length(MissingItemIDProfile) > 0 ){ #& gimme_value() == 1) {
+      showNotification(paste("The profile you selected is missing the following latest items:\n", paste0(MissingItemIDProfile, " (in ", x$Group[match(MissingItemIDProfile, x$ItemID)], ")",  collapse = ",\n"), ".\n Please, fill out those items by hand and double check that the info in the second column is filled out properly. Then, save your new profile."), type = 'err', duration = NULL)
+    }
   })
 
   observe({
