@@ -163,8 +163,13 @@ RequiredFormat <- function(
   ### Life status
   if( !is.null(input$LifeStatus)) {
     if(!input$LifeStatus %in% "none") {
+
       # Data[, LifeStatusOriginal := LifeStatus]
-      Data[, LifeStatus := ifelse(LifeStatus %in% input$IsLive, TRUE, FALSE)]
+      Data[LifeStatusOriginal %in% input$IsLiveMan, LifeStatus := TRUE]
+      Data[LifeStatusOriginal %in% input$IsDeadMan, LifeStatus := FALSE]
+
+      Data[, LifeStatus := as.logical(LifeStatus)] # any other thing that "TRUE" and "FALSE" will be converted to NA.
+
     }
   }
 
@@ -292,7 +297,7 @@ RequiredFormat <- function(
 
   ### if Date, use that to order the IdCensus
   if(!input$IdCensus %in% "none") {
-    if(!input$Date %in% "none") Data[, IdCensus := factor(IdCensus, levels = unique(IdCensus)[order(Date)], ordered = T)]
+    if(!input$Date %in% "none") Data[, IdCensus := factor(IdCensus, levels = unique(IdCensus[order(Date)]), ordered = T)]
   }
 
   ### if not IdCensus, use Year instead

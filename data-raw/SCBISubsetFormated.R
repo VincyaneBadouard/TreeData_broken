@@ -2,11 +2,11 @@
 
 SCBISubsetFormated <- readRDS("C:/Users/herrmannV/Dropbox (Smithsonian)/GitHub/VincyaneBadouard/demo/scbi_formated.rds")
 
-SCBISubsetFormated$LifeStatus[c(1, 2, 15, 389)]<- NA # making some NA's
-scbi_formated$LifeStatus[151006] <- FALSE #making some dead
-scbi_formated  <- scbi_formated[-c(258,3243, 567)] # removing some records
+SCBISubsetFormated[c(1, 2, 15, 389), c("LifeStatus", "LifeStatusOriginal")] <- NA # making some NA's
+SCBISubsetFormated[151006,  c("LifeStatus", "LifeStatusOriginal")] <- FALSE #making some dead
+SCBISubsetFormated  <- SCBISubsetFormated[-c(258,3243, 567)] # removing some records
 
-
+SCBISubsetFormated[IdStem %in% 58921 & IdCensus %in% 2, LifeStatus := FALSE ] # this is to create a case of "Tree can't be dead before bein alive
 SCBISubsetFormated <- SCBISubsetFormated[IdStem %in% c("67276", "1304", "65905", "58921", "1", "10012", "11012", "66114", "31258", "10032", "3631"), ]
 
 usethis::use_data(SCBISubsetFormated, overwrite = TRUE)

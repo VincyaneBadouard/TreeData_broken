@@ -32,8 +32,8 @@ A named list
 \item{BCirc}{Value or column name in data set @ForestGeoSubset (none) corresponding to Basal Circumference}
 \item{BCircUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is your basal circumference unit?}
 \item{IdMeasure}{Value or column name in data set @ForestGeoSubset (MeasureID) corresponding to Measure ID}
-\item{IdLevel}{Value or column name in data set @ForestGeoSubset (IDLevel) corresponding to Deepest taxonomic level for which full identification is known}
-\item{TreeFieldNum}{Value or column name in data set @ForestGeoSubset (tag) corresponding to Tree tag}
+\item{IdLevel}{Value or column name in data set @ForestGeoSubset (IDLevel) corresponding to Determination rank}
+\item{TreeFieldNum}{Value or column name in data set @ForestGeoSubset (tag) corresponding to Inidividual tag}
 \item{ScientificName}{Value or column name in data set @ForestGeoSubset (Latin) corresponding to Scientific name}
 \item{DateFormatMan}{Value or column name in data set @ForestGeoSubset (yyyy-mm-dd) corresponding to What is your date format?}
 \item{IdCensus}{Value or column name in data set @ForestGeoSubset (CensusID) corresponding to Census ID}
@@ -52,12 +52,13 @@ A named list
 \item{Site}{Value or column name in data set @ForestGeoSubset (none) corresponding to Site name}
 \item{TreeLon}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree longitude}
 \item{Plot}{Value or column name in data set @ForestGeoSubset (none) corresponding to Plot name}
-\item{IdTree}{Value or column name in data set @ForestGeoSubset (treeID) corresponding to Tree ID}
+\item{IdTree}{Value or column name in data set @ForestGeoSubset (treeID) corresponding to Individual ID}
 \item{LifeForm}{Value or column name in data set @ForestGeoSubset (none) corresponding to Life form}
 \item{VernName}{Value or column name in data set @ForestGeoSubset (none) corresponding to Vernacular name}
 \item{SubplotArea}{Value or column name in data set @ForestGeoSubset (none) corresponding to Subplot area}
 \item{SiteMan}{Value or column name in data set @ForestGeoSubset () corresponding to What is your site name ?}
 \item{IsLiveMan}{Value or column name in data set @ForestGeoSubset (c("alive", "broken below")) corresponding to Which of your status(es) represent a LIVE tree?}
+\item{IsDeadMan}{Value or column name in data set @ForestGeoSubset (stem dead) corresponding to Which of your status(es) represent a DEAD tree?}
 \item{TreeCodes}{Value or column name in data set @ForestGeoSubset (codes) corresponding to Select all the columns that give information about your tree, and/or your methods of measurements}
 \item{TreeCodesSepMan}{Value or column name in data set @ForestGeoSubset ([[:punct:]]) corresponding to If you store multiple tree codes in one cell, what character separates each code?}
 \item{Authority}{Value or column name in data set @ForestGeoSubset (SpeciesID) corresponding to  Taxonomic authority for the ID level}

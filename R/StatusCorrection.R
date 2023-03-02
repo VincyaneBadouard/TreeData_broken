@@ -143,7 +143,7 @@ StatusCorrection <- function(
 
 
   # Order IDs and times in ascending order
-  Data <- Data[order(get(ID), IdCensus)]
+  Data <- Data[order(get(ID), IdCensus), ]
 
   # IDs vector
   Ids <- as.vector(na.omit(unique(Data[, get(ID)]))) # Tree Ids
@@ -251,7 +251,7 @@ StatusHistoryC <- mapply(function(x, m) {
 
   # scenario C - Enough/not enough occurrences of death to validate it ####
 
-  unseen <- gregexpr(paste0("(?<=1)N{", DeathConfirmation, ",}$"), StatusHistoryC, perl = T)
+  unseen <- gregexpr(paste0("(?<=1)N{", DeathConfirmation, ",}$|(?<=1)N{", DeathConfirmation, ",}(?=0)"), StatusHistoryC, perl = T)
 
   NewCommentsC <- mapply(function(x, m, t) {
     invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("C", ml), m, attr(m, "match.length")))
@@ -280,15 +280,15 @@ StatusHistoryC <- mapply(function(x, m) {
 
   # scenario E - remains dead ####
 
-  deadNAend <- gregexpr("(?<=10)(N+0*)*$", StatusHistoryC, perl = T)
+  deadNAend <- gregexpr("(?<=1)0+(N+)*$", StatusHistoryC, perl = T)
 
   NewCommentsC <- mapply(function(x, m, t) {
-    invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("E", ml), m, attr(m, "match.length")))
+    invisible(mapply(function(so, ml) if(ml>0) substring(t, so, so + ml - 1L) <<- strrep("E", ml),  attr(m, "capture.start"), attr(m, "capture.length")))
     t
   }, StatusHistoryC, deadNAend, NewCommentsC, USE.NAMES = F)
 
 StatusHistoryC <- mapply(function(x, m) {
-    invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), m, attr(m, "match.length")))
+    invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("0", ml), attr(m, "capture.start"), attr(m, "capture.length")))
     x
   }, StatusHistoryC, deadNAend, USE.NAMES = F)
 

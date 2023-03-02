@@ -106,6 +106,7 @@ if (!interactive()) {
       Genus = "Genus",
       SpeciesAbundance = "none",
       IsLiveMan = "TRUE",
+      IsDeadMan = "FALSE",
       SubplotLat = "none",
       SpeciesDensity = "none",
       SpeciesRelativeFrequency = "none",

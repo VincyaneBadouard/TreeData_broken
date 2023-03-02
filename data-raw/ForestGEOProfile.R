@@ -53,6 +53,7 @@ ForestGeoProfile <-
     SubplotArea = "none",
     SiteMan = "",
     IsLiveMan = c("alive", "broken below"),
+    IsDeadMan = c("stem dead"),
     TreeCodes = "codes",
     TreeCodesSepMan = "[[:punct:]]",
     Authority = "SpeciesID",

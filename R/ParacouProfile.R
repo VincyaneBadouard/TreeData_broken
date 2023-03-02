@@ -6,7 +6,7 @@
 #'   \item{TreeHeight}{Value or column name in data set @ParacouSubset (none) corresponding to Tree height}
 #'   \item{XTreeUTM}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X UTM coordinate}
 #'   \item{Date}{Value or column name in data set @ParacouSubset (CensusDate) corresponding to Date of measurement}
-#'   \item{SubplotAreaMan}{Value or column name in data set @ParacouSubset (0) corresponding to What is your Subplot area in hectare?}
+#'   \item{SubplotAreaMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your Subplot area in hectare?}
 #'   \item{SpeciesVolume}{Value or column name in data set @ParacouSubset (none) corresponding to Species volume}
 #'   \item{POM}{Value or column name in data set @ParacouSubset (none) corresponding to POM}
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ParacouSubset (ha) corresponding to What is the unit for plot area?}
@@ -24,14 +24,14 @@
 #'   \item{SubplotArea}{Value or column name in data set @ParacouSubset (none) corresponding to Subplot area}
 #'   \item{IdCensus}{Value or column name in data set @ParacouSubset (none) corresponding to Census ID}
 #'   \item{XTreePlot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in plot}
-#'   \item{PlotAreaMan}{Value or column name in data set @ParacouSubset (0) corresponding to What is your plot area in hectare?}
+#'   \item{PlotAreaMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your plot area in hectare?}
 #'   \item{PlotElevation}{Value or column name in data set @ParacouSubset (none) corresponding to Plot elevation}
 #'   \item{BPOM}{Value or column name in data set @ParacouSubset (none) corresponding to Basal POM}
 #'   \item{SpeciesDensityUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your species density unit?}
 #'   \item{CommercialSp}{Value or column name in data set @ParacouSubset (CommercialSp) corresponding to Commercial species indicator}
 #'   \item{IsCommercialMan}{Value or column name in data set @ParacouSubset (TRUE) corresponding to Which of the following(s) indicate a commercial species?}
 #'   \item{SpeciesBasalAreaDensity}{Value or column name in data set @ParacouSubset (none) corresponding to Species basal area density}
-#'   \item{YearMan}{Value or column name in data set @ParacouSubset (0) corresponding to What is your year of measurement?}
+#'   \item{YearMan}{Value or column name in data set @ParacouSubset (-999) corresponding to What is your year of measurement?}
 #'   \item{Subspecies}{Value or column name in data set @ParacouSubset (none) corresponding to Subspecies name}
 #'   \item{Circ}{Value or column name in data set @ParacouSubset (Circ) corresponding to Circumference}
 #'   \item{SpeciesTotalBasalAreaUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your basal area unit?}
@@ -39,13 +39,14 @@
 #'   \item{PlotNDead}{Value or column name in data set @ParacouSubset (none) corresponding to Number of dead trees in the sampling unit}
 #'   \item{XTreeSubplot}{Value or column name in data set @ParacouSubset (none) corresponding to Tree X euclidean position in SUBplot}
 #'   \item{Site}{Value or column name in data set @ParacouSubset (Forest) corresponding to Site name}
+#'   \item{Cluster}{Value or column name in data set @ParacouSubset (none) corresponding to Cluster of plots}
 #'   \item{MinDBH}{Value or column name in data set @ParacouSubset (none) corresponding to Minimum DBH}
 #'   \item{Day}{Value or column name in data set @ParacouSubset (none) corresponding to Day of measurement}
 #'   \item{TreeUTMUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to Tree UTM units}
 #'   \item{PlotNLive}{Value or column name in data set @ParacouSubset (none) corresponding to Number of living trees in the sampling unit}
 #'   \item{SpeciesVolumeUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your species volume unit?}
 #'   \item{BHOM}{Value or column name in data set @ParacouSubset (none) corresponding to Basal HOM}
-#'   \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Tree ID}
+#'   \item{IdTree}{Value or column name in data set @ParacouSubset (idTree) corresponding to Individual ID}
 #'   \item{LifeForm}{Value or column name in data set @ParacouSubset (none) corresponding to Life form}
 #'   \item{TreeSubplotUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to Tree XY subplot coordinates units}
 #'   \item{VernName}{Value or column name in data set @ParacouSubset (VernName) corresponding to Vernacular name}
@@ -75,9 +76,9 @@
 #'   \item{Species}{Value or column name in data set @ParacouSubset (Species) corresponding to Species name}
 #'   \item{SpeciesRelativeDensity}{Value or column name in data set @ParacouSubset (none) corresponding to Species Relative Density}
 #'   \item{CircUnitMan}{Value or column name in data set @ParacouSubset (cm) corresponding to What is your circumference unit?}
-#'   \item{IdLevel}{Value or column name in data set @ParacouSubset (none) corresponding to Deepest taxonomic level for which full identification is known}
+#'   \item{IdLevel}{Value or column name in data set @ParacouSubset (none) corresponding to Determination rank}
 #'   \item{XPlotUTM}{Value or column name in data set @ParacouSubset (none) corresponding to Plot X UTM coordinate}
-#'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Tree tag}
+#'   \item{TreeFieldNum}{Value or column name in data set @ParacouSubset (TreeFieldNum) corresponding to Inidividual tag}
 #'   \item{YTreeUTM}{Value or column name in data set @ParacouSubset (none) corresponding to Tree Y UTM coordinate}
 #'   \item{TreeLon}{Value or column name in data set @ParacouSubset (none) corresponding to Tree longitude}
 #'   \item{BCircUnitMan}{Value or column name in data set @ParacouSubset (none) corresponding to What is your basal circumference unit?}
