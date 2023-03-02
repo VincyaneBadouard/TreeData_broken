@@ -23,13 +23,13 @@ but based on the 2022 taxonomy)
 "BotanicalCorrection","<tr valign=""top"">
 <td><code>WFOData</code></td>
 <td>
-<p>If <code>Source</code> = ""WFO"". Data set
-with the static copy of the <em>World Flora Online</em> (WFO) Taxonomic Backbone
-data (from http://www.worldfloraonline.org/downloadData.) (data.frame or
-data.table in R, .rds file if you are uploading from the Shiny App.). Note that the
-classification.csv file downloaded from the website it too large to be uploaded
+<p>If <code>Source</code> = ""WFO"".
+Data setwith the static copy of the <em>World Flora Online</em> (WFO) Taxonomic Backbone
+data (from http://www.worldfloraonline.org/downloadData).
+data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
+Note that the classification.csv file downloaded from the website it too large to be uploaded
 in the App, so it needs to be opened in R first, trimmed to the set of species
-relevant to you, and saved to an rds file (function saveRDS).</p>
+relevant to you, and saved to an .rds file using function saveRDS().</p>
 </td>
 </tr>","BotanicalCorrectionWFOData","NULL","fileInput","FALSE","FALSE","accept","FALSE",NA,FALSE
 "StatusCorrection","<tr valign=""top"">
