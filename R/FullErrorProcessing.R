@@ -252,7 +252,6 @@ FullErrorProcessing <- function(
   Data <- RecruitmentCorrection(Data,
                                 KeepMeas = KeepMeas,
                                 MinDBH = MinDBH,
-                                PositiveGrowthThreshold = PositiveGrowthThreshold,
                                 OnlyDetectMissedRecruits = OnlyDetectMissedRecruits
   )
 
