@@ -7,7 +7,7 @@ library(TreeData)
 
 
 # increase size limit to 10MB
-options(shiny.maxRequestSize=25*1024^2)
+options(shiny.maxRequestSize=100*1024^2)
 
 # my function to change first letter in uppercase (e.g for updatePickerInput)
 firstUpper <- function(x) {
@@ -102,7 +102,7 @@ server <- function(input, output, session) { # server ####
                          value = paste0("Table", i)
                ),
                width = NULL,
-               fileInput(inputId = paste0("file", i), "Choose CSV File (max 25MB)", accept = ".csv"),
+               fileInput(inputId = paste0("file", i), "Choose CSV File (max 100MB)", accept = ".csv"),
                # does the dataframe have a header?
                dropdownButton( icon = icon("cog"), size  ="sm",
                                checkboxInput( paste0("header", i), "Header", TRUE),
@@ -978,7 +978,7 @@ server <- function(input, output, session) { # server ####
   # DataFormated <- eventReactive(input$LaunchFormating | input$UpdateTable, {
 
     withCallingHandlers({
-      DataFormated(RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x, ThisIsShinyApp = T))
+      DataFormated(RequiredFormat(Data = TidyTable(), isolate(reactiveValuesToList(input)), x))
     },
     warning = function(warn){
       showNotification(paste(gsub("simpleWarning in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\), :", "", warn), collapse = ". "), type = 'warning', duration = NULL)
@@ -1171,7 +1171,7 @@ server <- function(input, output, session) { # server ####
           cl <- gsub(')\"', ")", cl)
           cl <- gsub(' (\\d*)L', " \\1", cl)
 
-          if(grepl("WFOData", cl)) {
+          if(grepl('Source = "WFO"', cl)) {
             ext <- tools::file_ext(input$BotanicalCorrectionWFOData$datapath)
 
             if(ext %in% "rds") WFOData = setDT(readRDS(input$BotanicalCorrectionWFOData$datapath))
@@ -1182,9 +1182,10 @@ server <- function(input, output, session) { # server ####
               text = "The is not a .rds file!",
               type = "error")
 
+            cl <- gsub("WFOData = .*)", "WFOData =WFOData)", cl) # this is to deal with the upload of world flora
+
           }
 
-          cl <- gsub("WFOData = .*)", "WFOData =WFOData)", cl) # this is to deal with the upload of world flora
 
 
 
@@ -1391,10 +1392,10 @@ server <- function(input, output, session) { # server ####
         DataOutput(DataDone())
 
         } else {
-      # DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+      # DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x))
 
           withCallingHandlers({
-            DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+            DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x))
           },
           warning = function(warn){
             showNotification(paste0(warn, collapse = "; "), type = 'warning', duration = NULL)
@@ -1705,7 +1706,7 @@ server <- function(input, output, session) { # server ####
       DataOutput(DataDone())
 
     } else {
-      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x, ThisIsShinyApp = T))
+      DataOutput(ReversedRequiredFormat(DataDone(), profileOutput(), x))
     }
   })
 
