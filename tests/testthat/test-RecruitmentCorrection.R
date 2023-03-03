@@ -16,9 +16,6 @@ test_that("RecruitmentCorrection", {
   expect_error(RecruitmentCorrection(MatrixData),
                regexp = "Data must be a data.frame or data.table")
 
-  expect_error(RecruitmentCorrection(TestData, MinDBH = c(5, 10, 20), PositiveGrowthThreshold = TRUE),
-               regexp = "MinDBH must be numeric value of length 1")
-
   expect_error(RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = "no"),
                regexp = "The 'OnlyDetectMissedRecruits' argument
          of the 'RecruitmentCorrection' function must be logicals")
@@ -28,9 +25,12 @@ test_that("RecruitmentCorrection", {
 
 
 
-  expect_warning(RecruitmentCorrection(TestData), regexp = "We added rows for trees that were supposed to be recruited earlier based on growth pattern and MinDBH")
+  expect_warning(  Rslt <-RecruitmentCorrection(TestData), regexp = "We added rows for trees that were supposed to be recruited earlier based on growth pattern and MinDBH")
+
+  expect_equal(sum(Rslt$CorrectedRecruit), 77)
 
   # Check the function works
   Rslt <- RecruitmentCorrection(TestData, OnlyDetectMissedRecruits = T)
+  expect_null(Rslt$CorrectedRecruit)
 
 })

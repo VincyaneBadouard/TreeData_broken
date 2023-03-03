@@ -8,7 +8,6 @@ RecruitmentCorrection(
   Data,
   KeepMeas = c("MaxHOM", "MaxDate"),
   MinDBH = NULL,
-  PositiveGrowthThreshold = 5,
   OnlyDetectMissedRecruits = FALSE
 )
 }
@@ -30,9 +29,6 @@ year but more recent date)
 \item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
 NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
 
-\item{PositiveGrowthThreshold}{A tree widening by more than x cm/year is
-considered abnormal (numeric, 1 value) (Default = 5 cm)}
-
 \item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
 }
@@ -48,11 +44,14 @@ should have been recruited earlier according to your protocol (MinDBH)."
 RecruitmentCorrection
 }
 \details{
-If the size of the tree has never changed, or if there is only one
-value the same value is kept for the added forgotten recruits. If the
-Diameter has not been corrected ('Diameter_TreeDataCor' column does not
-exist), the function will create it for the forgotten recruits. It is
-strongly recommended to correct the Diameter before correcting the recruits
+This function detects trees that may have been missed
+at a previous census if the estimated diameter at that census is
+greater than MinDBH. Estimated diameter is calculated
+by recursively removing the tree's first growth measurement to it's first
+diameter measurement. If growth can't be calculated for a tree, we use
+the average first growth of trees of the same species, if not possible,
+of the same genus, and if not possible, of all trees.
+It is strongly recommended to correct the Diameter before correcting the recruits.
 }
 \examples{
 library(data.table)

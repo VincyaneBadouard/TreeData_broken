@@ -321,14 +321,6 @@ NULL (Default) if you wish to use the MinDBH indicated in your data, which may v
 </tr>
 ","RecruitmentCorrectionMinDBH","NULL","numericInput","FALSE","FALSE","value","FALSE","NULL",FALSE
 "RecruitmentCorrection","<tr valign=""top"">
-<td><code>PositiveGrowthThreshold</code></td>
-<td>
-<p>A tree widening by more than x cm/year is
-considered abnormal (numeric, 1 value) (Default = 5 cm)</p>
-</td>
-</tr>
-","RecruitmentCorrectionPositiveGrowthThreshold","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"RecruitmentCorrection","<tr valign=""top"">
 <td><code>OnlyDetectMissedRecruits</code></td>
 <td>
 <p>TRUE: Only detect errors, FALSE: detect and correct errors

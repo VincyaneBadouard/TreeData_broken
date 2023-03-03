@@ -15,17 +15,17 @@
 #' @param MinDBH Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
 #'   NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot
 #'
-#' @param PositiveGrowthThreshold A tree widening by more than x cm/year is
-#'   considered abnormal (numeric, 1 value) (Default = 5 cm)
-#'
 #' @param OnlyDetectMissedRecruits TRUE: Only detect errors, FALSE: detect and correct errors
 #'   (logical)
 #'
-#' @details If the size of the tree has never changed, or if there is only one
-#'   value the same value is kept for the added forgotten recruits. If the
-#'   Diameter has not been corrected ('Diameter_TreeDataCor' column does not
-#'   exist), the function will create it for the forgotten recruits. It is
-#'   strongly recommended to correct the Diameter before correcting the recruits
+#' @details This function detects trees that may have been missed
+#' at a previous census if the estimated diameter at that census is
+#' greater than MinDBH. Estimated diameter is calculated
+#' by recursively removing the tree's first growth measurement to it's first
+#' diameter measurement. If growth can't be calculated for a tree, we use
+#' the average first growth of trees of the same species, if not possible,
+#' of the same genus, and if not possible, of all trees.
+#' It is strongly recommended to correct the Diameter before correcting the recruits.
 #'
 #' @return  When non in OnlyDetectMissedRecruits mode, add rows for forgotten recruits with their estimated DBH in the
 #'   'Diameter_TreeDataCor' column, create a 'CorrectedRecruit' col (logical) to indicate
@@ -62,7 +62,6 @@ RecruitmentCorrection <- function(
     KeepMeas = c("MaxHOM", "MaxDate"),
 
     MinDBH = NULL,
-    PositiveGrowthThreshold = 5,
     OnlyDetectMissedRecruits = FALSE
 ){
 
@@ -104,13 +103,6 @@ RecruitmentCorrection <- function(
     Data$MinDBH <- MinDBH
   }
 
-  # PositiveGrowthThreshold (numeric, 1 value)
-  if(!length(PositiveGrowthThreshold) %in% 1 |
-     !inherits(PositiveGrowthThreshold, c("numeric", "integer")))
-     stop("'RecruitmentCorrection' must be 1 numeric value")
-
-
-
   # OnlyDetectMissedRecruits (logical)
   if(!all(unlist(lapply(list(OnlyDetectMissedRecruits),
                         inherits, "logical"))))
@@ -125,8 +117,7 @@ RecruitmentCorrection <- function(
   # Diameter_TreeDataCor column exists
   if(!OnlyDetectMissedRecruits){
     if(!"Diameter_TreeDataCor" %in% names(Data))
-      warning("The 'Diameter_TreeDataCor' (corrected Diameter) column does't exist in the dataset.
-         We advise to first correct the diameter measurements before correcting the recruitment")
+      warning("We advise to first correct the diameter measurements before correcting the recruitment")
   }
 
 
@@ -177,8 +168,13 @@ RecruitmentCorrection <- function(
 
   if(!"Diameter_TreeDataCor" %in% names(Data)) {
     Data[, Diameter_TreeDataCor := Diameter]
-}
-
+  }
+  if(!"ScientificName_TreeDataCor" %in% names(Data)) {
+    Data[, ScientificName_TreeDataCor := ScientificName]
+  }
+  if(!"Genus_TreeDataCor" %in% names(Data)) {
+    Data[, Genus_TreeDataCor := Genus]
+  }
 
   # get a DiameterHistory
   DiameterHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter_TreeDataCor", drop = FALSE)
@@ -189,15 +185,24 @@ RecruitmentCorrection <- function(
   DateHistory <- as.matrix(DateHistory, 1)
 
   # get a MinDBHHistory (this is useful if not same threshold accross plots)
-
   MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
   MinDBHHistory <- as.matrix(MinDBHHistory, 1)
   MinDBHHistory[] <- apply(MinDBHHistory, 1, function(x) x[is.na(x)] <- as.numeric(names(which.max(table(x))))) # fill NA with most common MinDBH in the row . this could be a problem if MinDBH changes accross censuses but should be rare enough that it does not matter
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # get growth History
   GrowthHistory <- matrix(NA, ncol = ncol(DiameterHistory)-1, nrow = nrow(DiameterHistory), dimnames = list(rownames(DiameterHistory), NULL))
   GrowthHistory[] <- t(round(apply(DiameterHistory, 1, diff) / apply(DateHistory, 1, function(x) diff(as.Date(x))/365), 2))
+
+  if(ThisIsShinyApp) incProgress(1/15)
+
+  # get species and Genus
+  Species <- Data[, ScientificName_TreeDataCor[1], by = c(ID)]
+  Species <- as.matrix(Species, 1)
+
+  Genus <- Data[, Genus_TreeDataCor[1], by = c(ID)]
+  Genus <- as.matrix(Genus, 1)
 
   # find out leading NAs and first growth
   LeadingNAHistory <- DiameterHistory
@@ -215,10 +220,19 @@ RecruitmentCorrection <- function(
     y
   }))
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   FirstDiameter <- apply(DiameterHistory, 1, function(x) {x[which(!is.na(x))[1]] })
 
   FirstGrowth <- apply(GrowthHistory, 1, function(x) {x[which(!is.na(x))[1]]})
-  FirstGrowth[is.na(FirstGrowth)] <- PositiveGrowthThreshold
+
+  AvgSpFstGrowth <- tapply(FirstGrowth, Species[,1], mean, na.rm = T)
+  AvgGnFstGrowth <- tapply(FirstGrowth, Genus[,1], mean, na.rm = T)
+
+  FirstGrowth[is.na(FirstGrowth)] <- AvgSpFstGrowth[Species[is.na(FirstGrowth),1]] # first take species avg
+  FirstGrowth[is.na(FirstGrowth)] <- AvgGnFstGrowth[Genus[is.na(FirstGrowth),1]] # then take genus avg
+
+  FirstGrowth[is.na(FirstGrowth)] <- mean(FirstGrowth, na.rm = T) # then take overall avg
 
   # DiameterHistory["380189_1_auto", ]
   # LeadingNAHistory["380189_1_auto", ]
@@ -239,6 +253,17 @@ RecruitmentCorrection <- function(
   # fill in the leading NA with calculated DBH by recursively removing first growth
 
   IdsToFix <- names(which(LeadingNAHistory == 1, arr.ind = T)[,1])
+
+  # only look at cases when there is at least one diameter
+  IdsToFix <- IdsToFix[apply(DiameterHistory[IdsToFix, ], 1, function(x) any(!is.na(x)))]
+
+  # only look at cases that would likely mean missed recruit (where 1st diameter > MinDBH)
+  IdsToFix <- IdsToFix[mapply(function(d, g, m) {
+    x <- d-g
+    x[which(!is.na(x))[1]] > m
+  }, FirstDiameter[IdsToFix], FirstGrowth[IdsToFix], MinDBHHistory[IdsToFix, 1]
+  )]
+
   # MatrixFirstGrowth <- matrix(rep(FirstGrowth, each = ncol(DiameterHistory)-1), ncol =  ncol(DiameterHistory)-1, byrow = T, dimnames = list(rownames(DiameterHistory), NULL))
 
   DiameterHistoryCorrected <- DiameterHistory
@@ -321,7 +346,7 @@ RecruitmentCorrection <- function(
 
 
   # Order IDs and times in ascending order -------------------------------------
-  Data <- Data[order(get(ID), IdCensus)]
+  Data <- Data[order(get(ID), IdCensus), ]
 
   } else {
     warning("You only have one census so we can't only apply recruitment corrections.")
