@@ -55,7 +55,6 @@
 <span>  <span class="va">Data</span>,</span>
 <span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span>,</span>
 <span>  MinDBH <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  PositiveGrowthThreshold <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  OnlyDetectMissedRecruits <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,11 +82,6 @@ year but more recent date)</p></li>
 NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p></dd>
 
 
-<dt>PositiveGrowthThreshold</dt>
-<dd><p>A tree widening by more than x cm/year is
-considered abnormal (numeric, 1 value) (Default = 5 cm)</p></dd>
-
-
 <dt>OnlyDetectMissedRecruits</dt>
 <dd><p>TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)</p></dd>
@@ -106,11 +100,14 @@ should have been recruited earlier according to your protocol (MinDBH)."</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>If the size of the tree has never changed, or if there is only one
-value the same value is kept for the added forgotten recruits. If the
-Diameter has not been corrected ('Diameter_TreeDataCor' column does not
-exist), the function will create it for the forgotten recruits. It is
-strongly recommended to correct the Diameter before correcting the recruits</p>
+    <p>This function detects trees that may have been missed
+at a previous census if the estimated diameter at that census is
+greater than MinDBH. Estimated diameter is calculated
+by recursively removing the tree's first growth measurement to it's first
+diameter measurement. If growth can't be calculated for a tree, we use
+the average first growth of trees of the same species, if not possible,
+of the same genus, and if not possible, of all trees.
+It is strongly recommended to correct the Diameter before correcting the recruits.</p>
     </div>
 
     <div class="section level2">
@@ -133,7 +130,7 @@ strongly recommended to correct the Diameter before correcting the recruits</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">IdTree</span><span class="op">)</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 55 rows containing missing values (`geom_line()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 47 rows containing missing values (`geom_line()`).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
@@ -288,7 +285,7 @@ strongly recommended to correct the Diameter before correcting the recruits</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 62 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 61 rows containing missing values (`geom_point()`).</span>
 <span class="r-plt img"><img src="RecruitmentCorrection-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
