@@ -4,13 +4,7 @@
 \alias{ReversedRequiredFormat}
 \title{ReversedRequiredFormat}
 \usage{
-ReversedRequiredFormat(
-  Data,
-  input,
-  x = NULL,
-  ThisIsShinyApp = FALSE,
-  Untidy = FALSE
-)
+ReversedRequiredFormat(Data, input, x = NULL, Untidy = FALSE)
 }
 \arguments{
 \item{Data}{Standardized data, returned from \code{\link[=RequiredFormat]{RequiredFormat()}}}
@@ -21,9 +15,6 @@ column names correspondence, size units etc... Chosen to be the output
 profile the user wants their data turned into}
 
 \item{x}{For internal use when function used by Shiny app}
-
-\item{ThisIsShinyApp}{For internal use when function used by Shiny app
-(logical)}
 
 \item{Untidy}{(logical). If TRUE and input$tidy exists, the data will be
 untidy (changed from long to wide format, according to input information)}

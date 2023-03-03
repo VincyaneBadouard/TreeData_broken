@@ -107,6 +107,8 @@ BotanicalCorrection <- function(
   WFOData = NULL
 ){
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
   #### Arguments check ####
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
@@ -200,6 +202,7 @@ BotanicalCorrection <- function(
   Data[grepl('[[:punct:]]', Family), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Family'")]
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
     if(Source == "TPL"){
 
@@ -255,7 +258,9 @@ BotanicalCorrection <- function(
       # Join Family table and the dataset
       Data <- merge(Data, FamilyData, by.x = "GenusCor", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
 
-    } # end if "TPL"
+      if(ThisIsShinyApp) incProgress(1/15)
+
+      } # end if "TPL"
 
     if(Source == "WFO"){
 
@@ -345,7 +350,9 @@ BotanicalCorrection <- function(
       # Create GenusCor and SpeciesCor
       Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)] # fixed = T : match split exactly
 
-    } # end if WFO
+      if(ThisIsShinyApp) incProgress(1/15)
+
+      } # end if WFO
 
     # IN COMMON -------------------------------------------------------------------------------------------------------------
 
@@ -357,11 +364,15 @@ BotanicalCorrection <- function(
     if(Source == "WFO") FamCorSource <- "World Flora Online"
     Data[!is.na(FamilyCor), FamilyCorSource := FamCorSource] # create the Source
 
+    if(ThisIsShinyApp) incProgress(1/15)
+
     # If no Family corr because no genus, previously with -aceae, take this name put in GenspFamily -------------------------
     Data[is.na(FamilyCor) & !is.na(GenspFamily), `:=`(FamilyCor = GenspFamily,
                                                       FamilyCorSource = "Found in the 'Genus' or 'Species' column")]
 
     Data[, GenspFamily := NULL] # remove obsolete column
+
+    if(ThisIsShinyApp) incProgress(1/15)
 
     # Homogenise unique botanical info (same Family, Genus, Species, Vernacular name) by IdTree if NA -----------------------
 
@@ -374,6 +385,8 @@ BotanicalCorrection <- function(
                             na.omit(unique(get(j))), get(j))
            , keyby = IdTree]
     }
+
+    if(ThisIsShinyApp) incProgress(1/15)
 
     # If no correction keep input botanical values: "Family", "Genus", "Species", "ScientificName" ------------------------
     # (en fait c'est pas une bonne idée)
@@ -397,6 +410,7 @@ BotanicalCorrection <- function(
     Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)] # remove NA after Genus in ScientificNameCor
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
 
 
 
@@ -434,6 +448,8 @@ vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNa
     # Rename correction columns
     Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
     setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol), skip_absent=TRUE)
+
+    if(ThisIsShinyApp) incProgress(1/15)
 
   return(Data)
 

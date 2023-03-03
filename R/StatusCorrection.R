@@ -76,6 +76,9 @@ StatusCorrection <- function(
     RemoveRAfterDeath = FALSE){
 
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
+
   InvariantColumns = c("MinDBH", "Site",
                        "Cluster", "Plot", "PlotViewID", "Subplot", "PlotArea", "PlotElevation",
                        "SubplotArea", "PlotLat", "PlotLon", "XPlotUTM", "YPlotUTM",
@@ -234,6 +237,8 @@ StatusCorrection <- function(
 
   }
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # scenario B - Alive > *Alive* > Alive ####
 
   resucitate <- gregexpr("(?<=1)[^1]*(?=1)", StatusHistoryC, perl = T)
@@ -248,6 +253,7 @@ StatusHistoryC <- mapply(function(x, m) {
     x
   }, StatusHistoryC, resucitate, USE.NAMES = F)
 
+if(ThisIsShinyApp) incProgress(1/15)
 
   # scenario C - Enough/not enough occurrences of death to validate it ####
 
@@ -263,6 +269,7 @@ StatusHistoryC <- mapply(function(x, m) {
     x
   }, StatusHistoryC, unseen, USE.NAMES = F)
 
+if(ThisIsShinyApp) incProgress(1/15)
 
   # scenario D - Dead before alive ####
 
@@ -277,6 +284,9 @@ StatusHistoryC <- mapply(function(x, m) {
     invisible(mapply(function(so, ml) if(ml>0) substring(x, so, so + ml - 1L) <<- strrep("N", ml), m, attr(m, "match.length")))
     x
   }, StatusHistoryC, deadfirst, USE.NAMES = F)
+
+
+if(ThisIsShinyApp) incProgress(1/15)
 
   # scenario E - remains dead ####
 
@@ -293,6 +303,7 @@ StatusHistoryC <- mapply(function(x, m) {
   }, StatusHistoryC, deadNAend, USE.NAMES = F)
 
 
+if(ThisIsShinyApp) incProgress(1/15)
 
   # convert the Status and Comments history tables back into the data ###
 
@@ -326,6 +337,7 @@ StatusHistoryC <- mapply(function(x, m) {
     Data <- cbind(Data, LifeStatus_TreeDataCor = NewStatusHistory$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewStatusHistory$rn, NewStatusHistory$IdCensus))])
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
 
   # Creating rows for absents ####
   if(AddRowsForForgottenCensuses) {
@@ -362,13 +374,14 @@ StatusHistoryC <- mapply(function(x, m) {
   }
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
   # Re-put the the rows without ID
   Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
 
 
   Data <- Data[order(get(ID), IdCensus )] # order by time
 
-
+  if(ThisIsShinyApp) incProgress(1/15)
   # return Data
   return(Data)
 

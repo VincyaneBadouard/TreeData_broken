@@ -171,6 +171,9 @@ DiameterCorrection <- function(
     coef = 0.9
 ){
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
+
   # prepare a place to hold all warnings so we get only one pop up window
   AllWarnings <- NULL
 
@@ -264,6 +267,7 @@ DiameterCorrection <- function(
 
   } # end Pioneers criteria
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
 
   # In data.table
@@ -309,6 +313,7 @@ DiameterCorrection <- function(
   # If no diameter value, write a comment
   Data[is.na(Diameter), Comment_TreeData := GenerateComment(Comment_TreeData, comment = "Missing value in 'Diameter'")]
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   #### Function ####
 
@@ -323,6 +328,8 @@ DiameterCorrection <- function(
     if("POM" %in% names(Data))  Data[, POM_TreeDataCor := .SD[1, POM], by = c(ID)]
   }
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
   Data <- Data[order(get(ID), IdCensus)]
 
@@ -334,6 +341,8 @@ DiameterCorrection <- function(
 
   # Dataset with the rows without IdCensus ----------------------------------------------------------------------------------
   DataIdCensusNa <- Data[is.na(IdCensus)]
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Apply Corrections -----------------------------------------------------------------------------------------------
 
@@ -406,6 +415,7 @@ DiameterCorrection <- function(
   # DiameterHistory[DiameterHistory > MaxDBH] <- NA
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # fill in the Diameter when the tree was missed
 
@@ -451,6 +461,8 @@ DiameterCorrection <- function(
     return(x[])
   }
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # get growth History (for annual growth incrementation)
   GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
 
@@ -475,11 +487,14 @@ DiameterCorrection <- function(
   } # make one object for each info (will help later)
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # calculate weights to use with "individual correction"
   ## For each Census, compute the absolute time difference and use coefs to calculate weight of the growths by temporal proximity
 
   Weights <- lapply(1:ncol(DateHistory), function(j) matrix(exp(as.numeric(abs(as.Date(DateHistory) - as.Date(DateHistory[,j])))/365*-coef), nrow = nrow(DiameterHistory), ncol = ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))) # list of length equal to number of censuses
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Corrections ####
   Idx_enough_DBH <- rowSums(!is.na(DiameterHistory)) > 1
@@ -527,6 +542,7 @@ DiameterCorrection <- function(
   DiameterDiffHistory[idx] <- NA
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   if("POM change" %in% WhatToCorrect){
 
@@ -534,6 +550,7 @@ DiameterCorrection <- function(
         but 'POM' and HOM' columns are empty for all trees so we can't apply corrections.")
 }
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
     ## POM change detection -----------------------------------------------------------------------------------------------
 
@@ -561,6 +578,7 @@ DiameterCorrection <- function(
     idxToReplace <- suppressWarnings(cbind(which(idxPOMChange, arr.ind = T), what = 1)) # 1 is for POM Change, 2 is for abnormal growth
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
 
     ## Abnormal growth detection (punctual and shift combined) -----------------------------------------------------------------------------------------------
 
@@ -583,6 +601,7 @@ if(nrow(idxToReplace) > 0) {
 
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
 
     # ## Leading NA in status (to see if we may be missing recruitments) -----------------------------------------------------------------------------------------------
     #
@@ -703,6 +722,8 @@ if(nrow(idxToReplace) > 0) {
         }
 
 
+        if(ThisIsShinyApp) incProgress(1/15)
+
       }
 
 
@@ -747,6 +768,7 @@ if(nrow(idxToReplace) > 0) {
     idx = !is.na(GrowthHistory) & GrowthHistory < NegativeGrowthThreshold # Valentine decided to use GrowthHistory instead of DiameterDiffHistory
     if(sum(idx)>1)   AllWarnings <- c(AllWarnings, "There are still individuals with abnormal negative growth (the selected methods are insufficient
                     or the method needs to be improved)" )
+    if(ThisIsShinyApp) incProgress(1/15)
 
 # Write changes in Data -------------------------------------------------------------------------------------------
 
@@ -777,6 +799,7 @@ if(nrow(idxToReplace) > 0) {
 
 
 
+    if(ThisIsShinyApp) incProgress(1/15)
 
 # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
     DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by DiameterCorrections.")]
@@ -788,6 +811,8 @@ if(DBHCorForDeadTrees == FALSE){
   Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
 }
 
+    if(ThisIsShinyApp) incProgress(1/15)
+
 # Order IDs and times in ascending order ----------------------------------------------------------------------------
 Data <- Data[order(get(ID), IdCensus)]
   } else {
@@ -797,6 +822,8 @@ Data <- Data[order(get(ID), IdCensus)]
 
   # show warnings
   if(!is.null(AllWarnings)) warning(paste(AllWarnings, collapse = "\n"))
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # return Data
   return(Data)

@@ -66,6 +66,10 @@ RecruitmentCorrection <- function(
     OnlyDetectMissedRecruits = FALSE
 ){
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
+  if(ThisIsShinyApp) incProgress(1/15)
+
   InvariantColumns = c("MinDBH", "Site",
                        "Cluster", "Plot", "PlotViewID", "Subplot", "PlotArea", "PlotElevation",
                        "SubplotArea", "PlotLat", "PlotLon", "XPlotUTM", "YPlotUTM",
@@ -133,6 +137,7 @@ RecruitmentCorrection <- function(
   }
 
   #### Function ####
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # data.frame to data.table
   setDT(Data)
@@ -166,6 +171,7 @@ RecruitmentCorrection <- function(
   # Dataset with the rows without Year -----------------------------------------
   DataYearNa <- Data[is.na(Year)]
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Apply for all the trees ------------------------------------
 
@@ -228,6 +234,7 @@ RecruitmentCorrection <- function(
   # FirstGrowth["391764_1_auto"]
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # fill in the leading NA with calculated DBH by recursively removing first growth
 
@@ -247,6 +254,9 @@ RecruitmentCorrection <- function(
 
   }
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
+
   # keep only the ones that are > MinDBH
   DiameterHistoryCorrected[LeadingNAHistory%in%1] <- ifelse(DiameterHistoryCorrected[LeadingNAHistory%in%1] <  MinDBHHistory[LeadingNAHistory%in%1], NA, DiameterHistoryCorrected[LeadingNAHistory%in%1])
 
@@ -261,6 +271,7 @@ RecruitmentCorrection <- function(
   idx_CommentOnly <- idx_CommentOnly[!duplicated(Data[,get(ID)][idx_CommentOnly])]
   idx_CommentOnly <- idx_CommentOnly[!is.na(idx_CommentOnly)]
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # add comment if detection only
   if(OnlyDetectMissedRecruits)
@@ -303,6 +314,7 @@ RecruitmentCorrection <- function(
  # add rows for those that have been missed
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Put back duplicated rows, or rows without ID or Year -----------------------
   Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
@@ -315,6 +327,7 @@ RecruitmentCorrection <- function(
     warning("You only have one census so we can't only apply recruitment corrections.")
   }
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # return Data
   return(Data)

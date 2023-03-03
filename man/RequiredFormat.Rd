@@ -4,7 +4,7 @@
 \alias{RequiredFormat}
 \title{RequiredFormat}
 \usage{
-RequiredFormat(Data, input, x = NULL, ThisIsShinyApp = FALSE)
+RequiredFormat(Data, input, x = NULL)
 }
 \arguments{
 \item{Data}{Forest inventory data set (data.frame or data.table) - already stacked, merged and tidyed}
@@ -14,9 +14,6 @@ RequiredFormat_interactive, also called site profile. It has information on
 column names correspondence, size units etc...}
 
 \item{x}{For internal use when function used by Shiny app}
-
-\item{ThisIsShinyApp}{For internal use when function used by Shiny app
-(logical)}
 }
 \value{
 Input inventory (data.frame) in the required package format.

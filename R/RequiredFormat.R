@@ -8,9 +8,6 @@
 #'
 #'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp For internal use when function used by Shiny app
-#'  (logical)
-#'
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
 #'  it is, and converts the column names to the standardized names used in this
@@ -40,13 +37,14 @@
 RequiredFormat <- function(
     Data,
     input,
-    x = NULL,
-    ThisIsShinyApp = FALSE
+    x = NULL
 ){
   # data(ParacouSubset)
   # data(ParacouProfile)
   # Data <- ParacouSubset
   # input <- ParacouProfile
+
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
 
   # prepare a place to hold all warnings so we get only one pop up window
   AllWarnings <- NULL

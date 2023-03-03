@@ -9,9 +9,6 @@
 #'
 #'@param x For internal use when function used by Shiny app
 #'
-#'@param ThisIsShinyApp For internal use when function used by Shiny app
-#'  (logical)
-#'
 #'@param Untidy (logical). If TRUE and input$tidy exists, the data will be
 #'  untidy (changed from long to wide format, according to input information)
 #'
@@ -41,13 +38,16 @@ ReversedRequiredFormat <- function(
   Data,
   input,
   x = NULL,
-  ThisIsShinyApp = FALSE,
   Untidy = FALSE
 ){
   # data(ParacouSubsetFormated)
   # data("ForestGeoProfile")
   # Data <- ParacouSubsetFormated
   # input <- ForestGeoProfile
+
+
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
 
   # Arguments check
   if (!inherits(Data, c("data.table", "data.frame")))
