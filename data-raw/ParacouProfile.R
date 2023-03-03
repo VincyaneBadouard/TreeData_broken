@@ -67,6 +67,7 @@ if (!interactive()) {
       Variety = "none",
       Family = "Family",
       HOM = "none",
+      HOMMan = 1.3,
       ScientificNameSepMan = "",
       BDUnitMan = "none",
       YSubplotUTM = "none",

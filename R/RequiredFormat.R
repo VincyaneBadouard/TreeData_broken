@@ -469,6 +469,24 @@ RequiredFormat <- function(
     }
   }
 
+  ## HOM if we don't have it
+  if(input$HOM %in% "none") {
+
+    if(!input$HOMMan %in% -999) {
+      Data[, HOM := input$HOMMan]
+      input$MinDBHUnitMan <- "m" # if HOM given by hand, it should be in m
+
+    }
+    if(input$HOMMan %in% -999) {
+
+      if(input$MeasLevel %in% c("Tree", "Stem")) {
+        AllWarnings <- c(AllWarnings, "You did not specify a height of measurement (HOM)")
+
+      }
+    }
+  }
+
+
 
   # PlotArea (if area is entered manually, it is supposed to be in ha already)
   if(input$PlotArea %in% "none") {

@@ -11,6 +11,7 @@
 #'   \item{Day}{Value or column name in data set @ForestGeoSubset (none) corresponding to Day of measurement}
 #'   \item{POM}{Value or column name in data set @ForestGeoSubset (none) corresponding to POM}
 #'   \item{HOM}{Value or column name in data set @ForestGeoSubset (hom) corresponding to HOM}
+#'   \item{HOMMan}{Value or column name in data set @ForestGeoSubset (-999) corresponding to What is the height of diameter measurement in your inventory?}
 #'   \item{PlotAreaUnitMan}{Value or column name in data set @ForestGeoSubset (none) corresponding to What is the unit for plot area?}
 #'   \item{XTreeUTM}{Value or column name in data set @ForestGeoSubset (none) corresponding to Tree X UTM coordinate}
 #'   \item{IdStem}{Value or column name in data set @ForestGeoSubset (stemID) corresponding to Stem ID}

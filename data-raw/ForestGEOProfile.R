@@ -10,6 +10,7 @@ ForestGeoProfile <-
     Day = "none",
     POM = "none",
     HOM = "hom",
+    HOMMan = -999,
     PlotAreaUnitMan = "none",
     XTreeUTM = "none",
     IdStem = "stemID",
