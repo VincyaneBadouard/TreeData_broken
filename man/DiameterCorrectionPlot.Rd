@@ -46,12 +46,13 @@ Plot diameter correction result
 
  data(TestData)
 
-TestData$HOM <- 1.3
 TestData$HOM[1:3] <- c(0.5,1.5,NA)
+TestData$Diameter[1:3] <- TestData$Diameter[1:3] + c(2,-2,0)
+TestData$Diameter[21:23] <- c(31,91,14)
 
 Rslt <- DiameterCorrection(
  TestData,
-  WhatToCorrect = c("POM change", "Abnormal growth"),
+  WhatToCorrect = c("POM change","Abnormal growth"),
    CorrectionType = c("phylo"),
     MinIndividualNbr = 1, Digits = 2L)
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
