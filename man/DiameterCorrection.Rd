@@ -96,7 +96,7 @@ the \code{ScientificName_TreeDataCor} column (characters vector)}
 widens by more than this value is considered abnormal (numeric, 1 value)}
 
 \item{WhatToCorrect}{Possible values: "POM change", "Abnormal growth"
-(character)
+(character). All are complementary and recommended.
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
 Diameter values from it. (Ignored if taper correction is applied)
@@ -136,7 +136,7 @@ have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
 
-\item{coef}{description... (numeric)}
+\item{coef}{(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity}
 }
 \value{
 Fill the \emph{Comment_TreeData} column with error type informations and add columns:
@@ -168,8 +168,8 @@ framing values.
 # library(data.table)
 data(TestData)
 
-TestData$HOM <- 1.3
 TestData$HOM[1:3] <- c(0.5,1.5,NA)
+TestData$Diameter[21:23] <- c(31,91,14)
 
 Rslt <- DiameterCorrection(
  TestData,

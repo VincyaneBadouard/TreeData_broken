@@ -45,8 +45,8 @@
 #'   - "MaxDate": apply the correction to the **most recent measurement** (same
 #'                year but more recent date)
 #'
- # param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
- # stand in cm (numeric, 1 value)
+# param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
+# stand in cm (numeric, 1 value)
 #'
 #' @param PositiveGrowthThreshold in cm/year: a tree
 #'   widening by more than this value is considered abnormal (numeric, 1 value)
@@ -64,7 +64,7 @@
 #'   widens by more than this value is considered abnormal (numeric, 1 value)
 #'
 #' @param WhatToCorrect Possible values: "POM change", "Abnormal growth"
-#'   (character)
+#'   (character). All are complementary and recommended.
 #'   - "POM change": detect POM change in the column `POM` and correct the
 #'                   Diameter values from it. (Ignored if taper correction is applied)
 #'   - "Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
@@ -99,7 +99,8 @@
 #'   FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 #'   have corrected the tree life status with the *StatusCorrection()* function.
 #'
-#' @param coef description... (numeric)
+#' @param coef (numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity
+
 #'
 #' @return Fill the *Comment_TreeData* column with error type informations and add columns:
 #'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
@@ -129,8 +130,8 @@
 #' # library(data.table)
 #' data(TestData)
 #'
-#' TestData$HOM <- 1.3
 #' TestData$HOM[1:3] <- c(0.5,1.5,NA)
+#' TestData$Diameter[21:23] <- c(31,91,14)
 #'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
@@ -226,7 +227,7 @@ DiameterCorrection <- function(
 
   # Taper before if 'HOM' in the dataset and 'UseTaperCorrection' = F
   if(!UseTaperCorrection & length(unique(na.omit((Data$HOM)))) > 1) {# HOM exist and UseTaperCorrection FALSE
-   message("You have the 'HOM' information in your dataset.
+    message("You have the 'HOM' information in your dataset.
             We advise you to correct your diameters also with UseTaperCorrection = TRUE") # only show if there are varying HOM
   }
 
@@ -280,7 +281,7 @@ DiameterCorrection <- function(
   # Create new columns we need (if not already there)
   if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
-    if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) Data[, DiameterCorrectionMeth_TreeData := ""]
+  if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) Data[, DiameterCorrectionMeth_TreeData := ""]
 
 
   # Dataset with the dead trees if no correction wanted for them --------------------------------------------
@@ -349,208 +350,217 @@ DiameterCorrection <- function(
 
   if(length(na.omit(unique(Data$IdCensus))) > 1) { # only possible if more than one census
     if(!"Diameter_TreeDataCor" %in% names(Data)) {
-    Data[, Diameter_TreeDataCor := Diameter]
-  }
-
-  if(!"HOM_TreeDataCor" %in% names(Data)) {
-    Data[, HOM_TreeDataCor := HOM]
-  }
-  if(!"POM_TreeDataCor" %in% names(Data)){
-    Data[, POM_TreeDataCor := POM]
-  }
-  if(!"LifeStatus_TreeDataCor" %in% names(Data)) {
-    Data[, LifeStatus_TreeDataCor := LifeStatus]
-
-  }
-
-
-
-  # get a DiameterHistory
-  DiameterHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter_TreeDataCor", drop = FALSE)
-  DiameterHistory <- as.matrix(DiameterHistory, 1)
-
-
-  # get HOMHistory
-  HOMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "HOM_TreeDataCor", drop = FALSE)
-  HOMHistory <- as.matrix(HOMHistory, 1)
-
-  # get HOMChange History
-  HOMChangeHistory <- cbind(NA, t(apply(HOMHistory, 1, diff)))
-  colnames(HOMChangeHistory) <- colnames(HOMHistory)
-
-  # get POMHistory
-  POMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "POM_TreeDataCor", drop = FALSE)
-  POMHistory <- as.matrix(POMHistory, 1)
-
-  # get POMChange History
-  POMChangeHistory <-  t(apply(POMHistory, 1, function(x) x != data.table::shift(x, type = "lag")))
-
-  # get DateHistory (to be able to calculate growth)
-  DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
-  DateHistory <- as.matrix(DateHistory, 1)
-
-  # get DateDiff
-  DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
-  DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - data.table::shift(as.Date(x)))/365))
-
-
-  # get a MinDBHHistory (this is useful if not same threshold accross plots)
-  MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
-  MinDBHHistory <- as.matrix(MinDBHHistory, 1)
-  MinDBHHistory[] <- apply(MinDBHHistory, 1, function(x) x[is.na(x)] <- as.numeric(names(which.max(table(x))))) # fill NA with most common MinDBH in the row . this could be a problem if MinDBH changes accross censuses but should be rare enough that it does not matter
-
-  # get LifeStatusHistory
-  LifeStatusHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "LifeStatus_TreeDataCor", drop = FALSE)
-  LifeStatusHistory <- as.matrix(LifeStatusHistory, 1)
-
-  # create Comment History
-  CommentHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
-
-  DiameterCorrectionMethHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
-
-  # small correction affecting next histories
-  # DBH = 0 is impossible
-  DiameterHistory[DiameterHistory %in% 0] <- NA
-  # DBH > MaxDBH -> DBH = NA
-  # DiameterHistory[DiameterHistory > MaxDBH] <- NA
-
-
-  if(ThisIsShinyApp) incProgress(1/15)
-
-  # fill in the Diameter when the tree was missed
-
-  MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l) {
-
-    if(any(!is.na(d))) { # only run if we have diameters to work with
-          t <- as.Date(t)
-    m <- lm(d~t)
-
-    if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
-      p <- stats::predict(lm(d~t), newdata = t) # if some t are NA, still i twil
-      # p <- p[match(names(d), names(p))] # this is to account for when the date is NA
-      c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "Missed tree")
-      cm[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(cm[is.na(d) & !is.na(p)], "Initial linear interpolation")
-      d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
+      Data[, Diameter_TreeDataCor := Diameter]
     }
+
+    if(!"HOM_TreeDataCor" %in% names(Data)) {
+      Data[, HOM_TreeDataCor := HOM]
+    }
+    if(!"POM_TreeDataCor" %in% names(Data)){
+      Data[, POM_TreeDataCor := POM]
+    }
+    if(!"LifeStatus_TreeDataCor" %in% names(Data)) {
+      Data[, LifeStatus_TreeDataCor := LifeStatus]
+    }
+    if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) {
+      Data[, DiameterCorrectionMeth_TreeData := ""]
+    }
+    if(!"Diameter_TreeDataCor" %in% names(Data)) {
+      Data[, Diameter_TreeDataCor := ""]
+
     }
 
 
-    return(list(d, c, cm))
-
-  },
-  d = split(DiameterHistory, row(DiameterHistory)),
-  t = split(DateHistory, row(DateHistory)),
-  c = split(CommentHistory, row(CommentHistory)),
-  cm = split(DiameterCorrectionMethHistory, row(DiameterCorrectionMethHistory)),
-  l = split(LifeStatusHistory, row(LifeStatusHistory))))
-
-  DiameterHistory[] <- do.call(rbind, MissedDiametetFilled[,1])
-  CommentHistory[] <-  do.call(rbind, MissedDiametetFilled[,2])
-  DiameterCorrectionMethHistory[] <-  do.call(rbind, MissedDiametetFilled[,3])
-
-  # create a function that will allow to get diameter difference and growth history (because we will need to recalculate those a few times, as we make corrections)
-  CalcGrowthHist <- function(DiameterHistory, DateHistory) {
-    x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
-    x[,-1] <- t(round(apply(DiameterHistory, 1, diff) / apply(DateHistory, 1, function(x) diff(as.Date(x))/365), 2))
-    return(x[])
-  }
-
-  CalcDiameterDiffHist <- function(DiameterHistory = DiameterHistory) {
-    x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
-    x[,-1] <- t(round(apply(DiameterHistory, 1, diff),2))
-    return(x[])
-  }
-
-  if(ThisIsShinyApp) incProgress(1/15)
-
-  # get growth History (for annual growth incrementation)
-  GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
-
-  # get Growth difference (for absolute growth incrementation)
-  DiameterDiffHistory <- CalcDiameterDiffHist(DiameterHistory)
-
-  # get Plot, Family, Genus and Specie in an array
-  UniqueInfo <- Data[, .(Plot = unique(Plot),
-          Family = unique(Family),
-          Genus = unique(Genus),
-          Species = unique(ScientificName)), by = .(IdStem =get(ID))]
-
-  UniqueInfo <- UniqueInfo[complete.cases(UniqueInfo),] # removing when for some reason one of these info is not specified (which deals with most duplicated)
-
-  if(any(duplicated(UniqueInfo$get))) stop("Some individuals don't have a unique Plot, Family, Genus or species")
-
-  for(w in c("Plot", "Family", "Genus", "Species")) {
-    x <- UniqueInfo[, get(w)]
-    names(x) <- UniqueInfo$IdStem
-    x <- x[rownames(DiameterHistory)] # make sure same order as other objecys
-    assign(w, x)
-  } # make one object for each info (will help later)
+    # get a DiameterHistory
+    DiameterHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Diameter_TreeDataCor", drop = FALSE)
+    DiameterHistory <- as.matrix(DiameterHistory, 1)
 
 
-  if(ThisIsShinyApp) incProgress(1/15)
+    # get HOMHistory
+    HOMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "HOM_TreeDataCor", drop = FALSE)
+    HOMHistory <- as.matrix(HOMHistory, 1)
 
-  # calculate weights to use with "individual correction"
-  ## For each Census, compute the absolute time difference and use coefs to calculate weight of the growths by temporal proximity
+    # get HOMChange History
+    HOMChangeHistory <- cbind(NA, t(apply(HOMHistory, 1, diff)))
+    colnames(HOMChangeHistory) <- colnames(HOMHistory)
 
-  Weights <- lapply(1:ncol(DateHistory), function(j) matrix(exp(as.numeric(abs(as.Date(DateHistory) - as.Date(DateHistory[,j])))/365*-coef), nrow = nrow(DiameterHistory), ncol = ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))) # list of length equal to number of censuses
+    # get POMHistory
+    POMHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "POM_TreeDataCor", drop = FALSE)
+    POMHistory <- as.matrix(POMHistory, 1)
 
-  if(ThisIsShinyApp) incProgress(1/15)
+    # get POMChange History
+    POMChangeHistory <-  t(apply(POMHistory, 1, function(x) x != data.table::shift(x, type = "lag")))
 
-  # Corrections ####
-  Idx_enough_DBH <- rowSums(!is.na(DiameterHistory)) > 1
-  Idx_one_DBH <- rowSums(!is.na(DiameterHistory)) %in% 1
+    # get DateHistory (to be able to calculate growth)
+    DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
+    DateHistory <- as.matrix(DateHistory, 1)
+
+    # get DateDiff
+    DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
+    DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - data.table::shift(as.Date(x)))/365))
+
+
+    # get a MinDBHHistory (this is useful if not same threshold accross plots)
+    MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
+    MinDBHHistory <- as.matrix(MinDBHHistory, 1)
+    MinDBHHistory[] <- apply(MinDBHHistory, 1, function(x) x[is.na(x)] <- as.numeric(names(which.max(table(x))))) # fill NA with most common MinDBH in the row . this could be a problem if MinDBH changes accross censuses but should be rare enough that it does not matter
+
+    # get LifeStatusHistory
+    LifeStatusHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "LifeStatus_TreeDataCor", drop = FALSE)
+    LifeStatusHistory <- as.matrix(LifeStatusHistory, 1)
+
+    # create Comment History
+    CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment_TreeData", drop = FALSE)
+    CommentHistory <- as.matrix(CommentHistory, 1)
+    # CommentHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
+
+    DiameterCorrectionMethHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "DiameterCorrectionMeth_TreeData", drop = FALSE)
+    DiameterCorrectionMethHistory <- as.matrix(DiameterCorrectionMethHistory, 1)
+    # DiameterCorrectionMethHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
+
+    # small correction affecting next histories
+    # DBH = 0 is impossible
+    DiameterHistory[DiameterHistory %in% 0] <- NA
+    # DBH > MaxDBH -> DBH = NA
+    # DiameterHistory[DiameterHistory > MaxDBH] <- NA
+
+
+    if(ThisIsShinyApp) incProgress(1/15)
+
+    # fill in the Diameter when the tree was missed
+
+    MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l) {
+
+      if(any(!is.na(d))) { # only run if we have diameters to work with
+        t <- as.Date(t)
+        m <- lm(d~t)
+
+        if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
+          p <- stats::predict(lm(d~t), newdata = t) # if some t are NA, still i twil
+          # p <- p[match(names(d), names(p))] # this is to account for when the date is NA
+          c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "Missed tree")
+          cm[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(cm[is.na(d) & !is.na(p)], "Initial linear interpolation")
+          d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
+        }
+      }
+
+
+      return(list(d, c, cm))
+
+    },
+    d = split(DiameterHistory, row(DiameterHistory)),
+    t = split(DateHistory, row(DateHistory)),
+    c = split(CommentHistory, row(CommentHistory)),
+    cm = split(DiameterCorrectionMethHistory, row(DiameterCorrectionMethHistory)),
+    l = split(LifeStatusHistory, row(LifeStatusHistory))))
+
+    DiameterHistory[] <- do.call(rbind, MissedDiametetFilled[,1])
+    CommentHistory[] <-  do.call(rbind, MissedDiametetFilled[,2])
+    DiameterCorrectionMethHistory[] <-  do.call(rbind, MissedDiametetFilled[,3])
+
+    # create a function that will allow to get diameter difference and growth history (because we will need to recalculate those a few times, as we make corrections)
+    CalcGrowthHist <- function(DiameterHistory, DateHistory) {
+      x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
+      x[,-1] <- t(round(apply(DiameterHistory, 1, diff) / apply(DateHistory, 1, function(x) diff(as.Date(x))/365), 2))
+      return(x[])
+    }
+
+    CalcDiameterDiffHist <- function(DiameterHistory = DiameterHistory) {
+      x <-  matrix(NA, ncol = ncol(DiameterHistory), nrow = nrow(DiameterHistory), dimnames = dimnames(DiameterHistory))
+      x[,-1] <- t(round(apply(DiameterHistory, 1, diff),2))
+      return(x[])
+    }
+
+    if(ThisIsShinyApp) incProgress(1/15)
+
+    # get growth History (for annual growth incrementation)
+    GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
+
+    # get Growth difference (for absolute growth incrementation)
+    DiameterDiffHistory <- CalcDiameterDiffHist(DiameterHistory)
+
+    # get Plot, Family, Genus and Specie in an array
+    UniqueInfo <- Data[, .(Plot = unique(Plot),
+                           Family = unique(Family),
+                           Genus = unique(Genus),
+                           Species = unique(ScientificName)), by = .(IdStem =get(ID))]
+
+    UniqueInfo <- UniqueInfo[complete.cases(UniqueInfo),] # removing when for some reason one of these info is not specified (which deals with most duplicated)
+
+    if(any(duplicated(UniqueInfo$get))) stop("Some individuals don't have a unique Plot, Family, Genus or species")
+
+    for(w in c("Plot", "Family", "Genus", "Species")) {
+      x <- UniqueInfo[, get(w)]
+      names(x) <- UniqueInfo$IdStem
+      x <- x[rownames(DiameterHistory)] # make sure same order as other objecys
+      assign(w, x)
+    } # make one object for each info (will help later)
+
+
+    if(ThisIsShinyApp) incProgress(1/15)
+
+    # calculate weights to use with "individual correction"
+    ## For each Census, compute the absolute time difference and use coefs to calculate weight of the growths by temporal proximity
+
+    Weights <- lapply(1:ncol(DateHistory), function(j) matrix(exp(as.numeric(abs(as.Date(DateHistory) - as.Date(DateHistory[,j])))/365*-coef), nrow = nrow(DiameterHistory), ncol = ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))) # list of length equal to number of censuses
+
+    if(ThisIsShinyApp) incProgress(1/15)
+
+    # Corrections ####
+    Idx_enough_DBH <- rowSums(!is.na(DiameterHistory)) > 1
+    Idx_one_DBH <- rowSums(!is.na(DiameterHistory)) %in% 1
 
 
 
-  # detect and change to NA the growth of cases of abnormal increment
+    # detect and change to NA the growth of cases of abnormal increment
 
-  ## positive
+    ## positive
 
-  if(!is.null(Pioneers)) {
+    if(!is.null(Pioneers)) {
 
-    ### pioneers
-    idx_sp <- Species %in% Pioneers
-    idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PioneersGrowthThreshold
+      ### pioneers
+      idx_sp <- Species %in% Pioneers
+      idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PioneersGrowthThreshold
 
-    CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PioneersGrowthThreshold))
-    GrowthHistory[idx_sp, ][idx]  <- NA
-    DiameterDiffHistory[idx_sp, ][idx] <- NA
+      CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PioneersGrowthThreshold))
+      GrowthHistory[idx_sp, ][idx]  <- NA
+      DiameterDiffHistory[idx_sp, ][idx] <- NA
 
-    ### non-pioneers
-    idx_sp <- !Species %in% Pioneers
-    idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PositiveGrowthThreshold
+      ### non-pioneers
+      idx_sp <- !Species %in% Pioneers
+      idx = !is.na(GrowthHistory[idx_sp, ]) & GrowthHistory[idx_sp, ] >= PositiveGrowthThreshold
 
-    CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
-    GrowthHistory[idx_sp, ][idx]  <- NA
-    DiameterDiffHistory[idx_sp, ][idx] <- NA
+      CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
+      GrowthHistory[idx_sp, ][idx]  <- NA
+      DiameterDiffHistory[idx_sp, ][idx] <- NA
 
-  } else {
+    } else {
 
-    idx = !is.na(GrowthHistory) & GrowthHistory >= PositiveGrowthThreshold
+      idx = !is.na(GrowthHistory) & GrowthHistory >= PositiveGrowthThreshold
 
-    CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
+      CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
+      GrowthHistory[idx]  <- NA
+      DiameterDiffHistory[idx] <- NA
+    }
+
+
+    ## negative
+    idx = !is.na(GrowthHistory) & GrowthHistory < NegativeGrowthThreshold # Valentine decided to use GrowthHistory instead of DiameterDiffHistory
+
+    CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth smaller than threshold of", NegativeGrowthThreshold))
     GrowthHistory[idx]  <- NA
     DiameterDiffHistory[idx] <- NA
-  }
 
 
-  ## negative
-  idx = !is.na(GrowthHistory) & GrowthHistory < NegativeGrowthThreshold # Valentine decided to use GrowthHistory instead of DiameterDiffHistory
+    if(ThisIsShinyApp) incProgress(1/15)
 
-  CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth smaller than threshold of", NegativeGrowthThreshold))
-  GrowthHistory[idx]  <- NA
-  DiameterDiffHistory[idx] <- NA
+    if("POM change" %in% WhatToCorrect){
 
-
-  if(ThisIsShinyApp) incProgress(1/15)
-
-  if("POM change" %in% WhatToCorrect){
-
-    if(all(is.na(HOMHistory)) & all(is.na(POMHistory)))  stop("You have chosen to make a 'POM change' correction,
+      if(all(is.na(HOMHistory)) & all(is.na(POMHistory)))  stop("You have chosen to make a 'POM change' correction,
         but 'POM' and HOM' columns are empty for all trees so we can't apply corrections.")
-}
+    }
 
-  if(ThisIsShinyApp) incProgress(1/15)
+    if(ThisIsShinyApp) incProgress(1/15)
 
     ## POM change detection -----------------------------------------------------------------------------------------------
 
@@ -592,12 +602,15 @@ DiameterCorrection <- function(
 
 
     ## get the sign of the growth ---------------------------------------------
-if(nrow(idxToReplace) > 0) {
-  idxToReplace <- cbind(idxToReplace, sign = NA)
-  idxToReplace[idxToReplace[, 3] %in% 1, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])
-  idxToReplace[idxToReplace[, 3] %in% 2, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxAbnormal])
+    if(nrow(idxToReplace) > 0) {
+      idxToReplace <- cbind(idxToReplace, sign = NA)
+      idxToReplace[idxToReplace[, 3] %in% 1, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])
+      idxToReplace[idxToReplace[, 3] %in% 2, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxAbnormal])
 
-}
+    }
+
+    ## order to make sure we are looking at each stem successivele
+    idxToReplace <- idxToReplace[order(idxToReplace[,1], idxToReplace[,2]),]
 
 
 
@@ -614,7 +627,7 @@ if(nrow(idxToReplace) > 0) {
     # CAREFUL IF WE BRING THIS BACK IN THE FUNCTION WE NEED TO CHANGE idxToReplace <- idxToReplace[idxToReplace[, 2]> 1, ] to idxToReplace <- idxToReplace[idxToReplace[, 2]> 1 | idxToReplace[, 2] %in% 3, ] + keep working on the corrections(need to go backward instead of forward)
 
 
-## Corrections -------------------------------------------------------------
+    ## Corrections -------------------------------------------------------------
 
 
     # remove cases where NA is in first column since that is fake data
@@ -628,14 +641,16 @@ if(nrow(idxToReplace) > 0) {
     # replace Diameters that need it
     if(nrow(idxToReplace) > 0) {
 
+      lTosktip = 0 # this is a machanism to skip idxToReplace that are return to normal
 
       for(l in 1:nrow(idxToReplace)) {
+         if(l == lTosktip) next
 
         t = rownames(idxToReplace)[l]
         i = idxToReplace[l, 1]
         j = idxToReplace[l, 2]
 
-         if(l > 1) if(idxToReplace[l, 3] %in% 2 & idxToReplace[l-1, 3] %in% 2 & t %in% rownames(idxToReplace)[l-1] & (j-1) %in% idxToReplace[l-1, 2] & idxToReplace[l,4] + idxToReplace[l-1,4] == 0) next # ignore this correction if the previous fix was a punctual error measurement and this abnormal growth is just the return to "normal"
+        if(l > 1) if(idxToReplace[l, 3] %in% 2 & idxToReplace[l-1, 3] %in% 2 & t %in% rownames(idxToReplace)[l-1] & (j-1) %in% idxToReplace[l-1, 2] & idxToReplace[l,4] + idxToReplace[l-1,4] == 0) next # ignore this correction if the previous fix was a punctual error measurement and this abnormal growth is just the return to "normal"
 
         pd = DiameterHistory[i,j-1] # previous dbh
 
@@ -656,15 +671,15 @@ if(nrow(idxToReplace) > 0) {
 
           # figure out set of colleague (need at least MinIndividualNbr, with actual growth measures)
 
-          idxColleagues <- list(species = idxSameSpecies & idxDBHWithinRange & idxGrowthExists,
-                                genus = idxSameGenus & idxDBHWithinRange & idxGrowthExists,
-                                family = idxSameFamily & idxDBHWithinRange & idxGrowthExists,
-                                plot = idxSamePlot & idxDBHWithinRange & idxGrowthExists)
+          idxColleagues <- list(Species = idxSameSpecies & idxDBHWithinRange & idxGrowthExists,
+                                Genus = idxSameGenus & idxDBHWithinRange & idxGrowthExists,
+                                Family = idxSameFamily & idxDBHWithinRange & idxGrowthExists,
+                                Plot = idxSamePlot & idxDBHWithinRange & idxGrowthExists)
 
 
           Method <- names(which(lapply(idxColleagues, sum, na.rm = T) > MinIndividualNbr))[1] # take the first set that meets the min requirement
 
-          if(length(Method) > 0) { # if we can use phylo correction
+          if(!is.na(Method)) { # if we can use phylo correction
             idxColleagues <- idxColleagues[[Method]]
 
             # compute Colleagues growth mean
@@ -674,10 +689,10 @@ if(nrow(idxToReplace) > 0) {
 
             SwitchToIndividual = FALSE
           } else {
-          #   stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
-          #              You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument).
-          #               The 'individual' correction is applied in this case.")
-          # }
+            #   stop("Not enough individuals in your dataset to apply the 'phylogenetic hierarchical' correction even at the 'stand' level.
+            #              You asked for a minimum of ", MinIndividualNbr," individuals ('MinIndividualNbr' argument).
+            #               The 'individual' correction is applied in this case.")
+            # }
             SwitchToIndividual = TRUE
           }
 
@@ -707,20 +722,26 @@ if(nrow(idxToReplace) > 0) {
 
         # apply switch to other values if j is not last column and l+1 in idxToReplace is not of same tree with opposite sign (which would indicated a punctual errro measurement)
         shift = FALSE # initialize with no shift
+        lTosktip = 0
         if(j < ncol(DiameterHistory)) {
-          if(l == nrow(idxToReplace))  {
-            shift = TRUE # if this is the last abnormal growth, we know we need to shift because we already skipped it if it was a return to normwl
-          } else {
-            if((idxToReplace[l, 3] %in% 1 | (idxToReplace[l, 3] %in% 2 & idxToReplace[l+1, 3] %in% 2 & t %in% rownames(idxToReplace)[l+1] & (j+1) %in% idxToReplace[l+1, 2] & idxToReplace[l,4] + idxToReplace[l+1,4] != 0))) shift = TRUE
+          if(l == nrow(idxToReplace)) shift = TRUE # if this is the last abnormal growth, we know we need to shift because we already skipped it if it was a return to normwl
+          if(idxToReplace[l, 3] %in% 1 )  shift = TRUE # POM change automatically shifts
+          if(idxToReplace[l, 3] %in% 2) {
+            if(!t %in% rownames(idxToReplace)[l+1]) shift = TRUE # next error is not in the same tree s nothing is compensating --> need to shift
+            if(t %in% rownames(idxToReplace)[l+1]) {
+              if(idxToReplace[l+1, 3] %in% 2 & (j+1) %in% idxToReplace[l+1, 2]  & idxToReplace[l,4] + idxToReplace[l+1,4] != 0 )  shift = TRUE # if next error is not compensating this error
+              else lTosktip = l+1 # if next is compensating, we will want to remove it from idxToReplace
+              }
+            }
+
           }
-        }
+
 
         if(shift) {
           DiameterHistory[i,(j+1):ncol(DiameterHistory)] <- DiameterHistory[i,(j+1):ncol(DiameterHistory)] + dn - do
 
           DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)]  <- GenerateComment( DiameterCorrectionMethHistory[i,(j+1):ncol(DiameterHistory)] , paste("Shift realignment after", c("POM change", "Abnormal growth")[idxToReplace[l, 3]]))
         }
-
 
         if(ThisIsShinyApp) incProgress(1/15)
 
@@ -731,10 +752,10 @@ if(nrow(idxToReplace) > 0) {
     }
 
 
-# If not enough Diameters or growth to help? --------------------------------------------------
+    # If not enough Diameters or growth to help? --------------------------------------------------
 
 
-# Check that there are no more abnormal growths -----------------------------------------------------------------------------
+    # Check that there are no more abnormal growths -----------------------------------------------------------------------------
 
     GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
 
@@ -770,7 +791,7 @@ if(nrow(idxToReplace) > 0) {
                     or the method needs to be improved)" )
     if(ThisIsShinyApp) incProgress(1/15)
 
-# Write changes in Data -------------------------------------------------------------------------------------------
+    # Write changes in Data -------------------------------------------------------------------------------------------
 
     # write comments
     DiameterHistoryCorrected <- melt(setDT(as.data.frame(CommentHistory), keep.rownames=TRUE), measure.vars = colnames(CommentHistory) , variable.name = "IdCensus")
@@ -801,23 +822,23 @@ if(nrow(idxToReplace) > 0) {
 
     if(ThisIsShinyApp) incProgress(1/15)
 
-# Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
+    # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
     DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by DiameterCorrections.")]
 
     Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
 
-# Re-put the dead trees in the dataset (if there are not corrected by choice)
-if(DBHCorForDeadTrees == FALSE){
-  Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
-}
+    # Re-put the dead trees in the dataset (if there are not corrected by choice)
+    if(DBHCorForDeadTrees == FALSE){
+      Data <- rbindlist(list(Data, DeadTrees), use.names = TRUE, fill = TRUE)
+    }
 
     if(ThisIsShinyApp) incProgress(1/15)
 
-# Order IDs and times in ascending order ----------------------------------------------------------------------------
-Data <- Data[order(get(ID), IdCensus)]
+    # Order IDs and times in ascending order ----------------------------------------------------------------------------
+    Data <- Data[order(get(ID), IdCensus)]
   } else {
     AllWarnings <- c(AllWarnings, "You only have one census so we can only apply Taper Corrections (if you have HOM).")
-}
+  }
 
 
   # show warnings
@@ -829,5 +850,3 @@ Data <- Data[order(get(ID), IdCensus)]
   return(Data)
 
 }
-
-
