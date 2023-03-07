@@ -197,7 +197,7 @@ widens by more than this value is considered abnormal (numeric, 1 value)</p></dd
 
 <dt>WhatToCorrect</dt>
 <dd><p>Possible values: "POM change", "Abnormal growth"
-(character)</p><ul><li><p>"POM change": detect POM change in the column <code>POM</code> and correct the
+(character). All are complementary and recommended.</p><ul><li><p>"POM change": detect POM change in the column <code>POM</code> and correct the
 Diameter values from it. (Ignored if taper correction is applied)</p></li>
 <li><p>"Abnormal growth": detect if the growth is greater than PositiveGrowthThreshold ('PioneersGrowthThreshold' if species belongs to 'Pioneers')
 or smaller than NegativeGrowthThreshold and correct it by <code>CorrectionType</code></p></li>
@@ -247,7 +247,7 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 
 
 <dt>coef</dt>
-<dd><p>description... (numeric)</p></dd>
+<dd><p>(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity</p></dd>
 
 
 <dt>OnlyDetectMissedRecruits</dt>
