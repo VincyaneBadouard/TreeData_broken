@@ -121,7 +121,7 @@ the \code{ScientificName_TreeDataCor} column (characters vector)}
 widens by more than this value is considered abnormal (numeric, 1 value)}
 
 \item{WhatToCorrect}{Possible values: "POM change", "Abnormal growth"
-(character)
+(character). All are complementary and recommended.
 \itemize{
 \item "POM change": detect POM change in the column \code{POM} and correct the
 Diameter values from it. (Ignored if taper correction is applied)
@@ -161,7 +161,7 @@ have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
 
-\item{coef}{description... (numeric)}
+\item{coef}{(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity}
 
 \item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
