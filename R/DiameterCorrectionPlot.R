@@ -44,7 +44,7 @@
 #'  TestData,
 #'   WhatToCorrect = c("POM change","Abnormal growth"),
 #'    CorrectionType = c("phylo"),
-#'     MinIndividualNbr = 1, Digits = 2L)
+#'     MinIndividualNbr = 1)
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE, SeveralWindows = FALSE)
 #'
 #' # dev.off()
@@ -52,7 +52,7 @@
 #'
 DiameterCorrectionPlot <- function(
     Data,
-    OnlyCorrected = FALSE,
+    OnlyCorrected = TRUE,
     CorCol = "Diameter_TreeDataCor",
     # InitialCol = "Diameter"
     SeveralWindows = TRUE

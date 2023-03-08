@@ -21,7 +21,6 @@ DiameterCorrection(
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
-  Digits = 1L,
   DBHCorForDeadTrees = TRUE,
   coef = 0.9
 )
@@ -129,9 +128,6 @@ correction. Give the name of the column(s) for which the individuals must
 have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
 (character)}
 
-\item{Digits}{Number of decimal places to be used in the \code{DBHCor} column
-(Default: 1L) (integer)}
-
 \item{DBHCorForDeadTrees}{(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
@@ -175,7 +171,7 @@ Rslt <- DiameterCorrection(
  TestData,
   WhatToCorrect = c("POM change", "Abnormal growth"),
     CorrectionType = c("phylo"),
-    MinIndividualNbr = 1, Digits = 2L)
+    MinIndividualNbr = 1)
 
 DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 

@@ -195,7 +195,7 @@ widens by more than this value is considered abnormal (numeric, 1 value)</p>
 <td><code>WhatToCorrect</code></td>
 <td>
 <p>Possible values: ""POM change"", ""Abnormal growth""
-(character)
+(character). All are complementary and recommended.
 </p>
 
 <ul>
@@ -267,14 +267,6 @@ have the same value as the tree to correct (e.g. c(""Plot"", ""Subplot""))
 </tr>
 ","DiameterCorrectionOtherCrit","NULL","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","ColumnOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
-<td><code>Digits</code></td>
-<td>
-<p>Number of decimal places to be used in the <code>DBHCor</code> column
-(Default: 1L) (integer)</p>
-</td>
-</tr>
-","DiameterCorrectionDigits","1","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"DiameterCorrection","<tr valign=""top"">
 <td><code>DBHCorForDeadTrees</code></td>
 <td>
 <p>(logical) TRUE: return DBHCor also for dead trees.
@@ -286,7 +278,7 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 "DiameterCorrection","<tr valign=""top"">
 <td><code>coef</code></td>
 <td>
-<p>description... (numeric)</p>
+<p>(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity</p>
 </td>
 </tr>","DiameterCorrectioncoef","0.9","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
 "RecruitmentCorrection","<tr valign=""top"">

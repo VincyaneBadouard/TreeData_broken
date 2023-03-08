@@ -80,7 +80,6 @@ FullErrorProcessing <- function(
   DBHRange = 10,
   MinIndividualNbr = 5,
   OtherCrit = NULL,
-  Digits = 1L,
 
   DBHCorForDeadTrees = TRUE,
 
@@ -173,12 +172,6 @@ FullErrorProcessing <- function(
   # CorrectionType
   CorrectionType <- match.arg(CorrectionType, several.ok = TRUE)
 
-  # Digits
-  if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
-    warning(paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
-    Digits <- as.integer(Digits)
-  }
-
   # Taper before if 'HOM' and no taper correction asked
   if(any(!is.na(Data$HOM)) & !UseTaperCorrection) # HOM exists?
     message("You have the 'HOM' information in your dataset.
@@ -240,7 +233,6 @@ FullErrorProcessing <- function(
                                DBHRange = DBHRange,
                                MinIndividualNbr = MinIndividualNbr,
                                OtherCrit = OtherCrit,
-                               Digits = Digits,
 
                                DBHCorForDeadTrees = DBHCorForDeadTrees,
 

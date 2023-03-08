@@ -92,9 +92,6 @@
 #'   have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
 #'   (character)
 #'
-#' @param Digits Number of decimal places to be used in the `DBHCor` column
-#'   (Default: 1L) (integer)
-#'
 #' @param DBHCorForDeadTrees (logical) TRUE: return DBHCor also for dead trees.
 #'   FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 #'   have corrected the tree life status with the *StatusCorrection()* function.
@@ -138,7 +135,7 @@
 #'  TestData,
 #'   WhatToCorrect = c("POM change", "Abnormal growth"),
 #'     CorrectionType = c("phylo"),
-#'     MinIndividualNbr = 1, Digits = 2L)
+#'     MinIndividualNbr = 1)
 #'
 #' DiameterCorrectionPlot(Rslt, OnlyCorrected = TRUE)
 #'
@@ -166,7 +163,6 @@ DiameterCorrection <- function(
     DBHRange = 10,
     MinIndividualNbr = 5,
     OtherCrit = NULL,
-    Digits = 1L,
 
     DBHCorForDeadTrees = TRUE,
 
@@ -218,12 +214,6 @@ DiameterCorrection <- function(
 
   # CorrectionType
   CorrectionType <- match.arg(CorrectionType)
-
-  # Digits
-  if(!inherits(Digits, "integer") & Digits != as.integer(Digits))  {
-    AllWarnings <- c(AllWarnings, paste0("The 'Digits' argument must be an integer. Value entered (", Digits, ")  coerced to ", as.integer(Digits), "."))
-    Digits <- as.integer(Digits)
-  }
 
 
   # Taper before if 'HOM' in the dataset and 'UseTaperCorrection' = F
@@ -817,9 +807,7 @@ DiameterCorrection <- function(
 
     idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterCorrected$rn, DiameterCorrected$IdCensus))
 
-    Data$Diameter_TreeDataCor <- round(DiameterCorrected$value[idx], Digits)
-
-
+    Data$Diameter_TreeDataCor <- DiameterCorrected$value[idx]
 
     if(ThisIsShinyApp) incProgress(1/15)
 

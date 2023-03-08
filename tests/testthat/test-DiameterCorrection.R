@@ -44,11 +44,6 @@ test_that("DiameterCorrection", {
   expect_error(DiameterCorrection(TestData, CorrectionType = "best"),
                regexp = "'arg' should be one of \"individual\", \"phylogenetic hierarchical\"")
 
-  expect_warning(DiameterCorrection(TestData, Digits = 1.2),
-                 regexp = "The 'Digits' argument must be an integer")
-
-
-
   expect_message(DiameterCorrection(POMData, CorrectionType = "individual", WhatToCorrect = "Abnormal growth", UseTaperCorrection = F),
                  regexp = "You have the 'POM' information in your dataset")
 
@@ -76,15 +71,14 @@ test_that("DiameterCorrection", {
     CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,
-    MinIndividualNbr = 1,
-    Digits = 2L)
+    MinIndividualNbr = 1)
 
   # Growth > 5 cm DBH/year & < -2 cm DBH/census
 
   # Comment and Methode if correction
-  expect_true(all(!is.na(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), DiameterCorrectionMeth_TreeData]))) # method when the DBH has been corrected
+  expect_true(all(!is.na(Rslt[Diameter_TreeDataCor != Diameter, DiameterCorrectionMeth_TreeData]))) # method when the DBH has been corrected
 
-  # expect_true(all(Rslt[Diameter_TreeDataCor != round(Diameter, digits = 2L), Comment] != "")) # comment when the DBH has been corrected
+  # expect_true(all(Rslt[Diameter_TreeDataCor != round(Diameter), Comment] != "")) # comment when the DBH has been corrected
 
 
 
