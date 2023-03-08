@@ -22,7 +22,7 @@
 #'   IdStem.
 #'
 #' @importFrom ggplot2 ggplot geom_point geom_line aes theme_minimal guides theme guide_legend
-#'   position_nudge scale_colour_manual labs vars
+#'   position_nudge scale_colour_manual labs vars ggplot_build
 #' @importFrom ggforce facet_wrap_paginate
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom grDevices dev.new
@@ -217,7 +217,13 @@ DiameterCorrectionPlot <- function(
   nPages <- ggforce::n_pages(p+
     ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = 1))
 
-  if(SeveralWindows == TRUE)
+  if(ThisIsShinyApp) {
+
+    return(list(p = p, nPages = nPages, ID = ID, n = n, i = i))
+
+    } else {
+
+      if(SeveralWindows == TRUE)
     dev.new()
 
   for(k in seq_len( nPages)) {
@@ -229,6 +235,9 @@ DiameterCorrectionPlot <- function(
     if(SeveralWindows == TRUE & i < nPages)
       dev.new()
   }
+  }
+
+
 
   # return(Pl)
 

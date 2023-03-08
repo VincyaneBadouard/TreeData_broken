@@ -10,7 +10,7 @@
 #'   - `ScientificName` (character)
 #'
 #'
-#'@param Source (character, 1 value) To correct and standardise, you can choose between:
+#' @param Source (character, 1 value) To correct and standardise, you can choose between:
 #'  - "TPL": *The Plant List* (http://www.theplantlist.org/) (faster but based
 #'           on the 2013 taxonomy)
 #'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
@@ -36,7 +36,7 @@
 #'   - `VernName_TreeDataCor` (character): completed if information available at
 #'       `IdTree` level.
 #'
-#'@details
+#' @details
 #' - No special characters (typography)
 #' - No family name in the Genus and Species columns (the suffix "aceae" is
 #'     specific to the family name.
@@ -47,10 +47,11 @@
 #' - Check **invariant botanical informations per IdTree** (1 IdTree = 1 family,
 #'     1 scientific and 1 vernacular name)
 #'
-#'@importFrom Taxonstand TPL
-#'@importFrom BIOMASS getTaxonomy
-#'@importFrom WorldFlora WFO.match
-#'@importFrom stats na.omit
+#' @importFrom Taxonstand TPL
+#' @importFrom BIOMASS getTaxonomy
+#' @importFrom WorldFlora WFO.match
+#' @importFrom stats na.omit
+#' @importFrom shiny incProgress
 #'
 #' @export
 #'

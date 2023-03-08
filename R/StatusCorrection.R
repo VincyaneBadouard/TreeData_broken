@@ -45,6 +45,7 @@
 #'
 #' @importFrom data.table data.table rbindlist
 #' @importFrom stats na.omit
+#' @importFrom shiny incProgress
 #'
 #' @export
 #'

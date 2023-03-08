@@ -123,6 +123,7 @@
 #'
 #' @importFrom utils capture.output
 #' @importFrom stats na.omit complete.cases weighted.mean
+#' @importFrom shiny incProgress
 #'
 #' @export
 #'
