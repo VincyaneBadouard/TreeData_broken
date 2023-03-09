@@ -145,7 +145,7 @@ corresponding to the default measurement height (HOM), using an allometry.
 # Illustrations
 ## Diagnostic graphs
 
- - LifeStatusCorrectionPlot() : plot life status correction result
+ - StatusCorrectionPlot() : plot life status correction result
  - DiameterCorrectionPlot() : plot diameter correction result
 
 ## Results graphs

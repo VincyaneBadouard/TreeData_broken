@@ -173,7 +173,7 @@ for(i in which(Fct_args$argValue %in% "TBD")) {
   if(!all(eval( Fct_args$Default[[i]]) %in% x$ItemID[x$Activate == T])){
     Fct_args$argValue[i] <- paste(deparse(Fct_args$Default[[i]]), collapse = "")
     Fct_args$ReactiveArgValue[i] <- FALSE
-    Fct_args$Default[i] <- paste0('c("', eval(Fct_args$Default[[i]])[1], '")')
+    if( !Fct_args$ItemID[[i]] %in% "DiameterCorrectionWhatToCorrect") Fct_args$Default[i] <- paste0('c("', eval(Fct_args$Default[[i]])[1], '")')
   }
 
 }

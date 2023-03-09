@@ -212,7 +212,7 @@ or smaller than NegativeGrowthThreshold and correct it by <code>CorrectionType</
 </ul>
 </td>
 </tr>
-","DiameterCorrectionWhatToCorrect","c(""POM change"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""POM change"", ""Abnormal growth"")",FALSE
+","DiameterCorrectionWhatToCorrect","c(""POM change"", ""Abnormal growth"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""POM change"", ""Abnormal growth"")",FALSE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>CorrectionType</code></td>
 <td>

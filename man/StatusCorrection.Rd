@@ -76,6 +76,6 @@ TestData[IdTree == "101436", LifeStatus := c(TRUE, NA, NA, FALSE, NA)]
 Rslt <- StatusCorrection(TestData[IdTree \%in\% selection])
 
 
-LifeStatusCorrectionPlot(Rslt)
+StatusCorrectionPlot(Rslt)
 
 }

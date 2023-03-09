@@ -27,17 +27,19 @@
 #' @examples
 #'
 #'\dontrun{
-#' pdf("LifeStatusCorrectionPlots.pdf", width = 25, height = 10)
-#' LifeStatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
+#' pdf("StatusCorrectionPlots.pdf", width = 25, height = 10)
+#' data(TestData)
+#' Rslt <- StatusCorrection(TestData)
+#' StatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
 #' dev.off()
 #'}
 #'
-LifeStatusCorrectionPlot <- function(
+StatusCorrectionPlot <- function(
   Data,
-  OnlyCorrected = FALSE,
+  OnlyCorrected = TRUE,
   # CorCol = "LifeStatus_TreeDataCor",
   # InitialCol = "LifeStatus",
-  # FileName = "LifeStatusCorrectionPlots.pdf"
+  # FileName = "StatusCorrectionPlots.pdf"
   SeveralWindows = TRUE
 ){
 

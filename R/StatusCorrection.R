@@ -66,7 +66,7 @@
 #' Rslt <- StatusCorrection(TestData[IdTree %in% selection])
 #'
 #'
-#' LifeStatusCorrectionPlot(Rslt)
+#' StatusCorrectionPlot(Rslt)
 #'
 StatusCorrection <- function(
     Data,
