@@ -68,7 +68,6 @@
 <span>  DBHRange <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  MinIndividualNbr <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  OtherCrit <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  Digits <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  DBHCorForDeadTrees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coef <span class="op">=</span> <span class="fl">0.9</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -196,11 +195,6 @@ have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
 (character)</p></dd>
 
 
-<dt>Digits</dt>
-<dd><p>Number of decimal places to be used in the <code>DBHCor</code> column
-(Default: 1L) (integer)</p></dd>
-
-
 <dt>DBHCorForDeadTrees</dt>
 <dd><p>(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
@@ -248,7 +242,7 @@ framing values.</p>
 <span class="r-in"><span> <span class="va">TestData</span>,</span></span>
 <span class="r-in"><span>  WhatToCorrect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POM change"</span>, <span class="st">"Abnormal growth"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    CorrectionType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"phylo"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    MinIndividualNbr <span class="op">=</span> <span class="fl">1</span>, Digits <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    MinIndividualNbr <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="DiameterCorrectionPlot.html">DiameterCorrectionPlot</a></span><span class="op">(</span><span class="va">Rslt</span>, OnlyCorrected <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
