@@ -375,7 +375,7 @@ if(ThisIsShinyApp) incProgress(1/15)
 
     NewRows$LifeStatus_TreeDataCor <- NewStatusHistory[idx_new_rows, value][m]
 
-    NewRows$StatusCorrectionMeth_TreeData <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
+    NewRows$StatusCorrectionMeth_TreeData <- NewComments[idx_new_rows, value][m]
 
     NewRows$Comment_TreeData <- "Missed tree"
 
