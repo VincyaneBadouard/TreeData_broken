@@ -43,9 +43,6 @@
     <loc>/reference/GenerateComment.html</loc>
   </url>
   <url>
-    <loc>/reference/LifeStatusCorrectionPlot.html</loc>
-  </url>
-  <url>
     <loc>/reference/ParacouProfile.html</loc>
   </url>
   <url>
@@ -71,6 +68,9 @@
   </url>
   <url>
     <loc>/reference/StatusCorrection.html</loc>
+  </url>
+  <url>
+    <loc>/reference/StatusCorrectionPlot.html</loc>
   </url>
   <url>
     <loc>/reference/TaperCorrection.html</loc>

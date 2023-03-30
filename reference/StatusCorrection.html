@@ -63,8 +63,9 @@ Inspired by the code of Nino Page package (ForestData::correct_alive() and
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">StatusCorrection</span><span class="op">(</span></span>
 <span>  <span class="va">Data</span>,</span>
 <span>  DeathConfirmation <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  UseSize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  UseSize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  AddRowsForForgottenCensuses <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span>,</span>
 <span>  RemoveRBeforeAlive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  RemoveRAfterDeath <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -92,6 +93,16 @@ tree (logical) (Default = FALSE)</p></dd>
 
 <dt>AddRowsForForgottenCensuses</dt>
 <dd><p>TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).</p></dd>
+
+
+<dt>KeepMeas</dt>
+<dd><p>In case of <strong>multiple diameter measurements</strong> in the same
+census year:
+Possible values: "MaxHOM", "MaxDate" (character).</p><ul><li><p>"MaxHOM": apply the correction to the measurement taken at the
+<strong>highest POM</strong></p></li>
+<li><p>"MaxDate": apply the correction to the <strong>most recent measurement</strong> (same
+year but more recent date)</p></li>
+</ul></dd>
 
 
 <dt>RemoveRBeforeAlive</dt>
@@ -626,23 +637,7 @@ if DeathConfirmation =&lt; unseens -&gt; Dead</p></li>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>We added rows for missing trees and imputed average census Date</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="LifeStatusCorrectionPlot.html">LifeStatusCorrectionPlot</a></span><span class="op">(</span><span class="va">Rslt</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
+<span class="r-in"><span><span class="fu"><a href="StatusCorrectionPlot.html">StatusCorrectionPlot</a></span><span class="op">(</span><span class="va">Rslt</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
