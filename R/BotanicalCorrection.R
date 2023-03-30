@@ -1,55 +1,60 @@
+# Auxiliary functions:
+
+# Function to ensure that the first letter of any string is uppercase
+toUpperFirst <- function(txt) {
+  short <- which(nchar(txt) < 2)
+  long <- which(nchar(txt) > 1)
+  
+  txt[long] <- paste0(toupper(substring(txt[long], 1, 1)),
+                      substring(txt[long], 2))
+  
+  txt[short] <- toupper(txt[short])
+  
+  txt
+}
+
+# Function to count the number of uppercases within character strings
+countUpperCase <- function(txt) {
+  matches <- gregexpr("[A-Z]", txt)
+  count <- unlist(lapply(matches, function(match) {
+    if(is.na(match[1]))
+    {
+      return(0)
+    } else {
+      if (match[1] == -1) {
+        return(0)
+      } else {
+        return(length(match))
+      }
+    }
+  }))
+  return(count)
+}
+
+
 #' Botanical Correction
 #'
-#' @param Data Dataset (data.frame or data.table)
-#'   The dataset must contain the columns:
-#'   - `IdTree` (character)
-#'   - `Family` (character)
-#'   - `Genus` (character)
-#'   - `Species` (character)
-#'   - `VernName` (character)
-#'   - `ScientificName` (character)
+#' @param Data Dataset (data.frame or data.table); it must contain Site and IdTree
 #'
-#'
-#'@param Source (character, 1 value) To correct and standardise, you can choose between:
-#'  - "TPL": *The Plant List* (http://www.theplantlist.org/) (faster but based
-#'           on the 2013 taxonomy)
-#'  - "WFO": *World Flora Online* (http://www.worldfloraonline.org/) (long time
-#'           but based on the 2022 taxonomy)
-#'
-#' @param WFOData If `Source` = "WFO".
-#'   Data setwith the static copy of the *World Flora Online* (WFO) Taxonomic Backbone
-#'   data (from http://www.worldfloraonline.org/downloadData).
-#'   data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
-#'   Note that the classification.csv file downloaded from the website it too large to be uploaded
-#'   in the App, so it needs to be opened in R first, trimmed to the set of species
-#'   relevant to you, and saved to an .rds file using function saveRDS().
-#'
-#'
-#' @return Fill the *Comment_TreeData* column with error type informations and add columns:
-#'   - `Family_TreeDataCor` (character): corrected Family name
-#'   - `FamilyCorSource` (character): source of the Family correction
-#'   - `Genus_TreeDataCor` (character): corrected Genus name
-#'   - `Species_TreeDataCor` (character): corrected Species name
-#'   - `BotanicalCorrectionSource` (character): source of the Genus and Species
-#'       correction
-#'   - `ScientificName_TreeDataCor` (character): corrected Scientific name
-#'   - `VernName_TreeDataCor` (character): completed if information available at
-#'       `IdTree` level.
+#' @return A list with a complete log of the botanical corrections and Data with new columns:
+#'   - `Accepted_family_returned_by_TNRS` (character): corrected family name
+#'   - `Accepted_genus_returned_by_TNRS` (character): corrected genus name
+#'   - `Accepted_species_returned_by_TNRS` (character): corrected species name
+#'   - `Accepted_name_returned_by_TNRS` (character): corrected name (at any taxonomic level)
+#'   - `Annotations_returned_by_TNRS` (character): cf., aff., etc.
+#'   - `Unmatched_terms_returned_by_TNRS` (character): unmatched terms, possibly needed to make morphospecies
+
 #'
 #'@details
+#' - The function uses TNRS package provided by BIEN, https://bien.nceas.ucsb.edu/bien/tools/tnrs/
 #' - No special characters (typography)
-#' - No family name in the Genus and Species columns (the suffix "aceae" is
-#'     specific to the family name.
-#' - Correct spelling of botanical names (*Taxonstand or WorldFlora*)
-#' - Family & Scientific names match (*BIOMASS::getTaxonomy or WorldFlora*)
-#' - Update the scientific botanical names with the current phylogenetic
-#'     classification
-#' - Check **invariant botanical informations per IdTree** (1 IdTree = 1 family,
-#'     1 scientific and 1 vernacular name)
+#' - The suffix "aceae" is restricted to families, and words ending with "aceae" are deleted anywhere else
+#' - Correct spelling of botanical names
+#' - Update the families according to APG
+#' - The log contains a flag if there is more than one name for one Site x IdTree combination
+#' - The log contains all details returned by TNRS (authors, etc.). Data just keeps the basic corrected names.
 #'
-#'@importFrom Taxonstand TPL
-#'@importFrom BIOMASS getTaxonomy
-#'@importFrom WorldFlora WFO.match
+
 #'@importFrom stats na.omit
 #'
 #' @export
@@ -58,383 +63,418 @@
 #'\dontrun{
 #' library(data.table)
 #' data(TestData)
+#' ...
 #'
-#'# With The Plant List:
-#' Rslt <- BotanicalCorrection(TestData, Source = "TPL")
 #'
-#' ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
-#'                 list(ScientificName, ScientificNameCor,
-#'                 Family, FamilyCor, FamilyCorSource,
-#'                 Genus, GenusCor,
-#'                 Species, SpeciesCor, Subspecies,
-#'                 BotanicalCorrectionSource, Comment)
-#'                 ])
 #'
-#' FamCor <- unique(Rslt[FamilyCor != Family,
-#'                 list(ScientificName, ScientificNameCor,
-#'                 Family, FamilyCor, FamilyCorSource,
-#'                 Genus, GenusCor,
-#'                 Species, SpeciesCor, Subspecies,
-#'                 BotanicalCorrectionSource, Comment)
-#'                 ])
-#'
-#'# With World Flora Online:
-#' WFO_Backbone <- file.choose()
-#' load(WFO_Backbone)
-#'
-#' RsltWFO <- BotanicalCorrection(TestData, Source = "WFO", WFOData = WFO_Backbone)
-#'
-#' ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
-#'                 list(ScientificName, ScientificNameCor,
-#'                 Family, FamilyCor,
-#'                 Genus, GenusCor,
-#'                 Species, SpeciesCor, Subspecies,
-#'                 BotanicalCorrectionSource, Comment)
-#'                 ])
-#'
-#' FamCor <- unique(RsltWFO[FamilyCor != Family,
-#'                 list(ScientificName, ScientificNameCor,
-#'                 Family, FamilyCor,
-#'                 Genus, GenusCor,
-#'                 Species, SpeciesCor, Subspecies,
-#'                 BotanicalCorrectionSource, Comment)
-#'                 ])
-#'}
-#'
-BotanicalCorrection <- function(
-  Data,
-  Source = c("TPL", "WFO"),
-  WFOData = NULL
-){
+BotanicalCorrection <- function(Data) {
 
   #### Arguments check ####
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
 
-  # Source
-  Source <- match.arg(Source)
-
-  # WFOData
-  if(Source == "WFO" & is.null(WFOData))
-    stop("You must provide the 'WFOData' argument,  a database as a static copy of the
-         World Flora Online (WFO) Taxonomic Backbone, when you choose Source = 'WFO'.")
-
-
   #### Function ####
 
   setDT(Data) # data.frame to data.table
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
-
   Data[, IdTree := as.character(IdTree)]
 
+  # Make sure that we have the columns that we need  ---------------------------------------------------------------------
+  # (Mostly to avoid "if" statements and ramifications of the cases)
   if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
+  if(!"Family" %in% names(Data)) Data[, Family := NA]
+  if(!"ScientificName" %in% names(Data)) Data[, ScientificName := NA]
+  if(!"Genus" %in% names(Data)) Data[, Genus := NA]
+  if(!"Species" %in% names(Data)) Data[, Species := NA]
+  if(!"Subspecies" %in% names(Data)) Data[, Subspecies := NA]
+  if(!"Variety" %in% names(Data)) Data[, Variety := NA]
+  
+  # Not processed: "VernName", "Voucher", "IdLevel", "Authority"
 
-  # Missing value ---------------------------------------------------------------------------------------------------------
-  # Family, ScientificName/Genus, species, VernName
+  # Exploration of data sources and reasoning (March 2023) ---------------------------------------------------------------------------------------------------------
+  if(FALSE) # *** I do not know where to keep this
+  {
+    # TPL is static since 2013, it has been substituted by WFO.
+    # Taxonstand package uses TPL and is not maintained. Do not use.
+    # Anything "SOAP" has been deprecated or is not functional anymore.
+    # Tropicos is the source of APG classification, APG4 as of today.
+    # taxize package looks into many sources to match the names, it takes 10x more time than alternatives.
+    # WFO package requires local installation of WFO -- it is an option but relatively slow. It requires handling authors etc. in separate steps.
+    # how to download:
+    # WFO.download(save.dir = path.wfo)
+    # unzip(paste0(path.wfo, "WFO_Backbone.zip"), exdir = path.wfo)
+    # WFO.remember(WFO.file = paste0(path.wfo, "classification.csv"))
+    
+    # The taxize package has two solvers, but one of them is defunct:
+    # ?taxize::tnrs Phylotastic Taxonomic Name Resolution Service. Defunct - service was down far too much to be reliable
+    # The other is faster than TNRS package, but returns all matches from many sources,
+    # which is a mixture of latin binomials with and without authors, and does not
+    # give any idea of which one is a "good" name or not. TNRS is slower but returns
+    # what we need: Family, Genus, Species etc. separated, authors and annotations separated,
+    # and a explicit accepted name for the taxon.
+    system.time(t1 <- taxize::gnr_resolve(TestData$ScientificName[1:10]))
+    system.time(t2 <- TNRS::TNRS(TestData$ScientificName[1:10]))
+    
+    # If seems easier to work with TNRS than with taxize, because it handles messy strings better:
+    taxize::gnr_resolve("cf. Inga edulis") # fails
+    TNRS::TNRS("cf. Inga edulis")$Accepted_name # works
+    
+    # All decisions about string manipulation and flow are based on the behavior
+    # of the TNRS package. It is not trivial to switch to another name solver.
+    
+    # Because of TNRS behavior, it seems feasible to concatenate things from different
+    # columns and then pass to TNRS main function. We do not have to go through the entire
+    # range of possibilities, in terms of string matches, finding annotations, etc.
+    # However, we cannot concatenate stuff blindly.
+    
+    # Before concatenating, we need to solve redundancies in "Species" column.
+    TNRS::TNRS("Inga edulis edulis")$Name_matched # this returns "Inga edulis var. edulis"
+    TNRS::TNRS("Inga edulis Inga edulis")$Name_matched # this returns "Inga edulis var. edulis"
+    
+    # Before concatenating, we also need to solve redundancies in "Genus" column.
+    # Redundancy in genus does not seem to be a problem in general...
+    TNRS::TNRS("Inga edulis Inga")$Name_matched # returns Inga edulis
+    TNRS::TNRS("Inga edulis var. edulis Inga")$Name_matched # returns Inga edulis var. edulis
+    TNRS::TNRS("Inga edulis subsp. edulis Inga")$Name_matched # returns Inga edulis var. edulis
+    TNRS::TNRS("Inga sp.1 Inga")$Name_matched # returns Inga
+    TNRS::TNRS("Inga Inga")$Name_matched # returns Inga
+    
+    # ... but there are a few cases of invalid names.
+    # Plants should not have specific epithets mimicking the genus, but
+    # sometimes they have, and those names could appear in the databases.
+    # See 23.4 in https://www.bgbm.org/iapt/nomenclature/code/SaintLouis/0027Ch3Sec4a023.htm
+    TNRS::TNRS("Inga Inga")$Accepted_name # returns accepted name Inga
+    TNRS::TNRS("Linaria linaria")$Accepted_name # returns accepted name Linaria vulgaris
+    TNRS::TNRS("Linaria Linaria")$Accepted_name # upper case changes its behavior --> general advice
+    
+    # If the content of "Family" column is not a "aceae" word,
+    # Is it safe to concatenate with the ScientificName column?
+    # NOT safe in general; do only if the word is absent.
+    TNRS::TNRS("Linaria Linaria linaria")$Name_matched # not safe
+    TNRS::TNRS("Inga Inga edulis")$Name_matched # not safe
+    
+    # *** Possible bug: short codes for families, that are NOT aceae words.
+    # We need to identify them and get rid of them entirely.
+    # This might be possible with the Family column, but not
+    # so easy if the short codes are integrated into ScientificName.
+    TNRS::TNRS("FAB Inga edulis")$Name_matched # returns "Faba", a different genus
+    TNRS::TNRS("FABAC. Inga edulis")$Name_matched # returns "Faba", a different genus
+    TNRS::TNRS("AREC. Euterpe precatoria")$Name_matched # returns "Areca", a different genus
+    
+    # What if ScientificName contains just the specific epithet?
+    # The order of concatenation matters!
+    # It is KEY that the user provides the specific epithet only in the "Species" column
+    TNRS::TNRS("edulis Inga")$Name_matched # returns "Elelis"
+    
+    # Genus initials: this is an issue that could take us to
+    # the reverse "species-genus" problem and/or other problems:
+    TNRS::TNRS("Inga I. edulis")$Accepted_name # losing the species is better than
+    TNRS::TNRS("I. edulis")$Accepted_name # losing everything
+    TNRS::TNRS("Inga I. edulis")$Accepted_name # concatenating Genus first won't solve the problem
+    # It seems necessary to anticipate these cases and complete ScientificName from Genus
+    
+    # We do not need to solve redundancies in subspecies or variety, because concatenation 
+    # of "ScientificName" with "Subspecies" and "Variety" columns seems safe.
+    # Furthermore, many subspecies and varieties are the same words as the specific epithet,
+    # so if we remove redundancias we will lose part of the information.
+    TNRS::TNRS("Inga edulis var. edulis var. edulis")$Name_matched # returns Inga edulis var. edulis
+    TNRS::TNRS("Inga edulis var. edulis subsp. edulis")$Name_matched # returns Inga edulis var. edulis
+    
+    # Subspecies and Variety need to have just the name of the subspecies or variety,
+    # without the latin binomial for the species. Otherwise it will fail.
+    TNRS::TNRS("Inga edulis var. Inga edulis var. edulis")$Name_matched # this will not return the variety
+    
+    # It is safe to concatenate free text that characterizes the morfospecies,
+    # it will just return the accepted name.
+    TNRS::TNRS("Inga edulis var. extremely hairy ecotype")$Name_matched # returns "Inga edulis"
+    TNRS::TNRS("Inga edulis subsp. extremely hairy ecotype")$Name_matched # returns "Inga edulis"
+    TNRS::TNRS("Inga edulis var. Inga edulis extremely hairy ecotype")$Name_matched # returns "Inga edulis"
+    TNRS::TNRS("Inga edulis subsp. Inga edulis extremely hairy ecotype")$Name_matched # returns "Inga edulis"
+    TNRS::TNRS("Inga var. extremely hairy ecotype")$Name_matched # returns "Inga"
+    TNRS::TNRS("Inga subsp. extremely hairy ecotype")$Name_matched # returns "Inga"
+    TNRS::TNRS("Inga indet var. extremely hairy ecotype")$Name_matched # returns "Inga"
+    TNRS::TNRS("Inga indet subsp. extremely hairy ecotype")$Name_matched # returns "Inga"
+    TNRS::TNRS("cf. Inga var. extremely hairy ecotype")$Name_matched # returns "Inga"
+    TNRS::TNRS("cf. Inga subsp. extremely hairy ecotype")$Name_matched # returns "Inga"
+    
+    # Messy "indet."s: a reason why we need to add spaces after points to avoid problems.
+    TNRS::TNRS("Indet.Sapindaceae Indet.")$Accepted_name  # no spaces in the original TestData: fails
+    TNRS::TNRS("Indet. Sapindaceae Indet.")$Accepted_name # with space: works
+    TNRS::TNRS("Poaceae Indet. Indet.")$Accepted_name # this will work just fine
+    TNRS::TNRS("Poaceae Indet. Indet. Indet. Indet.")$Accepted_name # this works
+    TNRS::TNRS("cf. Poaceae Indet. sp. = GAT1234")$Accepted_name # this works 
+    
+    # Passing vernacular names to TNRS will not work. This is not considered in the code.
+    TNRS::TNRS("santi koko")$Accepted_name
+    TNRS::TNRS("wata tiki")$Accepted_name
+    TNRS::TNRS("tossopassa montagne")$Accepted_name
+    TNRS::TNRS("wapa")$Accepted_name
+    
+    # Some cases identifies by Vincyane as problematic with WFO are not problems with TNRS:
+    # For the moment, there is no need of a "special taxa" internal library.
+    TNRS::TNRS(c("Tetragastris panamensis",
+                 "Protium picramnioides",
+                 "Tetragastris stevensonii"))$Accepted_name # works fine, returns "Protium stevensonii"
+    
+    TNRS::TNRS("Tovomita")$Accepted_family # correctly placed in Clusiaceae
+    TNRS::TNRS("Votomita")$Accepted_family # correctly placed in Melastomataceae. Memecylaceae was a split for Mouriri-like Melastomataceae
 
-  Vars <- c("Family", "ScientificName", "Genus", "Species", "VernName")
+    # Other things to have in mind:
+    TNRS::TNRS(NULL) # gives error
+    TNRS::TNRS(NA) # gives error
+    TNRS::TNRS("")$Accepted_name # will work
+  }
+  
+  # General string manipulations (order matters)  ---------------------------------------------------------------------------------------------------------
+  # space after point
+  # _ to space
+  # remove double spaces
+  # strings to NA: "NA", " ", "", "NULL", "unknown", "none", "?"
+  # make sure first letter is uppercase in: Family, ScientificName, Genus
+  # remove special characters for Genus and Family (in Species we want to keep them)
+  
+  Vars <- c("Family", "ScientificName", "Genus", "Species", "Subspecies", "Variety")
+  
+  M <- as.matrix(Data[, ..Vars]) # we can use vectorized code on several columns
+  original.name.ids <- paste(M[,"Family"],
+                             M[,"ScientificName"],
+                             M[,"Genus"],
+                             M[,"Species"],
+                             M[,"Subspecies"],
+                             M[,"Variety"])
+  
+  rownames(M) <- original.name.ids
+  M <- unique(M) # smaller object
 
-  for (v in 1:length(Vars)) {
+  # for development ***
+  if(FALSE)
+  {
+    M <- head(M, 5)
+    M[2, 1] <- "a"
+    M <- tolower(M)
+    M[1, 1] <- "NA"
+  }
+  
+  M <- gsub(".", ". ", M, fixed = TRUE)
+  M <- gsub("_", " ", M, fixed = TRUE)
+  M <- matrix(stringr::str_squish(M), nrow = nrow(M), dimnames = dimnames(M))
+  M[M %in% c("NA", "N/A", "na", " ", "", "NULL", "unknown", "none", "?", "??", "???", "...")] <- NA
+  M[,c("Family", "ScientificName", "Genus")] <- toUpperFirst(M[,c("Family", "ScientificName", "Genus")])
+  M[,"Family"] <- gsub("[[:punct:]]", "", M[,"Family"]) # !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
+  M[,"Genus"] <- gsub("[[:punct:]]", "", M[,"Genus"]) # !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
+  
+  # Handle "Family" column and get the best guess of the family ----
+  # One thing that could generate many problems is using short codes instead
+  # of full family names, e.g. FAB or FABAC. instead of Fabaceae, etc.
+  # This is relatively common practice and needs to be checked before moving forward.
+  # TNRS is robust to the lack of families, but we do not want to remove content
+  # from Family column entirely because it might be the only taxonomic information.
+  # (Presence of text inside ScientificName is not enough proof that we know more than family,
+  # as we could have things like Family = "Fabaceae" + ScientificName = "Indet. sp. 1";
+  # we cannot expect in general that IdLevel column will be populated either).
+  
+  # Procedure:
+  # first, try to match with the complete names
+  # second, look for "aceae" words everywhere: keep elsewhere and remove from columns
+  # lastly, remove anything remaining in Family, and use the space to store "aceae" words
+  
+  # Note that the behavior before (Vincyane's code) was to swap
+  # and include into the Genus column any word without "aceae" in
+  # the Family column. In the current version, it is KEY that the
+  # user includes the genus into the ScientificName or Genus columns.
+  # Redundancy by including genus into Family column won't affect.
+  
+  # (1) try to guess the family based on short codes
+  txt <- M[,"Family"]
+  #txt <- c("FAB.", "MELAS", "AST", "CLU", "PIP.") # for development ***
+  
+  cleantxt <- gsub(".", "", txt, fixed = TRUE)
+  cleantxt <- gsub(" ", "", cleantxt, fixed = TRUE)
+  
+  fams <- taxize::apg_families
+  fams <- unique(c(fams$family, fams$synonym, fams$original, fams$accepted_name))
+  fams <- unique(unlist(strsplit(fams, "=", fixed = TRUE)))
+  fams <- gsub(" ", "", fams, fixed = TRUE)
+  fams <- gsub("?", "", fams, fixed = TRUE)
+  fams <- unique(fams[grep("aceae", fams)])
+  
+  try.to.complete <- which(!grepl("aceae", cleantxt))
+  versions <- na.omit(unique(nchar(cleantxt[try.to.complete])))
+  guessed.family <- cleantxt
+  for(NC in versions)
+  {
+    w <- try.to.complete[which(nchar(cleantxt[try.to.complete]) == NC)]
+    short <- substr(fams, 1, NC)
+    names(short) <- fams
+    unequivocal <- names(which(table(short) == 1))
+    names(unequivocal) <- names(short)[match(unequivocal, short)]
+    guessed.family[w] <- names(unequivocal)[match(tolower(cleantxt[w]), tolower(unequivocal))]
+  }
+  
+  M[try.to.complete, "Family"] <- guessed.family[try.to.complete]
 
-    if(Vars[v] %in% names(Data)){ # If the column exists
-
-      Data[is.na(get(Vars[v])), Comment_TreeData := GenerateComment(Comment_TreeData, paste0("Missing value in ", Vars[v]))] # Data <- GenerateComment(Data, condition = is.na(Data[,get(Vars[v])]), comment = paste0("Missing value in ", Vars[v]))
-    }
+  # (2) find "aceae" words anywhere and keep them as the
+  # most reliable source of information regarding family.
+  # Remove all "aceae" words from their original locations.
+  # (If multiple matches, this code does not cross-check; it just picks one)
+  ends_in <- function(x, pattern = "aceae") substr(x, nchar(x) - nchar(pattern) + 1, nchar(x)) == pattern
+  best.guess.family <- rep(NA, nrow(M))
+  words <- strsplit(M, split = " ")
+  aceae <- matrix(sapply(words, function(x) x[ends_in(x, "aceae")][1]), nrow = nrow(M)) # [1] picks one
+  W <- which(!is.na(aceae), arr.ind = TRUE)
+  W <- W[!duplicated(W[,"row"]),] # this also picks one
+  best.guess.family[W[,"row"]] <- aceae[W]
+  
+  delete_aceae <- function(txt) {
+    words <- strsplit(txt, split = " ")
+    sapply(words, function(x) {
+      x <- x[!is.na(x)]
+      paste(x[!ends_in(x, "aceae")], collapse = " ")
+    })
+  }
+  
+  M[,"Family"] <- delete_aceae(M[,"Family"]) # will be deleted later anyway
+  M[,"ScientificName"] <- delete_aceae(M[,"ScientificName"])
+  M[,"Genus"] <- delete_aceae(M[,"Genus"])
+  M[,"Species"] <- delete_aceae(M[,"Species"])
+  M[,"Subspecies"] <- delete_aceae(M[,"Subspecies"])
+  M[,"Variety"] <- delete_aceae(M[,"Variety"])
+  
+  # (3) use the "aceae" words found in previous step to
+  # populate the Family column, and remove anything else
+  # that remains in there.
+  M[,"Family"] <- ""
+  M[,"Family"] <- best.guess.family
+  M[is.na(M[,"Family"]),"Family"] <- ""
+  M[,c("Family", "ScientificName", "Genus")] <- toUpperFirst(M[,c("Family", "ScientificName", "Genus")])
+  
+  # Solve initials ----
+  # E.g. {Family = "Fabaceae", ScientificName = "I. edulis", Genus = "Inga", ...}
+  # This problem is a problem because of the order of concatenation.
+  # Two possible forms: "A. " or "A " at the first letter. No genus has just 1 letter.
+  # Single letters might have some meaning, like morfospecies:
+  # {ScientificName = "A Inga", Genus = "Inga} and {ScientificName = "B Inga", Genus = "Inga}
+  # but appending them to the end of ScientificName will mess with the subspecies and varieties:
+  #TNRS::TNRS("Inga edulis X.")$Accepted_name # this will work
+  #TNRS::TNRS("Inga edulis X. var. edulis")$Accepted_name # but this will fail
+  
+  # I get rid of initials entirely -- this might be source of some issues later.
+  problems2 <- which(substr(M[,"ScientificName"], 1, 2) %in% paste0(LETTERS, " "))
+  problems3 <- which(substr(M[,"ScientificName"], 1, 3) %in% paste0(LETTERS, ". "))
+  M[problems2,"ScientificName"] <- paste(M[problems2,"Genus"], substr(M[problems2,"ScientificName"], 3, nchar(M[problems2,"ScientificName"])))
+  M[problems3,"ScientificName"] <- paste(M[problems3,"Genus"], substr(M[problems3,"ScientificName"], 4, nchar(M[problems3,"ScientificName"])))
+  
+  # Besides, remove initials if they are present in the "Species" column:
+  problems2 <- which(substr(M[,"Species"], 1, 2) %in% paste0(LETTERS, " "))
+  problems3 <- which(substr(M[,"Species"], 1, 3) %in% paste0(LETTERS, ". "))
+  M[problems2,"Species"] <- substr(M[problems2,"Species"], 3, nchar(M[problems2,"Species"]))
+  M[problems3,"Species"] <- substr(M[problems3,"Species"], 4, nchar(M[problems3,"Species"]))
+  
+  # Solve redundancies between ScientificName and Species/Genus columns ----
+  # A concatenation can fail if we incorporate the specific epithet twice,
+  # as TNRS will try to find subspecies and varieties. It can also fail in
+  # rare instances of invalid names where the specific epithet is the same
+  # word as in the genus. Solve redundancies in both cases is safer.
+  # https://stackoverflow.com/questions/19424709/r-gsub-pattern-vector-and-replacement-vector
+  M <- matrix(stringr::str_squish(M), nrow = nrow(M), dimnames = dimnames(M))
+  to.remove <- gsub(" ", "|", M[,"ScientificName"]) # any individual word
+  replacements <- rep("", length(to.remove)) 
+  names(replacements) <- to.remove # this is needed for the code to run in a vectorized way
+  M[,"Species"] <- stringr::str_replace_all(M[,"Species"], replacements)
+  M[,"Genus"] <- stringr::str_replace_all(M[,"Genus"], replacements)
+  
+  # Concatenate a single string to pass to TNRS ----
+  M <- matrix(stringr::str_squish(M), nrow = nrow(M), dimnames = dimnames(M))
+  M[is.na(M)] <- ""
+  s <- ifelse(M[,"Subspecies"] == "", "", paste("subsp.", M[,"Subspecies"]))
+  v <- ifelse(M[,"Variety"] == "", "", paste("var.", M[,"Variety"]))
+  pass.this <- paste(M[,"Family"], M[,"ScientificName"], M[,"Genus"], M[,"Species"], s, v)
+  pass.this <- stringr::str_squish(pass.this)
+  
+  # Call TNRS ---
+  # Use multiple sources for names, but the classification of Tropicos = APG.
+  pass.this.unique <- unique(pass.this)
+  tnrs <- TNRS::TNRS(pass.this.unique,
+                     sources = c("tropicos", "usda", "wfo", "wcvp"),
+                     classification = "tropicos")
+  
+  leftovers <- pass.this.unique[!pass.this.unique %in% tnrs$Name_submitted] # I do not know why, but sometimes we have this!
+  if(length(leftovers) > 0)
+  {
+    tnrs2 <- TNRS::TNRS(leftovers,
+                       sources = c("tropicos", "usda", "wfo", "wcvp"),
+                       classification = "tropicos")
+    tnrs <- rbind(tnrs, tnrs2)
+  }
+  
+  # Add Accepted_genus to the TNRS output, for easier management later
+  g <- sapply(strsplit(tnrs$Accepted_species, split = " "), function(x) x[1])
+  g[is.na(g)] <- "" # consistency with TNRS
+  tnrs$Accepted_genus <- g
+  
+  # Log of botanical corrections + merge back into main dataset ----
+  # Put together M + authority, ... + output of TNRS
+  # Outside the function we may need to substitute with the user's column names
+  where.in.tnrs <- match(pass.this, tnrs$Name_submitted)
+  expanded.tnrs <- tnrs[where.in.tnrs,]
+  colnames(expanded.tnrs) <- paste0(colnames(expanded.tnrs), "_returned_by_TNRS")
+  
+  colnames(M) <- paste0(colnames(M), "_processed_by_app")
+  M <- data.frame(M, expanded.tnrs)
+  where.in.M <- match(original.name.ids, rownames(M))
+  M <- M[where.in.M,] # same number of rows as Data
+  
+  extra.vars1 <- c("IdStem", "IdTree", "Site", "Voucher", "IdLevel", "Authority", "VernName")
+  extra.vars2 <- c("IdLevel", "Authority", "VernName")
+  V <- c(extra.vars1, Vars, extra.vars2)
+  M0 <- as.matrix(Data[, ..V]) # original
+  
+  LOG <- data.frame(M0, M) # a complete record of the original names, what we did to them, and what TNRS thinks
+  #LOG[which(LOG$Accepted_name_returned_by_TNRS == ""), ] # one of the things the user will have to look at
+  
+  # We do not need to keep everything, just the stuff required for taxonomic homogeneization
+  # Note: Unmatched_terms are needed to differentiate morphospecies.
+  keep <- c("Accepted_family", "Accepted_genus", "Accepted_species", "Accepted_name",  "Annotations", "Unmatched_terms") 
+  keep <- paste0(keep, "_returned_by_TNRS")
+  Data <- c(Data, LOG[,keep]) # Merge back into the dataset
+  setDT(Data)
+  
+  # Fill information at the stem level if missing ----
+  # The individual-level info is at IdTree within Site
+  # The code below does this just for the corrected variables,
+  # those that we keep from TNRS output. But we could do it
+  # for the original columns as well. The things with that is
+  # that incongruences may or may not mean anything.
+  for(k in keep)
+  {
+    # Go from "" to NA to be able to use the gap-filling function of zoo
+    Data[, (k) := replace(get(k), get(k) == "", NA)]
+    
+    # Fill the gaps in the target column by group (Site and IdTree)
+    Data[, (k) := zoo::na.locf(get(k), na.rm = FALSE, fromLast = FALSE), by = .(Site, IdTree)]
+    Data[, (k) := zoo::na.locf(get(k), na.rm = FALSE, fromLast = TRUE), by = .(Site, IdTree)]
   }
 
-  # Data[Comment != ""] # to check
-
-
-    # Corrected columns initialisation --------------------------------------------------------------------------------------
-    Data[, GenusCor := Genus]
-    Data[, SpeciesCor := Species]
-
-    # No family name in the genus and species columns -----------------------------------------------------------------------
-
-    ## Columns split if there is multiple information -----------------------------------------------------------------------
-    # For Genus: split at punctuation then at upper case, and Create GenspFamily
-    Data[, c("GenusCor", "GenspFamily") := tstrsplit(Genus, '[[:punct:]]')]
-    Data[, c("GenusCor", "GenspFamily") := tstrsplit(Genus, "(?<=.)(?=[[:upper:]])", perl = TRUE)]
-
-    ## Detection of the suffix "aceae" in the genus column (it is specific to the family name)
-    # if there is -aceae in  GenusCor and not in GenspFamily, swap values between GenusCor and GenspFamily
-    Data[grep("aceae", GenusCor),  c("GenusCor", "GenspFamily")] <- Data[grep("aceae", GenusCor), c("GenspFamily", "GenusCor")]
-
-    # For species: split at space or underscore, and create Subspecies
-    SpeciesInfo <- Data[, tstrsplit(Species, '\\[[:blank:]] |\\_')]
-
-    Data[, SpeciesCor := SpeciesInfo[,1]]
-
-    # if there is information on subspecies
-    if (ncol(SpeciesInfo) > 1) {
-      # paste subspecies info (all columns after the species name), removing NAs
-      SpeciesInfo[!is.na(V2),
-                  Subspecies := gsub(" NA", "", do.call(paste, .SD)),
-                  .SDcols = colnames(SpeciesInfo)[-1]]
-      Data[, Subspecies := SpeciesInfo$Subspecies]
-    }
-
-    rm(SpeciesInfo)
-
-    # Detection of the suffix "aceae" in the species column (it is specific to the family name)
-    Data[grep("aceae", SpeciesCor), `:=`(GenspFamily = ifelse(grep("aceae", SpeciesCor), SpeciesCor, GenspFamily),
-                                         SpeciesCor = NA_character_)]
-
-    Data[!grep("aceae", GenspFamily), GenspFamily := NA_character_]
-
-    # Remove special characters only for Genus (because in Species we want to keep them): ---------------------------------
-    # remove : !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
-    Data[, GenusCor := gsub("[[:punct:]]", "", Data$GenusCor)]
-
-    Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
-
-
-
-
-  # Comment :
-  Data[grepl("aceae", Genus) | grepl("aceae", Species), Comment_TreeData := GenerateComment(Comment_TreeData, "Names ending in 'aceae' cannot be genus or species names")] #  Data <- GenerateComment(Data, condition = grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), comment = "Names ending in 'aceae' cannot be genus or species names")
-
-  Data[grepl('[[:punct:]]', Genus), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Genus'")] # Data <- GenerateComment(Data, condition = grepl('[[:punct:]]', Data$Genus), # TRUE if there are any special character comment = "Special characters in the 'Genus'")
-
-  Data[grepl('[[:punct:]]', Family), Comment_TreeData := GenerateComment(Comment_TreeData, "Special characters in the 'Family'")]
-
-
-
-    if(Source == "TPL"){
-
-      # Correct spelling error & standardise botanical names ----------------------------------------------------------------
-
-      # TPL correction with Taxonstand package
-      TPLCor <- suppressWarnings(Taxonstand::TPL(splist = unique(Data$ScientificNameCor),
-                                                 corr = TRUE, diffchar = 20, max.distance = 1)
-      ) # diffchar: maximum difference of characters nbr between input and output
-      # with Genus and species marche pas bien pcq décale genre et sp quand on unique())
-
-      setDT(TPLCor) # df to dt
-
-      # Take only corrected names. Columns: New.Genus, New.Species, Typo. Not Family because it is outdated.
-      TPLCor <- TPLCor[New.Genus != Genus | New.Species != Species,]
-      TPLCor <- TPLCor[, list(Taxonomic.status, Typo, Taxon, New.Genus, New.Species)]
-      TPLCor[, BotanicalCorrectionSource := "The Plant List"] # create the Source
-
-
-      # Join the corrected Genus and Species, by original 'ScientificNameCor'
-      Data <- merge(Data, TPLCor, by.x = "ScientificNameCor", by.y = "Taxon", all.x = TRUE)
-
-      # Update correction columns
-      Data[, GenusCor := ifelse(!is.na(New.Genus), New.Genus, GenusCor)]
-      Data[, SpeciesCor := ifelse(!is.na(New.Species), New.Species, SpeciesCor)]
-
-
-      # Comment:
-      ## if "Synonym" :
-
-      Data[Taxonomic.status == "Synonym" & !is.na(Taxonomic.status), Comment_TreeData := GenerateComment(Comment_TreeData, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Taxonomic.status == "Synonym" & !is.na(Data$Taxonomic.status), comment = "'ScientificName' is a synonym of the accepted botanical name")
-
-      ## if Typo == TRUE :
-
-      Data[Typo %in% TRUE, Comment_TreeData := GenerateComment(Comment_TreeData, "Spelling error in the 'ScientificName'")] # Data <- GenerateComment(Data, condition = (Data$Typo == TRUE) & !is.na(Data$Typo), comment = "Spelling error in the 'ScientificName'")
-
-      # Remove columns that have become useless
-      Data[, c("Taxonomic.status", "Typo", "New.Genus", "New.Species") := NULL]
-
-
-      # Family & Scientific names match -------------------------------------------------------------------------------------
-      # Retrieve Family names by Genus
-      # (*BIOMASS::getTaxonomy*) with APG III family
-
-      FamilyData <-
-        setDT( # as data.table
-          BIOMASS::getTaxonomy(unique(Data$GenusCor), findOrder = FALSE)
-        )
-
-      setnames(FamilyData, "family", "FamilyCor", skip_absent=TRUE) # rename columns
-
-
-      # Join Family table and the dataset
-      Data <- merge(Data, FamilyData, by.x = "GenusCor", by.y = "inputGenus",  all.x = TRUE, sort = FALSE)
-
-    } # end if "TPL"
-
-    if(Source == "WFO"){
-
-      # Prepare WFO database
-      setDT(WFOData) # in data.table
-      WFOData[is.na(WFOData), ] <- "" # WFO.match doesn't take NA but ""
-
-      # Prepare Data (replace risky characters)
-      Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)]
-      Data[, ScientificNameCor := gsub("Indet", "", ScientificNameCor)]
-      Data[, ScientificNameCor := gsub("indet", "", ScientificNameCor)]
-
-      # "Plants of the World Online" correction (more actual than WFO): ---------------------------------------------------
-
-      Data[ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), Comment_TreeData := GenerateComment(Comment_TreeData, "ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$ScientificNameCor %in% c("Tetragastris panamensis", "Protium picramnioides", "Tetragastris stevensonii"), comment = "'ScientificName' is a synonym of the accepted botanical name")
-
-      Data[ScientificNameCor %in% c("Tetragastris panamensis",
-                                    "Protium picramnioides",
-                                    "Tetragastris stevensonii"),
-           `:=` (ScientificNameCor = "Protium stevensonii",
-                 FamilyCor = "Burseraceae",
-                 BotanicalCorrectionSource = "Plants of the World Online")]
-
-      # Genus not found but I don't know why: -----------------------------------------------------------------------------
-      # Data[GenusCor == "Tovomita",
-      #      FamilyCor := "Clusiaceae"]
-
-      # Special taxa vector
-      Specialtaxa <- c("Protium stevensonii")
-
-      WFmatch <- WorldFlora::WFO.match(spec.data = unique(Data[!ScientificNameCor %in% Specialtaxa,
-                                                               ScientificNameCor]), # data to correct
-                                       WFO.data = WFOData, # WFO data
-                                       no.dates = TRUE, # to speed
-                                       First.dist = TRUE,
-                                       Fuzzy.one = TRUE,
-                                       Fuzzy.force = FALSE,
-                                       Fuzzy.shortest = TRUE,
-                                       # squish = TRUE, # don't remove whitespace
-                                       spec.name.nonumber = TRUE, # if nbr take only the genus
-                                       spec.name.sub = FALSE, # don't remove " sp"
-                                       verbose = FALSE)
-      setDT(WFmatch) # in data.table
-
-      WFmatch <- WFmatch[, list(taxonomicStatus, Old.status, spec.name.ORIG, scientificName, family)] # columns of interest
-      WFmatch <- WFmatch[taxonomicStatus == "ACCEPTED",] # Only "ACCEPTED"
-      WFmatch[, taxonomicStatus := NULL] # remove the column
-
-
-      # Remove multiple matches case (but keep the family and prefer not synonym)
-      # WFmatch[spec.name.ORIG %in% c(WFmatch[duplicated(WFmatch[, spec.name.ORIG]), spec.name.ORIG]), Old.status := ""] # not necessary with fromLast = TRUE
-      WFmatch <- WFmatch[!duplicated(WFmatch[, spec.name.ORIG], fromLast = TRUE)] # the first is a synonym, the last can be the original name
-
-      # Create the correction source
-      WFmatch[, BotaCorSource := "World Flora Online"]
-
-
-      # Join the corrected Genus and Species, by original 'ScientificNameCor'
-      Data <- merge(Data, WFmatch, by.x = "ScientificNameCor", by.y = "spec.name.ORIG", all.x = TRUE)
-
-      Data[, ScientificNameCor := NULL] # remove previous column before create the new one
-
-      # Deal with "Plants of the World Online" correction
-      Data[, FamilyCor := ifelse(is.na(FamilyCor), family, FamilyCor)]
-      Data[, BotanicalCorrectionSource := ifelse(is.na(BotanicalCorrectionSource), BotaCorSource, BotanicalCorrectionSource)]
-      Data[, c("family", "BotaCorSource") := NULL]
-
-      setnames(Data, "scientificName", "ScientificNameCor", skip_absent=TRUE) # rename columns
-
-      # For Genus not detected by WFO by already corrected the family
-      Data[is.na(ScientificNameCor) & !is.na(FamilyCor), ScientificNameCor := paste(GenusCor, SpeciesCor)]
-
-      # No output species name if only genus in input
-      Data[is.na(SpeciesCor) | grepl("Indet", SpeciesCor)| grepl("indet", SpeciesCor)| grepl("[0-9]", SpeciesCor),
-           ScientificNameCor := sub(" .*", "", ScientificNameCor) ]
-
-      # But we want to keep species name with number
-      Data[grepl("[0-9]", SpeciesCor),
-           ScientificNameCor := paste(ScientificNameCor, SpeciesCor)]
-
-
-      # if "Synonym" :
-      Data[ Old.status %in% "SYNONYM" , Comment_TreeData := GenerateComment(Comment_TreeData, "'ScientificName' is a synonym of the accepted botanical name")] # Data <- GenerateComment(Data, condition = Data$Old.status %in% "SYNONYM", comment = "'ScientificName' is a synonym of the accepted botanical name")
-
-      Data[, Old.status := NULL] # remove the column
-
-      # Create GenusCor and SpeciesCor
-      Data[, c("GenusCor", "SpeciesCor") := tstrsplit(ScientificNameCor, " ", fixed = TRUE)] # fixed = T : match split exactly
-
-    } # end if WFO
-
-    # IN COMMON -------------------------------------------------------------------------------------------------------------
-
-    # Generate a comment if the family name is incorrect --------------------------------------------------------------------
-
-    Data[!Family %in% Data$FamilyCor, Comment_TreeData := GenerateComment(Comment_TreeData, "The 'Family' name is incorrect")] # Data <- GenerateComment(Data, condition = !Data$Family %in% Data$FamilyCor, comment = "The 'Family' name is incorrect")
-
-    if(Source == "TPL") FamCorSource <- "APG III family"
-    if(Source == "WFO") FamCorSource <- "World Flora Online"
-    Data[!is.na(FamilyCor), FamilyCorSource := FamCorSource] # create the Source
-
-    # If no Family corr because no genus, previously with -aceae, take this name put in GenspFamily -------------------------
-    Data[is.na(FamilyCor) & !is.na(GenspFamily), `:=`(FamilyCor = GenspFamily,
-                                                      FamilyCorSource = "Found in the 'Genus' or 'Species' column")]
-
-    Data[, GenspFamily := NULL] # remove obsolete column
-
-    # Homogenise unique botanical info (same Family, Genus, Species, Vernacular name) by IdTree if NA -----------------------
-
-    Data[, VernNameCor := VernName]
-
-    BotaCols <- c("FamilyCor", "GenusCor", "SpeciesCor", "VernNameCor", "FamilyCorSource", "BotanicalCorrectionSource")
-
-    for(j in BotaCols){
-      Data[,  (j) := ifelse(is.na(get(j)) & length(na.omit(unique(get(j)))) == 1,
-                            na.omit(unique(get(j))), get(j))
-           , keyby = IdTree]
-    }
-
-    # If no correction keep input botanical values: "Family", "Genus", "Species", "ScientificName" ------------------------
-    # (en fait c'est pas une bonne idée)
-    # NotCorVar <- c("Family", "Genus", "Species", "ScientificName")
-    #
-    # for(i in NotCorVar){
-    #   j <- paste0(i, "Cor")
-    #
-    #   Data[is.na(get(j)), c(j, "BotanicalCorrectionSource") := list(get(i), "Taxon not found")]
-    #
-    # }
-    Data[is.na(FamilyCor) & is.na(BotanicalCorrectionSource), BotanicalCorrectionSource := "Taxon not found"]
-
-    # Reform ScientificNameCor ------------------------------------------------------------------------------------------
-    # If "NA NA" -> NA_character_
-
-    Data[, ScientificNameCor := paste(GenusCor, SpeciesCor)]
-
-    Data[, ScientificNameCor := ifelse(ScientificNameCor == "NA NA", NA_character_, ScientificNameCor)]
-
-    Data[, ScientificNameCor := gsub(" NA", "", ScientificNameCor)] # remove NA after Genus in ScientificNameCor
-
-
-
-
-
-  # Check invariant botanical informations per IdTree -------------------------------------------------------------------
-  # Family, Genus, Species, Subspecies, VernName
-
-  if(!"Subspecies" %in% names(Data)) Data[, Subspecies := NA_character_]
-
-  duplicated_ID <- CorresIDs <- vector("character")
-
-vars <- c("IdTree", "FamilyCor", "GenusCor", "SpeciesCor", "Subspecies", "VernNameCor")
-
-
-  # For each site
-  for (s in unique(na.omit(Data$Site))) {
-
-    BotaIDCombination <- unique(
-      Data[Site == s, vars, with = FALSE]
-    )
-
-    CorresIDs <- BotaIDCombination[, IdTree] # .(IdTree)
-
-    if(!identical(CorresIDs, unique(CorresIDs))){ # check if it's the same length, same ids -> 1 asso/ID
-
-      duplicated_ID <- unique(CorresIDs[duplicated(CorresIDs)]) # identify the Idtree(s) having several P-SubP-TreeFieldNum combinations
-
-      Data[Site %in% s & IdTree %in% duplicated_ID, Comment_TreeData := GenerateComment(Comment_TreeData, "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")] # Data <- GenerateComment(Data, condition = Data[,Site] == s & Data[,IdTree] %in% duplicated_ID, comment = "Different botanical informations (Family, ScientificName, Subspecies, or VernName) for a same IdTree")
-    }
-  } # end site loop
-
-  # unique(Data[IdTree %in% duplicated_ID,
-  #             .(IdTree = sort(IdTree), Family, Genus, Species, Subspecies, VernName)]) # to check
-
-
-    # Rename correction columns
-    Corcol <- c("FamilyCor", "GenusCor", "SpeciesCor", "ScientificNameCor", "VernNameCor")
-    setnames(Data, Corcol, gsub("Cor", "_TreeDataCor", Corcol), skip_absent=TRUE)
-
-  return(Data)
-
+  # Incongruences in the determination of different stems within the same tree
+  problems <- list()
+  for(k in keep)
+  {
+    freqs <- Data[, list(Freq =.N), by=list(get(k), Site, IdTree)]
+    freqs$problem_with <- k
+    problems <- rbind(problems, freqs[which(duplicated(freqs[,c("Site", "IdTree")])), ])
+  }
+  problems <- problems[,c("Site", "IdTree", "problem_with")]
+  problems <- problems[, .(problems_with = paste(problem_with, collapse = ", ")), by = .(Site, IdTree)]
+
+  comment.to.add <- problems$problems_with[match(paste0(LOG$Site, "-", LOG$IdTree), 
+                                                 paste0(problems$Site, "-", problems$IdTree))]
+  
+  comment.to.add[!is.na()] <- paste0("Incongruent taxonomic information within Site x IdTree combinations. Check: ", comment.to.add[!is.na()])
+  comment.to.add[is.na(comment.to.add)] <- ""
+  
+  LOG$incongruent_taxonomic_information_within_the_same_tree <- comment.to.add
+  
+  # Return ----
+  return(list(Data = Data, log = LOG))
 }
