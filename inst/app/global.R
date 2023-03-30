@@ -15,6 +15,9 @@ library(htmlTable)
 library(TreeData)
 library(markdown)
 library(lubridate)
+library(ggplot2)
+library(ggforce)
+library(ggrepel)
 
 useSweetAlert()
 

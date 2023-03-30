@@ -813,6 +813,8 @@ DiameterCorrection <- function(
 
     # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
     DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by DiameterCorrections.")]
+    DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing ID measurement was not processed by DiameterCorrections.")]
+    DataIdCensusNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing census measurement was not processed by DiameterCorrections.")]
 
     Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
 

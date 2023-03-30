@@ -127,7 +127,7 @@ test_that("StatusCorrection", {
     expect_true(all(SeqCor[!is.na(Rslt[IdTree %in% i, Diameter])] == T))
 
     ## Add a "Comment" value when "LifeStatus" != "LifeStatus_TreeDataCor"
-    Comment <- Rslt[IdTree %in% i, Comment_TreeData] != ""
+    Comment <- Rslt[IdTree %in% i, StatusCorrectionMeth_TreeData ] != ""
 
     compareNA <- function(v1,v2) {
       same <- (v1 == v2) | (is.na(v1) & is.na(v2))
@@ -153,9 +153,9 @@ test_that("StatusCorrection", {
 
 data(SCBISubsetFormated)
 
-expect_warning(SCBICorrected <- StatusCorrection(SCBISubsetFormated), "We added rows for missing trees and imputed average census Date")
+expect_warning(SCBICorrected <- StatusCorrection(SCBISubsetFormated, UseSize = T), "We added rows for missing trees and imputed average census Date")
 
-expect_identical(unique(SCBICorrected$Comment_TreeData), c("", "A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
+expect_identical(unique(SCBICorrected$StatusCorrectionMeth_TreeData ), c("", "A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
                                                            "Between 2 alive occurrences, the tree was alive;This tree was missed and this row was added",
                                                            "This tree was missed and this row was added", "Tree can't be dead before first being alive"
 ))
@@ -165,23 +165,24 @@ expect_identical(SCBICorrected[IdStem %in% "10012",LifeStatus_TreeDataCor], SCBI
 
 expect_true(all(SCBICorrected[IdStem %in% "11012", LifeStatus_TreeDataCor])) # first measurement had a DBH so should be alive, then second should be Alive because inbetwen two alive
 
-expect_identical(SCBICorrected[IdStem %in% "11012", Comment_TreeData ], c("A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
+expect_identical(SCBICorrected[IdStem %in% "11012", StatusCorrectionMeth_TreeData  ], c("A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
                                                                           ""))
 
 SCBISubsetFormated[IdStem %in% "66114",]
-expect_identical(SCBICorrected[IdStem %in% "66114", Comment_TreeData], c("This tree was missed and this row was added", "", ""))
+expect_identical(SCBICorrected[IdStem %in% "66114", StatusCorrectionMeth_TreeData ], c("This tree was missed and this row was added", "", ""))
 
 SCBISubsetFormated[IdStem %in% "31258",]
 SCBICorrected[IdStem %in% "31258",]
 
 SCBISubsetFormated[IdStem %in% "10032",]
-expect_identical(SCBICorrected[IdStem %in% "10032",.(LifeStatus_TreeDataCor, Comment_TreeData)],
+
+expect_equal(SCBICorrected[IdStem %in% "10032",.(LifeStatus_TreeDataCor, StatusCorrectionMeth_TreeData )],
                  structure(list(LifeStatus_TreeDataCor = c(TRUE, FALSE, FALSE),
-                                Comment_TreeData = c("A measured tree is a living tree","", "")),
-                           row.names = c(NA, -3L), class = c("data.table","data.frame")))
+                                StatusCorrectionMeth_TreeData  = c("A measured tree is a living tree","", "")),
+                           row.names = c(NA, -3L), class = c("data.table","data.frame")), ignore_attr = TRUE)
 
 
-expect_equal(nrow(SCBICorrected[Comment_TreeData %in% "A measured tree is a living tree",]), 5)
+expect_equal(nrow(SCBICorrected[StatusCorrectionMeth_TreeData  %in% "A measured tree is a living tree",]), 5)
 
 
 

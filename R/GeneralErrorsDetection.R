@@ -34,6 +34,9 @@ GeneralErrorsDetection <- function(
     Data
 ){
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
+
   #### Arguments check ####
 
   # Data

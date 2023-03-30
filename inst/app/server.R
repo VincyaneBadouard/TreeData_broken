@@ -1149,6 +1149,7 @@ server <- function(input, output, session) { # server ####
 
   # apply corrections
   DataCorrected <- reactiveVal()
+  CorrectionPlots <- reactiveVal()
 
   observeEvent(input$ApplyCorrections, {
 
@@ -1205,28 +1206,90 @@ server <- function(input, output, session) { # server ####
             shiny:::reactiveStop(showNotification(paste0(err, collapse = "; "), type = 'err', duration = NULL))
           })
 
+          if(f %in% c("DiameterCorrection", "StatusCorrection")) {
 
-          # tryCatch({
-          #   eval(cl)
-          # },
-          # # warning = function(warn){
-          # #   showNotification(gsub("in RequiredFormat\\(Data = TidyTable\\(\\), isolate\\(reactiveValuesToList\\(input\\)\\),", "", warn), type = 'warning', duration = NULL)
-          # # },
-          # error = function(err){
-          #     shiny:::reactiveStop(showNotification(err, type = 'err', duration = NULL))
-          # })
+            p <- list(eval(str2lang(paste0(f, "Plot(Rslt)"))))
+            names(p) <- f
+
+            CorrectionPlots(append(CorrectionPlots(), p))
+          }
+
         }
       }
     )
     DataCorrected(Rslt)
   })
 
+
+
   output$CorrectedTable <- DT::renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
-                                    options = list(pageLength = 8, scrollX=TRUE),
-                                    container = FooterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
-                                    selection = "none")
+                                        options = list(pageLength = 8, scrollX=TRUE),
+                                        container = FooterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
+                                        selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
+
+
+  output$CorrectioPlots <- renderUI({
+
+    do.call(tabsetPanel, c(id='CorrPlot', type = "tabs", lapply( names(which(reactiveValuesToList(input)[c("DiameterCorrection", "StatusCorrection")] == "Yes")), function(f) {
+
+
+     tabPanel(
+        title=f,
+        uiOutput(outputId = paste0(f, "Plots"))
+      )
+
+    })))
+
+
+
+  })
+
+
+  observe({
+
+    lapply(names(CorrectionPlots()), function(f){
+
+      p <- CorrectionPlots()[[f]]
+
+      output[[paste0(f, "Plots")]] <- renderUI(
+        do.call(tabsetPanel, c(id='IndCorrPlot', type = "tabs", lapply(seq_len(p$nPages), function(k) { tabPanel(
+          title = paste("Page", k),
+          plotOutput( paste0(f, k))
+        )
+        }))))
+
+      for(k in seq_len( p$nPages)) {
+        output[[paste0(f, k)]] <- renderPlot({
+          p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = k)
+        })
+      }
+
+  })
+  })
+
+
+
+  # observe({
+  #
+  #   lapply(names(CorrectionPlots()), function(f){
+  #
+  #     p <- CorrectionPlots()[[f]]
+  #
+  #   for(k in seq_len( p$nPages)) {
+  #     output[[paste0(f, k)]] <- renderPlot({
+  #       p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = k)
+  #       })
+  #   }
+  #
+  #
+  #   })
+  # })
+
+
+
+
 
 
   # place holder to put either corrected data or non corrected data

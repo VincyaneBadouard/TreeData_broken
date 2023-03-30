@@ -17,6 +17,14 @@
 #' @param UseSize Use the size presence  (> min DBH) as a witness of the living status of the
 #'   tree (logical) (Default = FALSE)
 #'
+#' @param KeepMeas In case of **multiple diameter measurements** in the same
+#'   census year:
+#' Possible values: "MaxHOM", "MaxDate" (character).
+#'   - "MaxHOM": apply the correction to the measurement taken at the
+#'               **highest POM**
+#'   - "MaxDate": apply the correction to the **most recent measurement** (same
+#'                year but more recent date)
+#'
 #' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).
 #'
 #'
@@ -71,8 +79,9 @@
 StatusCorrection <- function(
     Data,
     DeathConfirmation = 2,
-    UseSize = TRUE,
+    UseSize = FALSE,
     AddRowsForForgottenCensuses = TRUE,
+    KeepMeas = c("MaxHOM", "MaxDate"),
     RemoveRBeforeAlive = FALSE,
     RemoveRAfterDeath = FALSE){
 
@@ -143,6 +152,14 @@ StatusCorrection <- function(
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData:= ""]
+  if(!"StatusCorrectionMeth_TreeData" %in% names(Data)) Data[, StatusCorrectionMeth_TreeData:= ""]
+
+  CompleteData <- copy(Data)
+
+  Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
+
+  DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
   # Data[, (ID) := as.character(get(ID))]
 
 
@@ -176,9 +193,7 @@ StatusCorrection <- function(
   }
 
   # get comment History
-  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData:= ""]
-
-  CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment_TreeData", drop = FALSE)
+  CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "StatusCorrectionMeth_TreeData", drop = FALSE)
   # rownames(CommentHistory) <- CommentHistory[[1]]
   # CommentHistory[,1] <- NULL
   CommentHistory <- as.matrix(CommentHistory, 1)
@@ -319,7 +334,7 @@ if(ThisIsShinyApp) incProgress(1/15)
   suppressWarnings(NewComments <- melt(setDT(as.data.frame(NewComments), keep.rownames=TRUE), measure.vars = colnames(NewComments) , variable.name = "IdCensus"))
 
 
-  Data$Comment_TreeData <- GenerateComment(Data$Comment_TreeData, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
+  Data$StatusCorrectionMeth_TreeData <- GenerateComment(Data$StatusCorrectionMeth_TreeData, NewComments$value[match(paste(Data[,get(ID)], Data[,IdCensus]), paste(NewComments$rn, NewComments$IdCensus))])
 
 
 
@@ -360,7 +375,9 @@ if(ThisIsShinyApp) incProgress(1/15)
 
     NewRows$LifeStatus_TreeDataCor <- NewStatusHistory[idx_new_rows, value][m]
 
-    NewRows$Comment_TreeData <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
+    NewRows$StatusCorrectionMeth_TreeData <- GenerateComment( NewComments[idx_new_rows, value][m], "This tree was missed and this row was added")
+
+    NewRows$Comment_TreeData <- "Missed tree"
 
     # make best guess at other things
     warning("We added rows for missing trees and imputed average census Date")
@@ -376,11 +393,22 @@ if(ThisIsShinyApp) incProgress(1/15)
 
 
     if(ThisIsShinyApp) incProgress(1/15)
-  # Re-put the the rows without ID
-  Data <- rbindlist(list(Data, DataIDNa), use.names=TRUE, fill=TRUE)
+
+  # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
+  DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "Duplicated measurement.")]
+  DuplicatedRows[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed.")]
+  DuplicatedRows[, LifeStatus_TreeDataCor := LifeStatus]
+
+  DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "Missing ID.")]
+  DataIDNa[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed.")]
+  DataIDNa [, LifeStatus_TreeDataCor := LifeStatus]
 
 
-  Data <- Data[order(get(ID), IdCensus )] # order by time
+  Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa), use.names = TRUE, fill = TRUE)
+
+
+  # order by time
+  Data <- Data[order(get(ID), IdCensus )]
 
   if(ThisIsShinyApp) incProgress(1/15)
   # return Data

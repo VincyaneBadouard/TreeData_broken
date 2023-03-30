@@ -47,7 +47,7 @@ to be considered dead (numeric)  (Default = 2 censuses)</p>
 tree (logical) (Default = FALSE)</p>
 </td>
 </tr>
-","StatusCorrectionUseSize","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+","StatusCorrectionUseSize","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "StatusCorrection","<tr valign=""top"">
 <td><code>AddRowsForForgottenCensuses</code></td>
 <td>
@@ -55,6 +55,29 @@ tree (logical) (Default = FALSE)</p>
 </td>
 </tr>
 ","StatusCorrectionAddRowsForForgottenCensuses","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"StatusCorrection","<tr valign=""top"">
+<td><code>KeepMeas</code></td>
+<td>
+<p>In case of <strong>multiple diameter measurements</strong> in the same
+census year:
+Possible values: ""MaxHOM"", ""MaxDate"" (character).
+</p>
+
+<ul>
+<li>
+<p> ""MaxHOM"": apply the correction to the measurement taken at the
+<strong>highest POM</strong>
+</p>
+</li>
+<li>
+<p> ""MaxDate"": apply the correction to the <strong>most recent measurement</strong> (same
+year but more recent date)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+","StatusCorrectionKeepMeas","c(""MaxHOM"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""MaxHOM"", ""MaxDate"")",FALSE
 "StatusCorrection","<tr valign=""top"">
 <td><code>RemoveRBeforeAlive</code></td>
 <td>

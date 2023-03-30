@@ -7,8 +7,9 @@
 StatusCorrection(
   Data,
   DeathConfirmation = 2,
-  UseSize = TRUE,
+  UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
+  KeepMeas = c("MaxHOM", "MaxDate"),
   RemoveRBeforeAlive = FALSE,
   RemoveRAfterDeath = FALSE
 )
@@ -27,6 +28,16 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 tree (logical) (Default = FALSE)}
 
 \item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).}
+
+\item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
+census year:
+Possible values: "MaxHOM", "MaxDate" (character).
+\itemize{
+\item "MaxHOM": apply the correction to the measurement taken at the
+\strong{highest POM}
+\item "MaxDate": apply the correction to the \strong{most recent measurement} (same
+year but more recent date)
+}}
 
 \item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
 before it was seen alive for the 1st time? (logical)}

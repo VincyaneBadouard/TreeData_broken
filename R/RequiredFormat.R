@@ -102,7 +102,7 @@ RequiredFormat <- function(
 
 
   } else {
-    if(!is.null(input$TreeCodes) && !input$TreeCodes %in% "none") {
+    if(!is.null(input$TreeCodes) && !input$TreeCodes %in% "none" & all(input$TreeCodes %in% names(Data)) ) {
       Data[, paste0("Original_", colnames(Data)[colnames(Data) %in% input$TreeCodes])] <-  Data[, colnames(Data) %in% input$TreeCodes]
 
       NewColNames <- c(NewColNames, paste0("Original_", colnames(Data)[colnames(Data) %in%  input$TreeCodes]))

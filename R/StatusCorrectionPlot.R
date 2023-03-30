@@ -27,11 +27,9 @@
 #' @examples
 #'
 #'\dontrun{
-#' pdf("StatusCorrectionPlots.pdf", width = 25, height = 10)
 #' data(TestData)
 #' Rslt <- StatusCorrection(TestData)
 #' StatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
-#' dev.off()
 #'}
 #'
 StatusCorrectionPlot <- function(
@@ -42,6 +40,8 @@ StatusCorrectionPlot <- function(
   # FileName = "StatusCorrectionPlots.pdf"
   SeveralWindows = TRUE
 ){
+
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
 
   #### Arguments check ####
 
@@ -96,51 +96,72 @@ StatusCorrectionPlot <- function(
 
 
   # Plot --------------------------------------------------------------------------------------------------------------
-  # pdf(FileName, width = 25, height = 10)
 
-  if(SeveralWindows == TRUE)
-  dev.new()
 
-  for(p in 1:(ceiling(length(unique(IDCor))/9))){
-    print(ggplot(DataCor) +
-      aes(x = Year) +
+ p <- ggplot(DataCor) +
+      aes(x = IdCensus, y = LifeStatus) +
 
-      # Initial
-      geom_point(aes(y = LifeStatus,
-                     color = ifelse(LifeStatus != LifeStatus_TreeDataCor, 'Initial', 'Conserved')),
-                 shape = "circle", size = 3.9) +
 
-      geom_line(aes(y = LifeStatus, color = ifelse(LifeStatus != LifeStatus_TreeDataCor, 'Initial', 'Conserved'))) +
+    geom_point(aes(color = "Initial"),  shape = "circle", size = 3.9) +
+    geom_point(data = DataCor[LifeStatus == LifeStatus_TreeDataCor, ], aes(color = "Conserved"),  shape = "circle", size = 3.9) +
 
+
+        ggrepel::geom_text_repel(data = DataCor[grepl("Missed tree", Comment_TreeData), ],
+                                 label = "Missed tree",
+                                 point.size = 3.9, size = 3, direction = "y") +
+
+    geom_point(data = DataCor[grepl("Not processed", StatusCorrectionMeth_TreeData), ], aes(color = "Not processed"),  shape = "circle", size = 3.9) +
+    ggrepel::geom_text_repel(data = DataCor[grepl("Not processed", StatusCorrectionMeth_TreeData), ],
+                             aes(label = Comment_TreeData),
+                             point.size = 3.9, size = 3, direction = "y") +
+
+        # not able to correct
+
+        geom_point(data = DataCor[!is.na(LifeStatus) & is.na(LifeStatus_TreeDataCor), ], aes(y = LifeStatus, color = "Not able to correct"),  shape = "circle", size = 3.9) +
+        ggrepel::geom_text_repel(data =  DataCor[!is.na(LifeStatus) & is.na(LifeStatus_TreeDataCor), ],
+                                 aes(y = LifeStatus, label = Comment_TreeData),
+                                 point.size = 3.9, size = 3, direction = "y") +
 
       # Corrected
-      geom_line(aes(y = LifeStatus_TreeDataCor, color = ifelse(LifeStatus != LifeStatus_TreeDataCor, 'Corrected', 'Conserved'))) +
-      geom_point(aes(y = LifeStatus_TreeDataCor,
-                     color = ifelse(LifeStatus != LifeStatus_TreeDataCor | is.na(LifeStatus), 'Corrected', 'Conserved')),
-                 shape = "circle", size = 3.9) +
+        geom_point(data = DataCor[LifeStatus != LifeStatus_TreeDataCor & !is.na(LifeStatus_TreeDataCor), ], aes(y = LifeStatus_TreeDataCor, color = 'Corrected',  shape = StatusCorrectionMeth_TreeData), size = 3.9) +
 
 
       # Colours
       scale_colour_manual(name = "Status", values = c("Conserved" = "black",
                                                       "Initial" = "red",
-                                                      "Corrected" = "forestgreen")) +
+                                                      "Corrected" = "forestgreen",
+                                                      "Not able to correct" = "pruple",
+                                                      "Not processed" = "purple")) +
       theme_minimal() +
 
       # Titles
       labs(
         # title =  paste("ID: ",unique(DataCor[,get(ID)],""),
-        x = "Year", y = "LifeStatus") +
+        x = "Census ID", y = "LifeStatus")
 
-      ggforce::facet_wrap_paginate(vars(get(ID)), scales = "free", ncol = min(n,3), nrow = i, page = p)
 
-    )
+  nPages <- ggforce::n_pages(p+
+                               ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = 1))
 
-    if(SeveralWindows == TRUE & p < ceiling(length(unique(IDCor))/9))
+  if(ThisIsShinyApp) {
+
+    return(list(p = p, nPages = nPages, ID = ID, n = n, i = i))
+
+  } else {
+
+    if(SeveralWindows == TRUE)
       dev.new()
 
+    for(k in seq_len( nPages)) {
+      print(
+        p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = k)
 
+      )
+
+      if(SeveralWindows == TRUE & i < nPages)
+        dev.new()
+    }
   }
-  # dev.off()
 
 
   # return(Pl)

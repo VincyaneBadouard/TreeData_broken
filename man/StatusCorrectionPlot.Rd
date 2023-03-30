@@ -33,11 +33,9 @@ Plot life status correction result
 \examples{
 
 \dontrun{
-pdf("StatusCorrectionPlots.pdf", width = 25, height = 10)
 data(TestData)
 Rslt <- StatusCorrection(TestData)
 StatusCorrectionPlot(Rslt, SeveralWindows = FALSE)
-dev.off()
 }
 
 }

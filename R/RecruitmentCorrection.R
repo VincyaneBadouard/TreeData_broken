@@ -135,17 +135,22 @@ RecruitmentCorrection <- function(
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
+  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
+
+
   if(length(na.omit(unique(Data$IdCensus))) > 1) { # only possible if more than one census
 
   # Remove duplicated measurements per Year because different POM or Date ------
   CompleteData <- copy(Data)
+
+
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
 
   DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
 
 
 
-  if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
+
 
   if(!OnlyDetectMissedRecruits){
     Data[, CorrectedRecruit := FALSE] # The initial rows are not corrected recruits
@@ -343,6 +348,10 @@ RecruitmentCorrection <- function(
   if(ThisIsShinyApp) incProgress(1/15)
 
   # Put back duplicated rows, or rows without ID or Year -----------------------
+  DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by RecruitmentCorrection.")]
+  DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing ID measurement was not processed by RecruitmentCorrection.")]
+  DataYearNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing year measurement was not processed by RecruitmentCorrection.")]
+
   Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataYearNa), use.names = TRUE, fill = TRUE)
 
 
