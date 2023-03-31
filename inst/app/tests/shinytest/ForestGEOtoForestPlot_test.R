@@ -1,11 +1,11 @@
 
 library(shinytest)
-#  viewTestDiff("inst/app/", "ForestGEOtoForestPlot_test")
-#  snapshotUpdate("inst/app/", "ForestGEOtoForestPlot_test")
+#  viewTestDiff("inst/app/", "ForestGeotoForestPlot_test")
+#  snapshotUpdate("inst/app/", "ForestGeotoForestPlot_test")
 
 
 app <- ShinyDriver$new("../../")
-app$snapshotInit("ForestGEOtoForestPlot_test")
+app$snapshotInit("ForestGeotoForestPlot_test")
 
 app$setInputs(nTable = 2)
 app$setInputs(nTable = 4)
@@ -28,7 +28,7 @@ app$setInputs(rightKey = "sp")
 app$setInputs(Merge = "click")
 app$setInputs(GoToTidy = "click")
 app$setInputs(SkipTidy = "click")
-app$uploadFile(profile = "ForestGEOProfile.rds")
+app$uploadFile(profile = "ForestGeoProfile.rds")
 app$setInputs(UseProfile = "click")
 app$setInputs(UseProfile = "click")
 app$setInputs(LaunchFormating = "click")

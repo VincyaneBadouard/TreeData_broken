@@ -1,11 +1,11 @@
 
 library(shinytest)
-#  viewTestDiff("inst/app/", "ForestPlotToForestGEO_test")
-#  snapshotUpdate("inst/app/", "ForestPlotToForestGEO_test")
+#  viewTestDiff("inst/app/", "ForestPlotToForestGeo_test")
+#  snapshotUpdate("inst/app/", "ForestPlotToForestGeo_test")
 
 
 app <- ShinyDriver$new("../../")
-app$snapshotInit("ForestPlotToForestGEO_test")
+app$snapshotInit("ForestPlotToForestGeo_test")
 
 app$setInputs(nTable = 2)
 app$uploadFile(file1 = "ForestPlots_test2_trees_small.csv")
@@ -27,7 +27,7 @@ app$setInputs(UseProfile = "click")
 app$setInputs(LaunchFormating = "click")
 app$setInputs(GoToCorrect = "click")
 app$setInputs(SkipCorrections = "click")
-app$uploadFile(profileOutput = "ForestGEOProfile.rds") # <-- This should be the path to the file, relative to the app's tests/shinytest directory
+app$uploadFile(profileOutput = "ForestGeoProfile.rds") # <-- This should be the path to the file, relative to the app's tests/shinytest directory
 app$setInputs(UseProfileOutput = "click")
 app$snapshot()
 app$snapshotDownload("dbMetadata")
