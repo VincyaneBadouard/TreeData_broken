@@ -26,7 +26,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Suggests:
     knitr,
     rmarkdown,
@@ -54,6 +54,8 @@ Imports:
     utils (>= 3.6.1),
     Taxonstand (>= 2.4),
     WorldFlora (>= 1.10),
+    taxize,
+    TNRS,
     dplyr,
     BIOMASS (>= 2.1.7), 
     DT, 

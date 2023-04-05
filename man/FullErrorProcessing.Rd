@@ -6,8 +6,6 @@
 \usage{
 FullErrorProcessing(
   Data,
-  Source = NULL,
-  WFOData = NULL,
   DeathConfirmation = 2,
   UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
@@ -16,8 +14,8 @@ FullErrorProcessing(
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
-    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
+  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(exp(-TaperParameter
+    * (HOM - DefaultHOM))),
   KeepMeas = c("MaxHOM", "MaxDate"),
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
@@ -36,22 +34,6 @@ FullErrorProcessing(
 }
 \arguments{
 \item{Data}{Dataset (data.frame or data.table)}
-
-\item{Source}{(character, 1 value) To correct and standardise, you can choose between:
-\itemize{
-\item "TPL": \emph{The Plant List} (http://www.theplantlist.org/) (faster but based
-on the 2013 taxonomy)
-\item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
-but based on the 2022 taxonomy)
-}}
-
-\item{WFOData}{If \code{Source} = "WFO".
-Data setwith the static copy of the \emph{World Flora Online} (WFO) Taxonomic Backbone
-data (from http://www.worldfloraonline.org/downloadData).
-data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
-Note that the classification.csv file downloaded from the website it too large to be uploaded
-in the App, so it needs to be opened in R first, trimmed to the set of species
-relevant to you, and saved to an .rds file using function saveRDS().}
 
 \item{DeathConfirmation}{Number of times (censuses) needed for an unseen tree
 to be considered dead (numeric)  (Default = 2 censuses)}
@@ -193,10 +175,8 @@ Rslt <- FullErrorProcessing(TestData,
  OnlyDetectMissedRecruits = TRUE,
   AddRowsForForgottenCensuses = FALSE)
 
-WFO_Backbone <- file.choose()
-load(WFO_Backbone)
-Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)
-Rslt_Panama <- FullErrorProcessing(PanamaFormated, Source = "WFO", WFOData = WFO_Backbone)
+Rslt_Test <- FullErrorProcessing(TestData)
+Rslt_Panama <- FullErrorProcessing(PanamaFormated)
 }
 
 }

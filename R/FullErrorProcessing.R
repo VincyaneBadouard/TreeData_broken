@@ -33,21 +33,13 @@
 #'  OnlyDetectMissedRecruits = TRUE,
 #'   AddRowsForForgottenCensuses = FALSE)
 #'
-#' WFO_Backbone <- file.choose()
-#' load(WFO_Backbone)
-#' Rslt_Test <- FullErrorProcessing(TestData, Source = "WFO", WFOData = WFO_Backbone)
-#' Rslt_Panama <- FullErrorProcessing(PanamaFormated, Source = "WFO", WFOData = WFO_Backbone)
+#' Rslt_Test <- FullErrorProcessing(TestData)
+#' Rslt_Panama <- FullErrorProcessing(PanamaFormated)
 #' }
 #'
 FullErrorProcessing <- function(
 
   Data,
-
-
-  # Botanical informations
-  Source = NULL,
-  WFOData = NULL,
-
   # Life status
 
   DeathConfirmation = 2,
@@ -95,16 +87,6 @@ FullErrorProcessing <- function(
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
-
-  # Source
-  Source <- match.arg(Source, choices = c("TPL", "WFO", NULL))
-
-  # WFOData
-  if(Source == "WFO" & is.null(WFOData))
-    stop("You must provide the 'WFOData' argument,
-          a database as a static copy of the World Flora Online (WFO) Taxonomic Backbone,
-          when you choose Source = 'WFO'.")
-
 
   # Plot column exists
   if (!"Plot" %in% names(Data)){
@@ -193,9 +175,7 @@ FullErrorProcessing <- function(
 
   #### Botanical informations ####
 
-  Data <- BotanicalCorrection(Data = Data,
-                              Source = Source,
-                              WFOData = WFOData)
+  Data <- BotanicalCorrection(Data = Data)$Data
 
   #### Life status ####
 

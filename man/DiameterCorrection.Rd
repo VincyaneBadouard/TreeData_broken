@@ -9,8 +9,8 @@ DiameterCorrection(
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
-  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM)
-    DAB/(exp(-TaperParameter * (HOM - DefaultHOM))),
+  TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(exp(-TaperParameter
+    * (HOM - DefaultHOM))),
   KeepMeas = c("MaxHOM", "MaxDate"),
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,

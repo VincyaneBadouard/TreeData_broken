@@ -4,48 +4,19 @@
 \alias{BotanicalCorrection}
 \title{Botanical Correction}
 \usage{
-BotanicalCorrection(Data, Source = c("TPL", "WFO"), WFOData = NULL)
+BotanicalCorrection(Data)
 }
 \arguments{
-\item{Data}{Dataset (data.frame or data.table)
-The dataset must contain the columns:
-\itemize{
-\item \code{IdTree} (character)
-\item \code{Family} (character)
-\item \code{Genus} (character)
-\item \code{Species} (character)
-\item \code{VernName} (character)
-\item \code{ScientificName} (character)
-}}
-
-\item{Source}{(character, 1 value) To correct and standardise, you can choose between:
-\itemize{
-\item "TPL": \emph{The Plant List} (http://www.theplantlist.org/) (faster but based
-on the 2013 taxonomy)
-\item "WFO": \emph{World Flora Online} (http://www.worldfloraonline.org/) (long time
-but based on the 2022 taxonomy)
-}}
-
-\item{WFOData}{If \code{Source} = "WFO".
-Data setwith the static copy of the \emph{World Flora Online} (WFO) Taxonomic Backbone
-data (from http://www.worldfloraonline.org/downloadData).
-data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
-Note that the classification.csv file downloaded from the website it too large to be uploaded
-in the App, so it needs to be opened in R first, trimmed to the set of species
-relevant to you, and saved to an .rds file using function saveRDS().}
+\item{Data}{Dataset (data.frame or data.table); it must contain Site and IdTree}
 }
 \value{
-Fill the \emph{Comment_TreeData} column with error type informations and add columns:
+A list with a complete log of the botanical corrections and Data with new columns:
 \itemize{
-\item \code{Family_TreeDataCor} (character): corrected Family name
-\item \code{FamilyCorSource} (character): source of the Family correction
-\item \code{Genus_TreeDataCor} (character): corrected Genus name
-\item \code{Species_TreeDataCor} (character): corrected Species name
-\item \code{BotanicalCorrectionSource} (character): source of the Genus and Species
-correction
-\item \code{ScientificName_TreeDataCor} (character): corrected Scientific name
-\item \code{VernName_TreeDataCor} (character): completed if information available at
-\code{IdTree} level.
+\item \code{Accepted_family_TreeDataCor} (character): corrected family name
+\item \code{Accepted_genus_TreeDataCor} (character): corrected genus name
+\item \code{Accepted_species_TreeDataCor} (character): corrected species name
+\item \code{Accepted_name_TreeDataCor} (character): corrected name (at any taxonomic level)
+\item \code{Accepted_name_rank_TreeDataCor} (character): Taxonomic rank of name matched by the TNRS
 }
 }
 \description{
@@ -53,62 +24,21 @@ Botanical Correction
 }
 \details{
 \itemize{
+\item The function uses TNRS package provided by BIEN, https://bien.nceas.ucsb.edu/bien/tools/tnrs/
 \item No special characters (typography)
-\item No family name in the Genus and Species columns (the suffix "aceae" is
-specific to the family name.
-\item Correct spelling of botanical names (\emph{Taxonstand or WorldFlora})
-\item Family & Scientific names match (\emph{BIOMASS::getTaxonomy or WorldFlora})
-\item Update the scientific botanical names with the current phylogenetic
-classification
-\item Check \strong{invariant botanical informations per IdTree} (1 IdTree = 1 family,
-1 scientific and 1 vernacular name)
+\item The suffix "aceae" is restricted to families, and words ending with "aceae" are deleted anywhere else
+\item Correct spelling of botanical names
+\item Update the families according to APG
+\item The log contains a flag if there is more than one name for one Site x IdTree combination
+\item The log contains all details returned by TNRS (authors, etc.). Data just keeps the basic corrected names.
 }
 }
 \examples{
 \dontrun{
 library(data.table)
 data(TestData)
-
-# With The Plant List:
-Rslt <- BotanicalCorrection(TestData, Source = "TPL")
-
-ScfcCor <- unique(Rslt[ScientificNameCor != ScientificName,
-                list(ScientificName, ScientificNameCor,
-                Family, FamilyCor, FamilyCorSource,
-                Genus, GenusCor,
-                Species, SpeciesCor, Subspecies,
-                BotanicalCorrectionSource, Comment)
-                ])
-
-FamCor <- unique(Rslt[FamilyCor != Family,
-                list(ScientificName, ScientificNameCor,
-                Family, FamilyCor, FamilyCorSource,
-                Genus, GenusCor,
-                Species, SpeciesCor, Subspecies,
-                BotanicalCorrectionSource, Comment)
-                ])
-
-# With World Flora Online:
-WFO_Backbone <- file.choose()
-load(WFO_Backbone)
-
-RsltWFO <- BotanicalCorrection(TestData, Source = "WFO", WFOData = WFO_Backbone)
-
-ScfcCor <- unique(RsltWFO[ScientificNameCor != ScientificName,
-                list(ScientificName, ScientificNameCor,
-                Family, FamilyCor,
-                Genus, GenusCor,
-                Species, SpeciesCor, Subspecies,
-                BotanicalCorrectionSource, Comment)
-                ])
-
-FamCor <- unique(RsltWFO[FamilyCor != Family,
-                list(ScientificName, ScientificNameCor,
-                Family, FamilyCor,
-                Genus, GenusCor,
-                Species, SpeciesCor, Subspecies,
-                BotanicalCorrectionSource, Comment)
-                ])
+Rslt <- BotanicalCorrection(TestData)
 }
+
 
 }

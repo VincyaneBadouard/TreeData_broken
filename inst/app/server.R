@@ -1172,20 +1172,20 @@ server <- function(input, output, session) { # server ####
           cl <- gsub(')\"', ")", cl)
           cl <- gsub(' (\\d*)L', " \\1", cl)
 
-          if(grepl('Source = "WFO"', cl)) {
-            ext <- tools::file_ext(input$BotanicalCorrectionWFOData$datapath)
-
-            if(ext %in% "rds") WFOData = setDT(readRDS(input$BotanicalCorrectionWFOData$datapath))
-            if(ext %in% "csv") WFOData = fread(input$BotanicalCorrectionWFOData$datapath)
-            if(!ext %in% c("rds", "csv")) sendSweetAlert(
-              session = session,
-              title = "Oups !",
-              text = "The is not a .rds file!",
-              type = "error")
-
-            cl <- gsub("WFOData = .*)", "WFOData =WFOData)", cl) # this is to deal with the upload of world flora
-
-          }
+          # if(grepl('Source = "WFO"', cl)) {
+          #   ext <- tools::file_ext(input$BotanicalCorrectionWFOData$datapath)
+          #
+          #   if(ext %in% "rds") WFOData = setDT(readRDS(input$BotanicalCorrectionWFOData$datapath))
+          #   if(ext %in% "csv") WFOData = fread(input$BotanicalCorrectionWFOData$datapath)
+          #   if(!ext %in% c("rds", "csv")) sendSweetAlert(
+          #     session = session,
+          #     title = "Oups !",
+          #     text = "The is not a .rds file!",
+          #     type = "error")
+          #
+          #   cl <- gsub("WFOData = .*)", "WFOData =WFOData)", cl) # this is to deal with the upload of world flora
+          #
+          # }
 
 
 

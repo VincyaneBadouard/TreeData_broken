@@ -14,8 +14,8 @@ test_that("BotanicalCorrection", {
   #                   "originalNameUsageID", "taxonRemarks", "source", "majorGroup", "tplId"):= NULL]
   #
   # usethis::use_data(WFOdataSubset, overwrite = TRUE)
-
-  data(WFOdataSubset)
+#
+#   data(WFOdataSubset)
 
   # Create test data ------------------------------------------------------------------------------------------------------
 
@@ -71,97 +71,52 @@ test_that("BotanicalCorrection", {
   expect_error(BotanicalCorrection(MatrixData),
                regexp = "Data must be a data.frame or data.table")
 
-  expect_error(BotanicalCorrection(Data, Source = TRUE),
-               regexp = "must be NULL or a character vector")
-
-  expect_error(BotanicalCorrection(Data, Source = "TRUE"),
-               regexp = "should be one of")
-
-  expect_error(BotanicalCorrection(Data, Source = "WFO", WFOData = NULL),
-               regexp = "You must provide the 'WFOData' argument")
-
   # Check the function work -----------------------------------------------------------------------------------------------
 
   ## Detect Only: no correction, only comments ----------------------------------------------------------------------------
-  RsltTPL <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)) # "TPL" (doest' work during the github actions)
-  RsltWFO <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset))
+  DataCor <- suppressWarnings(BotanicalCorrection(Data))
 
-  Rslt <- list(RsltTPL, RsltWFO)
+  DataCor <- DataCor$Data
+  LOG <- DataCor$log
 
   OriginalColumns <- names(Data)
 
-  # r = 1
-  for(r in 1:length(Rslt)){
-
-    # Missing value
-    Rslt[[r]][is.na(Subspecies), Subspecies := ""] # Subspecies = NA is ok
-    expect_true(all(grepl("Missing value", Rslt[[r]][rowSums(is.na(Rslt[[r]][, OriginalColumns, with = F])) > 0, Comment_TreeData])))
 
     # -aceae in Genus or Species
-    expect_true(all(grepl("'aceae' cannot be genus or species names",
-                          Rslt[[r]][grepl("aceae", Data$Genus) | grepl("aceae", Data$Species), Comment_TreeData])))
-
-    # Special character in Genus, Family
-    expect_true(all(grepl("Special characters",
-                          Rslt[[r]][grepl('[[:punct:]]', Data$Genus) | grepl('[[:punct:]]', Data$Family), Comment_TreeData])))
+    expect_true(all(is.na(DataCor[grepl("aceae", Data$Genus), Genus_TreeDataCor] )))
+    expect_true(all(is.na(DataCor[grepl("aceae", Data$Species), Species_TreeDataCor] )))
 
     # Variant botanical info per IdTree (A FAIRE)
-    VarIdTree <- unique(Rslt[[r]][, .(IdTree, Family_TreeDataCor, Genus_TreeDataCor, Species_TreeDataCor, Subspecies, VernName_TreeDataCor)])[duplicated(IdTree), IdTree]
+    VarIdTree <- unique(Data[, .(IdTree, Family, Genus, Species, Subspecies)])[duplicated(IdTree), IdTree]
 
-    expect_true(all(grepl("Different botanical informations",
-                          Rslt[[r]][IdTree %in% VarIdTree, Comment_TreeData])))
+    expect_true(all(grepl("Incongruent taxonomic information within Site x IdTree combinations.",
+                          DataCor[IdTree %in% VarIdTree, Comment_TreeData])))
 
 
-  }
-
-  # Correction
-  RsltTPL <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset)) # "TPL" (doest' work during the github actions)
-  RsltWFO <- suppressWarnings(BotanicalCorrection(Data, Source = "WFO", WFOData = WFOdataSubset))
-
-  Rslt <- list(RsltTPL, RsltWFO)
-
-  # r = 1
-  for(r in 1:length(Rslt)){
-
-    # ScientificNameCor = GenusCor + SpeciesCor
-    # expect_true(all(na.omit((Rslt[[r]]$ScientificName_TreeDataCor == paste(Rslt[[r]]$Genus_TreeDataCor, Rslt[[r]]$Species_TreeDataCor)))))
-    expect_true(all(is.na(Rslt[[r]]$ScientificName_TreeDataCor) == ( is.na(Rslt[[r]]$Genus_TreeDataCor) & is.na(Rslt[[r]]$Species_TreeDataCor)) ))
+    # make sure Genus ans species are NA if ScientificName_TreeDataCor
+    expect_true(all(is.na(DataCor$ScientificName_TreeDataCor) == ( is.na(DataCor$Genus_TreeDataCor) & is.na(DataCor$Species_TreeDataCor)) ))
 
     # No "aceae" in Genus or Species column --------------------------------------------------------------------------------
-    expect_true(!any(grepl("aceae", Rslt[[r]]$ScientificName_TreeDataCor)))
+    expect_true(!any(grepl("aceae", DataCor$ScientificName_TreeDataCor)))
 
-    # Family if Genus (unless found in Genus /species col) ----------------------------------------------------------------
-    expect_true(all(!is.na(Rslt[[r]][!is.na(Family_TreeDataCor) & !grepl("Found in", RsltWFO$FamilyCorSource), Genus_TreeDataCor])))
 
     # All Family names with -aceae
-    expect_true(all(grepl("aceae", na.omit(Rslt[[r]]$Family_TreeDataCor))))
+    expect_true(all(grepl("aceae", na.omit(DataCor$Family_TreeDataCor))))
 
     # No special character in Genus and Family columns ---------------------------------------------------------------------
-    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$Genus_TreeDataCor)))
-    expect_true(!any(grepl("[[:punct:]]", Rslt[[r]]$Family_TreeDataCor)))
+    expect_true(!any(grepl("[[:punct:]]", DataCor$Genus_TreeDataCor)))
+    expect_true(!any(grepl("[[:punct:]]", DataCor$Family_TreeDataCor)))
 
     # No space or underscore in Species column
-    expect_true(!any(grepl("[[:blank:]]", Rslt[[r]]$Species_TreeDataCor)))
-    expect_true(!any(grepl("_", Rslt[[r]]$Species_TreeDataCor)))
+    expect_true(!any(grepl("[[:blank:]]", DataCor$Species_TreeDataCor)))
+    expect_true(!any(grepl("_", DataCor$Species_TreeDataCor)))
 
     # No Indet in Family, no subsp in Species
-    expect_true(!any(grepl("Indet", Rslt[[r]]$Family_TreeDataCor)))
-    expect_true(!any(grepl("subsp", Rslt[[r]]$Species_TreeDataCor)))
-
-    # Subspecies
-    expect_true(any(grepl("subsp", Rslt[[r]]$Subspecies)))
-
-    # Source columns ? (A FAIRE)
-    # BotanicalCorrectionSource == "The Plant List” or "World Flora Online"
-    # FamilyCorSource == "APG III family” if TPL, "World Flora Online”
+    expect_true(!any(grepl("Indet", DataCor$Family_TreeDataCor)))
+    expect_true(!any(grepl("subsp", DataCor$Species_TreeDataCor)))
 
     # No adding rows
-    expect_true( nrow(Rslt[[r]]) == nrow(Data) )
-
-  } # end corrected Rslt loop
-
-
-  # options(warn = 0) # when debug is over
+    expect_true( nrow(DataCor) == nrow(Data) )
 
 
 })
