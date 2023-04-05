@@ -51,66 +51,35 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">BotanicalCorrection</span><span class="op">(</span><span class="va">Data</span>, Source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TPL"</span>, <span class="st">"WFO"</span><span class="op">)</span>, WFOData <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">BotanicalCorrection</span><span class="op">(</span><span class="va">Data</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>Data</dt>
-<dd><p>Dataset (data.frame or data.table)
-The dataset must contain the columns:</p><ul><li><p><code>IdTree</code> (character)</p></li>
-<li><p><code>Family</code> (character)</p></li>
-<li><p><code>Genus</code> (character)</p></li>
-<li><p><code>Species</code> (character)</p></li>
-<li><p><code>VernName</code> (character)</p></li>
-<li><p><code>ScientificName</code> (character)</p></li>
-</ul></dd>
-
-
-<dt>Source</dt>
-<dd><p>(character, 1 value) To correct and standardise, you can choose between:</p><ul><li><p>"TPL": <em>The Plant List</em> (http://www.theplantlist.org/) (faster but based
-on the 2013 taxonomy)</p></li>
-<li><p>"WFO": <em>World Flora Online</em> (http://www.worldfloraonline.org/) (long time
-but based on the 2022 taxonomy)</p></li>
-</ul></dd>
-
-
-<dt>WFOData</dt>
-<dd><p>If <code>Source</code> = "WFO".
-Data setwith the static copy of the <em>World Flora Online</em> (WFO) Taxonomic Backbone
-data (from http://www.worldfloraonline.org/downloadData).
-data.frame or data.table in R, .rds file if you are uploading from the Shiny App.
-Note that the classification.csv file downloaded from the website it too large to be uploaded
-in the App, so it needs to be opened in R first, trimmed to the set of species
-relevant to you, and saved to an .rds file using function saveRDS().</p></dd>
+<dd><p>Dataset (data.frame or data.table); it must contain Site and IdTree</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Fill the <em>Comment_TreeData</em> column with error type informations and add columns:</p><ul><li><p><code>Family_TreeDataCor</code> (character): corrected Family name</p></li>
-<li><p><code>FamilyCorSource</code> (character): source of the Family correction</p></li>
-<li><p><code>Genus_TreeDataCor</code> (character): corrected Genus name</p></li>
-<li><p><code>Species_TreeDataCor</code> (character): corrected Species name</p></li>
-<li><p><code>BotanicalCorrectionSource</code> (character): source of the Genus and Species
-correction</p></li>
-<li><p><code>ScientificName_TreeDataCor</code> (character): corrected Scientific name</p></li>
-<li><p><code>VernName_TreeDataCor</code> (character): completed if information available at
-<code>IdTree</code> level.</p></li>
+<p>A list with a complete log of the botanical corrections and Data with new columns:</p><ul><li><p><code>Accepted_family_TreeDataCor</code> (character): corrected family name</p></li>
+<li><p><code>Accepted_genus_TreeDataCor</code> (character): corrected genus name</p></li>
+<li><p><code>Accepted_species_TreeDataCor</code> (character): corrected species name</p></li>
+<li><p><code>Accepted_name_TreeDataCor</code> (character): corrected name (at any taxonomic level)</p></li>
+<li><p><code>Accepted_name_rank_TreeDataCor</code> (character): Taxonomic rank of name matched by the TNRS</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     
-<ul><li><p>No special characters (typography)</p></li>
-<li><p>No family name in the Genus and Species columns (the suffix "aceae" is
-specific to the family name.</p></li>
-<li><p>Correct spelling of botanical names (<em>Taxonstand or WorldFlora</em>)</p></li>
-<li><p>Family &amp; Scientific names match (<em>BIOMASS::getTaxonomy or WorldFlora</em>)</p></li>
-<li><p>Update the scientific botanical names with the current phylogenetic
-classification</p></li>
-<li><p>Check <strong>invariant botanical informations per IdTree</strong> (1 IdTree = 1 family,
-1 scientific and 1 vernacular name)</p></li>
+<ul><li><p>The function uses TNRS package provided by BIEN, https://bien.nceas.ucsb.edu/bien/tools/tnrs/</p></li>
+<li><p>No special characters (typography)</p></li>
+<li><p>The suffix "aceae" is restricted to families, and words ending with "aceae" are deleted anywhere else</p></li>
+<li><p>Correct spelling of botanical names</p></li>
+<li><p>Update the families according to APG</p></li>
+<li><p>The log contains a flag if there is more than one name for one Site x IdTree combination</p></li>
+<li><p>The log contains all details returned by TNRS (authors, etc.). Data just keeps the basic corrected names.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -118,48 +87,9 @@ classification</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">TestData</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With The Plant List:</span></span></span>
-<span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">BotanicalCorrection</span><span class="op">(</span><span class="va">TestData</span>, Source <span class="op">=</span> <span class="st">"TPL"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ScfcCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Rslt</span><span class="op">[</span><span class="va">ScientificNameCor</span> <span class="op">!=</span> <span class="va">ScientificName</span>,</span></span>
-<span class="r-in"><span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ScientificName</span>, <span class="va">ScientificNameCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Family</span>, <span class="va">FamilyCor</span>, <span class="va">FamilyCorSource</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Genus</span>, <span class="va">GenusCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Species</span>, <span class="va">SpeciesCor</span>, <span class="va">Subspecies</span>,</span></span>
-<span class="r-in"><span>                <span class="va">BotanicalCorrectionSource</span>, <span class="va">Comment</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                <span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">FamCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Rslt</span><span class="op">[</span><span class="va">FamilyCor</span> <span class="op">!=</span> <span class="va">Family</span>,</span></span>
-<span class="r-in"><span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ScientificName</span>, <span class="va">ScientificNameCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Family</span>, <span class="va">FamilyCor</span>, <span class="va">FamilyCorSource</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Genus</span>, <span class="va">GenusCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Species</span>, <span class="va">SpeciesCor</span>, <span class="va">Subspecies</span>,</span></span>
-<span class="r-in"><span>                <span class="va">BotanicalCorrectionSource</span>, <span class="va">Comment</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                <span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With World Flora Online:</span></span></span>
-<span class="r-in"><span><span class="va">WFO_Backbone</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.choose.html" class="external-link">file.choose</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">WFO_Backbone</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">RsltWFO</span> <span class="op">&lt;-</span> <span class="fu">BotanicalCorrection</span><span class="op">(</span><span class="va">TestData</span>, Source <span class="op">=</span> <span class="st">"WFO"</span>, WFOData <span class="op">=</span> <span class="va">WFO_Backbone</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ScfcCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">RsltWFO</span><span class="op">[</span><span class="va">ScientificNameCor</span> <span class="op">!=</span> <span class="va">ScientificName</span>,</span></span>
-<span class="r-in"><span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ScientificName</span>, <span class="va">ScientificNameCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Family</span>, <span class="va">FamilyCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Genus</span>, <span class="va">GenusCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Species</span>, <span class="va">SpeciesCor</span>, <span class="va">Subspecies</span>,</span></span>
-<span class="r-in"><span>                <span class="va">BotanicalCorrectionSource</span>, <span class="va">Comment</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                <span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">FamCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">RsltWFO</span><span class="op">[</span><span class="va">FamilyCor</span> <span class="op">!=</span> <span class="va">Family</span>,</span></span>
-<span class="r-in"><span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ScientificName</span>, <span class="va">ScientificNameCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Family</span>, <span class="va">FamilyCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Genus</span>, <span class="va">GenusCor</span>,</span></span>
-<span class="r-in"><span>                <span class="va">Species</span>, <span class="va">SpeciesCor</span>, <span class="va">Subspecies</span>,</span></span>
-<span class="r-in"><span>                <span class="va">BotanicalCorrectionSource</span>, <span class="va">Comment</span><span class="op">)</span></span></span>
-<span class="r-in"><span>                <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">BotanicalCorrection</span><span class="op">(</span><span class="va">TestData</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
