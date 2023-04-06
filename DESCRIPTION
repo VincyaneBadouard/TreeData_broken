@@ -52,6 +52,7 @@ Imports:
     stringdist (>= 0.9.8),
     stats (>= 3.6.1),
     utils (>= 3.6.1),
+    stringr,
     taxize,
     TNRS,
     dplyr,
