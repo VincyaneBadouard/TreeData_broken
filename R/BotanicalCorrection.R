@@ -31,7 +31,6 @@ toUpperFirst <- function(x) {
 #'
 #'@importFrom stats na.omit
 #'@importFrom stringr str_squish str_replace_all
-#'@importFrom taxize apg_families
 #'@importFrom TNRS TNRS
 #'
 #' @export
