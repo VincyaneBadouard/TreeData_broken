@@ -119,8 +119,11 @@
 #'   framing values.
 #'
 #' @importFrom utils capture.output
-#' @importFrom stats na.omit complete.cases weighted.mean
-#' @importFrom shiny incProgress
+#' @importFrom stats na.omit complete.cases weighted.mean predict
+#' @importFrom shiny incProgress isRunning
+#' @importFrom data.table shift
+#' @importFrom ggrepel geom_text_repel
+#' @importFrom ggforce n_pages facet_wrap_paginate
 #'
 #' @export
 #'

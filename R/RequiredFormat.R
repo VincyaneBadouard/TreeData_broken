@@ -23,6 +23,8 @@
 #'
 #'@importFrom data.table copy setDT setDF melt tstrsplit :=
 #'@importFrom utils read.csv
+#'@importFrom units install_unit remove_unit
+
 #'
 #' @examples
 #'\dontrun{
