@@ -91,24 +91,24 @@ ItemType_lookup <- list(
     argValue = "FormatedScientificNameOptions",
     ReactiveArgValue = TRUE
   ),
-  Source = list(
-    ItemType = "pickerInput",
-    Multiple = F,
-    Options = "list( `actions-box` = TRUE)",
-    Argument = "choices",
-    Argument2 = "selected",
-    argValue = "BotanicalSourceOptions",
-    ReactiveArgValue = FALSE
-  ),
-  WFOData = list(
-    ItemType = "fileInput",
-    Multiple = F,
-    Options = F,
-    Argument = "accept",
-    Argument2 = F,
-    argValue = NA,
-    ReactiveArgValue = FALSE
-  ),
+  # Sources = list(
+  #   ItemType = "pickerInput",
+  #   Multiple = T,
+  #   Options = "list( `actions-box` = TRUE)",
+  #   Argument = "choices",
+  #   Argument2 = "selected",
+  #   argValue = "BotanicalSourceOptions",
+  #   ReactiveArgValue = FALSE
+  # ),
+  # WFOData = list(
+  #   ItemType = "fileInput",
+  #   Multiple = F,
+  #   Options = F,
+  #   Argument = "accept",
+  #   Argument2 = F,
+  #   argValue = NA,
+  #   ReactiveArgValue = FALSE
+  # ),
   OtherCrit = list(
     ItemType = "pickerInput",
     Multiple = T,
@@ -173,7 +173,7 @@ for(i in which(Fct_args$argValue %in% "TBD")) {
   if(!all(eval( Fct_args$Default[[i]]) %in% x$ItemID[x$Activate == T])){
     Fct_args$argValue[i] <- paste(deparse(Fct_args$Default[[i]]), collapse = "")
     Fct_args$ReactiveArgValue[i] <- FALSE
-    if( !Fct_args$ItemID[[i]] %in% "DiameterCorrectionWhatToCorrect") Fct_args$Default[i] <- paste0('c("', eval(Fct_args$Default[[i]])[1], '")')
+    if( !Fct_args$ItemID[[i]] %in% c("DiameterCorrectionWhatToCorrect", "BotanicalCorrectionSources")) Fct_args$Default[i] <- paste0('c("', eval(Fct_args$Default[[i]])[1], '")')
   }
 
 }

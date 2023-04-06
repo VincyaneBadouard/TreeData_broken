@@ -10,6 +10,7 @@ toUpperFirst <- function(x) {
 #' Botanical Correction
 #'
 #' @param Data Dataset (data.frame or data.table); it must contain Site and IdTree
+#' @param Sources Character vector. Taxonomic source(s) to use. Options are c("tropicos", "usda", "wfo", "wcvp") and default is all of them.
 #'
 #' @return A list with a complete log of the botanical corrections and Data with new columns:
 #'   - `Accepted_family_TreeDataCor` (character): corrected family name
@@ -29,6 +30,9 @@ toUpperFirst <- function(x) {
 #' - The log contains all details returned by TNRS (authors, etc.). Data just keeps the basic corrected names.
 #'
 #'@importFrom stats na.omit
+#'@importFrom stringr str_squish str_replace_all
+#'@importFrom taxize apg_families
+#'@importFrom TNRS TNRS
 #'
 #' @export
 #'
@@ -40,7 +44,7 @@ toUpperFirst <- function(x) {
 #'}
 #'
 #'
-BotanicalCorrection <- function(Data) {
+BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "wcvp")) {
 
   #### Arguments check ####
   # Data
@@ -227,7 +231,7 @@ BotanicalCorrection <- function(Data) {
   pass.this.unique <- unique(pass.this)
 
   tnrs <- TNRS::TNRS(pass.this.unique,
-                     sources = c("tropicos", "usda", "wfo", "wcvp"),
+                     sources = Sources,
                      classification = "tropicos")
 if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass through") else tnrs$Name_submitted <- pass.this.unique # this necessary when there is special characters
 
@@ -235,7 +239,7 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
   # leftovers <- pass.this[!pass.this %in% tnrs$Name_submitted] # I do not know why, but sometimes we have this!
   # if(length(leftovers) > 0) {
   #   tnrs2 <- TNRS::TNRS(leftovers,
-  #                      sources = c("tropicos", "usda", "wfo", "wcvp"),
+  #                      sources = Sources,
   #                      classification = "tropicos")
   #   tnrs <- rbind(tnrs, tnrs2)
   # }

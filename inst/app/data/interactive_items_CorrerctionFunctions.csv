@@ -1,4 +1,10 @@
 "Function","Label","ItemID","Default","ItemType","Multiple","Options","Argument","Argument2","argValue","ReactiveArgValue"
+"BotanicalCorrection","<tr valign=""top"">
+<td><code>Sources</code></td>
+<td>
+<p>Character vector. Taxonomic source(s) to use. Options are c(""tropicos"", ""usda"", ""wfo"", ""wcvp"") and default is all of them.</p>
+</td>
+</tr>","BotanicalCorrectionSources","c(""tropicos"", ""usda"", ""wfo"", ""wcvp"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""tropicos"", ""usda"", ""wfo"", ""wcvp"")",FALSE
 "StatusCorrection","<tr valign=""top"">
 <td><code>DeathConfirmation</code></td>
 <td>
