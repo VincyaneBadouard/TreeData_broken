@@ -47,7 +47,10 @@ utils::globalVariables(c("Site", "Plot", "Subplot", "PlotArea", "SubplotArea", "
                          "Genus_TreeDataCor", "Species_TreeDataCor", "ScientificName_TreeDataCor", "Family_TreeDataCor", "VernName_TreeDataCor",
                          "New.Genus", "New.Species", "Taxonomic.status", "Typo", "family",
                          "Taxon", "GenspFamily", "taxonomicStatus", "spec.name", "scientificName",
-                         "Old.status", "spec.name.ORIG", "BotaCorSource",
+                         "Old.status", "spec.name.ORIG",
+                         "Variety", "..Vars", "..V", "..keep", ".I", "Overall_score_returned_by_TNRS",
+                         "StatusCorrectionMeth_TreeData", "StatusCorrectionMeth_TreeData",
+                         "BotaCorSource",
                          "BotanicalCorrectionSource", "FamilyCorSource",
                          "raised", "InvariantColumns"
 ))
