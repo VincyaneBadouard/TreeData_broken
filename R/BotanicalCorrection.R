@@ -45,6 +45,9 @@ toUpperFirst <- function(x) {
 #'
 BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "wcvp")) {
 
+  ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
+
+
   #### Arguments check ####
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
@@ -67,6 +70,8 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   if(!"Variety" %in% names(Data)) Data[, Variety := NA]
 
   # Not processed: "VernName", "Voucher", "IdLevel", "Authority"
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # General string manipulations (order matters)  ---------------------------------------------------------------------------------------------------------
   # space after point
@@ -95,6 +100,10 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   M[,c("Family", "ScientificName", "Genus")] <- toUpperFirst(M[,c("Family", "ScientificName", "Genus")])
   M[,"Family"] <- gsub("[[:punct:]]", "", M[,"Family"]) # !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
   M[,"Genus"] <- gsub("[[:punct:]]", "", M[,"Genus"]) # !"#$%&’()*+,-./:;<=>?@[]^_`{|}~
+
+
+  if(ThisIsShinyApp) incProgress(1/15)
+
 
   # Handle "Family" column and get the best guess of the family ----
   # One thing that could generate many problems is using short codes instead
@@ -145,6 +154,8 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
 
   M[try.to.complete, "Family"] <- guessed.family[try.to.complete]
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # (2) find "aceae" words anywhere and keep them as the
   # most reliable source of information regarding family.
   # Remove all "aceae" words from their original locations.
@@ -171,6 +182,9 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   M[,"Species"] <- delete_aceae(M[,"Species"])
   M[,"Subspecies"] <- delete_aceae(M[,"Subspecies"])
   M[,"Variety"] <- delete_aceae(M[,"Variety"])
+
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # (3) use the "aceae" words found in previous step to
   # populate the Family column, and remove anything else
@@ -202,6 +216,9 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   M[problems2,"Species"] <- substr(M[problems2,"Species"], 3, nchar(M[problems2,"Species"]))
   M[problems3,"Species"] <- substr(M[problems3,"Species"], 4, nchar(M[problems3,"Species"]))
 
+
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # Solve redundancies between ScientificName and Species/Genus columns ----
   # A concatenation can fail if we incorporate the specific epithet twice,
   # as TNRS will try to find subspecies and varieties. It can also fail in
@@ -212,8 +229,8 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   to.remove <- gsub(" ", "|", M[,"ScientificName"]) # any individual word
   replacements <- rep("", length(to.remove))
   names(replacements) <- to.remove # this is needed for the code to run in a vectorized way
-  M[,"Species"] <- stringr::str_replace_all(M[,"Species"], replacements)
-  M[,"Genus"] <- stringr::str_replace_all(M[,"Genus"], replacements)
+  M[,"Species"] <- suppressWarnings(stringr::str_replace_all(M[,"Species"], replacements))
+  M[,"Genus"] <- suppressWarnings(stringr::str_replace_all(M[,"Genus"], replacements))
 
   # Concatenate a single string to pass to TNRS ----
   M <- matrix(stringr::str_squish(M), nrow = nrow(M), dimnames = dimnames(M))
@@ -224,6 +241,7 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
   pass.this <- stringr::str_squish(pass.this)
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Call TNRS ---
   # Use multiple sources for names, but the classification of Tropicos = APG.
@@ -234,6 +252,7 @@ BotanicalCorrection <- function(Data,  Sources = c("tropicos", "usda", "wfo", "w
                      classification = "tropicos")
 if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass through") else tnrs$Name_submitted <- pass.this.unique # this necessary when there is special characters
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # leftovers <- pass.this[!pass.this %in% tnrs$Name_submitted] # I do not know why, but sometimes we have this!
   # if(length(leftovers) > 0) {
@@ -244,6 +263,8 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
   # }
 
   tnrs <- tnrs[match(pass.this, tnrs$Name_submitted), ]
+
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Add Accepted_genus to the TNRS output, for easier management later
   g <- sapply(strsplit(tnrs$Accepted_species, split = " "), function(x) x[1])
@@ -269,6 +290,9 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
   setDT(LOG)
   LOG <- LOG[, lapply(.SD, function(x) replace(x, which(x==""), NA))]
 
+
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # We do not need to keep everything, just the stuff required for taxonomic homogeneization
   # Note: Unmatched_terms are needed to differentiate morphospecies.
   keep <- c("Accepted_family", "Accepted_genus", "Accepted_species",  "Accepted_name_rank", "Accepted_name")
@@ -280,6 +304,7 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
   # keep the best score for each tree and record issues
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # record issues
   problems <- names(which(table(unique(LOG[, ..keep])[, paste(Site, IdTree)]) > 1))
@@ -295,6 +320,8 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
   Data <- merge(Data, bestScores, by = c("Site", "IdTree"), all.x = T) # Merge back into the dataset
 
 
+  if(ThisIsShinyApp) incProgress(1/15)
+
   # Species is technically ScientificName_TreeDataCor
   Data[, ScientificName_TreeDataCor := Species_TreeDataCor]
 
@@ -304,7 +331,7 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
 
 
 
-
+  if(ThisIsShinyApp) incProgress(1/15)
 
   # Return ----
   return(list(Data = Data, log = LOG))

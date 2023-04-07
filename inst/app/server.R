@@ -1217,7 +1217,7 @@ server <- function(input, output, session) { # server ####
         }
       }
     )
-    DataCorrected(Rslt)
+    DataCorrected(Rslt$Data)
   })
 
 
