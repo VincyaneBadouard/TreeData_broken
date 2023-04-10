@@ -666,7 +666,7 @@ tabItem("Codes",
 
               column(width = 12,
                      h4("Vizualize the corrections:"),
-                     withSpinner(uiOutput(outputId = "CorrectioPlots"), color="#0dc5c1", id = "spinner"),
+                     withSpinner(uiOutput(outputId = "CorrectionPlots"), color="#0dc5c1", id = "spinner"),
                      h4("View of your corrected table:"),
                      withSpinner(DT::DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner"),
                      h4("summary of your corrected table:"),

@@ -1196,7 +1196,7 @@ server <- function(input, output, session) { # server ####
           withCallingHandlers({
             withProgress(message = paste("running", f),
                          detail = 'This may take a while...', value = 0, {
-                           Rslt <<- eval(cl)
+                          if(f %in% "BotanicalCorrection") Rslt <<- eval(cl)$Data else  Rslt <<- eval(cl)
                          })
           },
           warning = function(warn){
@@ -1217,22 +1217,19 @@ server <- function(input, output, session) { # server ####
         }
       }
     )
-    DataCorrected(Rslt$Data)
+    DataCorrected(Rslt)
   })
 
 
 
-  output$CorrectedTable <- DT::renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE,
-                                        options = list(pageLength = 8, scrollX=TRUE),
-                                        container = FooterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]),
-                                        selection = "none")
+  output$CorrectedTable <- DT::renderDT(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )], rownames = FALSE, options = list(pageLength = 8, scrollX=TRUE), container = FooterWithHeader(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]), selection = "none")
 
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
 
 
-  output$CorrectioPlots <- renderUI({
+  output$CorrectionPlots <- renderUI({
 
-    do.call(tabsetPanel, c(id='CorrPlot', type = "tabs", lapply( names(which(reactiveValuesToList(input)[c("DiameterCorrection", "StatusCorrection")] == "Yes")), function(f) {
+    do.call(tabsetPanel, c(id='CorrPlot', type = "tabs", lapply( names(which(reactiveValuesToList(input)[c("BotanicalCorrection", "DiameterCorrection", "StatusCorrection")] == "Yes")), function(f) {
 
 
      tabPanel(
@@ -1269,6 +1266,58 @@ server <- function(input, output, session) { # server ####
   })
   })
 
+  observeEvent(input$ApplyCorrections, {
+    req(DataCorrected())
+    req(input$BotanicalCorrection %in% "Yes")
+    Rslt <- BotanicalCorrectionPlot(DataCorrected())
+    DataCor <- Rslt$DataCor
+    DataCorIncongruence <- Rslt$DataCorIncongruence
+
+    output[["BotanicalCorrectionPlots"]]  <- renderUI(
+      fluidRow(
+
+        box(width = NULL,
+            h2("Standardized scientific names"),
+            p("The following boxes' title are all the corrected scientific names that were sligthly different than the ones listed in your data.  Within each box is a list of the orginal species names, and underneath each species name is the list of tree ID's that are affected by the correction."),
+            p("Note that if a tree ID had a conflicting species ID, it will be listed here but also in the next section below."),
+            p("You can collapse each box."),
+            lapply(unique(DataCor$ScientificName_TreeDataCor), function(spcor) box(
+              title = spcor,
+              "The following tag(s) had their scientific name corrected:",
+              lapply(unique(DataCor[ScientificName_TreeDataCor %in% spcor, ScientificName]), function(sp)
+                box(title = sp,
+                    width = NULL,
+                    lapply(unique(DataCor[ScientificName_TreeDataCor %in% spcor &  ScientificName %in% sp, IdTree]), function(x) p(x)),
+                    collapsible = TRUE,
+                    status = "warning")),
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status = "primary"))
+        ),
+
+
+        box(width = NULL,
+            h2("Conflicting species within a tree ID"),
+            p("The following boxes list all the tree IDs that had conflicting scientific names withing your data."),
+            p("Each boxe's title is the corrected scientific names.  Each box contains a list of tree IDs that had conflicting species ID and those species names are listed underneath each tree ID."),
+            p("You can collapse each box."),
+            lapply(unique(DataCorIncongruence$ScientificName_TreeDataCor), function(sp) box(
+              title = sp,
+              "The following tag(s) had a conflicting species ID:",
+              lapply(unique(DataCorIncongruence[ScientificName_TreeDataCor %in% sp, IdTree]), function(id)
+                box(title = id,
+                    width = NULL,
+                    lapply(unique(DataCorIncongruence[ScientificName_TreeDataCor %in% sp &  IdTree %in% id, ScientificName]), function(x) p(x)),
+                    collapsible = TRUE,
+                    status = "warning")),
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status = "warning"))
+
+        )
+      )
+    )
+  })
 
 
   # observe({
