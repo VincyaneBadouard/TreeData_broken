@@ -3,7 +3,7 @@
 #' @param Data Dataset (data.frame or data.table)
 #'   The dataset must contain the columns:
 #'   - `IdStem` (character)
-#'   - `Year` (numeric)
+#'   - `IdCensus` (ordered factor)
 #'   - `Diameter` (numeric)
 #'   - `DBHCor` (numeric)
 #'   - `HOM` (Height Of Measurement) (numeric)
@@ -91,21 +91,21 @@ DiameterCorrectionPlot <- function(
   }else{ POMcorv <- "HOM_TreeDataCor"}
 
   # Columns --------------------------------------------------------------------------------------------------------------
-  # IdStem, Year, Diameter, DBHCor, HOM, HOMCor
-  if(!all(c("Year", "Diameter", CorCol, POMv, POMcorv) %in% names(Data)))
-    stop(paste0("'Year', 'Diameter', '",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
+  # IdStem, IdCensus, Diameter, DBHCor, HOM, HOMCor
+  if(!all(c("IdCensus", "Diameter", CorCol, POMv, POMcorv) %in% names(Data)))
+    stop(paste0("'IdCensus', 'Diameter', '",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
 
 
   #### Function ####
 
   # Order IDs and times in ascending order ----------------------------------------------------------------------------
-  Data <- Data[order(get(ID), Year)]
+  Data <- Data[order(get(ID), IdCensus)]
 
   if(OnlyCorrected == TRUE){
     # Only corrected stems ----------------------------------------------------------------------------------------------
-    IDCor <- Data[Diameter != get(CorCol) | is.na(get(CorCol)), get(ID)] #  corrected stems
+    IDCor <- Data[Diameter != get(CorCol) | (is.na(get(CorCol)) & !is.na(Diameter)), get(ID)] #  corrected stems
 
-    DataCor <- Data[get(ID) %in% IDCor] #  corrected stems
+    DataCor <- Data[get(ID) %in% IDCor, ] #  corrected stems
 
   }else{
     DataCor <- Data
@@ -122,11 +122,11 @@ DiameterCorrectionPlot <- function(
 
 
   p <- ggplot(DataCor) +
-    aes(x = Year, y = Diameter) +
+    aes(x = IdCensus, y = Diameter) +
 
 
     geom_point(aes(color = "Initial"),  shape = "circle", size = 3.9) +
-    geom_line(linetype = "dotted", color = "grey") +
+    # geom_line(linetype = "dotted", color = "grey") +
     ggrepel::geom_text_repel(data = DataCor[ !is.na(Diameter) & !is.na(get(POMv)),],
                              aes(label = get(POMv), colour = paste("initial", POMv)),
                              point.size = 3.9, size = 3, direction = "y") +
@@ -144,52 +144,13 @@ DiameterCorrectionPlot <- function(
                              point.size = 3.9, size = 3, direction = "y") +
 
     geom_point(data = DataCor[!is.na(Diameter) & !is.na(get(CorCol)) & Diameter != get(CorCol), ], aes(y = get(CorCol), color = "Corrected", shape = DiameterCorrectionMeth_TreeData), size = 3.9) +
-    geom_line(data = DataCor[!is.na(Diameter) & !is.na(get(CorCol)) & Diameter != get(CorCol), ], aes(y =  get(CorCol), color = "Corrected")) +
+    # geom_line(data = DataCor[!is.na(Diameter) & !is.na(get(CorCol)) & Diameter != get(CorCol), ], aes(y =  get(CorCol), color = "Corrected")) +
     ggrepel::geom_text_repel(data = DataCor[ !is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter), ],
                              aes(y = get(CorCol), label = get(POMcorv), colour = paste("new", POMv)),
                              point.size = 3.9, size = 3, direction = "y") +
 
-    geom_line(data = DataCor[!is.na(get(CorCol)), ], aes(y =  get(CorCol))) +
+    # geom_line(data = DataCor[!is.na(get(CorCol)), ], aes(y =  get(CorCol))) +
 
-
-    # Duplicated measurement
-    # {if(nrow(subset(DataCor, !is.na(Diameter) & is.na(get(CorCol)))) > 0)
-    #   geom_point(data = subset(DataCor, !is.na(Diameter) & is.na(get(CorCol))),
-    #              aes(y = Diameter,
-    #                  color = 'Duplicated measurement'),
-    #              shape = "circle", size = 3.9) } +
-    # Initial
-    # geom_point(data = subset(DataCor, !is.na(Diameter)),
-    #            aes(y = Diameter,
-    #                color = ifelse(is.na(get(CorCol)), 'Not able to correct', ifelse(Diameter != get(CorCol), 'Initial',  'Conserved'))),
-    #            shape = "circle", size = 3.9) +
-    #
-    # geom_line(aes(y = Diameter), linetype = "dotted", color = "grey")+
-    #
-    # geom_line(data = subset(DataCor, !is.na(Diameter)),
-    #           aes(y = Diameter, color = ifelse(is.na(get(CorCol)), 'Not able to correct', ifelse(Diameter != get(CorCol), 'Initial',  'Conserved')))) +
-    #
-    #
-    # ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(Diameter) & !is.na(get(POMv)))),
-    #                         aes(y = Diameter, label = get(POMv), colour = "POM or HOM"),
-    #                         point.size = 3.9, size = 3, direction = "y") +
-    #
-    # Corrected
-    # geom_line(data = subset(DataCor, !is.na(get(CorCol))),
-    #           aes(y = get(CorCol), color = ifelse(Diameter != get(CorCol), 'Corrected', 'Conserved') )) +
-    #
-    # geom_point(data = subset(DataCor,
-    #                          Diameter != get(CorCol) | is.na(Diameter)), aes(y = get(CorCol), color = 'Corrected', shape =  ifelse(Diameter != get(CorCol) | is.na(Diameter), DiameterCorrectionMeth_TreeData, "none")), size = 3.9) +
-    #
-    # ggrepel::geom_text_repel(data = subset(DataCor,
-    #                                       (!is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter))),
-    #                         aes(y = get(CorCol), label = get(POMcorv), colour = "POM or HOM"),
-    #                         point.size = 3.9, size = 3, direction = "y") +
-    # ggrepel::geom_text_repel(data = subset(DataCor, (!is.na(get(CorCol)) & DiameterCorrectionMeth_TreeData != "")),
-    #                          aes(y = get(CorCol), label = DiameterCorrectionMeth_TreeData, colour = "Method"),
-    #                          point.size = 10, size = 3) +
-
-    # Colours
     scale_colour_manual(name = "Status", values = c("Conserved" = "black",
                                                     # {if(nrow(subset(DataCor, !is.na(Diameter) & is.na(get(CorCol)))) > 0)
                                                     #   "Duplicated measurement" = "grey" },
@@ -201,6 +162,8 @@ DiameterCorrectionPlot <- function(
                                                     "initial POM" = "grey40",
                                                     "new HOM" = "darkgreen",
                                                     "new POM" = "darkgreen"))
+  # +
+  #     scale_x_continuous(labels = levels(DataCor$IdCensus))
 
 
   p  <- p + guides(shape= guide_legend(ncol = 2, override.aes = list(color = "forestgreen")),
@@ -211,7 +174,7 @@ DiameterCorrectionPlot <- function(
     # Titles
     labs(
       # title =  paste("ID: ",unique(DataCor[, get(ID)]),""),
-      x = "Year", y = "Diameter (cm)", shape = "Correction Method")
+      x = "Census", y = "Diameter (cm)", shape = "Correction Method")
 
 
   nPages <- ggforce::n_pages(p+

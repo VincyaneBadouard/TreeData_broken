@@ -16,7 +16,7 @@ DiameterCorrectionPlot(
 The dataset must contain the columns:
 \itemize{
 \item \code{IdStem} (character)
-\item \code{Year} (numeric)
+\item \code{IdCensus} (ordered factor)
 \item \code{Diameter} (numeric)
 \item \code{DBHCor} (numeric)
 \item \code{HOM} (Height Of Measurement) (numeric)

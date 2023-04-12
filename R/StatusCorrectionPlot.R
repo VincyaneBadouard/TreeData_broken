@@ -137,7 +137,10 @@ StatusCorrectionPlot <- function(
       # Titles
       labs(
         # title =  paste("ID: ",unique(DataCor[,get(ID)],""),
-        x = "Census ID", y = "LifeStatus")
+        x = "Census ID", y = "LifeStatus") +
+    theme(legend.position = "bottom") +
+    guides(color=guide_legend(nrow=5,byrow=TRUE, title.position = "top"),
+           shape=guide_legend(nrow=5,byrow=TRUE, title.position = "top"))
 
 
   nPages <- ggforce::n_pages(p+
@@ -153,12 +156,13 @@ StatusCorrectionPlot <- function(
       dev.new()
 
     for(k in seq_len( nPages)) {
+      print(k)
       print(
         p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = k)
 
       )
 
-      if(SeveralWindows == TRUE & i < nPages)
+      if(SeveralWindows == TRUE & k < nPages)
         dev.new()
     }
   }

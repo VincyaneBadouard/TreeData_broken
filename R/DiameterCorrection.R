@@ -5,7 +5,7 @@
 #'   - `IdTree` or `IdStem` (character)
 #'   - `ScientificName_TreeDataCor` (character)
 #'   - `Diameter` (numeric)
-#'   - `Year` (numeric)
+#'   - `IdCensus` (ordered factor)
 #'   - **`POM` (Point Of Measurement) (factor)** or
 #'     **`HOM` (Height Of Measurement) (numeric)** if you want to correct from
 #'      the **"POM change"**
@@ -38,12 +38,12 @@
 #'   - *TaperParameter*: Taper parameter (unitless)
 #'
 #' @param KeepMeas In case of **multiple diameter measurements** in the same
-#'   census year:
+#'   census:
 #' Possible values: "MaxHOM", "MaxDate" (character).
 #'   - "MaxHOM": apply the correction to the measurement taken at the
 #'               **highest POM**
 #'   - "MaxDate": apply the correction to the **most recent measurement** (same
-#'                year but more recent date)
+#'                IdCensus but more recent date)
 #'
 # param MaxDBH Maximum possible DBH (Diameter at the default HOM) of your
 # stand in cm (numeric, 1 value)
@@ -113,7 +113,7 @@
 #' @details When there is only 1 `Diameter` value for a tree/stem,
 #'   `Diameter_TreeDataCor` takes the original `Diameter` value. If this value
 #'   is 0 or > MaxDBH, `Diameter_TreeDataCor` takes NA. Diameters not linked to
-#'   an IdTree/IdStem or to a Census Year are not processed.
+#'   an IdTree/IdStem or to a Census IdCensus are not processed.
 #'   Punctual error correction only with linear regression and not quadratic,
 #'   because punctual errors are corrected from a local regression with the 2
 #'   framing values.
@@ -292,7 +292,7 @@ DiameterCorrection <- function(
     # nrow(Data) == nrow(AliveTrees) + nrow(DeadTrees) # to check
   }
 
-  # Remove duplicated measurements per Year because different POM or Date -----------------------------------
+  # Remove duplicated measurements per IdCensus because different POM or Date -----------------------------------
   CompleteData <- copy(Data)
 
   Data <- UniqueMeasurement(Data, KeepMeas = KeepMeas, ID = ID)
@@ -706,11 +706,11 @@ DiameterCorrection <- function(
 
 
 
-        do = DiameterHistory[i,j] # original DBH of that year
+        do = DiameterHistory[i,j] # original DBH of that IdCensus
 
         DiameterHistory[i,j] <- pd + wg * DateDiff[i, j]
 
-        dn = DiameterHistory[i,j] # new DBH of that year
+        dn = DiameterHistory[i,j] # new DBH of that IdCensus
 
 
 
@@ -810,7 +810,7 @@ DiameterCorrection <- function(
 
     idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterCorrected$rn, DiameterCorrected$IdCensus))
 
-    Data$Diameter_TreeDataCor <- DiameterCorrected$value[idx]
+    Data$Diameter_TreeDataCor <- as.numeric(mapply(function(x,y){as.character(round(x,y))}, DiameterCorrected$value[idx], nchar(gsub(".*\\d*\\.", "", prettyNum(Data$Diameter, drop0trailing = F))))) # rounding to the same n digits as original diameter (way more complicated that what you would think!)
 
     if(ThisIsShinyApp) incProgress(1/15)
 

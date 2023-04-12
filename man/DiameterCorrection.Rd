@@ -32,7 +32,7 @@ The dataset must contain the columns:
 \item \code{IdTree} or \code{IdStem} (character)
 \item \code{ScientificName_TreeDataCor} (character)
 \item \code{Diameter} (numeric)
-\item \code{Year} (numeric)
+\item \code{IdCensus} (ordered factor)
 \item \strong{\code{POM} (Point Of Measurement) (factor)} or
 \strong{\code{HOM} (Height Of Measurement) (numeric)} if you want to correct from
 the \strong{"POM change"}
@@ -70,13 +70,13 @@ With:
 }}
 
 \item{KeepMeas}{In case of \strong{multiple diameter measurements} in the same
-census year:
+census:
 Possible values: "MaxHOM", "MaxDate" (character).
 \itemize{
 \item "MaxHOM": apply the correction to the measurement taken at the
 \strong{highest POM}
 \item "MaxDate": apply the correction to the \strong{most recent measurement} (same
-year but more recent date)
+IdCensus but more recent date)
 }}
 
 \item{PositiveGrowthThreshold}{in cm/year: a tree
@@ -155,7 +155,7 @@ Diameter correction
 When there is only 1 \code{Diameter} value for a tree/stem,
 \code{Diameter_TreeDataCor} takes the original \code{Diameter} value. If this value
 is 0 or > MaxDBH, \code{Diameter_TreeDataCor} takes NA. Diameters not linked to
-an IdTree/IdStem or to a Census Year are not processed.
+an IdTree/IdStem or to a Census IdCensus are not processed.
 Punctual error correction only with linear regression and not quadratic,
 because punctual errors are corrected from a local regression with the 2
 framing values.
