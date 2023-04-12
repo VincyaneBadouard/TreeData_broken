@@ -80,7 +80,7 @@
 The dataset must contain the columns:</p><ul><li><p><code>IdTree</code> or <code>IdStem</code> (character)</p></li>
 <li><p><code>ScientificName_TreeDataCor</code> (character)</p></li>
 <li><p><code>Diameter</code> (numeric)</p></li>
-<li><p><code>Year</code> (numeric)</p></li>
+<li><p><code>IdCensus</code> (ordered factor)</p></li>
 <li><p><strong><code>POM</code> (Point Of Measurement) (factor)</strong> or
 <strong><code>HOM</code> (Height Of Measurement) (numeric)</strong> if you want to correct from
 the <strong>"POM change"</strong>
@@ -124,11 +124,11 @@ With:</p><ul><li><p><em>DAB</em>: Diameter Above Buttress (in cm)</p></li>
 
 <dt>KeepMeas</dt>
 <dd><p>In case of <strong>multiple diameter measurements</strong> in the same
-census year:
+census:
 Possible values: "MaxHOM", "MaxDate" (character).</p><ul><li><p>"MaxHOM": apply the correction to the measurement taken at the
 <strong>highest POM</strong></p></li>
 <li><p>"MaxDate": apply the correction to the <strong>most recent measurement</strong> (same
-year but more recent date)</p></li>
+IdCensus but more recent date)</p></li>
 </ul></dd>
 
 
@@ -224,7 +224,7 @@ measured.</p></li>
     <p>When there is only 1 <code>Diameter</code> value for a tree/stem,
 <code>Diameter_TreeDataCor</code> takes the original <code>Diameter</code> value. If this value
 is 0 or &gt; MaxDBH, <code>Diameter_TreeDataCor</code> takes NA. Diameters not linked to
-an IdTree/IdStem or to a Census Year are not processed.
+an IdTree/IdStem or to a Census IdCensus are not processed.
 Punctual error correction only with linear regression and not quadratic,
 because punctual errors are corrected from a local regression with the 2
 framing values.</p>
@@ -245,14 +245,6 @@ framing values.</p>
 <span class="r-in"><span>    MinIndividualNbr <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="DiameterCorrectionPlot.html">DiameterCorrectionPlot</a></span><span class="op">(</span><span class="va">Rslt</span>, OnlyCorrected <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_line()`: Each group consists of only one observation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
