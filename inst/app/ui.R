@@ -650,6 +650,7 @@ tabItem("Codes",
               )
               ))
             }),
+            fluidRow(
             hidden(actionBttn(
               inputId = "ApplyCorrections",
               label = "Apply Corrections",
@@ -661,12 +662,16 @@ tabItem("Codes",
               label = "Go To Output format",
               style = "material-flat",
               color = "success"
-            )),
+            ))
+            ),
             fluidRow(
 
               column(width = 12,
                      h4("Vizualize the corrections:"),
-                     withSpinner(uiOutput(outputId = "CorrectionPlots"), color="#0dc5c1", id = "spinner"),
+                     p("Figures may take a while to render..."),
+                     tabsetPanel(id = "CorrectionPlots"),
+
+                     # withSpinner(uiOutput(outputId = "CorrectionPlots"), color="#0dc5c1", id = "spinner"),
                      h4("View of your corrected table:"),
                      withSpinner(DT::DTOutput(outputId = "CorrectedTable"), color="#0dc5c1", id = "spinner"),
                      h4("summary of your corrected table:"),

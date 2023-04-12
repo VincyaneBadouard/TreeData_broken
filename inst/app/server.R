@@ -1212,9 +1212,29 @@ server <- function(input, output, session) { # server ####
             names(p) <- f
 
             CorrectionPlots(append(CorrectionPlots(), p))
+
+            p <- p[[f]]
+
+
+            removeTab(inputId = "CorrectionPlots", target = f) # this to avoid several tabs to be added as function is turned off and on
+
+            appendTab(inputId = "CorrectionPlots",
+                      tabPanel(f,
+                               do.call(tabsetPanel, c(id= paste0(f, 'IndCorrPlots'), type = "tabs", lapply(seq_len(p$nPages), function(k) {
+                                 tabPanel(
+                                 title = paste("Page", k)
+                               )
+                               }))),
+                               plotOutput(paste0("IndCorrPlot", f))
+                               ))
           }
 
-        }
+
+      } else {
+        removeTab(inputId = "CorrectionPlots", target = f)
+
+      }
+
       }
     )
     DataCorrected(Rslt)
@@ -1227,44 +1247,25 @@ server <- function(input, output, session) { # server ####
   output$CorrectedTableSummary <- renderPrint(summary(DataCorrected()[,lapply(.SD, function(x) {if(all(is.na(x))) {NULL} else {x}} )]))
 
 
-  output$CorrectionPlots <- renderUI({
-
-    do.call(tabsetPanel, c(id='CorrPlot', type = "tabs", lapply( names(which(reactiveValuesToList(input)[c("BotanicalCorrection", "DiameterCorrection", "StatusCorrection")] == "Yes")), function(f) {
-
-
-     tabPanel(
-        title=f,
-        uiOutput(outputId = paste0(f, "Plots"))
-      )
-
-    })))
-
-
-
-  })
 
 
   observe({
 
-    lapply(names(CorrectionPlots()), function(f){
+    req(length(CorrectionPlots())> 0)
+    req(input$CorrectionPlots)
+    req(input[[paste0(input$CorrectionPlots, "IndCorrPlots")]])
 
-      p <- CorrectionPlots()[[f]]
+    p <- CorrectionPlots()[[input$CorrectionPlots]]
 
-      output[[paste0(f, "Plots")]] <- renderUI(
-        do.call(tabsetPanel, c(id='IndCorrPlot', type = "tabs", lapply(seq_len(p$nPages), function(k) { tabPanel(
-          title = paste("Page", k),
-          plotOutput( paste0(f, k))
-        )
-        }))))
 
-      for(k in seq_len( p$nPages)) {
-        output[[paste0(f, k)]] <- renderPlot({
-          p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = k)
+
+        output[[paste0("IndCorrPlot", input$CorrectionPlots)]]<- renderPlot({
+          p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = as.numeric(gsub("Page ", "", input[[paste0(input$CorrectionPlots, "IndCorrPlots")]])))
         })
-      }
+
 
   })
-  })
+
 
   observeEvent(input$ApplyCorrections, {
     req(DataCorrected())
