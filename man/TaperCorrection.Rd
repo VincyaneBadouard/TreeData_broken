@@ -61,6 +61,7 @@ library(data.table)
 Data <- data.table(IdStem = "A",
       ScientificName = "Tree",
       Year = c(1998, 2008, 2016, 2017, 2018, 2019, 2021),
+      IdCensus = factor(c(1998, 2008, 2016, 2017, 2018, 2019, 2021), ordered = TRUE),
       Diameter = c(19, 19, 21.4, 22.6, 23.1, 23.1, 23.6),
       HOM = c(1.30, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25))
 
