@@ -72,11 +72,12 @@
 <span>  CorrectionType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"individual"</span>, <span class="st">"phylogenetic hierarchical"</span><span class="op">)</span>,</span>
 <span>  DBHRange <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  MinIndividualNbr <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  OtherCrit <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MinDBH <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  AddMissedRecruits <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>  AddMissedStems <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  DBHCorForDeadTrees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coef <span class="op">=</span> <span class="fl">0.9</span>,</span>
-<span>  OnlyDetectMissedRecruits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  MinDBH <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  OnlyDetectMissedRecruits <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -206,12 +207,21 @@ cm) (numeric, 1 value)</p></dd>
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)</p></dd>
 
 
-<dt>OtherCrit</dt>
-<dd><p>Other criteria to select the individuals used for the
-calculation of the mean growth in the "phylogenetic hierarchical"
-correction. Give the name of the column(s) for which the individuals must
-have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-(character)</p></dd>
+<dt>MinDBH</dt>
+<dd><p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p></dd>
+
+
+<dt>AddMissedRecruits</dt>
+<dd><p>(logical) TRUE: adds rows for stem that were supposed
+to be recruited at a prior census, based on their estimated diameter (from linear regression)
+and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+recruited earlier.</p></dd>
+
+
+<dt>AddMissedStems</dt>
+<dd><p>(logical) if TRUE, adds rows for trees that were missed between
+two censuses, with their estimated diameter (based on linear regression)</p></dd>
 
 
 <dt>DBHCorForDeadTrees</dt>
@@ -227,11 +237,6 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 <dt>OnlyDetectMissedRecruits</dt>
 <dd><p>TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)</p></dd>
-
-
-<dt>MinDBH</dt>
-<dd><p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
-NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p></dd>
 
 </dl></div>
     <div class="section level2">

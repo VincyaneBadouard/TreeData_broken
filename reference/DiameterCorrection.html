@@ -59,6 +59,9 @@
 <span>  TaperFormula <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">DAB</span>, <span class="va">HOM</span>, <span class="va">TaperParameter</span>, <span class="va">DefaultHOM</span><span class="op">)</span> <span class="va">DAB</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">TaperParameter</span></span>
 <span>    <span class="op">*</span> <span class="op">(</span><span class="va">HOM</span> <span class="op">-</span> <span class="va">DefaultHOM</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span>,</span>
+<span>  MinDBH <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  AddMissedRecruits <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  AddMissedStems <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  PositiveGrowthThreshold <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  NegativeGrowthThreshold <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>,</span>
 <span>  Pioneers <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -67,7 +70,6 @@
 <span>  CorrectionType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"individual"</span>, <span class="st">"phylogenetic hierarchical"</span><span class="op">)</span>,</span>
 <span>  DBHRange <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  MinIndividualNbr <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  OtherCrit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  DBHCorForDeadTrees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coef <span class="op">=</span> <span class="fl">0.9</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -132,6 +134,23 @@ IdCensus but more recent date)</p></li>
 </ul></dd>
 
 
+<dt>MinDBH</dt>
+<dd><p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p></dd>
+
+
+<dt>AddMissedRecruits</dt>
+<dd><p>(logical) TRUE: adds rows for stem that were supposed
+to be recruited at a prior census, based on their estimated diameter (from linear regression)
+and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+recruited earlier.</p></dd>
+
+
+<dt>AddMissedStems</dt>
+<dd><p>(logical) if TRUE, adds rows for trees that were missed between
+two censuses, with their estimated diameter (based on linear regression)</p></dd>
+
+
 <dt>PositiveGrowthThreshold</dt>
 <dd><p>in cm/year: a tree
 widening by more than this value is considered abnormal (numeric, 1 value)</p></dd>
@@ -187,14 +206,6 @@ cm) (numeric, 1 value)</p></dd>
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)</p></dd>
 
 
-<dt>OtherCrit</dt>
-<dd><p>Other criteria to select the individuals used for the
-calculation of the mean growth in the "phylogenetic hierarchical"
-correction. Give the name of the column(s) for which the individuals must
-have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-(character)</p></dd>
-
-
 <dt>DBHCorForDeadTrees</dt>
 <dd><p>(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
@@ -209,7 +220,7 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Fill the <em>Comment_TreeData</em> column with error type informations and add columns:</p><ul><li><p><em>Diameter_TreeDataCor</em>: corrected trees diameter at default HOM</p></li>
+<p>Fill the <em>Comment_TreeData</em> column with error type information and add columns:</p><ul><li><p><em>Diameter_TreeDataCor</em>: corrected trees diameter at default HOM</p></li>
 <li><p><em>DiameterCorrectionMeth_TreeData</em> = "local linear regression","weighted
 mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
 "shift realignment"/"Same value".</p></li>
@@ -237,14 +248,25 @@ framing values.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">TestData</span><span class="op">$</span><span class="va">HOM</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">1.5</span>,<span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">TestData</span><span class="op">$</span><span class="va">Diameter</span><span class="op">[</span><span class="fl">21</span><span class="op">:</span><span class="fl">23</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">31</span>,<span class="fl">91</span>,<span class="fl">14</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">TestData</span> <span class="op">&lt;-</span> <span class="va">TestData</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="va">IdStem</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"100658_1_auto"</span> <span class="op">&amp;</span> <span class="va">IdCensus</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">2017</span><span class="op">)</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">DiameterCorrection</span><span class="op">(</span></span></span>
 <span class="r-in"><span> <span class="va">TestData</span>,</span></span>
 <span class="r-in"><span>  WhatToCorrect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POM change"</span>, <span class="st">"Abnormal growth"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    CorrectionType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"phylo"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    MinIndividualNbr <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>We added rows for trees that were supposed to be recruited earlier based on linear extrapolation of growth and MinDBH</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> We added rows for trees that were missed and estimated their missed DBH by linear interpolation</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="DiameterCorrectionPlot.html">DiameterCorrectionPlot</a></span><span class="op">(</span><span class="va">Rslt</span>, OnlyCorrected <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 80 rows containing missing values (`geom_point()`).</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
