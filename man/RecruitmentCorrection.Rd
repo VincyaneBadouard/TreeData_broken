@@ -59,8 +59,8 @@ data(TestData)
 setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 
 Rslt <- RecruitmentCorrection(TestData)
-IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
-TreesCorr <- Rslt[IdTree \%in\% IdCorr]
+IdCorr <- Rslt[CorrectedRecruit \%in\%  TRUE, IdStem]
+TreesCorr <- Rslt[IdStem \%in\% IdCorr]
 
 library(ggplot2)
 ggplot(TreesCorr) +
@@ -68,6 +68,6 @@ aes(x = Year, y = Diameter_TreeDataCor) +
   geom_line(size = 0.5, colour = "#112446") +
   geom_point(shape = "circle", size = 1.5, mapping = aes(color = CorrectedRecruit)) +
   theme_minimal() +
-  facet_wrap(vars(IdTree), scales = "free")
+  facet_wrap(vars(IdStem), scales = "free")
 
 }

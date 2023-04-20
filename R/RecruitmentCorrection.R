@@ -46,8 +46,8 @@
 #' setnames(TestData, "Diameter", "Diameter_TreeDataCor", skip_absent=TRUE)
 #'
 #' Rslt <- RecruitmentCorrection(TestData)
-#' IdCorr <- Rslt[CorrectedRecruit == TRUE, IdTree]
-#' TreesCorr <- Rslt[IdTree %in% IdCorr]
+#' IdCorr <- Rslt[CorrectedRecruit %in%  TRUE, IdStem]
+#' TreesCorr <- Rslt[IdStem %in% IdCorr]
 #'
 #' library(ggplot2)
 #' ggplot(TreesCorr) +
@@ -55,7 +55,7 @@
 #'   geom_line(size = 0.5, colour = "#112446") +
 #'   geom_point(shape = "circle", size = 1.5, mapping = aes(color = CorrectedRecruit)) +
 #'   theme_minimal() +
-#'   facet_wrap(vars(IdTree), scales = "free")
+#'   facet_wrap(vars(IdStem), scales = "free")
 #'
 RecruitmentCorrection <- function(
     Data,
@@ -97,11 +97,14 @@ RecruitmentCorrection <- function(
   # ---------------------------------------------------------------------------------------------------------
 
   # If MinDBH is provided, overwrite the one in the data
-  if(!is.null(MinDBH)) {
+  if(ifelse(ThisIsShinyApp, !is.na(MinDBH), !is.null(MinDBH))) { # !is.na(MinDBH)  is needed when inside the app
     if(!inherits(MinDBH, c("numeric", "integer"))) stop("MinDBH must be numeric")
     if(length(MinDBH) > 1) stop("MinDBH must be numeric value of length 1")
 
     Data$MinDBH <- MinDBH
+  } else {
+    if(!"MinDBH" %in% names(Data)) stop("You don't have MinDBH in your dataset, please provide a MinDBH in the arguments.")
+    # -----------------------------------------------------------------------
   }
 
   # OnlyDetectMissedRecruits (logical)
