@@ -7,7 +7,7 @@ test_that("RequiredFormat", {
   input <- ParacouProfile
 
   expect_warning(
-    DataFormated <- RequiredFormat(Data, input ),
+    DataFormated <- RequiredFormat(Data, input, MeasLevel = "Tree" ),
     "You did not provide a Census ID column. We will use year as census ID.
 MinDBH was calculated.
 You did not specify a subplot area.")
@@ -52,11 +52,11 @@ You did not specify a subplot area.")
   input$DiameterUnitMan <- ParacouProfile$DiameterUnitMan
   input$CircUnitMan <- ParacouProfile$CircUnitMan
 
-  expect_error(expect_error(RequiredFormat(Data, input))) # don't expect the error anymore, but still warning
+  expect_error(expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ))) # don't expect the error anymore, but still warning
 
   # expect warning if no IdTree and no Tree Tag
   input$IdTree = input$TreeFieldNum = "none"
-  expect_warning(RequiredFormat(Data, input ), "You are missing treeIDs")
+  expect_warning(RequiredFormat(Data, input, MeasLevel = "Tree" ), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
@@ -64,18 +64,18 @@ You did not specify a subplot area.")
 
   # expect IdTree to be have Tree Tag if IdTree is "none"
   input$IdTree =  "none"
-  if( input$IdTree %in% "none" & !  input$TreeFieldNum %in% "none") expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) grepl(x["TreeFieldNum"] , x["IdTree"])))), "You are missing treeIDs")
+  if( input$IdTree %in% "none" & !  input$TreeFieldNum %in% "none") expect_warning(expect_true(all(apply(RequiredFormat(Data, input, MeasLevel = "Tree"), 1, function(x) grepl(x["TreeFieldNum"] , x["IdTree"])))), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
-  expect_error(expect_warning(RequiredFormat(Data, input ))) # don't expect the warning anymore
+  expect_error(expect_warning(RequiredFormat(Data, input, MeasLevel = "Tree" ))) # don't expect the warning anymore
 
   # expect IdTree to be filled with "auto" if is NA
   input$IdStem <- "IdStem"
   Data$IdStem <- Data$idTree
   Data[, input$IdTree][sample(10)] <- NA
 
-  expect_warning(expect_true(all(grepl("_auto", RequiredFormat(Data, input )$IdTree[is.na(Data[, input$IdTree])]))), "You are missing treeIDs")
+  expect_warning(expect_true(all(grepl("_auto", RequiredFormat(Data, input, MeasLevel = "Tree" )$IdTree[is.na(Data[, input$IdTree])]))), "You are missing treeIDs")
 
   input$IdTree <- ParacouProfile$IdTree
   input$TreeFieldNum <- ParacouProfile$TreeFieldNum
@@ -83,7 +83,7 @@ You did not specify a subplot area.")
 
   # expect IdTree to have Site, Plot and Subplot name, even when those are not in columns
   input$IdTree =  "none"
-  expect_warning(expect_true(all(apply(RequiredFormat(Data, input ), 1, function(x) {all(
+  expect_warning(expect_true(all(apply(RequiredFormat(Data, input, MeasLevel = "Tree" ), 1, function(x) {all(
     grepl(x["Site"] , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
       grepl(x["Subplot"] , x["IdTree"]))}))), "You are missing treeIDs")
@@ -95,7 +95,7 @@ You did not specify a subplot area.")
   input$Subplot <- "none"
   input$SubplotMan = ""
 
-  expect_true(all(apply(suppressWarnings(RequiredFormat(Data, input )), 1, function(x) {all(
+  expect_true(all(apply(suppressWarnings(RequiredFormat(Data, input, MeasLevel = "Tree" )), 1, function(x) {all(
     grepl("SiteA" , x["IdTree"]) &
       grepl(x["Plot"] , x["IdTree"]) &
       grepl("SubplotA" , x["IdTree"]))})))
@@ -171,7 +171,7 @@ You did not specify a subplot area.")
         oi <-  input[[UnitItemID]]
         input[[UnitItemID]]= i
 
-        if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits.") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+        if(i %in% "none") expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ), "is not recognized by udunits.") else expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
 
         input[[UnitItemID]] = oi # so that does not through an error anymore
 
@@ -199,7 +199,7 @@ You did not specify a subplot area.")
          oi <-  input[[paste0(j, "UnitMan")]]
          input[[paste0(j, "UnitMan")]]= i
 
-         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         if(i %in% "none") expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
          input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
 
        }
@@ -230,7 +230,7 @@ You did not specify a subplot area.")
          oi <-  input[[paste0(j, "UnitMan")]]
          input[[paste0(j, "UnitMan")]]= i
 
-         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         if(i %in% "none") expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
          input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
 
        }
@@ -269,7 +269,7 @@ You did not specify a subplot area.")
          oi <-  input[[paste0(j, "UnitMan")]]
          input[[paste0(j, "UnitMan")]]= i
 
-         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         if(i %in% "none") expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
          input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
 
        }
@@ -307,7 +307,7 @@ You did not specify a subplot area.")
          oi <-  input[[paste0(j, "UnitMan")]]
          input[[paste0(j, "UnitMan")]]= i
 
-         if(i %in% "none") expect_error(RequiredFormat(Data, input ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
+         if(i %in% "none") expect_error(RequiredFormat(Data, input, MeasLevel = "Tree" ), "is not recognized by udunits") else expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )[,(j),with = F][[1]], Data[,input[[j]]] * cf)
          input[[paste0(j, "UnitMan")]] = oi # so that does not through an error anymore
 
        }
@@ -347,7 +347,7 @@ You did not specify a subplot area.")
   # expect year to be filled
   input$Year = "none"
   input$YearMan = -999
-  expect_equal(RequiredFormat(Data, input )$Year, DataFormated$Year)
+  expect_equal(RequiredFormat(Data, input, MeasLevel = "Tree" )$Year, DataFormated$Year)
 
   input$Year <- ParacouProfile$Year
 
@@ -359,24 +359,24 @@ You did not specify a subplot area.")
   input$Genus =  input$Species = "none"
   input$ScientificNameSepMan = " "
 
-  DataFormated <- RequiredFormat(Data, input)
+  DataFormated <- RequiredFormat(Data, input, MeasLevel = "Tree" )
 
   expect_true(all(!is.na(DataFormated$Genus[!is.na(DataFormated$ScientificName)])) & all(!is.na(DataFormated$Species[!is.na(DataFormated$ScientificName)])))
 
   # make sure date format is handled correctly even when numeric or decimal
   Data[,  input$Date] <- as.numeric(DataFormated$Date)
   input$DateFormatMan = "numeric"
-  expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)) |  all(is.na(RequiredFormat(Data, input )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)])))
+  expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input, MeasLevel = "Tree" )$Date)) |  all(is.na(RequiredFormat(Data, input, MeasLevel = "Tree" )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input , MeasLevel = "Tree" )$Date)])))
 
 
   Data[,  input$Date] <- lubridate::decimal_date(DataFormated$Date)
   input$DateFormatMan = "decimal"
-  expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input )$Date)) |  all(is.na(RequiredFormat(Data, input )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}",RequiredFormat(Data, input )$Date)])))
+  expect_true(all(grepl("\\d{4}-\\d{2}-\\d{2}", RequiredFormat(Data, input, MeasLevel = "Tree"  )$Date)) |  all(is.na(RequiredFormat(Data, input, MeasLevel = "Tree"  )$Date[!grepl("\\d{4}-\\d{2}-\\d{2}",RequiredFormat(Data, input, MeasLevel = "Tree"  )$Date)])))
 
 
   # expect warning if some dates were not translated correctly
   Data[sample(10), input$Date] <- "doubidou"
-  expect_warning(RequiredFormat(Data, input ), "Some dates were translated as NA")
+  expect_warning(RequiredFormat(Data, input, MeasLevel = "Tree" ), "Some dates were translated as NA")
 
   # WITH ForestGEO ####
   data(ForestGeoSubset)
@@ -384,7 +384,7 @@ You did not specify a subplot area.")
   Data <- ForestGeoSubset
   input <- ForestGeoProfile
 
-  expect_warning(RequiredFormat(Data, input), "You did not specify a Site column or name, we will consider you have only one site called 'SiteA'.
+  expect_warning(RequiredFormat(Data, input, MeasLevel = "Stem" ), "You did not specify a Site column or name, we will consider you have only one site called 'SiteA'.
 You did not specify a plot area.
 You did not specify a subplot area.")
 
@@ -404,7 +404,7 @@ You did not specify a subplot area.")
   input$DateFormat = NULL
   input$MeasLevel = "Stem"
 
-  expect_warning(DataFormated <- RequiredFormat(Data, input), "You are missing treeID")
+  expect_warning(DataFormated <- RequiredFormat(Data, input, MeasLevel = "Stem"), "You are missing treeID")
 
   # make sure no IdTree is NA
   expect_false(any(is.na(DataFormated$IdTree)))
