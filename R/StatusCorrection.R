@@ -358,6 +358,8 @@ if(ThisIsShinyApp) incProgress(1/15)
   # Creating rows for absents ####
   if(AddRowsForForgottenCensuses) {
 
+    NewStatusHistory <- NewStatusHistory[!is.na(value), ] # this is to avoid adding rows before recruits
+
     # identify cases we need to add
     idx_new_rows <- which(match(paste(NewStatusHistory$rn, NewStatusHistory$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
 
