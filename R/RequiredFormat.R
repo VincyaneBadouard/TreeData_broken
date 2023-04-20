@@ -8,6 +8,8 @@
 #'
 #'@param x For internal use when function used by Shiny app
 #'
+#'@param MeasLevel your deepest level of measurements(When function is run outside of Shiny app). Options are one of c("Plot", "Species", "Tree", "Stem")
+#'
 #'
 #'@details This function takes the forest inventory data.frame or data.table as
 #'  it is, and converts the column names to the standardized names used in this
@@ -39,7 +41,8 @@
 RequiredFormat <- function(
     Data,
     input,
-    x = NULL
+    x = NULL,
+    MeasLevel = NULL
 ){
   # data(ParacouSubset)
   # data(ParacouProfile)
@@ -73,6 +76,11 @@ RequiredFormat <- function(
 
     # keep only what is "active" (the rest is not in used)
     x <- x[x$Activate,]
+
+
+    # add MeasLevel
+    if(!MeasLevel %in% c("Plot", "Species", "Tree", "Stem")) stop("MeasLevel needs to be one of 'Plot, 'Species', 'Tree' or 'Stem'")
+    input$MeasLevel <- MeasLevel
 
   }
 
@@ -305,7 +313,7 @@ RequiredFormat <- function(
 
     AllWarnings <- c(AllWarnings, "You did not provide a Census ID column. We will use year as census ID.")
 
-    Data$IdCensus <- factor(Data$Year, ordered = T)
+    Data$IdCensus <- factor(Data$Year, ordered = TRUE)
   }
 
   ## Site, Plot, subplot

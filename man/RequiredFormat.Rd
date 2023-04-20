@@ -4,7 +4,7 @@
 \alias{RequiredFormat}
 \title{RequiredFormat}
 \usage{
-RequiredFormat(Data, input, x = NULL)
+RequiredFormat(Data, input, x = NULL, MeasLevel = NULL)
 }
 \arguments{
 \item{Data}{Forest inventory data set (data.frame or data.table) - already stacked, merged and tidyed}
@@ -14,6 +14,8 @@ RequiredFormat_interactive, also called site profile. It has information on
 column names correspondence, size units etc...}
 
 \item{x}{For internal use when function used by Shiny app}
+
+\item{MeasLevel}{your deepest level of measurements(When function is run outside of Shiny app). Options are one of c("Plot", "Species", "Tree", "Stem")}
 }
 \value{
 Input inventory (data.frame) in the required package format.
