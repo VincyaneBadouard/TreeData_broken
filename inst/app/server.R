@@ -1228,6 +1228,13 @@ server <- function(input, output, session) { # server ####
                                plotOutput(paste0("IndCorrPlot", f))
                                ))
           }
+          if(f %in% "BotanicalCorrection") {
+            removeTab(inputId = "CorrectionPlots", target = f) # this to avoid several tabs to be added as function is turned off and on
+
+            appendTab(inputId = "CorrectionPlots",
+                      tabPanel(f,
+                               uiOutput(outputId = "BotanicalCorrectionPlots")))
+          }
 
 
       } else {
