@@ -1260,7 +1260,8 @@ server <- function(input, output, session) { # server ####
 
 
         output[[paste0("IndCorrPlot", input$CorrectionPlots)]]<- renderPlot({
-          p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = as.numeric(gsub("Page ", "", input[[paste0(input$CorrectionPlots, "IndCorrPlots")]])))
+          # p$p +   ggforce::facet_wrap_paginate(vars(get(p$ID), ScientificName), scales = "free", ncol = min(p$n,3), nrow = p$i, page = as.numeric(gsub("Page ", "", input[[paste0(input$CorrectionPlots, "IndCorrPlots")]])))
+          p$p[[as.numeric(gsub("Page ", "", input[[paste0(input$CorrectionPlots, "IndCorrPlots")]]))]]
         })
 
 
