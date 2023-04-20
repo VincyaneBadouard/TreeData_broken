@@ -89,15 +89,24 @@ StatusCorrection <- function(
   ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
 
 
-  InvariantColumns = c("MinDBH", "Site",
-                       "Cluster", "Plot", "PlotViewID", "Subplot", "PlotArea", "PlotElevation",
-                       "SubplotArea", "PlotLat", "PlotLon", "XPlotUTM", "YPlotUTM",
-                       "SubplotLat", "SubplotLon", "XSubplotUTM", "YSubplotUTM", "ScientificName",
-                       "VernName", "Family", "Genus", "Species", "Subspecies", "Variety",
-                       "Voucher", "IdLevel", "Authority", "CommercialSp", "LifeForm",
-                       "TreeFieldNum", "IdTree", "StemFieldNum", "IdStem",
+  InvariantColumns = c("Site", "IdTree", "MinDBH",
+                       "Cluster", "Plot", "PlotArea", "PlotElevation", "Subplot",
+                       "SubplotArea", "PlotViewID", "PlotLat", "PlotLon", "XPlotUTM",
+                       "YPlotUTM", "SubplotLat", "SubplotLon", "XSubplotUTM", "YSubplotUTM",
+                       "ScientificName", "VernName", "Family", "Genus", "Species", "Subspecies",
+                       "Variety", "Voucher", "IdLevel", "Authority", "CommercialSp",
+                       "LifeForm", "TreeFieldNum", "StemFieldNum", "IdStem",
                        "TreeLat", "TreeLon", "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot",
-                       "XTreeSubplot", "YTreeSubplot")
+                       "XTreeSubplot", "YTreeSubplot",
+                       "HOM", "POM", "BHOM", "BPOM",
+                       "ScientificNameOriginal", "CommercialSpOriginal",
+                       "TreeFieldNumOriginal", "IdTreeOriginal", "StemFieldNumOriginal",
+                       "IdStemOriginal", "LifeStatusOriginal",
+                       "Family_TreeDataCor", "Genus_TreeDataCor", "Species_TreeDataCor",
+                       "Determination_rank_TreeDataCor",
+                       "Name_TreeDataCor", "ScientificName_TreeDataCor",
+                       "StatusCorrectionMeth_TreeData",
+                       "HOM_TreeDataCor", "POM_TreeDataCor")
 
   #### Arguments check ####
   # Data
@@ -358,28 +367,39 @@ if(ThisIsShinyApp) incProgress(1/15)
   # Creating rows for absents ####
   if(AddRowsForForgottenCensuses) {
 
-    NewStatusHistory <- NewStatusHistory[!is.na(value), ] # this is to avoid adding rows before recruits
+    missingNewStatusHistory <-  NewStatusHistory[!NewComments$value%in% "", ]
+    missingNewComment <- NewComments[!value%in% "", ]
 
     # identify cases we need to add
-    idx_new_rows <- which(match(paste(NewStatusHistory$rn, NewStatusHistory$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
+    idx_new_rows <- which(match(paste(missingNewStatusHistory$rn, missingNewStatusHistory$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
+
+    if(length(idx_new_rows) > 0) {
 
     # get what we know about those trees
-    NewRows <- Data[get(ID) %in% NewStatusHistory$rn[idx_new_rows], ]
+    NewRows <- Data[get(ID) %in% missingNewStatusHistory$rn[idx_new_rows], ]
     NewRows <- NewRows[!duplicated(get(ID)), ]
 
     # remove the data that changes at each census
     NewRows[,setdiff(names(NewRows), InvariantColumns) := NA]
 
+    # repeat each row the number of times necessary
+    nreps <- table(missingNewStatusHistory[idx_new_rows, rn])
+
+    NewRows <- NewRows[rep(1:nrow(NewRows), times = nreps[match(NewRows[,get(ID)], names(nreps))]), ]
+
+
+
     # fill in info we know about the census and based on the Status we corrected
-    m <- match(NewRows[,get(ID)], NewStatusHistory[idx_new_rows, rn])
+    m <- order(missingNewStatusHistory[idx_new_rows, rn])
+    # m <- match(NewRows[,get(ID)], NewStatusHistory[idx_new_rows, rn])
 
-    NewRows$IdCensus <- NewStatusHistory[idx_new_rows, IdCensus][m]
+    NewRows$IdCensus <- missingNewStatusHistory[idx_new_rows, IdCensus][m]
 
-    NewRows$LifeStatus_TreeDataCor <- NewStatusHistory[idx_new_rows, value][m]
+    NewRows$LifeStatus_TreeDataCor <- missingNewStatusHistory[idx_new_rows, value][m]
 
-    NewRows$StatusCorrectionMeth_TreeData <- NewComments[idx_new_rows, value][m]
+    NewRows$StatusCorrectionMeth_TreeData <- missingNewComment[idx_new_rows, value][m]
 
-    NewRows$Comment_TreeData <- "Missed tree"
+    NewRows$Comment_TreeData <- "Missed stem"
 
     # make best guess at other things
     warning("We added rows for missing trees and imputed average census Date")
@@ -392,17 +412,18 @@ if(ThisIsShinyApp) incProgress(1/15)
     # Add these rows in the dataset
     Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
   }
+}
 
 
     if(ThisIsShinyApp) incProgress(1/15)
 
   # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
-  DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "Duplicated measurement.")]
-  DuplicatedRows[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed.")]
+  DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "Duplicated measurement")]
+  DuplicatedRows[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed")]
   DuplicatedRows[, LifeStatus_TreeDataCor := LifeStatus]
 
-  DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "Missing ID.")]
-  DataIDNa[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed.")]
+  DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "Missing ID")]
+  DataIDNa[, StatusCorrectionMeth_TreeData := GenerateComment(StatusCorrectionMeth_TreeData, "Not processed")]
   DataIDNa [, LifeStatus_TreeDataCor := LifeStatus]
 
 

@@ -55,7 +55,7 @@ test_that("DiameterCorrection", {
   # options(warn = 2) # trace warning
   # options(warn = 0) # when debug is over
 
-  Rslt <- DiameterCorrection(
+  expect_warning(Rslt <- DiameterCorrection(
     TestData,
 
     UseTaperCorrection = F,
@@ -71,7 +71,9 @@ test_that("DiameterCorrection", {
     CorrectionType = c("phylogenetic hierarchical"),
 
     DBHRange = 10,
-    MinIndividualNbr = 1)
+    MinIndividualNbr = 1),
+    "We added rows for trees that were supposed to be recruited earlier based on linear extrapolation of growth and MinDBH
+We added rows for trees that were missed and estimated their missed DBH by linear interpolation")
 
   # Growth > 5 cm DBH/year & < -2 cm DBH/census
 

@@ -25,11 +25,12 @@ FullErrorProcessing(
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
-  OtherCrit = NULL,
+  MinDBH = NULL,
+  AddMissedRecruits = T,
+  AddMissedStems = T,
   DBHCorForDeadTrees = TRUE,
   coef = 0.9,
-  OnlyDetectMissedRecruits = FALSE,
-  MinDBH = NULL
+  OnlyDetectMissedRecruits = FALSE
 )
 }
 \arguments{
@@ -129,11 +130,16 @@ cm) (numeric, 1 value)}
 \item{MinIndividualNbr}{Minimum number of individuals to take into account in
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)}
 
-\item{OtherCrit}{Other criteria to select the individuals used for the
-calculation of the mean growth in the "phylogenetic hierarchical"
-correction. Give the name of the column(s) for which the individuals must
-have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-(character)}
+\item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
+
+\item{AddMissedRecruits}{(logical) TRUE: adds rows for stem that were supposed
+to be recruited at a prior census, based on their estimated diameter (from linear regression)
+and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+recruited earlier.}
+
+\item{AddMissedStems}{(logical) if TRUE, adds rows for trees that were missed between
+two censuses, with their estimated diameter (based on linear regression)}
 
 \item{DBHCorForDeadTrees}{(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
@@ -143,9 +149,6 @@ have corrected the tree life status with the \emph{StatusCorrection()} function.
 
 \item{OnlyDetectMissedRecruits}{TRUE: Only detect errors, FALSE: detect and correct errors
 (logical)}
-
-\item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
-NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
 }
 \value{
 The original dataset (data.table) with a \emph{Comment} column containing

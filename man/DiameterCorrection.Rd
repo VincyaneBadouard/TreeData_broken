@@ -12,6 +12,9 @@ DiameterCorrection(
   TaperFormula = function(DAB, HOM, TaperParameter, DefaultHOM) DAB/(exp(-TaperParameter
     * (HOM - DefaultHOM))),
   KeepMeas = c("MaxHOM", "MaxDate"),
+  MinDBH = NULL,
+  AddMissedRecruits = TRUE,
+  AddMissedStems = TRUE,
   PositiveGrowthThreshold = 5,
   NegativeGrowthThreshold = -2,
   Pioneers = NULL,
@@ -20,7 +23,6 @@ DiameterCorrection(
   CorrectionType = c("individual", "phylogenetic hierarchical"),
   DBHRange = 10,
   MinIndividualNbr = 5,
-  OtherCrit = NULL,
   DBHCorForDeadTrees = TRUE,
   coef = 0.9
 )
@@ -79,6 +81,17 @@ Possible values: "MaxHOM", "MaxDate" (character).
 IdCensus but more recent date)
 }}
 
+\item{MinDBH}{Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot}
+
+\item{AddMissedRecruits}{(logical) TRUE: adds rows for stem that were supposed
+to be recruited at a prior census, based on their estimated diameter (from linear regression)
+and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+recruited earlier.}
+
+\item{AddMissedStems}{(logical) if TRUE, adds rows for trees that were missed between
+two censuses, with their estimated diameter (based on linear regression)}
+
 \item{PositiveGrowthThreshold}{in cm/year: a tree
 widening by more than this value is considered abnormal (numeric, 1 value)}
 
@@ -122,12 +135,6 @@ cm) (numeric, 1 value)}
 \item{MinIndividualNbr}{Minimum number of individuals to take into account in
 "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)}
 
-\item{OtherCrit}{Other criteria to select the individuals used for the
-calculation of the mean growth in the "phylogenetic hierarchical"
-correction. Give the name of the column(s) for which the individuals must
-have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-(character)}
-
 \item{DBHCorForDeadTrees}{(logical) TRUE: return DBHCor also for dead trees.
 FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 have corrected the tree life status with the \emph{StatusCorrection()} function.}
@@ -135,7 +142,7 @@ have corrected the tree life status with the \emph{StatusCorrection()} function.
 \item{coef}{(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity}
 }
 \value{
-Fill the \emph{Comment_TreeData} column with error type informations and add columns:
+Fill the \emph{Comment_TreeData} column with error type information and add columns:
 \itemize{
 \item \emph{Diameter_TreeDataCor}: corrected trees diameter at default HOM
 \item \emph{DiameterCorrectionMeth_TreeData} = "local linear regression","weighted
@@ -166,6 +173,7 @@ data(TestData)
 
 TestData$HOM[1:3] <- c(0.5,1.5,NA)
 TestData$Diameter[21:23] <- c(31,91,14)
+TestData <- TestData[!(IdStem \%in\% "100658_1_auto" & IdCensus \%in\% 2017), ]
 
 Rslt <- DiameterCorrection(
  TestData,

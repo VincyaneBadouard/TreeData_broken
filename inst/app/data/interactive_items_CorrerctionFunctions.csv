@@ -133,7 +133,7 @@ With:
 <td><code>KeepMeas</code></td>
 <td>
 <p>In case of <strong>multiple diameter measurements</strong> in the same
-census year:
+census:
 Possible values: ""MaxHOM"", ""MaxDate"" (character).
 </p>
 
@@ -145,13 +145,39 @@ Possible values: ""MaxHOM"", ""MaxDate"" (character).
 </li>
 <li>
 <p> ""MaxDate"": apply the correction to the <strong>most recent measurement</strong> (same
-year but more recent date)
+IdCensus but more recent date)
 </p>
 </li>
 </ul>
 </td>
 </tr>
 ","DiameterCorrectionKeepMeas","c(""MaxHOM"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""MaxHOM"", ""MaxDate"")",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>MinDBH</code></td>
+<td>
+<p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p>
+</td>
+</tr>
+","DiameterCorrectionMinDBH","NULL","numericInput","FALSE","FALSE","value","FALSE","NULL",FALSE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>AddMissedRecruits</code></td>
+<td>
+<p>(logical) TRUE: adds rows for stem that were supposed
+to be recruited at a prior census, based on their estimated diameter (from linear regression)
+and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+recruited earlier.</p>
+</td>
+</tr>
+","DiameterCorrectionAddMissedRecruits","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+"DiameterCorrection","<tr valign=""top"">
+<td><code>AddMissedStems</code></td>
+<td>
+<p>(logical) if TRUE, adds rows for trees that were missed between
+two censuses, with their estimated diameter (based on linear regression)</p>
+</td>
+</tr>
+","DiameterCorrectionAddMissedStems","TRUE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>PositiveGrowthThreshold</code></td>
 <td>
@@ -252,17 +278,6 @@ cm) (numeric, 1 value)</p>
 </tr>
 ","DiameterCorrectionMinIndividualNbr","5","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
 "DiameterCorrection","<tr valign=""top"">
-<td><code>OtherCrit</code></td>
-<td>
-<p>Other criteria to select the individuals used for the
-calculation of the mean growth in the ""phylogenetic hierarchical""
-correction. Give the name of the column(s) for which the individuals must
-have the same value as the tree to correct (e.g. c(""Plot"", ""Subplot""))
-(character)</p>
-</td>
-</tr>
-","DiameterCorrectionOtherCrit","NULL","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","ColumnOptions",TRUE
-"DiameterCorrection","<tr valign=""top"">
 <td><code>DBHCorForDeadTrees</code></td>
 <td>
 <p>(logical) TRUE: return DBHCor also for dead trees.
@@ -277,41 +292,3 @@ have corrected the tree life status with the <em>StatusCorrection()</em> functio
 <p>(numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity</p>
 </td>
 </tr>","DiameterCorrectioncoef","0.9","numericInput","FALSE","FALSE","value","FALSE","OtherOptions",TRUE
-"RecruitmentCorrection","<tr valign=""top"">
-<td><code>KeepMeas</code></td>
-<td>
-<p>In case of <strong>multiple diameter measurements</strong> in the same
-census year, on which to apply the correction:
-Possible values: ""MaxHOM"", ""MaxDate"" (character).
-</p>
-
-<ul>
-<li>
-<p> ""MaxHOM"": apply the correction to the measurement taken at the
-<strong>highest POM</strong>
-</p>
-</li>
-<li>
-<p> ""MaxDate"": apply the correction to the <strong>most recent measurement</strong> (same
-year but more recent date)
-</p>
-</li>
-</ul>
-</td>
-</tr>
-","RecruitmentCorrectionKeepMeas","c(""MaxHOM"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""MaxHOM"", ""MaxDate"")",FALSE
-"RecruitmentCorrection","<tr valign=""top"">
-<td><code>MinDBH</code></td>
-<td>
-<p>Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
-NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot</p>
-</td>
-</tr>
-","RecruitmentCorrectionMinDBH","NULL","numericInput","FALSE","FALSE","value","FALSE","NULL",FALSE
-"RecruitmentCorrection","<tr valign=""top"">
-<td><code>OnlyDetectMissedRecruits</code></td>
-<td>
-<p>TRUE: Only detect errors, FALSE: detect and correct errors
-(logical)</p>
-</td>
-</tr>","RecruitmentCorrectionOnlyDetectMissedRecruits","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE

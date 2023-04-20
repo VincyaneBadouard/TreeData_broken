@@ -86,20 +86,28 @@
 #' @param MinIndividualNbr Minimum number of individuals to take into account in
 #'   "phylogenetic hierarchical" correction (Default: 5) (numeric, 1 value)
 #'
-#' @param OtherCrit Other criteria to select the individuals used for the
-#'   calculation of the mean growth in the "phylogenetic hierarchical"
-#'   correction. Give the name of the column(s) for which the individuals must
-#'   have the same value as the tree to correct (e.g. c("Plot", "Subplot"))
-#'   (character)
 #'
 #' @param DBHCorForDeadTrees (logical) TRUE: return DBHCor also for dead trees.
 #'   FALSE: do not return DBHCor for dead trees. In this case it is advisable to
 #'   have corrected the tree life status with the *StatusCorrection()* function.
 #'
+#' @param AddMissedStems (logical) if TRUE, adds rows for trees that were missed between
+#' two censuses, with their estimated diameter (based on linear regression)
+#'
+#' @param AddMissedRecruits (logical) TRUE: adds rows for stem that were supposed
+#' to be recruited at a prior census, based on their estimated diameter (from linear regression)
+#' and MinDBH. FALSE: will only indicate in the comment that the stem was supposed to be
+#' recruited earlier.
+#'
+#' @param MinDBH Minimum diameter of trees inventoried (in cm) (numeric, 1 value) or
+#'   NULL (Default) if you wish to use the MinDBH indicated in your data, which may vary per plot
+#'
+#'
+#'
 #' @param coef (numeric, 1 value) This is used in individual corrections, to calculate weight of the growths by temporal proximity
 
 #'
-#' @return Fill the *Comment_TreeData* column with error type informations and add columns:
+#' @return Fill the *Comment_TreeData* column with error type information and add columns:
 #'   - *Diameter_TreeDataCor*: corrected trees diameter at default HOM
 #'   - *DiameterCorrectionMeth_TreeData* = "local linear regression","weighted
 #'       mean"/phylogenetic hierarchical("species"/"genus"/"family"/"stand")/
@@ -133,6 +141,7 @@
 #'
 #' TestData$HOM[1:3] <- c(0.5,1.5,NA)
 #' TestData$Diameter[21:23] <- c(31,91,14)
+#' TestData <- TestData[!(IdStem %in% "100658_1_auto" & IdCensus %in% 2017), ]
 #'
 #' Rslt <- DiameterCorrection(
 #'  TestData,
@@ -153,7 +162,11 @@ DiameterCorrection <- function(
 
     KeepMeas = c("MaxHOM", "MaxDate"),
 
-    # MaxDBH = 500,
+    MinDBH = NULL,
+    AddMissedRecruits = TRUE,
+    AddMissedStems = TRUE,
+
+
     PositiveGrowthThreshold = 5,
     NegativeGrowthThreshold = -2,
 
@@ -165,12 +178,15 @@ DiameterCorrection <- function(
 
     DBHRange = 10,
     MinIndividualNbr = 5,
-    OtherCrit = NULL,
 
     DBHCorForDeadTrees = TRUE,
 
     coef = 0.9
 ){
+
+
+
+# App-related housekeeping --------------------------------------------------------
 
   ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
 
@@ -178,10 +194,30 @@ DiameterCorrection <- function(
   # prepare a place to hold all warnings so we get only one pop up window
   AllWarnings <- NULL
 
-  #### Arguments check ####
+  InvariantColumns = c("Site", "IdTree", "MinDBH",
+                       "Cluster", "Plot", "PlotArea", "PlotElevation", "Subplot",
+                       "SubplotArea", "PlotViewID", "PlotLat", "PlotLon", "XPlotUTM",
+                       "YPlotUTM", "SubplotLat", "SubplotLon", "XSubplotUTM", "YSubplotUTM",
+                       "ScientificName", "VernName", "Family", "Genus", "Species", "Subspecies",
+                       "Variety", "Voucher", "IdLevel", "Authority", "CommercialSp",
+                       "LifeForm", "TreeFieldNum", "StemFieldNum", "IdStem",
+                       "TreeLat", "TreeLon", "XTreeUTM", "YTreeUTM", "XTreePlot", "YTreePlot",
+                       "XTreeSubplot", "YTreeSubplot", "LifeStatus",
+                       "HOM", "POM", "BHOM", "BPOM",
+                       "ScientificNameOriginal", "CommercialSpOriginal",
+                       "TreeFieldNumOriginal", "IdTreeOriginal", "StemFieldNumOriginal",
+                       "IdStemOriginal", "LifeStatusOriginal",
+                       "Family_TreeDataCor", "Genus_TreeDataCor", "Species_TreeDataCor",
+                       "Determination_rank_TreeDataCor",
+                       "Name_TreeDataCor", "ScientificName_TreeDataCor",
+                       "StatusCorrectionMeth_TreeData",
+                       "HOM_TreeDataCor", "POM_TreeDataCor")
+  # Arguments check ---------------------------------------------------------
+
   # Data
   if (!inherits(Data, c("data.table", "data.frame")))
     stop("Data must be a data.frame or data.table")
+
 
   # IdStem or IdTree? ---------------------------------------------------------------------------------------
   # If no IdStem take IdTree
@@ -192,7 +228,6 @@ DiameterCorrection <- function(
 
   if(!any(c("IdStem", "IdTree") %in% names(Data)) | (all(is.na(Data$IdStem)) &  all(is.na(Data$IdTree))) )
     stop("The 'IdStem' or 'IdTree' column is missing in your dataset")
-  # ---------------------------------------------------------------------------------------------------------
 
   # Diameter column exists
   if(!"Diameter" %in% names(Data))
@@ -207,6 +242,14 @@ DiameterCorrection <- function(
                         inherits, c("numeric", "integer")))))
     stop("The 'PositiveGrowthThreshold', 'NegativeGrowthThreshold', 'PioneersGrowthThreshold' and 'DefaultHOM' arguments
          of the 'DiameterCorrection' function must be 1 numeric value each")
+
+  # AddMissedRecruits
+  if(!inherits(AddMissedRecruits, "logical") & !is.null(AddMissedRecruits))
+    stop("'AddMissedRecruits' argument must be logical")
+
+  # AddMissedStems
+  if(!inherits(AddMissedStems, "logical") & !is.null(AddMissedStems))
+    stop("'AddMissedStems' argument must be logical")
 
   # Pioneers (characters vector)
   if(!inherits(Pioneers, "character") & !is.null(Pioneers))
@@ -265,7 +308,9 @@ DiameterCorrection <- function(
   if(ThisIsShinyApp) incProgress(1/15)
 
 
-  # In data.table
+# set things up for function ----------------------------------------------------------------
+
+
   setDT(Data)
   Data <- copy(Data)   # <~~~~~ KEY LINE so things don't happen on the global environment
 
@@ -276,6 +321,17 @@ DiameterCorrection <- function(
   if(!"Comment_TreeData" %in% names(Data)) Data[, Comment_TreeData := ""]
 
   if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) Data[, DiameterCorrectionMeth_TreeData := ""]
+
+  # If MinDBH is provided, overwrite the one in the data
+  if(ifelse(ThisIsShinyApp, !is.na(MinDBH), !is.null(MinDBH))) { # !is.na(MinDBH)  is needed when inside the app
+    if(!inherits(MinDBH, c("numeric", "integer"))) stop("MinDBH must be numeric")
+    if(length(MinDBH) > 1) stop("MinDBH must be numeric value of length 1")
+
+    Data$MinDBH <- MinDBH
+  } else {
+    if(!"MinDBH" %in% names(Data)) stop("You don't have MinDBH in your dataset, please provide a MinDBH in the arguments.")
+    # -----------------------------------------------------------------------
+  }
 
 
   # Dataset with the dead trees if no correction wanted for them --------------------------------------------
@@ -299,18 +355,15 @@ DiameterCorrection <- function(
 
   DuplicatedRows <- CompleteData[!Data, on = .NATURAL] # rows removed
 
-  # Remove duplicated measurements (randomly)
-  # Data <- Data[!duplicated(Data[, list((get(ID), IdCensus)], fromLast = TRUE)] # keep the last measurement
-
-
-
 
   # If no diameter value, write a comment
-  Data[is.na(Diameter), Comment_TreeData := GenerateComment(Comment_TreeData, comment = "Missing value in 'Diameter'")]
+  # Data[is.na(Diameter), Comment_TreeData := GenerateComment(Comment_TreeData, comment = "Missing value in 'Diameter'")]
 
   if(ThisIsShinyApp) incProgress(1/15)
 
-  #### Function ####
+
+# Function ----------------------------------------------------------------
+
 
   # Taper correction ------------------------------------------------------------------------------------------------------
   if(UseTaperCorrection) {
@@ -343,6 +396,7 @@ DiameterCorrection <- function(
 
 
   if(length(na.omit(unique(Data$IdCensus))) > 1) { # only possible if more than one census
+
     if(!"Diameter_TreeDataCor" %in% names(Data)) {
       Data[, Diameter_TreeDataCor := Diameter]
     }
@@ -355,6 +409,8 @@ DiameterCorrection <- function(
     }
     if(!"LifeStatus_TreeDataCor" %in% names(Data)) {
       Data[, LifeStatus_TreeDataCor := LifeStatus]
+    } else {
+      if(AddMissedStems) Data <- Data[!Comment_TreeData %in% "Missed stem", ] # remove those as they will be added again
     }
     if(!"DiameterCorrectionMeth_TreeData" %in% names(Data)) {
       Data[, DiameterCorrectionMeth_TreeData := ""]
@@ -389,11 +445,6 @@ DiameterCorrection <- function(
     DateHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Date", drop = FALSE)
     DateHistory <- as.matrix(DateHistory, 1)
 
-    # get DateDiff
-    DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
-    DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - data.table::shift(as.Date(x)))/365))
-
-
     # get a MinDBHHistory (this is useful if not same threshold accross plots)
     MinDBHHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "MinDBH", drop = FALSE)
     MinDBHHistory <- as.matrix(MinDBHHistory, 1)
@@ -403,13 +454,32 @@ DiameterCorrection <- function(
     LifeStatusHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "LifeStatus_TreeDataCor", drop = FALSE)
     LifeStatusHistory <- as.matrix(LifeStatusHistory, 1)
 
+    #get BeforeRecruitHistory
+    ## this is to figure out what was missed at an estimated dbh>minDBH at the head of the stem history
+    BeforeRecruitHistory <- LifeStatusHistory
+    BeforeRecruitHistory [] <- t(apply(LifeStatusHistory, 1, function(x) {
+      y <- x
+      ina <- which(is.na(x))
+      diffina <- diff(ina)
+
+      y[] <- 0
+      if(1 %in% ina) {
+        ilna <- 1
+        if(diffina[1] %in% 1)  ilna <- 1:(attr(regexpr("^1+", paste(diffina, collapse = "")), "match.length")+1)
+        y[ilna] <- 1
+      }
+      y
+    }))
+
     # create Comment History
     CommentHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "Comment_TreeData", drop = FALSE)
     CommentHistory <- as.matrix(CommentHistory, 1)
+    CommentHistory[is.na(CommentHistory)] <- ""
     # CommentHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
 
     DiameterCorrectionMethHistory <- dcast(Data, get(ID) ~ IdCensus, value.var = "DiameterCorrectionMeth_TreeData", drop = FALSE)
     DiameterCorrectionMethHistory <- as.matrix(DiameterCorrectionMethHistory, 1)
+    DiameterCorrectionMethHistory[is.na(DiameterCorrectionMethHistory)] <- ""
     # DiameterCorrectionMethHistory <- matrix("", nrow(DiameterHistory), ncol(DiameterHistory), dimnames = dimnames(DiameterHistory))
 
     # small correction affecting next histories
@@ -419,11 +489,49 @@ DiameterCorrection <- function(
     # DiameterHistory[DiameterHistory > MaxDBH] <- NA
 
 
+    # get Plot, Subplot, Family, Genus and Specie in an array
+    UniqueInfo <- Data[, .(Plot = unique(Plot),
+                           Subplot = unique(Subplot),
+                           Family = unique(Family),
+                           Genus = unique(Genus),
+                           Species = unique(ScientificName)), by = .(IdStem =get(ID))]
+
+    UniqueInfo <- UniqueInfo[complete.cases(UniqueInfo),] # removing when for some reason one of these info is not specified (which deals with most duplicated)
+
+    if(any(duplicated(UniqueInfo$get))) stop("Some individuals don't have a unique Plot, Family, Genus or species")
+
+    for(w in c("Plot", "Subplot", "Family", "Genus", "Species")) {
+      x <- UniqueInfo[, get(w)]
+      names(x) <- UniqueInfo$IdStem
+      x <- x[rownames(DiameterHistory)] # make sure same order as other objecys
+      assign(w, x)
+    } # make one object for each info (will help later)
+
+
+
+    if(ThisIsShinyApp) incProgress(1/15)
+
+
+    ## fill in date when it is NA, by most common of date in that subplot
+    ### this is to be able to interpolate outside of measured dates, and detect missed recruits
+    idxToFill <- which(is.na(DateHistory), arr.ind = T)
+    DateLookup <- by(DateHistory, Subplot, function(x) apply(x, 2, function(y) names(sort(table(y),decreasing = T))[1]))
+
+    if(nrow(idxToFill) > 0) {
+        DateHistory[is.na(DateHistory)] <- mapply(function(x, y) DateLookup[[Subplot[x]]][y], x = idxToFill[,1], y = idxToFill[, 2] )
+    }
+
+
+    # get DateDiff
+    DateDiff <- matrix(NA, ncol = ncol(DateHistory), nrow = nrow(DateHistory), dimnames = dimnames(DiameterHistory))
+    DateDiff[] <- t(apply(DateHistory, 1, function(x) (as.Date(x) - data.table::shift(as.Date(x)))/365))
+
+
     if(ThisIsShinyApp) incProgress(1/15)
 
     # fill in the Diameter when the tree was missed
 
-    MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l) {
+    MissedDiametetFilled <- t(mapply(function(d, t, c, cm, l, r, md) {
 
       if(any(!is.na(d))) { # only run if we have diameters to work with
         t <- as.Date(t)
@@ -431,10 +539,29 @@ DiameterCorrection <- function(
 
         if(!is.na(coef(m)["t"])) { # if there is at least 2 diameters and corresponding dates... if not, no regression can be done
           p <- stats::predict(lm(d~t), newdata = t) # if some t are NA, still i twil
-          # p <- p[match(names(d), names(p))] # this is to account for when the date is NA
-          c[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(c[is.na(d) & !is.na(p)], "Missed tree")
-          cm[is.na(d) & !is.na(p) & l %in% TRUE] <- GenerateComment(cm[is.na(d) & !is.na(p)], "Initial linear interpolation")
-          d[is.na(d) & l %in% TRUE] <- p[is.na(d) & l %in% TRUE]
+
+          # missed measurement (between censuses)
+          idx = is.na(d) & !is.na(p) & l %in% TRUE
+
+          c[idx] <- GenerateComment(c[idx], "Missed measurement")
+          cm[idx] <- GenerateComment(cm[idx], "Initial linear interpolation")
+          d[idx] <- p[idx]
+
+          # missed stem completely (between censuses)
+          idx = is.na(d) & !is.na(p) & l %in% NA & r %in% 0
+          c[idx] <- GenerateComment(c[idx], "Missed stem")
+          cm[idx] <- GenerateComment(cm[idx], "Initial linear interpolation")
+          d[idx] <- p[idx]
+
+          # missed recruits (before stem was censused)
+          idx = is.na(d) & !is.na(p) & l %in% NA & r %in% 1 & p > md
+
+          c[idx] <- GenerateComment(c[idx], "Missed recruit")
+          cm[idx] <- GenerateComment(cm[idx], "Initial linear interpolation")
+          d[idx] <- p[idx]
+
+
+
         }
       }
 
@@ -446,7 +573,9 @@ DiameterCorrection <- function(
     t = split(DateHistory, row(DateHistory)),
     c = split(CommentHistory, row(CommentHistory)),
     cm = split(DiameterCorrectionMethHistory, row(DiameterCorrectionMethHistory)),
-    l = split(LifeStatusHistory, row(LifeStatusHistory))))
+    l = split(LifeStatusHistory, row(LifeStatusHistory)),
+    r = split(BeforeRecruitHistory, row(BeforeRecruitHistory)),
+    md = split(MinDBHHistory, row(MinDBHHistory))))
 
     DiameterHistory[] <- do.call(rbind, MissedDiametetFilled[,1])
     CommentHistory[] <-  do.call(rbind, MissedDiametetFilled[,2])
@@ -471,24 +600,8 @@ DiameterCorrection <- function(
     GrowthHistory <- CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)
 
     # get Growth difference (for absolute growth incrementation)
-    DiameterDiffHistory <- CalcDiameterDiffHist(DiameterHistory)
+    # DiameterDiffHistory <- CalcDiameterDiffHist(DiameterHistory) Valentine decided to use GrowthHistory instead of DiameterDiffHistory
 
-    # get Plot, Family, Genus and Specie in an array
-    UniqueInfo <- Data[, .(Plot = unique(Plot),
-                           Family = unique(Family),
-                           Genus = unique(Genus),
-                           Species = unique(ScientificName)), by = .(IdStem =get(ID))]
-
-    UniqueInfo <- UniqueInfo[complete.cases(UniqueInfo),] # removing when for some reason one of these info is not specified (which deals with most duplicated)
-
-    if(any(duplicated(UniqueInfo$get))) stop("Some individuals don't have a unique Plot, Family, Genus or species")
-
-    for(w in c("Plot", "Family", "Genus", "Species")) {
-      x <- UniqueInfo[, get(w)]
-      names(x) <- UniqueInfo$IdStem
-      x <- x[rownames(DiameterHistory)] # make sure same order as other objecys
-      assign(w, x)
-    } # make one object for each info (will help later)
 
 
     if(ThisIsShinyApp) incProgress(1/15)
@@ -518,7 +631,7 @@ DiameterCorrection <- function(
 
       CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PioneersGrowthThreshold))
       GrowthHistory[idx_sp, ][idx]  <- NA
-      DiameterDiffHistory[idx_sp, ][idx] <- NA
+      # DiameterDiffHistory[idx_sp, ][idx] <- NA
 
       ### non-pioneers
       idx_sp <- !Species %in% Pioneers
@@ -526,7 +639,7 @@ DiameterCorrection <- function(
 
       CommentHistory[idx_sp, ][idx] <- GenerateComment(CommentHistory[idx_sp, ][idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
       GrowthHistory[idx_sp, ][idx]  <- NA
-      DiameterDiffHistory[idx_sp, ][idx] <- NA
+      # DiameterDiffHistory[idx_sp, ][idx] <- NA
 
     } else {
 
@@ -534,7 +647,7 @@ DiameterCorrection <- function(
 
       CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth greated than threshold of", PositiveGrowthThreshold))
       GrowthHistory[idx]  <- NA
-      DiameterDiffHistory[idx] <- NA
+      # DiameterDiffHistory[idx] <- NA
     }
 
 
@@ -543,7 +656,7 @@ DiameterCorrection <- function(
 
     CommentHistory[idx] <- GenerateComment(CommentHistory[idx], paste("Growth smaller than threshold of", NegativeGrowthThreshold))
     GrowthHistory[idx]  <- NA
-    DiameterDiffHistory[idx] <- NA
+    # DiameterDiffHistory[idx] <- NA
 
 
     if(ThisIsShinyApp) incProgress(1/15)
@@ -558,7 +671,7 @@ DiameterCorrection <- function(
 
     ## POM change detection -----------------------------------------------------------------------------------------------
 
-    # Check the HOM value over the time
+    # Check HOM value over time
 
     idx = !is.na(HOMChangeHistory) & HOMChangeHistory < 0
     CommentHistory[idx] <- GenerateComment(CommentHistory[idx], "HOM decreased")
@@ -566,16 +679,16 @@ DiameterCorrection <- function(
     idx = !is.na(HOMChangeHistory) & HOMChangeHistory > 0
     CommentHistory[idx] <- GenerateComment(CommentHistory[idx], "HOM increased")
 
-
-    # Check the POM value over the time
+    # Check POM value over time
     CommentHistory[POMChangeHistory %in% TRUE] <- GenerateComment(CommentHistory[idx], "POM changed")
+
 
     # detect any change in HOM or POM
     idxPOMChange <- !is.na(HOMChangeHistory) & !HOMChangeHistory %in% 0 | POMChangeHistory %in% TRUE
 
     # Remove growth between shifts (take growth only intra seq)
     GrowthHistory[idxPOMChange]  <- NA
-    DiameterDiffHistory[idxPOMChange] <- NA
+    # DiameterDiffHistory[idxPOMChange] <- NA
 
     # get indexes to replace
     idxPOMChange <- is.na(GrowthHistory) & idxPOMChange
@@ -595,7 +708,7 @@ DiameterCorrection <- function(
 
 
 
-    ## get the sign of the growth ---------------------------------------------
+    ## get the sign of growth ---------------------------------------------
     if(nrow(idxToReplace) > 0) {
       idxToReplace <- cbind(idxToReplace, sign = NA)
       idxToReplace[idxToReplace[, 3] %in% 1, "sign"] <-  sign(CalcGrowthHist(DiameterHistory = DiameterHistory, DateHistory = DateHistory)[idxPOMChange])
@@ -603,10 +716,8 @@ DiameterCorrection <- function(
 
     }
 
-    ## order to make sure we are looking at each stem successivele
+    ## order to make sure we are looking at each stem successively
     idxToReplace <- idxToReplace[order(idxToReplace[,1], idxToReplace[,2]),]
-
-
 
     if(ThisIsShinyApp) incProgress(1/15)
 
@@ -788,21 +899,21 @@ DiameterCorrection <- function(
     # Write changes in Data -------------------------------------------------------------------------------------------
 
     # write comments
-    DiameterHistoryCorrected <- melt(setDT(as.data.frame(CommentHistory), keep.rownames=TRUE), measure.vars = colnames(CommentHistory) , variable.name = "IdCensus")
-    DiameterHistoryCorrected <- DiameterHistoryCorrected[!value %in% "", ]
+    CommentHistoryCorrected <- melt(setDT(as.data.frame(CommentHistory), keep.rownames=TRUE), measure.vars = colnames(CommentHistory) , variable.name = "IdCensus")
+    # CommentHistoryCorrected <- CommentHistoryCorrected[!value %in% "", ]
 
-    idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterHistoryCorrected$rn, DiameterHistoryCorrected$IdCensus))
+    idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(CommentHistoryCorrected$rn, CommentHistoryCorrected$IdCensus))
 
-    Data$Comment_TreeData <- DiameterHistoryCorrected$value[idx]
+    Data$Comment_TreeData <- CommentHistoryCorrected$value[idx]
 
 
     # write methods
     DiameterCorrectionMethHistoryCorrected <- melt(setDT(as.data.frame(DiameterCorrectionMethHistory), keep.rownames=TRUE), measure.vars = colnames(DiameterCorrectionMethHistory) , variable.name = "IdCensus")
-    DiameterCorrectionMethHistoryCorrected <- DiameterCorrectionMethHistoryCorrected[!value %in% "", ]
+    # DiameterCorrectionMethHistoryCorrected <- DiameterCorrectionMethHistoryCorrected[!value %in% "", ]
 
     idx <- match(paste(Data[,get(ID)], Data[,IdCensus]), paste(DiameterCorrectionMethHistoryCorrected$rn, DiameterCorrectionMethHistoryCorrected$IdCensus))
 
-    Data$DiameterCorrectionMeth_TreeData <- DiameterCorrectionMethHistoryCorrected$value[idx]
+    Data$DiameterCorrectionMeth_TreeData <- ifelse(is.na(DiameterCorrectionMethHistoryCorrected$value[idx]), "", DiameterCorrectionMethHistoryCorrected$value[idx])
 
 
     # write DBH corrected
@@ -814,10 +925,101 @@ DiameterCorrection <- function(
 
     if(ThisIsShinyApp) incProgress(1/15)
 
+
+
+# Add new rows where needed -----------------------------------------------
+
+    DateHistoryCorrected <- melt(setDT(as.data.frame(DateHistory), keep.rownames=TRUE), measure.vars = colnames(DateHistory) , variable.name = "IdCensus")
+
+
+    for(addrows in c("AddMissedRecruits", "AddMissedStems")) {
+
+      if(addrows %in% "AddMissedStems" & !AddMissedStems) next
+
+
+      if(addrows %in% "AddMissedRecruits")  pattern <- "Missed recruit"
+      if(addrows %in% "AddMissedStems")  pattern <- "Missed stem"
+
+
+      missedComment <- CommentHistoryCorrected[grepl(pattern, CommentHistoryCorrected$value), ]
+      missedMethod <- DiameterCorrectionMethHistoryCorrected[grepl(pattern, CommentHistoryCorrected$value), ]
+      missedDiameter <- DiameterCorrected[grepl(pattern, CommentHistoryCorrected$value), ]
+      missedDate <- DateHistoryCorrected[grepl(pattern, CommentHistoryCorrected$value), ]
+
+
+      idx_new_rows <- which(match(paste(missedComment$rn, missedComment$IdCensus), paste(Data[,get(ID)], Data[,IdCensus])) %in% NA)
+
+      if(length(idx_new_rows) > 0) {
+
+      # find out which rows in Data should get a comment to indicate the previous census should have recruited this tree already (adding this comment only when OnlyDetectMissedRecruits)
+      idx_CommentOnly <- match(apply(missedComment[, levels(missedComment$IdCensus)[max(as.numeric(IdCensus)) +1], by = rn], 1, paste, collapse = " "), paste(Data[, get(ID)], Data$IdCensus))
+      idx_CommentOnly <- idx_CommentOnly[!duplicated(Data[,get(ID)][idx_CommentOnly])]
+      idx_CommentOnly <- idx_CommentOnly[!is.na(idx_CommentOnly)]
+
+      if(addrows %in% "AddMissedRecruits" & !AddMissedRecruits)  Data[idx_CommentOnly, Comment_TreeData := GenerateComment(Comment_TreeData, "This tree should have been recruited earlier based on its growth and your protocol (MinDBH)")]
+
+      if(get(addrows)) {
+
+        # get what we know about those trees
+        NewRows <- Data[get(ID) %in% missedComment[idx_new_rows, rn], ]
+        NewRows <- NewRows[!duplicated(get(ID)), ]
+
+        # remove the data that changes at each census
+        NewRows[,setdiff(names(NewRows), InvariantColumns) := NA]
+
+        # repeat each row the number of times necessary
+        nreps <- table(missedComment[idx_new_rows, rn])
+
+        NewRows <- NewRows[rep(1:nrow(NewRows), times = nreps[match(NewRows[,get(ID)], names(nreps))]), ]
+
+
+        # fill in info we know about the census and based on the Status we corrected
+        m <- order(missedComment[idx_new_rows, rn])
+        NewRows$IdCensus <- missedComment[idx_new_rows, IdCensus][m]
+
+        NewRows$Comment_TreeData <- missedComment[idx_new_rows, value][m]
+
+        NewRows$DiameterCorrectionMeth_TreeData <- missedMethod[idx_new_rows, value][m]
+
+        NewRows$Diameter_TreeDataCor <- missedDiameter[idx_new_rows, value][m]
+
+        NewRows$Date <- as.Date(missedDate[idx_new_rows, value][m])
+
+        NewRows$LifeStatus_TreeDataCor <- TRUE
+
+        NewRows$MissedTree <- TRUE
+        Data$MissedTree <- FALSE
+
+        # make best guess at other things
+
+
+        NewRows$Year <- format(NewRows$Date, "%Y")
+        NewRows$Month <- format(NewRows$Date, "%m")
+        NewRows$Day <- format(NewRows$Date, "%d")
+
+        # Add these rows in the dataset
+        Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
+        if(addrows %in% "AddMissedRecruits" & nrow(NewRows) >0 )  AllWarnings <- c(AllWarnings, "We added rows for trees that were supposed to be recruited earlier based on linear extrapolation of growth and MinDBH")
+        if(addrows %in% "AddMissedStems" & nrow(NewRows) >0 )  AllWarnings <- c(AllWarnings, "We added rows for trees that were missed and estimated their missed DBH by linear interpolation")
+
+      }
+
+
+}
+     if(ThisIsShinyApp) incProgress(1/15)
+     }
+
+
+
     # Re-put the rows duplicated, or without ID or IdCensus -----------------------------------------------------------------
-    DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "This duplicated measurement was not processed by DiameterCorrections.")]
-    DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing ID measurement was not processed by DiameterCorrections.")]
-    DataIdCensusNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "This missing census measurement was not processed by DiameterCorrections.")]
+    DuplicatedRows[, Comment_TreeData := GenerateComment(Comment_TreeData, "Duplicated measurement")]
+    DuplicatedRows[, DiameterCorrectionMeth_TreeData := GenerateComment(DiameterCorrectionMeth_TreeData, "Not processed")]
+
+    DataIDNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "Missing ID.")]
+    DataIDNa[, DiameterCorrectionMeth_TreeData := GenerateComment(DiameterCorrectionMeth_TreeData, "Not processed.")]
+
+    DataIdCensusNa[, Comment_TreeData := GenerateComment(Comment_TreeData, "Missing IdCensus")]
+    DataIdCensusNa[, DiameterCorrectionMeth_TreeData := GenerateComment(DiameterCorrectionMeth_TreeData, "Not processed")]
 
     Data <- rbindlist(list(Data, DuplicatedRows, DataIDNa, DataIdCensusNa), use.names = TRUE, fill = TRUE)
 

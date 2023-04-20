@@ -16,11 +16,13 @@ Fct_args <- NULL
 # 4. R/DiameterCorrection.R
 # 5. R/RecruitmentCorrection.R
 
-for(rd in c("GeneralErrorsDetection.Rd",
+for(rd in c(
+  # "GeneralErrorsDetection.Rd",
             "BotanicalCorrection.Rd",
             "StatusCorrection.Rd",
-            "DiameterCorrection.Rd",
-            "RecruitmentCorrection.Rd")) {
+            "DiameterCorrection.Rd"
+            # "RecruitmentCorrection.Rd"
+            )) {
 
   tools::Rd2HTML(db[[rd]], outfile)
 
@@ -109,15 +111,15 @@ ItemType_lookup <- list(
   #   argValue = NA,
   #   ReactiveArgValue = FALSE
   # ),
-  OtherCrit = list(
-    ItemType = "pickerInput",
-    Multiple = T,
-    Options = "list( `actions-box` = TRUE)",
-    Argument = "choices",
-    Argument2 = "selected",
-    argValue = "ColumnOptions",
-    ReactiveArgValue = TRUE
-  ),
+  # OtherCrit = list(
+  #   ItemType = "pickerInput",
+  #   Multiple = T,
+  #   Options = "list( `actions-box` = TRUE)",
+  #   Argument = "choices",
+  #   Argument2 = "selected",
+  #   argValue = "ColumnOptions",
+  #   ReactiveArgValue = TRUE
+  # ),
   MinDBH = list(
     ItemType = "numericInput",
     Multiple = FALSE,

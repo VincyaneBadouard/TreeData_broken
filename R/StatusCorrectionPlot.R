@@ -63,8 +63,13 @@ StatusCorrectionPlot <- function(
 
   # Columns
   # IdTree, Year, LifeStatus, LifeStatus_TreeDataCor
-  if(!all(c("Year", "LifeStatus", "LifeStatus_TreeDataCor") %in% names(Data)))
-    stop("'Year', 'LifeStatus', 'LifeStatus_TreeDataCor' should be columns of Data")
+  if(!all(c("Year", "LifeStatus", "LifeStatus_TreeDataCor", "ScientificName") %in% names(Data)))
+    stop("'Year', 'LifeStatus', 'LifeStatus_TreeDataCor', 'ScientificName' should be columns of Data")
+
+  if(!"ScientificName_TreeDataCor" %in% names(Data)) {
+    Data[, ScientificName_TreeDataCor := ScientificName]
+  }
+
 
 
   #### Function ####
@@ -106,8 +111,8 @@ StatusCorrectionPlot <- function(
     geom_point(data = DataCor[LifeStatus == LifeStatus_TreeDataCor, ], aes(color = "Conserved"),  shape = "circle", size = 3.9) +
 
 
-        ggrepel::geom_text_repel(data = DataCor[grepl("Missed tree", Comment_TreeData), ],
-                                 label = "Missed tree",
+        ggrepel::geom_text_repel(data = DataCor[grepl("Missed stem", Comment_TreeData), ],
+                                 label = "Missed stem",
                                  point.size = 3.9, size = 3, direction = "y") +
 
     geom_point(data = DataCor[grepl("Not processed", StatusCorrectionMeth_TreeData), ], aes(color = "Not processed"),  shape = "circle", size = 3.9) +
@@ -144,9 +149,11 @@ StatusCorrectionPlot <- function(
 
 
   nPages <- ggforce::n_pages(p+
-                               ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = 1))
+                               ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = 1))
 
   if(ThisIsShinyApp) {
+
+    p <- lapply(seq_len( nPages), function(k)         p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = k))
 
     return(list(p = p, nPages = nPages, ID = ID, n = n, i = i))
 
@@ -158,7 +165,7 @@ StatusCorrectionPlot <- function(
     for(k in seq_len( nPages)) {
       print(k)
       print(
-        p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = k)
+        p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = k)
 
       )
 

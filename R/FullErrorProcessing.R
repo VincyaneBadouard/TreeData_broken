@@ -71,15 +71,17 @@ FullErrorProcessing <- function(
 
   DBHRange = 10,
   MinIndividualNbr = 5,
-  OtherCrit = NULL,
+
+  MinDBH = NULL,
+  AddMissedRecruits = T,
+  AddMissedStems = T,
 
   DBHCorForDeadTrees = TRUE,
 
   coef = 0.9,
 
   # Recruitment
-  OnlyDetectMissedRecruits = FALSE,
-  MinDBH = NULL
+  OnlyDetectMissedRecruits = FALSE
 ){
 
   #### Arguments check ####
@@ -212,9 +214,10 @@ FullErrorProcessing <- function(
 
                                DBHRange = DBHRange,
                                MinIndividualNbr = MinIndividualNbr,
-                               OtherCrit = OtherCrit,
-
                                DBHCorForDeadTrees = DBHCorForDeadTrees,
+                               MinDBH = MinDBH,
+                               AddMissedRecruits = AddMissedRecruits,
+                               AddMissedStems = AddMissedStems,
 
                                coef = coef)
   }

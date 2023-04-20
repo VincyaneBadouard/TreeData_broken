@@ -21,6 +21,7 @@ test_that("StatusCorrection", {
 
   TestData[IdTree %in% "e", ("Diameter") := c(13:21)] # "e" Diameter seq
   TestData[IdTree %in% "e" & Year == 2014, ("Diameter") := NA] # a NA in the "e" Diameter seq
+  TestData <- TestData[!(IdTree %in% "a" & Year %in% 2014),] # remove one record
 
   suppressWarnings(TestData <- RequiredFormat(TestData,
                              input = list(MeasLevel = "Tree",
@@ -39,7 +40,8 @@ test_that("StatusCorrection", {
                                           DiameterUnitMan = "cm",
                                           PlotArea = "none",
                                           SubplotArea = "none",
-                                          IsLiveMan = T))
+                                          IsLiveMan = T),
+                             MeasLevel = "Stem")
   )
 
   # Create test data
@@ -138,7 +140,7 @@ test_that("StatusCorrection", {
     expect_true(all(!compareNA(Seq, SeqCor) == Comment))
   }
 
-})
+
 
 
 # No "dead" before "alive"
@@ -166,11 +168,10 @@ expect_true(all(SCBICorrected[IdStem %in% "11012", LifeStatus_TreeDataCor])) # f
 expect_identical(SCBICorrected[IdStem %in% "11012", StatusCorrectionMeth_TreeData  ], c("A measured tree is a living tree", "Between 2 alive occurrences, the tree was alive",
                                                                           ""))
 
-SCBISubsetFormated[IdStem %in% "66114",]
-expect_identical(SCBICorrected[IdStem %in% "66114", Comment_TreeData ], c("Missed tree", "", ""))
+
 
 SCBISubsetFormated[IdStem %in% "31258",]
-SCBICorrected[IdStem %in% "31258",]
+expect_identical(SCBICorrected[IdStem %in% "31258", Comment_TreeData ], c("","Missed stem",  ""))
 
 SCBISubsetFormated[IdStem %in% "10032",]
 
@@ -182,5 +183,5 @@ expect_equal(SCBICorrected[IdStem %in% "10032",.(LifeStatus_TreeDataCor, StatusC
 
 expect_equal(nrow(SCBICorrected[StatusCorrectionMeth_TreeData  %in% "A measured tree is a living tree",]), 5)
 
-
+})
 

@@ -90,10 +90,15 @@ DiameterCorrectionPlot <- function(
 
   }else{ POMcorv <- "HOM_TreeDataCor"}
 
+
   # Columns --------------------------------------------------------------------------------------------------------------
   # IdStem, IdCensus, Diameter, DBHCor, HOM, HOMCor
-  if(!all(c("IdCensus", "Diameter", CorCol, POMv, POMcorv) %in% names(Data)))
-    stop(paste0("'IdCensus', 'Diameter', '",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
+  if(!all(c("IdCensus", "Diameter", "ScientificName", CorCol, POMv, POMcorv) %in% names(Data)))
+    stop(paste0("'IdCensus', 'Diameter', 'ScientificName', ",CorCol,"', '",POMv,"', ",POMcorv,"' should be columns of Data"))
+
+  if(!"ScientificName_TreeDataCor" %in% names(Data)) {
+    Data[, ScientificName_TreeDataCor := ScientificName]
+  }
 
 
   #### Function ####
@@ -103,7 +108,7 @@ DiameterCorrectionPlot <- function(
 
   if(OnlyCorrected == TRUE){
     # Only corrected stems ----------------------------------------------------------------------------------------------
-    IDCor <- Data[Diameter != get(CorCol) | (is.na(get(CorCol)) & !is.na(Diameter)), get(ID)] #  corrected stems
+    IDCor <- Data[Diameter != get(CorCol) | (is.na(get(CorCol)) & !is.na(Diameter)) | (!is.na(get(CorCol)) & is.na(Diameter)), get(ID)] #  corrected stems
 
     DataCor <- Data[get(ID) %in% IDCor, ] #  corrected stems
 
@@ -122,28 +127,43 @@ DiameterCorrectionPlot <- function(
 
 
   p <- ggplot(DataCor) +
-    aes(x = IdCensus, y = Diameter) +
+    aes(x = IdCensus) +
 
 
-    geom_point(aes(color = "Initial"),  shape = "circle", size = 3.9) +
+    geom_point(aes(y = Diameter, color = "Initial"),  shape = "circle", size = 3.9) +
     # geom_line(linetype = "dotted", color = "grey") +
     ggrepel::geom_text_repel(data = DataCor[ !is.na(Diameter) & !is.na(get(POMv)),],
-                             aes(label = get(POMv), colour = paste("initial", POMv)),
+                             aes(y = Diameter, label = get(POMv), colour = paste("initial", POMv)),
                              point.size = 3.9, size = 3, direction = "y") +
 
-    geom_point(data = DataCor[Diameter == get(CorCol), ], aes(color = "Conserved"),  shape = "circle", size = 3.9) +
+    geom_point(data = DataCor[Diameter == get(CorCol), ], aes(y = get(CorCol), color = "Conserved"),  shape = "circle", size = 3.9) +
 
-    ggrepel::geom_text_repel(data =DataCor[grepl("Missed tree", Comment_TreeData), ],
-                             label = "Missed tree",
+    ggrepel::geom_text_repel(data = DataCor[grepl("Missed measurement", Comment_TreeData), ],
+                             aes(y = get(CorCol)),
+                             label = "Missed measurement",
+                             point.size = 3.9, size = 3, direction = "y")  +
+
+    ggrepel::geom_text_repel(data = DataCor[grepl("Missed stem", Comment_TreeData), ],
+                             aes(y = get(CorCol)),
+                             label = "Missed stem",
+                             point.size = 3.9, size = 3, direction = "y") +
+
+    geom_point(data = DataCor[grepl("Missed recruit", Comment_TreeData), ], aes(y = get(CorCol), shape = DiameterCorrectionMeth_TreeData), color = "forestgreen", size = 3.9) +
+
+
+    ggrepel::geom_text_repel(data = DataCor[grepl("Missed recruit", Comment_TreeData), ],
+                             aes(y = get(CorCol)),
+                             label = "Missed recruit",
                              point.size = 3.9, size = 3, direction = "y") +
 
 
     geom_point(data = DataCor[!is.na(Diameter) & is.na(get(CorCol)), ], aes(y = Diameter, color = "Not able to correct"),  shape = "circle", size = 3.9) +
     ggrepel::geom_text_repel(data =  DataCor[!is.na(Diameter) & is.na(get(CorCol)), ],
                              aes(y = Diameter, label = Comment_TreeData),
+                             color = "purple",
                              point.size = 3.9, size = 3, direction = "y") +
 
-    geom_point(data = DataCor[!is.na(Diameter) & !is.na(get(CorCol)) & Diameter != get(CorCol), ], aes(y = get(CorCol), color = "Corrected", shape = DiameterCorrectionMeth_TreeData), size = 3.9) +
+    geom_point(data = DataCor[(Diameter != get(CorCol)) | (is.na(Diameter) & !is.na(get(CorCol))), ], aes(y = get(CorCol), color = "Corrected", shape = DiameterCorrectionMeth_TreeData), size = 3.9) +
     # geom_line(data = DataCor[!is.na(Diameter) & !is.na(get(CorCol)) & Diameter != get(CorCol), ], aes(y =  get(CorCol), color = "Corrected")) +
     ggrepel::geom_text_repel(data = DataCor[ !is.na(get(CorCol)) & !is.na(get(POMcorv)) & (Diameter != get(CorCol)) | is.na(Diameter), ],
                              aes(y = get(CorCol), label = get(POMcorv), colour = paste("new", POMv)),
@@ -178,9 +198,11 @@ DiameterCorrectionPlot <- function(
 
 
   nPages <- ggforce::n_pages(p+
-    ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = 1))
+    ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = 1))
 
   if(ThisIsShinyApp) {
+
+    p <- lapply(seq_len( nPages), function(k)         p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = k))
 
     return(list(p = p, nPages = nPages, ID = ID, n = n, i = i))
 
@@ -191,7 +213,7 @@ DiameterCorrectionPlot <- function(
 
   for(k in seq_len( nPages)) {
     print(
-      p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName), scales = "free", ncol = min(n,3), nrow = i, page = k)
+      p +   ggforce::facet_wrap_paginate(vars(get(ID), ScientificName_TreeDataCor), scales = "free", ncol = min(n,3), nrow = i, page = k)
 
     )
 
