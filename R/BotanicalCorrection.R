@@ -254,7 +254,7 @@ if(length(pass.this.unique) !=  nrow(tnrs)) stop("some species did not pass thro
 
   if(ThisIsShinyApp) incProgress(1/15)
 
-  # leftovers <- pass.this[!pass.this %in% tnrs$Name_submitted] # I do not know why, but sometimes we have this!
+  # pass.this.unique[!pass.this.unique %in% tnrs$Name_submitted] # I do not know why, but sometimes we have this!
   # if(length(leftovers) > 0) {
   #   tnrs2 <- TNRS::TNRS(leftovers,
   #                      sources = Sources,
