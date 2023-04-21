@@ -1490,6 +1490,17 @@ server <- function(input, output, session) { # server ####
                              shiny:::reactiveStop(showNotification("This is not a .rds file! Please upload a .rds file.", type = 'err', duration = NULL))
                            }))
 
+    missingItemsInOutputProfile <- setdiff(x$ItemID, names(profileOutput()))
+
+    if(length(missingItemsInOutputProfile) > 0) {
+      sendSweetAlert(
+        session = session,
+        title = "Sorry !",
+        text =  paste("The profile you selected is obsolete... It is missing",  paste0(paste(missingItemsInOutputProfile, ": ", x$Label[x$ItemID %in% missingItemsInOutputProfile]), collapse = "; "), ". If this is a preloaded profile, please contact us so we update it. If not, whoever built that profile needs to either update it by reprocessing their data in the app, or they can open the .rds file in R, and add those missing elements to the list."),
+        type = "error")
+    }
+
+
     if(paste(input$MeasLevel, profileOutput()$MeasLevel) %in% apply(rbind(
       expand.grid(i = c("Stem", "Tree"), o = c("Species", "Plot")),
 
