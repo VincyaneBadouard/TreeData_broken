@@ -65,9 +65,7 @@ Inspired by the code of Nino Page package (ForestData::correct_alive() and
 <span>  DeathConfirmation <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  UseSize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  AddRowsForForgottenCensuses <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span>,</span>
-<span>  RemoveRBeforeAlive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  RemoveRAfterDeath <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  KeepMeas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MaxHOM"</span>, <span class="st">"MaxDate"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,23 +102,13 @@ Possible values: "MaxHOM", "MaxDate" (character).</p><ul><li><p>"MaxHOM": apply 
 year but more recent date)</p></li>
 </ul></dd>
 
-
-<dt>RemoveRBeforeAlive</dt>
-<dd><p>Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)</p></dd>
-
-
-<dt>RemoveRAfterDeath</dt>
-<dd><p>After correction do you want to delete the rows
-concerning the tree after its death? (logical)</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Fill the <em>Comment_TreeData</em> column with error type informations and add
-a <em>LifeStatus_TreeDataCor</em> column with corrected trees life status.</p>
+<p>Fill the <em>Comment_TreeData</em> column with error type information and add
+a <em>LifeStatus_TreeDataCor</em> column with corrected trees life status. If AddRowsForForgottenCensuses is TRUE, a column <em>MissedStem_TreeDataCor</em> is added with value TRUE for new rows.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

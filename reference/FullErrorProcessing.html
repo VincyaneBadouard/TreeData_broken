@@ -56,8 +56,6 @@
 <span>  DeathConfirmation <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  UseSize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  AddRowsForForgottenCensuses <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  RemoveRBeforeAlive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  RemoveRAfterDeath <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  UseTaperCorrection <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  DefaultHOM <span class="op">=</span> <span class="fl">1.3</span>,</span>
 <span>  TaperParameter <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">DAB</span>, <span class="va">HOM</span><span class="op">)</span> <span class="fl">0.156</span> <span class="op">-</span> <span class="fl">0.023</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">DAB</span><span class="op">)</span> <span class="op">-</span> <span class="fl">0.021</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">HOM</span><span class="op">)</span>,</span>
@@ -99,16 +97,6 @@ tree (logical) (Default = FALSE)</p></dd>
 
 <dt>AddRowsForForgottenCensuses</dt>
 <dd><p>TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).</p></dd>
-
-
-<dt>RemoveRBeforeAlive</dt>
-<dd><p>Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)</p></dd>
-
-
-<dt>RemoveRAfterDeath</dt>
-<dd><p>After correction do you want to delete the rows
-concerning the tree after its death? (logical)</p></dd>
 
 
 <dt>UseTaperCorrection</dt>
