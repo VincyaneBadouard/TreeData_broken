@@ -117,6 +117,8 @@
 #'   - *HOM_TreeDataCor* (numeric): HOM value at which the corrected diameters
 #'       are proposed. Corresponds to the 1st HOM value at which the stem was
 #'       measured.
+#'   - *MissedStem_TreeDataCor* if AddMissedStems is TRUE (with value TRUE for new rows).
+#'   - *MissedRecruit_TreeDataCor* if AddMissedRecruits is TRUE (with value TRUE for new rows).
 #'
 #' @details When there is only 1 `Diameter` value for a tree/stem,
 #'   `Diameter_TreeDataCor` takes the original `Diameter` value. If this value
@@ -987,8 +989,8 @@ DiameterCorrection <- function(
 
         NewRows$LifeStatus_TreeDataCor <- TRUE
 
-        NewRows$MissedTree <- TRUE
-        Data$MissedTree <- FALSE
+        NewRows$MissedTree_TreeDataCor <- TRUE
+        Data$MissedTree_TreeDataCor <- FALSE
 
         # make best guess at other things
 
@@ -999,8 +1001,16 @@ DiameterCorrection <- function(
 
         # Add these rows in the dataset
         Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
-        if(addrows %in% "AddMissedRecruits" & nrow(NewRows) >0 )  AllWarnings <- c(AllWarnings, "We added rows for trees that were supposed to be recruited earlier based on linear extrapolation of growth and MinDBH")
-        if(addrows %in% "AddMissedStems" & nrow(NewRows) >0 )  AllWarnings <- c(AllWarnings, "We added rows for trees that were missed and estimated their missed DBH by linear interpolation")
+        if(addrows %in% "AddMissedRecruits")  {
+          AllWarnings <- c(AllWarnings, "We added rows for trees that were supposed to be recruited earlier based on linear extrapolation of growth and MinDBH")
+          NewRows$MissedRecruit_TreeDataCor <- TRUE
+          Data$MissedRecruit_TreeDataCor <- FALSE
+        }
+        if(addrows %in% "AddMissedStems" ) {
+          AllWarnings <- c(AllWarnings, "We added rows for trees that were missed and estimated their missed DBH by linear interpolation")
+          NewRows$MissedStem_TreeDataCor <- TRUE
+          Data$MissedStem_TreeDataCor <- FALSE
+        }
 
       }
 

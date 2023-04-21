@@ -45,8 +45,6 @@ FullErrorProcessing <- function(
   DeathConfirmation = 2,
   UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
-  RemoveRBeforeAlive = FALSE,
-  RemoveRAfterDeath = FALSE,
 
 
   # Diameter
@@ -104,10 +102,10 @@ FullErrorProcessing <- function(
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath/OnlyDetectMissedRecruits
-  if (!all(unlist(lapply(list(UseSize, RemoveRBeforeAlive, RemoveRAfterDeath, OnlyDetectMissedRecruits),
+  # UseSize/OnlyDetectMissedRecruits
+  if (!all(unlist(lapply(list(UseSize, OnlyDetectMissedRecruits),
                          inherits, "logical"))))
-    stop("The 'UseSize', 'RemoveRBeforeAlive', 'OnlyDetectMissedRecruits', and 'RemoveRAfterDeath' arguments
+    stop("The 'UseSize' and 'OnlyDetectMissedRecruits' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # UseSize-Diameter
@@ -184,9 +182,7 @@ FullErrorProcessing <- function(
   Data <- StatusCorrection(Data,
                            DeathConfirmation = DeathConfirmation,
                            UseSize = UseSize,
-                           AddRowsForForgottenCensuses = AddRowsForForgottenCensuses,
-                           RemoveRBeforeAlive = RemoveRBeforeAlive,
-                           RemoveRAfterDeath = RemoveRAfterDeath)
+                           AddRowsForForgottenCensuses = AddRowsForForgottenCensuses)
 
 
   #### Diameter ####

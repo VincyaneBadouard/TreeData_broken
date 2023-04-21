@@ -153,6 +153,8 @@ Corresponds to the 1st POM value at which the stem was measured.
 \item \emph{HOM_TreeDataCor} (numeric): HOM value at which the corrected diameters
 are proposed. Corresponds to the 1st HOM value at which the stem was
 measured.
+\item \emph{MissedStem_TreeDataCor} if AddMissedStems is TRUE (with value TRUE for new rows).
+\item \emph{MissedRecruit_TreeDataCor} if AddMissedRecruits is TRUE (with value TRUE for new rows).
 }
 }
 \description{

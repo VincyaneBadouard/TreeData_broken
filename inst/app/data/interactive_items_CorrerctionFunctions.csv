@@ -49,23 +49,7 @@ year but more recent date)
 </li>
 </ul>
 </td>
-</tr>
-","StatusCorrectionKeepMeas","c(""MaxHOM"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""MaxHOM"", ""MaxDate"")",FALSE
-"StatusCorrection","<tr valign=""top"">
-<td><code>RemoveRBeforeAlive</code></td>
-<td>
-<p>Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)</p>
-</td>
-</tr>
-","StatusCorrectionRemoveRBeforeAlive","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
-"StatusCorrection","<tr valign=""top"">
-<td><code>RemoveRAfterDeath</code></td>
-<td>
-<p>After correction do you want to delete the rows
-concerning the tree after its death? (logical)</p>
-</td>
-</tr>","StatusCorrectionRemoveRAfterDeath","FALSE","pickerInput","FALSE","list(`live-search` = TRUE)","choices","selected","LogicalOptions",TRUE
+</tr>","StatusCorrectionKeepMeas","c(""MaxHOM"")","pickerInput","TRUE","list( `actions-box` = TRUE)","choices","selected","c(""MaxHOM"", ""MaxDate"")",FALSE
 "DiameterCorrection","<tr valign=""top"">
 <td><code>UseTaperCorrection</code></td>
 <td>

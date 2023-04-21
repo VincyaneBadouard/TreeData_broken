@@ -28,12 +28,6 @@
 #' @param AddRowsForForgottenCensuses TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).
 #'
 #'
-#' @param RemoveRBeforeAlive Do you want to delete the rows about the tree
-#'   before it was seen alive for the 1st time? (logical)
-#'
-#' @param RemoveRAfterDeath After correction do you want to delete the rows
-#'   concerning the tree after its death? (logical)
-#'
 #' @details
 #' - if UseSize : if Diameter != NA -> Alive
 #' If (the value in bold is modified by the value given after the arrow):
@@ -48,8 +42,8 @@
 #'   if DeathConfirmation > unseens -> NA
 #'   if DeathConfirmation =< unseens -> Dead
 #'
-#' @return Fill the *Comment_TreeData* column with error type informations and add
-#'  a *LifeStatus_TreeDataCor* column with corrected trees life status.
+#' @return Fill the *Comment_TreeData* column with error type information and add
+#'  a *LifeStatus_TreeDataCor* column with corrected trees life status. If AddRowsForForgottenCensuses is TRUE, a column *MissedStem_TreeDataCor* is added with value TRUE for new rows.
 #'
 #' @importFrom data.table data.table rbindlist
 #' @importFrom stats na.omit
@@ -81,13 +75,13 @@ StatusCorrection <- function(
     DeathConfirmation = 2,
     UseSize = FALSE,
     AddRowsForForgottenCensuses = TRUE,
-    KeepMeas = c("MaxHOM", "MaxDate"),
-    RemoveRBeforeAlive = FALSE,
-    RemoveRAfterDeath = FALSE){
+    KeepMeas = c("MaxHOM", "MaxDate")){
 
 
   ThisIsShinyApp =  shiny::isRunning() # this is for internal use when function used by Shiny app
 
+  # prepare a place to hold all warnings so we get only one pop up window
+  AllWarnings <- NULL
 
   InvariantColumns = c("Site", "IdTree", "MinDBH",
                        "Cluster", "Plot", "PlotArea", "PlotElevation", "Subplot",
@@ -135,10 +129,10 @@ StatusCorrection <- function(
   if (!inherits(DeathConfirmation, "numeric"))
     stop("'DeathConfirmation' argument must be numeric")
 
-  # UseSize/RemoveRBeforeAlive/RemoveRAfterDeath
-  if (!all(unlist(lapply(list(UseSize, RemoveRBeforeAlive, RemoveRAfterDeath, AddRowsForForgottenCensuses),
+  # UseSize and AddRowsForForgottenCensuses
+  if (!all(unlist(lapply(list(UseSize,AddRowsForForgottenCensuses),
                          inherits, "logical"))))
-    stop("The 'UseSize', 'RemoveRBeforeAlive', 'AddRowsForForgottenCensuses' and 'RemoveRAfterDeath' arguments
+    stop("The 'UseSize' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
   # use corrected columns as InvariantColumns if they exist (mostly for Species names that may have been corrected)
@@ -402,12 +396,16 @@ if(ThisIsShinyApp) incProgress(1/15)
     NewRows$Comment_TreeData <- "Missed stem"
 
     # make best guess at other things
-    warning("We added rows for missing trees and imputed average census Date")
+    AllWarnings <- c(AllWarnings, "We added rows for missing trees and imputed average census Date")
+
     NewRows$Date <- as.Date(tapply(Data$Date, Data$IdCensus, mean, na.rm = T), origin = "1970-01-01")[NewRows$IdCensus]
 
     NewRows$Year <- format(NewRows$Date, "%Y")
     NewRows$Month <- format(NewRows$Date, "%m")
     NewRows$Day <- format(NewRows$Date, "%d")
+
+    NewRows$MissedStem_TreeDataCor <- TRUE
+    Data$MissedStem_TreeDataCor <- FALSE
 
     # Add these rows in the dataset
     Data <- rbindlist(list(Data, NewRows), use.names=TRUE, fill=TRUE)
@@ -434,6 +432,9 @@ if(ThisIsShinyApp) incProgress(1/15)
   Data <- Data[order(get(ID), IdCensus )]
 
   if(ThisIsShinyApp) incProgress(1/15)
+
+  if(!is.null(AllWarnings)) warning(paste(AllWarnings, collapse = "\n"))
+
   # return Data
   return(Data)
 

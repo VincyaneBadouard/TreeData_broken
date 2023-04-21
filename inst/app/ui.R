@@ -460,7 +460,7 @@ body <- dashboardBody(
                                label = div("Use a predifined format?", br(), em("(if your data follows one of the following network template)")),
                                choices = list("No thanks!" = "No",
                                               # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
-                                              "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO",
+                                              "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGeo",
                                               "App's profile (if the data you upload was downloaded from this app, using this app's standards)" = "App"#,
                                               # "RBA: Red de Bosques Andinos" = "RBA"
                                ),
@@ -687,7 +687,7 @@ tabItem("Codes",
                                       choices = list("No thanks! I'll upload a profile I have handy." = "No",
                                                      "This App's standard" = "App",
                                                      # "ATDN: The Amazon Tree Diversity Network" = "ATDN",
-                                                     "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGEO"#,
+                                                     "ForestGEO: The Smithsonian Forest Global Earth Observatory" = "ForestGeo"#,
                                                      # "RBA: Red de Bosques Andinos" = "RBA"
                                       ),
                                       selected = "No"),

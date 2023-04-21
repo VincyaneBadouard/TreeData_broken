@@ -9,9 +9,7 @@ StatusCorrection(
   DeathConfirmation = 2,
   UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
-  KeepMeas = c("MaxHOM", "MaxDate"),
-  RemoveRBeforeAlive = FALSE,
-  RemoveRAfterDeath = FALSE
+  KeepMeas = c("MaxHOM", "MaxDate")
 )
 }
 \arguments{
@@ -38,16 +36,10 @@ Possible values: "MaxHOM", "MaxDate" (character).
 \item "MaxDate": apply the correction to the \strong{most recent measurement} (same
 year but more recent date)
 }}
-
-\item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)}
-
-\item{RemoveRAfterDeath}{After correction do you want to delete the rows
-concerning the tree after its death? (logical)}
 }
 \value{
-Fill the \emph{Comment_TreeData} column with error type informations and add
-a \emph{LifeStatus_TreeDataCor} column with corrected trees life status.
+Fill the \emph{Comment_TreeData} column with error type information and add
+a \emph{LifeStatus_TreeDataCor} column with corrected trees life status. If AddRowsForForgottenCensuses is TRUE, a column \emph{MissedStem_TreeDataCor} is added with value TRUE for new rows.
 }
 \description{
 Detect errors, or detect errors and correct, the tree life

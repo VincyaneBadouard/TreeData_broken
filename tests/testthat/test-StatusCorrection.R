@@ -63,10 +63,8 @@ test_that("StatusCorrection", {
 
   expect_error(StatusCorrection(TestData,
                                 UseSize = "yes",
-                                AddRowsForForgottenCensuses = "no",
-                                RemoveRBeforeAlive = 1,
-                                RemoveRAfterDeath = "FALSE"),
-               regexp = "The 'UseSize', 'RemoveRBeforeAlive', 'AddRowsForForgottenCensuses' and 'RemoveRAfterDeath' arguments
+                                AddRowsForForgottenCensuses = "no"),
+               regexp = "The 'UseSize' and 'RemoveRAfterDeath' arguments
          of the 'SatusCorrection' function must be logicals")
 
 

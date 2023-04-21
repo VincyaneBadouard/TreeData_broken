@@ -9,8 +9,6 @@ FullErrorProcessing(
   DeathConfirmation = 2,
   UseSize = FALSE,
   AddRowsForForgottenCensuses = TRUE,
-  RemoveRBeforeAlive = FALSE,
-  RemoveRAfterDeath = FALSE,
   UseTaperCorrection = TRUE,
   DefaultHOM = 1.3,
   TaperParameter = function(DAB, HOM) 0.156 - 0.023 * log(DAB) - 0.021 * log(HOM),
@@ -43,12 +41,6 @@ to be considered dead (numeric)  (Default = 2 censuses)}
 tree (logical) (Default = FALSE)}
 
 \item{AddRowsForForgottenCensuses}{TRUE: adds rows for forgotten censuses, FALSE: does not add any rows (logical).}
-
-\item{RemoveRBeforeAlive}{Do you want to delete the rows about the tree
-before it was seen alive for the 1st time? (logical)}
-
-\item{RemoveRAfterDeath}{After correction do you want to delete the rows
-concerning the tree after its death? (logical)}
 
 \item{UseTaperCorrection}{(logical) TRUE: transform the tree diameter measured at a given height
 into the diameter corresponding to the default measurement height (\code{DefaultHOM}), using an allometry.
