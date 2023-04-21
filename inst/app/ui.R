@@ -636,20 +636,6 @@ tabItem("Codes",
                   color = "warning"
                 )
             ),
-
-            lapply(unique(xCorr$Function), function(f) {
-              box(
-                title = f,
-                radioButtons(inputId = f, label = paste("Apply", f, "?"), choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
-                hidden(div(id = paste0(f, "Yes"),
-
-                lapply(which(xCorr$Function %in% f), function(i) {
-                  # eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-                  eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))")), ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))"))), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
-                })
-              )
-              ))
-            }),
             fluidRow(
             hidden(actionBttn(
               inputId = "ApplyCorrections",
@@ -664,6 +650,20 @@ tabItem("Codes",
               color = "success"
             ))
             ),
+            lapply(unique(xCorr$Function), function(f) {
+              box(
+                title = f,
+                radioButtons(inputId = f, label = paste("Apply", f, "?"), choices = list("Yes" = "Yes", "No" = "No"), selected = "No"),
+                hidden(div(id = paste0(f, "Yes"),
+
+                lapply(which(xCorr$Function %in% f), function(i) {
+                  # eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], " = eval(parse(text = '", xCorr$Default[i], "'))", ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], " = eval(parse(text = '",xCorr$Default[i], "'))"), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                  eval(parse(text = paste0(xCorr$ItemType[i], "(inputId = xCorr$ItemID[i], label = div(HTML(xCorr$Label[i])),", xCorr$Argument[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))")), ifelse(xCorr$Argument2[i] != FALSE, paste0(", ", xCorr$Argument2[i], ifelse(grepl("input", xCorr$Default[i]), " = 'pending'", paste0(" = eval(parse(text = '", xCorr$Default[i], "'))"))), ""), ifelse(xCorr$Options[i] != FALSE, paste0(", options = ", xCorr$Options[i]), ""), ifelse(xCorr$Multiple[i] %in% TRUE, ", multiple = TRUE)", ")"))))
+                })
+              )
+              ))
+            }),
+
             fluidRow(
 
               column(width = 12,
