@@ -77,6 +77,8 @@ test_that("StatusCorrection", {
 
   expect_warning(StatusCorrection(TestData), "We added rows for missing trees and imputed average census Date")
 
+  expect_equal(nrow(TestData), nrow(StatusCorrection(TestData, AddRowsForForgottenCensuses = FALSE)))
+
   Rslt <- suppressWarnings(StatusCorrection(TestData, UseSize = TRUE))
 
   Ids <- as.vector(na.omit(unique(TestData$IdTree))) # Tree Ids
