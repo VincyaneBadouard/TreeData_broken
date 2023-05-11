@@ -1,5 +1,4 @@
 
-# Fichier pour gérer les interactions de l'application Shiny
 
 # install and load libraries
 # devtools::install_github("VincyaneBadouard/TreeData")
@@ -79,6 +78,21 @@ js <- c( # --- this is to edit CODES table
 # start server code here
 
 server <- function(input, output, session) { # server ####
+
+  observe( {
+    sendSweetAlert(
+      title = "Sorry !",
+      text = tags$span("This app is not longer maintained in this repository!",
+                      "Please use the following lines of code to get to the maintained version:",
+                      tags$code('devtools::install_github("Alliance-for-Tropical-Forest-Science/DataHarmonization", build_vignettes = TRUE)'),
+                      tags$br(),
+                      tags$code('shiny::runGitHub( "Alliance-for-Tropical-Forest-Science/DataHarmonization", subdir = "inst/app")')),
+      type = "error",
+      closeOnClickOutside = FALSE,
+      btn_labels = NA,
+      html = T
+      )
+  })
 
   # open browser #
 
